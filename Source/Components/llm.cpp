@@ -540,9 +540,9 @@ void ChatComponent::run()
     // 定义 Python 解释器路径和 Python 脚本路径
     //const char* pythonInterpreterPath = R"(E:\c++\day11\PythonApplication\env\Scripts\python.exe)";
     //const char* pythonScriptPath = R"("E:\c++\juceproject\juceEffector\supertonal\Source\llm.py")";
-    const char* pythonInterpreterPath = R"(E:\c++\effector\supertonal\Builds\PythonApplication\env\Scripts\python.exe)";
+    const char* pythonInterpreterPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\env\Scripts\python.exe)";
     //const char* pythonScriptPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\llm.py)";
-    const char* pythonScriptPath = R"("E:\c++\effector\supertonal\Builds\PythonApplication\llm.py")";
+    const char* pythonScriptPath = R"("E:\c++\juceproject\juceEffector\supertonal\Source\llm.py")";
     // 构建执行 Python 脚本的命令，将用户输入的信息作为参数传递给 Python 脚本
     std::string command = pythonInterpreterPath;
     command += " ";
@@ -564,7 +564,7 @@ void ChatComponent::run()
         updateStatus("Python script executed successfully");
 
         // 读取 result.txt 文件
-        std::ifstream file(R"(C:\Users\Lenovo56\Desktop\result.txt)");
+        std::ifstream file(R"(C:\Users\80753\Desktop\result.txt)");
         if (!file.is_open()) {
             std::cerr << "无法打开 result.txt 文件" << std::endl;
             updateStatus("无法打开 result.txt 文件");

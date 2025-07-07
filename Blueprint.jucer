@@ -27,9 +27,9 @@
             file="Assets/WorkSans-Regular.ttf"/>
     </GROUP>
     <GROUP id="{051B3464-46EA-0C7D-826E-4111001F4D4C}" name="Source">
-      <FILE id="IfkJ4G" name="test.py" compile="0" resource="1" file="Source/Components/PythonApplication/test.py"/>
-      <FILE id="Jf3s69" name="sql.py" compile="0" resource="1" file="Source/Components/PythonApplication/sql.py"/>
-      <FILE id="iZVWW6" name="llm.py" compile="0" resource="1" file="Source/Components/PythonApplication/llm.py"/>
+      <FILE id="JaEfIn" name="test.py" compile="0" resource="1" file="Source/test.py"/>
+      <FILE id="jeIrYO" name="sql.py" compile="0" resource="1" file="Source/sql.py"/>
+      <FILE id="hUjCWB" name="llm.py" compile="0" resource="1" file="Source/llm.py"/>
       <GROUP id="{E61AEAD2-A27B-4077-58C6-0AA347A325BE}" name="Utilities">
         <FILE id="zIhfUN" name="CircuitQuantityHelper.cpp" compile="1" resource="0"
               file="Source/Utilities/CircuitQuantityHelper.cpp"/>

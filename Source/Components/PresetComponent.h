@@ -86,7 +86,13 @@ private:
             std::string userMessage = readEnvWithType<std::string>("user_Message");
             // 在日志中打印 userMessage 的值
             juce::Logger::writeToLog("userMessage:" + juce::String(userMessage));
-
+           
+            if (userMessage.empty()) {
+                // 在日志中打印 userMessage 的值
+                juce::Logger::writeToLog("userMessage is empty" + juce::String(userMessage));
+                return;
+            }
+            
             // 收集所有效果器的开关状态
             const auto index1 = presetManager.getParameterValue("pre_compressor_on");
             const auto index2 = presetManager.getParameterValue("tube_screamer_on");
@@ -301,9 +307,9 @@ private:
             juce::Logger::writeToLog("paramString:" + juce::String(paramString));
             
             // 定义 Python 解释器路径和 Python 脚本路径
-            const char* pythonInterpreterPath = R"(E:\c++\effector\supertonal\Builds\PythonApplication\env\Scripts\python.exe)";
+            const char* pythonInterpreterPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\env\Scripts\python.exe)";
             //const char* pythonScriptPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\sql.py)";
-            const char* pythonScriptPath = R"("E:\c++\effector\supertonal\Builds\PythonApplication\sql.py")";
+            const char* pythonScriptPath = R"("E:\c++\juceproject\juceEffector\supertonal\Source\sql.py")";
             
             // 构建执行 Python 脚本的命令，将所有参数传递给 Python 脚本
             std::string command = pythonInterpreterPath;
