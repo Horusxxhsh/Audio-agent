@@ -6,6 +6,9 @@ import math
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from openai import OpenAI
+import pandas as pd
+import xml.etree.ElementTree as ET
+import os
 
 # 定义 MemoryNote 类
 class MemoryNote:
@@ -32,6 +35,27 @@ def text_similarity(text1, text2):
     vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform([text1, text2])
     return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+
+
+# 更新预设文件
+def update_preset_in_file(file_path, params_dict):
+    try:
+        tree = ET.parse(file_path)
+        root = tree.getroot()
+        
+        # 更新参数
+        for param in root.findall('PARAM'):
+            param_id = param.get('id')
+            if param_id in params_dict:
+                param.set('value', str(params_dict[param_id]))
+        
+        # 保存更新后的内容
+        tree.write(file_path, encoding='utf-8', xml_declaration=True)
+        print(f"预设文件 {file_path} 已更新")
+        return True
+    except Exception as e:
+        print(f"更新预设文件出错: {e}")
+        return False
 
 try:
     # 读取 result1.txt 文件
@@ -69,7 +93,7 @@ try:
     #测试路径
     #conn = sqlite3.connect(r'E:\c++\day11\PythonApplication\music_info.db')
     #实验路径
-    conn = sqlite3.connect(r'E:\c++\juceproject\juceEffector\supertonal\Builds\VisualStudio2022\music_info.db')
+    conn = sqlite3.connect(r'C:\Users\80753\Documents\GitHub\supertonal\Builds\VisualStudio2022\music_info.db')
     cursor = conn.cursor()
 
     # 获取index的值
@@ -518,7 +542,160 @@ try:
                             if 'new_parameter_neighborhood' in result3:
                                 new_params_list = result3['new_parameter_neighborhood']
                                 total_updates = 0
+                                
+                                # 假设使用第一个邻居的参数来更新预设文件
+                                if new_params_list:
+                                    for index, neighbor_params in enumerate(new_params_list):
+                                        print(f"new_params_list:{neighbor_params}")
+                                        # 转换参数格式以匹配Excel预设文件
+                                        excel_params = {}
+        
+                                        # 示例：根据邻居参数更新预设文件中的参数
+                                        # 注意：需要根据实际参数映射关系调整
+                                        param_mapping = {
+                                        # 开关控制映射
+                                        "CompressorOn": ("pre_compressor_on", 1),  # 开启时
+                                        "CompressorOff": ("pre_compressor_on", 0),  # 关闭时
+                                        "ScreamerOn": ("tube_screamer_on", 1),
+                                        "ScreamerOff": ("tube_screamer_on", 0),
+                                        "DriverOn": ("mouse_drive_on", 1),
+                                        "DriverOff": ("mouse_drive_on", 0),
+                                        "DelayOn": ("delay_on", 1),
+                                        "DelayOff": ("delay_on", 0),
+                                        "ReverbOn": ("room_on", 1),
+                                        "ReverbOff": ("room_on", 0),
+                                        "ChorusOn": ("chorus_on", 1),  # 新增开启状态映射
+                                        "ChorusOff": ("chorus_on", 0),
+                                        "FlangerOn": ("flanger_on", 1),  # 新增开启状态映射
+                                        "FlangerOff": ("flanger_on", 0),
+                                        "PhaserOn": ("phaser_on", 1),  # 新增开启状态映射
+                                        "PhaserOff": ("phaser_on", 0),
+                                        "EqualiserOn": ("pre_eq_on", 1),
+                                        "EqualiserOff": ("pre_eq_on", 0),
+
+                                        # 参数值映射 (使用相对路径)
+                                        "CompressorOn.Threshold": "pre_comp_thresh",
+                                        "CompressorOn.Ratio": "pre_comp_ratio",
+                                        "CompressorOn.Attack": "pre_comp_attack",
+                                        "CompressorOn.Release": "pre_comp_release",
+                                        "CompressorOn.Mix": "pre_comp_blend",
+                                        "CompressorOn.Makeup": "pre_comp_gain",
+                                        "CompressorOff.Threshold": "pre_comp_thresh",
+                                        "CompressorOff.Ratio": "pre_comp_ratio",
+                                        "CompressorOff.Attack": "pre_comp_attack",
+                                        "CompressorOff.Release": "pre_comp_release",
+                                        "CompressorOff.Mix": "pre_comp_blend",
+                                        "CompressorOff.Makeup": "pre_comp_gain",
+                                        "ScreamerOn.Drive": "tube_screamer_drive",
+                                        "ScreamerOn.Tone": "tube_screamer_tone",
+                                        "ScreamerOn.Level": "tube_screamer_level",
+                                        "ScreamerOff.Drive": "tube_screamer_drive",
+                                        "ScreamerOff.Tone": "tube_screamer_tone",
+                                        "ScreamerOff.Level": "tube_screamer_level",
+                                        "DriverOn.Distortion": "mouse_drive_distortion",
+                                        "DriverOn.Volume": "mouse_drive_volume",
+                                        "DriverOff.Distortion": "mouse_drive_distortion",
+                                        "DriverOff.Volume": "mouse_drive_volume",
+                                        "DelayOn.Feedback": "delay_feedback",
+                                        "DelayOn.Delay": "delay_left_millisecond",
+                                        "DelayOn.Mix": "delay_mix",
+                                        "DelayOff.Feedback": "delay_feedback",
+                                        "DelayOff.Delay": "delay_left_millisecond",
+                                        "DelayOff.Mix": "delay_mix",
+                                        "ReverbOn.Size": "room_size",
+                                        "ReverbOn.Damping": "room_damping",
+                                        "ReverbOn.Width": "room_width",
+                                        "ReverbOn.Mix": "room_mix",
+                                        "ReverbOff.Size": "room_size",
+                                        "ReverbOff.Damping": "room_damping",
+                                        "ReverbOff.Width": "room_width",
+                                        "ReverbOff.Mix": "room_mix",
+                                        "ChorusOn.Delay": "chorus_delay",
+                                        "ChorusOn.Depth": "chorus_depth",
+                                        "ChorusOn.Frequency": "chorus_frequency",
+                                        "ChorusOn.Width": "chorus_width",
+                                        "ChorusOff.Delay": "chorus_delay",
+                                        "ChorusOff.Depth": "chorus_depth",
+                                        "ChorusOff.Frequency": "chorus_frequency",
+                                        "ChorusOff.Width": "chorus_width",
+                                        "FlangerOn.Delay": "flanger_delay",
+                                        "FlangerOn.Depth": "flanger_depth",
+                                        "FlangerOn.Feedback": "flanger_feedback",
+                                        "FlangerOn.Frequency": "flanger_frequency",
+                                        "FlangerOn.Width": "flanger_width",
+                                        "FlangerOff.Delay": "flanger_delay",
+                                        "FlangerOff.Depth": "flanger_depth",
+                                        "FlangerOff.Feedback": "flanger_feedback",
+                                        "FlangerOff.Frequency": "flanger_frequency",
+                                        "FlangerOff.Width": "flanger_width",
+                                        "PhaserOn.Depth": "phaser_depth",
+                                        "PhaserOn.Feedback": "phaser_feedback",
+                                        "PhaserOn.Frequency": "phaser_frequency",
+                                        "PhaserOn.Width": "phaser_width",
+                                        "PhaserOff.Depth": "phaser_depth",
+                                        "PhaserOff.Feedback": "phaser_feedback",
+                                        "PhaserOff.Frequency": "phaser_frequency",
+                                        "PhaserOff.Width": "phaser_width",
+                                        "EqualiserOn.100hz": "pre_eq_100_gain",
+                                        "EqualiserOn.200hz": "pre_eq_200_gain",
+                                        "EqualiserOn.400hz": "pre_eq_400_gain",
+                                        "EqualiserOn.800hz": "pre_eq_800_gain",
+                                        "EqualiserOn.1600hz": "pre_eq_1600_gain",
+                                        "EqualiserOn.3200hz": "pre_eq_3200_gain",
+                                        "EqualiserOn.6400hz": "pre_eq_6400_gain",
+                                        "EqualiserOn.Level": "pre_eq_level_gain",
+                                        "EqualiserOff.100hz": "pre_eq_100_gain",
+                                        "EqualiserOff.200hz": "pre_eq_200_gain",
+                                        "EqualiserOff.400hz": "pre_eq_400_gain",
+                                        "EqualiserOff.800hz": "pre_eq_800_gain",
+                                        "EqualiserOff.1600hz": "pre_eq_1600_gain",
+                                        "EqualiserOff.3200hz": "pre_eq_3200_gain",
+                                        "EqualiserOff.6400hz": "pre_eq_6400_gain",
+                                        "EqualiserOff.Level": "pre_eq_level_gain"
+                                        }
     
+                                        # 1. 优先处理顶层开关状态（如 CompressorOff）
+                                        for key in neighbor_params:
+                                            if key in param_mapping:
+                                                # 若为开关状态（映射值为元组），提取参数名和值
+                                                if isinstance(param_mapping[key], tuple):
+                                                    param_id, param_value = param_mapping[key]
+                                                    excel_params[param_id] = param_value
+                                                    print(f"处理开关状态: {key} -> {param_id} = {param_value}")  # 日志跟踪
+    
+                                        # 2. 处理嵌套参数（如 CompressorOn.Threshold 等）
+                                        for key, value in neighbor_params.items():
+                                            if isinstance(value, dict):
+                                                # 处理嵌套字典（如 DriverOn.Distortion）
+                                                for sub_key, sub_value in value.items():
+                                                    full_key = f"{key}.{sub_key}"
+                                                    if full_key in param_mapping:
+                                                        param_id = param_mapping[full_key]
+                                                        excel_params[param_id] = sub_value
+                                            else:
+                                                # 处理非嵌套的参数值（若有）
+                                                if key in param_mapping and not isinstance(param_mapping[key], tuple):
+                                                    param_id = param_mapping[key]
+                                                    excel_params[param_id] = value
+    
+                                        # 打印生成的 excel_params，验证 pre_compressor_on 是否为 0
+                                        print(f"生成的预设参数: {excel_params.get('pre_compressor_on')}")
+                                        # 预设文件路径
+                                        if index < len(similar_songs):
+                                            song_name = similar_songs[index][0]
+                                            preset_file_path = fr"C:\Users\Public\Documents\Supertonal DSP\Blueprint Cory Bergeron2\{song_name}.preset"  
+                                            try:
+                                             # 更新预设文件
+                                              if update_preset_in_file(preset_file_path, excel_params):
+                                                print(f"预设文件 {song_name}.preset 更新成功")
+                                              else:
+                                                print(f"预设文件 {song_name}.preset 更新失败，继续执行后续代码")
+                                            except FileNotFoundError:
+                                              print(f"预设文件路径 {preset_file_path} 不存在，继续执行后续代码")
+                                            except Exception as e:
+                                              print(f"更新预设文件时出现未知错误: {e}，继续执行后续代码")
+                                    
+      
                                 # 遍历所有相似歌曲
                                 for i, (song_name, similarity, _, _, _) in enumerate(similar_songs):
                                     # 检查是否有对应的新参数

@@ -2,7 +2,7 @@
 import sqlite3
 
 # 连接到数据库
-conn = sqlite3.connect(r'E:\c++\juceproject\juceEffector\supertonal\Builds\VisualStudio2022\music_info.db')
+conn = sqlite3.connect(r'C:\Users\80753\Documents\GitHub\supertonal\Builds\VisualStudio2022\music_info.db')
 #conn = sqlite3.connect(r'E:\c++\day11\day11\music_info.db')
 cursor = conn.cursor()
 

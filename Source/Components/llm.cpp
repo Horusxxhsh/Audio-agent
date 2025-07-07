@@ -542,7 +542,7 @@ void ChatComponent::run()
     //const char* pythonScriptPath = R"("E:\c++\juceproject\juceEffector\supertonal\Source\llm.py")";
     const char* pythonInterpreterPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\env\Scripts\python.exe)";
     //const char* pythonScriptPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\llm.py)";
-    const char* pythonScriptPath = R"("E:\c++\juceproject\juceEffector\supertonal\Source\llm.py")";
+    const char* pythonScriptPath = R"("C:\Users\80753\Documents\GitHub\supertonal\Source\llm.py")";
     // 构建执行 Python 脚本的命令，将用户输入的信息作为参数传递给 Python 脚本
     std::string command = pythonInterpreterPath;
     command += " ";
