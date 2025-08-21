@@ -8,12 +8,13 @@ import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# 使用当前路径连接到数据库
-db_path = os.path.join(os.getcwd(), 'music_info.db')
-print(f"Database path: {db_path}")  # 打印数据库文件路径
+# 使用C盘固定路径连接到数据库
+db_dir = "C:\\MusicData"
+if not os.path.exists(db_dir):
+       os.makedirs(db_dir)  # 创建目录（如果不存在）
+db_path = os.path.join(db_dir, "music_info.db")
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
-
 # 删除表
 '''
 try:

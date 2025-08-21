@@ -559,6 +559,7 @@ void ChatComponent::run()
         std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
         std::cerr << "执行的命令: " << command << std::endl;
         updateStatus("Python script execution failed");
+        updateStatus("command:" + command);
     }
     else {
         updateStatus("Python script executed successfully");

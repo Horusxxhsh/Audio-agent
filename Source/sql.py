@@ -89,13 +89,12 @@ def get_ratio(value):
     return mapping.get(value)
 
 try:
-    # 连接到数据库
-    #测试路径
-    #conn = sqlite3.connect(r'E:\c++\day11\PythonApplication\music_info.db')
-    #实验路径
-    conn = sqlite3.connect(r'C:\Users\80753\Documents\GitHub\supertonal\Builds\VisualStudio2022\music_info.db')
+    db_dir = "C:\\MusicData"
+    if not os.path.exists(db_dir):
+           os.makedirs(db_dir)  # 创建目录（如果不存在）
+    db_path = os.path.join(db_dir, "music_info.db")
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-
     # 获取index的值
     if len(sys.argv) > 2:
         chat_message = sys.argv[1]  # 获取命令行中c++程序传入的第一个参数
