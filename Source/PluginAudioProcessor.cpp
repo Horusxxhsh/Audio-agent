@@ -1236,7 +1236,7 @@ void PluginAudioProcessor::resetParametersToDefault()
 	double e_32 = readEnvWithType<double>("e_32");
 	double e_64 = readEnvWithType<double>("e_64");
 	double e_Level = readEnvWithType<double>("e_Level");
-	double p_NoiseGateThreshold = readEnvWithType<double>("p_NoiseGateThreshold");
+	//double p_NoiseGateThreshold = readEnvWithType<double>("p_NoiseGateThreshold");
 	for (const auto& parameter : mAudioProcessorValueTreeStatePtr->state)
 	{
 		auto parameterId = parameter.getProperty("id").toString().toStdString();
@@ -1292,7 +1292,7 @@ void PluginAudioProcessor::resetParametersToDefault()
 			parameterInitialValues["pre_eq_3200_gain"] = e_32;
 			parameterInitialValues["pre_eq_6400_gain"] = e_64;
 			parameterInitialValues["pre_eq_level_gain"] = e_Level;
-			parameterInitialValues["noise_gate_threshold"] = p_NoiseGateThreshold;
+			//parameterInitialValues["noise_gate_threshold"] = p_NoiseGateThreshold;
 			// 从 parameterInitialValues 获取初始值
 			
 			if (parameterInitialValues.find(parameterId) != parameterInitialValues.end())

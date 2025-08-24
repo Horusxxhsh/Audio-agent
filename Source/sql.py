@@ -9,6 +9,7 @@ from openai import OpenAI
 import pandas as pd
 import xml.etree.ElementTree as ET
 import os
+import platform
 
 # 定义 MemoryNote 类
 class MemoryNote:
@@ -96,9 +97,19 @@ try:
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     # 获取index的值
-    if len(sys.argv) > 2:
+    if len(sys.argv) > 3:         
         chat_message = sys.argv[1]  # 获取命令行中c++程序传入的第一个参数
         print(f"Chat message: {chat_message}")
+        if platform.system() == "Windows":
+           # Windows命令行通常使用GBK编码
+           user_message = sys.argv[2].encode('cp936').decode('utf-8', errors='replace')
+           currentPresetName = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
+        else:
+           # Linux/macOS通常使用UTF-8
+           user_message = sys.argv[2]
+           currentPresetName = sys.argv[3]
+        print(f"User message: {user_message}")  # 获取命令行中c++程序传入的第二个参数  
+        print(f"currentPresetName: {currentPresetName}")
 
         # 从数据库中获取所有歌曲信息并计算相似度
         cursor.execute("SELECT SongName, Style, Feature, Parameters FROM music_responses")
@@ -112,7 +123,7 @@ try:
             style_str = row[1]
             feature_str = row[2]
             parameter_str = row[3]
-            if song_name != sys.argv[2]:
+            if song_name != user_message:
                 try:
                     style = json.loads(style_str)
                     feature = json.loads(feature_str)
@@ -149,12 +160,9 @@ try:
                 for i in range(9):
                     first_47[i] = float(first_47[i])
 
-                # 获取userMessageToSend的值并进行处理
-                userMessageToSend = sys.argv[2]  # 获取命令行中c++程序传入的第二个参数
-                print(f"userMessageToSend: {userMessageToSend}")
 
                 # 查询匹配的记录
-                cursor.execute("SELECT SongName, Style, Feature, Parameters FROM music_responses WHERE SongName =?", (userMessageToSend,))
+                cursor.execute("SELECT SongName, Style, Feature, Parameters FROM music_responses WHERE SongName =?", (user_message,))
                 row = cursor.fetchone()
 
                 if row:
@@ -469,7 +477,7 @@ try:
                         print(f"Style: {json.dumps(style, ensure_ascii=False, indent=2)}")
                         print(f"Parameters: {json.dumps(parameters, ensure_ascii=False, indent=2)}")
                         print("-" * 50)
-                       
+
                         sqlParameters = json.dumps(parameters, ensure_ascii=False, indent=2)
                         # 格式化 system_prompt3
                         memory_notes_str = "\n".join([str(note) for note in memory_notes])
@@ -491,7 +499,11 @@ try:
                                 1. Should this memory be evolved? Consider its relationships with other memories.
                                 2. What specific actions should be taken (strengthen, update_neighbor)?
                                    2.1 If choose to strengthen the connection, which memory should it be connected to? Can you give the updated tags of this memory?
-                                   2.2 If choose to update_neighbor, you can update the parameter of these memories based on the understanding of these memories. If the parameter is not updated, the new parameter should be the same as the original ones. Generate the new parameter in the sequential order of the input neighbors.
+                                   2.2 If choose to update_neighbor, you must update the parameters of these memories based on the following rules:
+                                           - For effectors (e.g., Flanger, Compressor, Screamer, etc.), if the new memory has an effector in "On" state (e.g., "FlangerOn") and the neighbor memory has the same effector in "Off" state (e.g., "FlangerOff"), update the neighbor's effector state to "On" (e.g., replace "FlangerOff" with "FlangerOn") and retain/adjust the parameter values to maintain consistency with the new memory's characteristics.
+                                           - For other parameters (values of effectors), adjust them based on the understanding of these memories' characteristics to ensure they are more consistent with the new memory's features and style.
+                                           - If no update is needed for certain parameters, keep them the same as the original.
+                                           Generate the new parameters in the sequential order of the input neighbors.
                                 Parameter should be determined by the content of these characteristic of these memories, which can be used to retrieve them later and categorize them.
                                 Return your decision in JSON format with the following structure:
                                 {{
@@ -502,7 +514,7 @@ try:
                                             [parameters_1],  // 对应第一首歌曲
                                             ..............,
                                             [parameters_n]   // 对应第n首歌曲
-  ]
+                            ]
                                 }}
                         '''
                         print(f"system_prompt3:{system_prompt3}")
@@ -517,7 +529,7 @@ try:
                                       stream=False
                         )
 
-                        # 获取 response4 响应数据并转换为 JSON
+                        # 获取 response3 响应数据并转换为 JSON
                         response_content3 = response3.choices[0].message.content
                         # 去除前后的代码块标记和换行
                         cleaned_content3 = response_content3.replace("```json", "").replace("```", "").strip()
@@ -534,125 +546,166 @@ try:
                             new_parameter_neighborhood = result3.get("new_parameter_neighborhood", [])
                             # 打印信息
                             print(f"记忆更新模型响应: {result3_str}")
-                            #print(f"吉他演奏的特点: {guitar_features}")
+
+
+                            # ---------------------- 新增：更新新记忆（当前song）的预设文件 ----------------------
+                            # 1. 定义参数映射（复用现有映射）
+                            param_mapping = {
+                                # 开关控制映射
+                                "CompressorOn": ("pre_compressor_on", 1),
+                                "CompressorOff": ("pre_compressor_on", 0),
+                                "ScreamerOn": ("tube_screamer_on", 1),
+                                "ScreamerOff": ("tube_screamer_on", 0),
+                                "DriverOn": ("mouse_drive_on", 1),
+                                "DriverOff": ("mouse_drive_on", 0),
+                                "DelayOn": ("delay_on", 1),
+                                "DelayOff": ("delay_on", 0),
+                                "ReverbOn": ("room_on", 1),
+                                "ReverbOff": ("room_on", 0),
+                                "ChorusOn": ("chorus_on", 1),
+                                "ChorusOff": ("chorus_on", 0),
+                                "FlangerOn": ("flanger_on", 1),
+                                "FlangerOff": ("flanger_on", 0),
+                                "PhaserOn": ("phaser_on", 1),
+                                "PhaserOff": ("phaser_on", 0),
+                                "EqualiserOn": ("pre_eq_on", 1),
+                                "EqualiserOff": ("pre_eq_on", 0),
+
+                                # 参数值映射
+                                "CompressorOn.Threshold": "pre_comp_thresh",
+                                "CompressorOn.Ratio": "pre_comp_ratio",
+                                "CompressorOn.Attack": "pre_comp_attack",
+                                "CompressorOn.Release": "pre_comp_release",
+                                "CompressorOn.Mix": "pre_comp_blend",
+                                "CompressorOn.Makeup": "pre_comp_gain",
+                                "CompressorOff.Threshold": "pre_comp_thresh",
+                                "CompressorOff.Ratio": "pre_comp_ratio",
+                                "CompressorOff.Attack": "pre_comp_attack",
+                                "CompressorOff.Release": "pre_comp_release",
+                                "CompressorOff.Mix": "pre_comp_blend",
+                                "CompressorOff.Makeup": "pre_comp_gain",
+                                "ScreamerOn.Drive": "tube_screamer_drive",
+                                "ScreamerOn.Tone": "tube_screamer_tone",
+                                "ScreamerOn.Level": "tube_screamer_level",
+                                "ScreamerOff.Drive": "tube_screamer_drive",
+                                "ScreamerOff.Tone": "tube_screamer_tone",
+                                "ScreamerOff.Level": "tube_screamer_level",
+                                "DriverOn.Distortion": "mouse_drive_distortion",
+                                "DriverOn.Volume": "mouse_drive_volume",
+                                "DriverOff.Distortion": "mouse_drive_distortion",
+                                "DriverOff.Volume": "mouse_drive_volume",
+                                "DelayOn.Feedback": "delay_feedback",
+                                "DelayOn.Delay": "delay_left_millisecond",
+                                "DelayOn.Mix": "delay_mix",
+                                "DelayOff.Feedback": "delay_feedback",
+                                "DelayOff.Delay": "delay_left_millisecond",
+                                "DelayOff.Mix": "delay_mix",
+                                "ReverbOn.Size": "room_size",
+                                "ReverbOn.Damping": "room_damping",
+                                "ReverbOn.Width": "room_width",
+                                "ReverbOn.Mix": "room_mix",
+                                "ReverbOff.Size": "room_size",
+                                "ReverbOff.Damping": "room_damping",
+                                "ReverbOff.Width": "room_width",
+                                "ReverbOff.Mix": "room_mix",
+                                "ChorusOn.Delay": "chorus_delay",
+                                "ChorusOn.Depth": "chorus_depth",
+                                "ChorusOn.Frequency": "chorus_frequency",
+                                "ChorusOn.Width": "chorus_width",
+                                "ChorusOff.Delay": "chorus_delay",
+                                "ChorusOff.Depth": "chorus_depth",
+                                "ChorusOff.Frequency": "chorus_frequency",
+                                "ChorusOff.Width": "chorus_width",
+                                "FlangerOn.Delay": "flanger_delay",
+                                "FlangerOn.Depth": "flanger_depth",
+                                "FlangerOn.Feedback": "flanger_feedback",
+                                "FlangerOn.Frequency": "flanger_frequency",
+                                "FlangerOn.Width": "flanger_width",
+                                "FlangerOff.Delay": "flanger_delay",
+                                "FlangerOff.Depth": "flanger_depth",
+                                "FlangerOff.Feedback": "flanger_feedback",
+                                "FlangerOff.Frequency": "flanger_frequency",
+                                "FlangerOff.Width": "flanger_width",
+                                "PhaserOn.Depth": "phaser_depth",
+                                "PhaserOn.Feedback": "phaser_feedback",
+                                "PhaserOn.Frequency": "phaser_frequency",
+                                "PhaserOn.Width": "phaser_width",
+                                "PhaserOff.Depth": "phaser_depth",
+                                "PhaserOff.Feedback": "phaser_feedback",
+                                "PhaserOff.Frequency": "phaser_frequency",
+                                "PhaserOff.Width": "phaser_width",
+                                "EqualiserOn.100hz": "pre_eq_100_gain",
+                                "EqualiserOn.200hz": "pre_eq_200_gain",
+                                "EqualiserOn.400hz": "pre_eq_400_gain",
+                                "EqualiserOn.800hz": "pre_eq_800_gain",
+                                "EqualiserOn.1600hz": "pre_eq_1600_gain",
+                                "EqualiserOn.3200hz": "pre_eq_3200_gain",
+                                "EqualiserOn.6400hz": "pre_eq_6400_gain",
+                                "EqualiserOn.Level": "pre_eq_level_gain",
+                                "EqualiserOff.100hz": "pre_eq_100_gain",
+                                "EqualiserOff.200hz": "pre_eq_200_gain",
+                                "EqualiserOff.400hz": "pre_eq_400_gain",
+                                "EqualiserOff.800hz": "pre_eq_800_gain",
+                                "EqualiserOff.1600hz": "pre_eq_1600_gain",
+                                "EqualiserOff.3200hz": "pre_eq_3200_gain",
+                                "EqualiserOff.6400hz": "pre_eq_6400_gain",
+                                "EqualiserOff.Level": "pre_eq_level_gain"
+                            }
+
+                            # 2. 将新记忆的parameters转换为预设文件格式
+                            new_memory_excel_params = {}
+                            # 处理顶层开关状态
+                            for key in parameters:
+                                if key in param_mapping and isinstance(param_mapping[key], tuple):
+                                    param_id, param_value = param_mapping[key]
+                                    new_memory_excel_params[param_id] = param_value
+                                    print(f"新记忆开关状态处理: {key} -> {param_id} = {param_value}")
+
+                            # 处理嵌套参数
+                            for key, value in parameters.items():
+                                if isinstance(value, dict):
+                                    for sub_key, sub_value in value.items():
+                                        full_key = f"{key}.{sub_key}"
+                                        if full_key in param_mapping:
+                                            param_id = param_mapping[full_key]
+                                            new_memory_excel_params[param_id] = sub_value
+                                else:
+                                    if key in param_mapping and not isinstance(param_mapping[key], tuple):
+                                        param_id = param_mapping[key]
+                                        new_memory_excel_params[param_id] = value
+
+                            # 3. 定义新记忆的预设文件路径
+                            new_memory_preset_path = fr"C:\Users\Public\Documents\Supertonal DSP\Blueprint Cory Bergeron2\{song_name}.preset"
+
+                            # 4. 更新新记忆的预设文件
+                            try:
+                                if update_preset_in_file(new_memory_preset_path, new_memory_excel_params):
+                                    print(f"新记忆 '{song_name}' 的预设文件更新成功")
+                                else:
+                                    print(f"新记忆 '{song_name}' 的预设文件更新失败")
+                            except FileNotFoundError:
+                                print(f"新记忆预设文件路径不存在: {new_memory_preset_path}")
+                            except Exception as e:
+                                print(f"更新新记忆预设文件时出错: {e}")
+                            # ---------------------- 新增结束 ----------------------
 
 
                             # 在获取 OpenAI 响应并解析 JSON 之后添加以下代码
                             if 'new_parameter_neighborhood' in result3:
                                 new_params_list = result3['new_parameter_neighborhood']
                                 total_updates = 0
-                                
+        
                                 # 假设使用第一个邻居的参数来更新预设文件
                                 if new_params_list:
                                     for index, neighbor_params in enumerate(new_params_list):
                                         print(f"new_params_list:{neighbor_params}")
                                         # 转换参数格式以匹配Excel预设文件
                                         excel_params = {}
-        
+
                                         # 示例：根据邻居参数更新预设文件中的参数
                                         # 注意：需要根据实际参数映射关系调整
-                                        param_mapping = {
-                                        # 开关控制映射
-                                        "CompressorOn": ("pre_compressor_on", 1),  # 开启时
-                                        "CompressorOff": ("pre_compressor_on", 0),  # 关闭时
-                                        "ScreamerOn": ("tube_screamer_on", 1),
-                                        "ScreamerOff": ("tube_screamer_on", 0),
-                                        "DriverOn": ("mouse_drive_on", 1),
-                                        "DriverOff": ("mouse_drive_on", 0),
-                                        "DelayOn": ("delay_on", 1),
-                                        "DelayOff": ("delay_on", 0),
-                                        "ReverbOn": ("room_on", 1),
-                                        "ReverbOff": ("room_on", 0),
-                                        "ChorusOn": ("chorus_on", 1),  # 新增开启状态映射
-                                        "ChorusOff": ("chorus_on", 0),
-                                        "FlangerOn": ("flanger_on", 1),  # 新增开启状态映射
-                                        "FlangerOff": ("flanger_on", 0),
-                                        "PhaserOn": ("phaser_on", 1),  # 新增开启状态映射
-                                        "PhaserOff": ("phaser_on", 0),
-                                        "EqualiserOn": ("pre_eq_on", 1),
-                                        "EqualiserOff": ("pre_eq_on", 0),
+                                        # （此处复用param_mapping，与新记忆处理逻辑一致）
 
-                                        # 参数值映射 (使用相对路径)
-                                        "CompressorOn.Threshold": "pre_comp_thresh",
-                                        "CompressorOn.Ratio": "pre_comp_ratio",
-                                        "CompressorOn.Attack": "pre_comp_attack",
-                                        "CompressorOn.Release": "pre_comp_release",
-                                        "CompressorOn.Mix": "pre_comp_blend",
-                                        "CompressorOn.Makeup": "pre_comp_gain",
-                                        "CompressorOff.Threshold": "pre_comp_thresh",
-                                        "CompressorOff.Ratio": "pre_comp_ratio",
-                                        "CompressorOff.Attack": "pre_comp_attack",
-                                        "CompressorOff.Release": "pre_comp_release",
-                                        "CompressorOff.Mix": "pre_comp_blend",
-                                        "CompressorOff.Makeup": "pre_comp_gain",
-                                        "ScreamerOn.Drive": "tube_screamer_drive",
-                                        "ScreamerOn.Tone": "tube_screamer_tone",
-                                        "ScreamerOn.Level": "tube_screamer_level",
-                                        "ScreamerOff.Drive": "tube_screamer_drive",
-                                        "ScreamerOff.Tone": "tube_screamer_tone",
-                                        "ScreamerOff.Level": "tube_screamer_level",
-                                        "DriverOn.Distortion": "mouse_drive_distortion",
-                                        "DriverOn.Volume": "mouse_drive_volume",
-                                        "DriverOff.Distortion": "mouse_drive_distortion",
-                                        "DriverOff.Volume": "mouse_drive_volume",
-                                        "DelayOn.Feedback": "delay_feedback",
-                                        "DelayOn.Delay": "delay_left_millisecond",
-                                        "DelayOn.Mix": "delay_mix",
-                                        "DelayOff.Feedback": "delay_feedback",
-                                        "DelayOff.Delay": "delay_left_millisecond",
-                                        "DelayOff.Mix": "delay_mix",
-                                        "ReverbOn.Size": "room_size",
-                                        "ReverbOn.Damping": "room_damping",
-                                        "ReverbOn.Width": "room_width",
-                                        "ReverbOn.Mix": "room_mix",
-                                        "ReverbOff.Size": "room_size",
-                                        "ReverbOff.Damping": "room_damping",
-                                        "ReverbOff.Width": "room_width",
-                                        "ReverbOff.Mix": "room_mix",
-                                        "ChorusOn.Delay": "chorus_delay",
-                                        "ChorusOn.Depth": "chorus_depth",
-                                        "ChorusOn.Frequency": "chorus_frequency",
-                                        "ChorusOn.Width": "chorus_width",
-                                        "ChorusOff.Delay": "chorus_delay",
-                                        "ChorusOff.Depth": "chorus_depth",
-                                        "ChorusOff.Frequency": "chorus_frequency",
-                                        "ChorusOff.Width": "chorus_width",
-                                        "FlangerOn.Delay": "flanger_delay",
-                                        "FlangerOn.Depth": "flanger_depth",
-                                        "FlangerOn.Feedback": "flanger_feedback",
-                                        "FlangerOn.Frequency": "flanger_frequency",
-                                        "FlangerOn.Width": "flanger_width",
-                                        "FlangerOff.Delay": "flanger_delay",
-                                        "FlangerOff.Depth": "flanger_depth",
-                                        "FlangerOff.Feedback": "flanger_feedback",
-                                        "FlangerOff.Frequency": "flanger_frequency",
-                                        "FlangerOff.Width": "flanger_width",
-                                        "PhaserOn.Depth": "phaser_depth",
-                                        "PhaserOn.Feedback": "phaser_feedback",
-                                        "PhaserOn.Frequency": "phaser_frequency",
-                                        "PhaserOn.Width": "phaser_width",
-                                        "PhaserOff.Depth": "phaser_depth",
-                                        "PhaserOff.Feedback": "phaser_feedback",
-                                        "PhaserOff.Frequency": "phaser_frequency",
-                                        "PhaserOff.Width": "phaser_width",
-                                        "EqualiserOn.100hz": "pre_eq_100_gain",
-                                        "EqualiserOn.200hz": "pre_eq_200_gain",
-                                        "EqualiserOn.400hz": "pre_eq_400_gain",
-                                        "EqualiserOn.800hz": "pre_eq_800_gain",
-                                        "EqualiserOn.1600hz": "pre_eq_1600_gain",
-                                        "EqualiserOn.3200hz": "pre_eq_3200_gain",
-                                        "EqualiserOn.6400hz": "pre_eq_6400_gain",
-                                        "EqualiserOn.Level": "pre_eq_level_gain",
-                                        "EqualiserOff.100hz": "pre_eq_100_gain",
-                                        "EqualiserOff.200hz": "pre_eq_200_gain",
-                                        "EqualiserOff.400hz": "pre_eq_400_gain",
-                                        "EqualiserOff.800hz": "pre_eq_800_gain",
-                                        "EqualiserOff.1600hz": "pre_eq_1600_gain",
-                                        "EqualiserOff.3200hz": "pre_eq_3200_gain",
-                                        "EqualiserOff.6400hz": "pre_eq_6400_gain",
-                                        "EqualiserOff.Level": "pre_eq_level_gain"
-                                        }
-    
                                         # 1. 优先处理顶层开关状态（如 CompressorOff）
                                         for key in neighbor_params:
                                             if key in param_mapping:
@@ -661,7 +714,7 @@ try:
                                                     param_id, param_value = param_mapping[key]
                                                     excel_params[param_id] = param_value
                                                     print(f"处理开关状态: {key} -> {param_id} = {param_value}")  # 日志跟踪
-    
+
                                         # 2. 处理嵌套参数（如 CompressorOn.Threshold 等）
                                         for key, value in neighbor_params.items():
                                             if isinstance(value, dict):
@@ -676,7 +729,7 @@ try:
                                                 if key in param_mapping and not isinstance(param_mapping[key], tuple):
                                                     param_id = param_mapping[key]
                                                     excel_params[param_id] = value
-    
+
                                         # 打印生成的 excel_params，验证 pre_compressor_on 是否为 0
                                         print(f"生成的预设参数: {excel_params.get('pre_compressor_on')}")
                                         # 预设文件路径
@@ -690,11 +743,11 @@ try:
                                               else:
                                                 print(f"预设文件 {song_name}.preset 更新失败，继续执行后续代码")
                                             except FileNotFoundError:
-                                              print(f"预设文件路径 {preset_file_path} 不存在，继续执行后续代码")
+                                                print(f"预设文件路径 {preset_file_path} 不存在，继续执行后续代码")
                                             except Exception as e:
-                                              print(f"更新预设文件时出现未知错误: {e}，继续执行后续代码")
-                                    
-      
+                                                print(f"更新预设文件时出现未知错误: {e}，继续执行后续代码")
+                
+
                                 # 遍历所有相似歌曲
                                 for i, (song_name, similarity, _, _, _) in enumerate(similar_songs):
                                     # 检查是否有对应的新参数
@@ -711,9 +764,9 @@ try:
                                         except Exception as e:
                                             print(f"更新 '{song_name}' 参数时出错: {e}")
                                             conn.rollback()
-    
+
                                 print(f"总共更新了 {total_updates} 首歌曲的参数")
-    
+
                                 if total_updates < len(similar_songs):
                                     print(f"注意: 有 {len(similar_songs) - total_updates} 首歌曲没有对应的新参数")
                             else:
@@ -726,7 +779,7 @@ try:
                     except json.JSONDecodeError:
                         print("从数据库读取的 JSON 数据格式错误，请检查数据库数据。")
                 else:
-                    print(f"未找到与 {userMessageToSend} 匹配的记录")
+                    print(f"未找到与 {user_message} 匹配的记录")
             except ValueError:
                 print("命令行参数无法转换为数字，请检查输入。")
     else:
@@ -736,3 +789,6 @@ except sqlite3.Error as e:
 finally:
     if 'conn' in locals() and conn:
         conn.close()
+
+# 新增：等待用户输入后再关闭窗口
+input("程序执行完毕，按回车键关闭窗口...")

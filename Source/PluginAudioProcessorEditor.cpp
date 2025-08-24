@@ -122,7 +122,8 @@ PluginAudioProcessorEditor::PluginAudioProcessorEditor(PluginAudioProcessor& pro
 	mTabbedComponentPtr->addTab("Cabinet", juce::Colours::transparentBlack, mCabinetComponentPtr.get(), true);
 	mTabbedComponentPtr->addTab("Mixer", juce::Colours::transparentBlack, mMixerApvtsIdComponentPtr.get(), true);
 	mTabbedComponentPtr->addTab("Hidden", juce::Colours::transparentBlack, mHiddenApvtsIdComponentPtr.get(), true);
-	mTabbedComponentPtr->addTab("Chat", juce::Colours::transparentBlack, new ChatComponent(), true);
+	// 将报错的那一行修改为：
+	mTabbedComponentPtr->addTab("Chat", juce::Colours::transparentBlack, new ChatComponent(processorRef.getPresetManager()), true);
 	setSize(800, 800);
 	setResizable(true, true);
 }

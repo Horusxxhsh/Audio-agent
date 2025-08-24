@@ -38,8 +38,15 @@ conn.commit()
 
 client = OpenAI(api_key="sk-1b73586fde854a329ec187dc371f53ef", base_url="https://api.deepseek.com")
 
+import platform
+
 if len(sys.argv) > 1:
-    chat_message = sys.argv[1]  # 获取命令行中输入的歌曲名称
+    if platform.system() == "Windows":
+        # Windows命令行通常使用GBK编码
+        chat_message = sys.argv[1].encode('cp936').decode('utf-8', errors='replace')
+    else:
+        # Linux/macOS通常使用UTF-8
+        chat_message = sys.argv[1]
 else:
     chat_message = "光辉岁月"
 
@@ -125,7 +132,7 @@ effectors = [
     },
     {
         "name": "delay",
-        "example_with": ' {"DelayOn":{"Feedback":"0.25","Delay":724.89,"Mix":"0.52"}}',
+        "example_with": ' {"DelayOn":{"Feedback":"0.25","Delay":450.00,"Mix":"0.52"}}',
         "prompt_with": f'对于歌曲{chat_message}，应该如何设置专业的音效模块中的延迟器的参数，专业的延迟器模块中可能的参数为Feedback，Delay，Mix，Feedback的可能范围为0.00~1.00，Delay(Time)的可能范围为1.00ms~10000.00ms，Mix的可能范围为0.00~1.00，请以JSON格式详细输出'
     },
     {
@@ -223,8 +230,8 @@ for song in similar_songs:
         feature = json.loads(song[3])
         resu.append(json.loads(song[4]))
         i+=1
-        #print(f"相似歌曲: {song_name}")
-        #print(f"相似度: {similarity:.4f}")
+        print(f"相似歌曲: {song_name}")
+        print(f"相似度: {similarity:.4f}")
         #print(f"风格: {json.dumps(style, ensure_ascii=False, indent=2)}")
         #print(f"吉他音色特点: {json.dumps(feature, ensure_ascii=False, indent=2)}")
         #print(f"参数: {json.dumps(resu, ensure_ascii=False, indent=2)}")
@@ -321,3 +328,6 @@ with open(r"C:\Users\80753\Desktop\result.txt", 'w', encoding='utf-8') as f:
 
 # 关闭数据库连接
 conn.close()
+
+# 新增：等待用户输入后再关闭窗口
+input("程序执行完毕，按回车键关闭窗口...")

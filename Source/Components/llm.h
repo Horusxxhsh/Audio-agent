@@ -1,6 +1,7 @@
 #pragma once
 #include <JuceHeader.h>
 #include <iostream>
+#include "../PluginPresetManager.h"
 
 // Coze API密钥
 static const juce::String COZE_API_KEY = "pat_qYqWeCHQq2kXBWHJukeL8mOYyyRI9gdDa8a4ENXQiQjXqb3DNOYs3RbgN54gD4vE"; // 替换为你的Coze API密钥
@@ -120,12 +121,14 @@ class ChatComponent : public juce::Component,
     private juce::Thread
 {
 public:
-    ChatComponent();
+    ChatComponent(PluginPresetManager& pm);
     void resized() override;
     void buttonClicked(juce::Button* button) override;
 
  
 private:
+    PluginPresetManager& presetManager;  // 添加引用成员
+    juce::String currentPresetName;
     juce::TextEditor inputEditor;
     juce::TextButton sendButton;
     juce::TextEditor responseEditor;
@@ -141,11 +144,13 @@ private:
 class MainWindow : public juce::DocumentWindow
 {
 public:
-    MainWindow();
+    // 添加参数接收PluginPresetManager引用
+    MainWindow(PluginPresetManager& pm);
     void closeButtonPressed() override;
 
 private:
     std::unique_ptr<juce::TabbedComponent> tabbedComponent;
+    PluginPresetManager& presetManager; // 引用必须通过构造函数初始化
 };
 
 

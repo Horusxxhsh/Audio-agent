@@ -86,7 +86,8 @@ private:
             std::string userMessage = readEnvWithType<std::string>("user_Message");
             // 在日志中打印 userMessage 的值
             juce::Logger::writeToLog("userMessage:" + juce::String(userMessage));
-           
+            std::string currentPresetName = presetManager.getCurrentPreset().toStdString();
+            juce::Logger::writeToLog("currentPresetName:" + juce::String(currentPresetName));
             if (userMessage.empty()) {
                 // 在日志中打印 userMessage 的值
                 juce::Logger::writeToLog("userMessage is empty" + juce::String(userMessage));
@@ -316,8 +317,8 @@ private:
             command += " ";
             command += pythonScriptPath;
             command += " \"" + paramString + "\"";  // 第一个参数: 所有效果器参数
-            command += " \"" + userMessage + "\"";  // 第二个参数: 用户消息
-
+            command += " \"" + userMessage + "\"";  // 第二个参数: 用户消息currentPresetName
+            command += " \"" + currentPresetName + "\"";
             // 执行 Python 脚本
             int returnCode = std::system(command.c_str());
             if (returnCode != 0) {

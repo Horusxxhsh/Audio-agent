@@ -4,6 +4,10 @@
 #include <string>
 #include <fstream>
 #include <juce_core/juce_core.h>
+#include "../PluginPresetManager.h"
+
+
+
 
 // 存储环境变量时添加引号并转义内部引号
 void storeEnvWithType(const std::string& key, const juce::String& value, const std::string& type) {
@@ -467,11 +471,13 @@ EffectParameters extractParameters(const juce::String& jsonString) {
 }
 
 // 实现 ChatComponent 类的构造函数
-ChatComponent::ChatComponent()
+ChatComponent::ChatComponent(PluginPresetManager& pm)
     : juce::Thread("NetworkThread"),  // 初始化网络线程
+    presetManager(pm),
     sendButton("Send"),
     statusLabel("Status", "Ready")
 {
+    currentPresetName = presetManager.getCurrentPreset();
     // 初始化UI组件
     addAndMakeVisible(inputEditor);
     addAndMakeVisible(sendButton);
@@ -535,52 +541,59 @@ void ChatComponent::run()
     auto userMessage = userMessageToSend;
     if (userMessage.isNotEmpty()) {
         juce::Logger::writeToLog("send request: " + userMessage);
+        // 打印到日志
+        juce::Logger::writeToLog("currentPresetName: " + currentPresetName);
     }
 
     // 定义 Python 解释器路径和 Python 脚本路径
-    //const char* pythonInterpreterPath = R"(E:\c++\day11\PythonApplication\env\Scripts\python.exe)";
-    //const char* pythonScriptPath = R"("E:\c++\juceproject\juceEffector\supertonal\Source\llm.py")";
     const char* pythonInterpreterPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\env\Scripts\python.exe)";
-    //const char* pythonScriptPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\llm.py)";
-    const char* pythonScriptPath = R"("C:\Users\80753\Documents\GitHub\supertonal\Source\llm.py")";
-    // 构建执行 Python 脚本的命令，将用户输入的信息作为参数传递给 Python 脚本
-    std::string command = pythonInterpreterPath;
-    command += " ";
-    command += pythonScriptPath;
-    command += " \"";  // 添加左引号
-    command += userMessage.toStdString();
-    command += "\"";   // 添加右引号
+    const char* pythonScriptPath = R"(C:\Users\80753\Documents\GitHub\supertonal\Source\llm.py)";
 
-    storeEnvWithType("user_Message", userMessage.toStdString(), "string");
+    // 构建执行 Python 脚本的命令，正确处理中文
+    juce::String command = juce::String(pythonInterpreterPath);
+    command += " ";
+    command += juce::String(pythonScriptPath);
+    command += " \"";
+    command += userMessage; // 直接使用 juce::String，避免转换
+    command += "\"";
+
+    // 存储环境变量，使用正确的编码
+    storeEnvWithType("user_Message", userMessage, "string");
+
+    // 将命令转换为 UTF-8 编码的 std::string 用于 system 调用
+    std::string utf8Command = command.toStdString();
 
     // 执行 Python 脚本
-    int returnCode = std::system(command.c_str());
+    int returnCode = std::system(utf8Command.c_str());
     if (returnCode != 0) {
         std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
-        std::cerr << "执行的命令: " << command << std::endl;
+        std::cerr << "执行的命令: " << utf8Command << std::endl;
         updateStatus("Python script execution failed");
-        updateStatus("command:" + command);
     }
     else {
         updateStatus("Python script executed successfully");
 
-        // 读取 result.txt 文件
-        std::ifstream file(R"(C:\Users\80753\Desktop\result.txt)");
+        // 读取 result.txt 文件，使用正确的编码处理
+        std::ifstream file(R"(C:\Users\80753\Desktop\result.txt)", std::ios::binary);
         if (!file.is_open()) {
             std::cerr << "无法打开 result.txt 文件" << std::endl;
             updateStatus("无法打开 result.txt 文件");
             return;
         }
 
+        // 读取文件内容为二进制数据
         std::stringstream buffer;
         buffer << file.rdbuf();
-        std::string result_str = buffer.str();
+        std::string resultBytes = buffer.str();
 
         // 关闭文件
         file.close();
 
+        // 将字节数据转换为 juce::String（假设文件是UTF-8编码）
+        juce::String resultStr = juce::String::fromUTF8(resultBytes.data(), resultBytes.size());
+
         // 调用提取参数的函数
-        EffectParameters params = extractParameters(result_str);
+        EffectParameters params = extractParameters(resultStr);
 
         // 将结果显示在 UI 上
         callAsync(juce::String(params.toString()));
@@ -595,13 +608,16 @@ void ChatComponent::updateStatus(const juce::String& text)
         [this, text]() { statusLabel.setText(text, juce::dontSendNotification); });
 }
 
-// 实现 MainWindow 类的构造函数
-MainWindow::MainWindow() : DocumentWindow("DeepSeek Chat",
-    juce::Colours::lightgrey,
-    DocumentWindow::allButtons)
+// 实现MainWindow构造函数，用参数初始化presetManager引用
+MainWindow::MainWindow(PluginPresetManager& pm)
+    : DocumentWindow("DeepSeek Chat",
+        juce::Colours::lightgrey,
+        DocumentWindow::allButtons), // 注意移除错误的presetManager(pm)初始化
+    presetManager(pm) // 正确初始化引用成员
 {
     tabbedComponent = std::make_unique<juce::TabbedComponent>(juce::TabbedButtonBar::TabsAtTop);
-    tabbedComponent->addTab("Chat", juce::Colours::lightblue, new ChatComponent(), true);
+    // 现在可以使用初始化后的presetManager了
+    tabbedComponent->addTab("Chat", juce::Colours::lightblue, new ChatComponent(presetManager), true);
 
     setContentOwned(tabbedComponent.get(), true);
     centreWithSize(800, 600);
