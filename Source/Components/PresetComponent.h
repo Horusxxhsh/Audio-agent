@@ -88,9 +88,9 @@ private:
             juce::Logger::writeToLog("userMessage:" + juce::String(userMessage));
             std::string currentPresetName = presetManager.getCurrentPreset().toStdString();
             juce::Logger::writeToLog("currentPresetName:" + juce::String(currentPresetName));
-            if (userMessage.empty()) {
-                // 在日志中打印 userMessage 的值
-                juce::Logger::writeToLog("userMessage is empty" + juce::String(userMessage));
+            if (userMessage.empty() && currentPresetName.empty()) {
+                // 在日志中打印相关信息
+                juce::Logger::writeToLog("userMessage and currentPresetName are both empty");
                 return;
             }
             

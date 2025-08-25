@@ -52,35 +52,7 @@ else:
 
 print(f"Chat message: {chat_message}")
 
-# 第一个系统提示
-system_prompt1 = f'你是音效参数专家，需要从用户输入的歌曲名称判断给歌曲添加哪些音效模块，这些模块包括过载，失真，延迟，混响，压缩，相位，合唱，镶边，均衡，噪声门，返回这些音效的 JSON 格式的参数列表，例如: {{"overload": "yes", "distortion": "yes", "delay": "yes", "reverb": "yes", "compression": "no", "phase": "no", "chorus": "no", "flanger": "no", "equalization": "yes", "noise_gate": "no"}}用户输入的歌曲是: {chat_message}，返回结果格式严格参照给的例子'
-user_prompt1 = chat_message
-response1 = client.chat.completions.create(
-    model="deepseek-chat",
-    messages=[
-        {"role": "system", "content": system_prompt1},
-        {"role": "user", "content": user_prompt1},
-    ],
-    stream=False
-)
 
-# 获取 response1 响应数据并转换为 JSON
-response_content1 = response1.choices[0].message.content
-# 提取有效的JSON部分
-start_index = response_content1.find("{")
-end_index = response_content1.rfind("}") + 1
-if start_index != -1 and end_index != -1:
-    cleaned_content1 = response_content1[start_index:end_index]
-else:
-    print("Error: 未找到有效的JSON内容")
-    sys.exit(1)
-
-try:
-    result1 = json.loads(cleaned_content1)
-    # print(json.dumps(result1, ensure_ascii=False, indent=2))
-except json.JSONDecodeError:
-    print(f"Error: 无效的JSON响应: {cleaned_content1}")
-    sys.exit(1)
 
 # 第二个系统提示
 system_prompt2 = f'你是音乐分析师，需要根据用户输入的歌曲名称判断该歌曲的风格(尽量具体)，并描述该歌曲中吉他solo的演奏特点，返回这些信息的 JSON 格式的参数列表，例如: {{"tags": ["tag_1",..."tag_n"],"description":["..."]}}'
@@ -206,7 +178,7 @@ for index, row in enumerate(rows, start=1):
         # 综合相似度 (权重可以调整)
         similarity = 0.7 * tag_similarity + 0.3 * desc_similarity
         
-        if similarity> 0:
+        if similarity> 0.2:
            similar_songs.append((song_name, similarity, style_str, feature_str, parameter_str))
         
        
@@ -215,7 +187,7 @@ for index, row in enumerate(rows, start=1):
 
 # 按相似度排序
 similar_songs.sort(key=lambda x: x[1], reverse=True)
-
+similar_songs = similar_songs[:3]
 
 # 打印相似度结果
 found_similar = False
@@ -239,15 +211,47 @@ for song in similar_songs:
 #print(f"resu:{resu}" )
 if not found_similar:
     print("未找到相似歌曲")
+
+# 第一个系统提示
+system_prompt1 = f'你是音效参数专家，需要从用户输入的歌曲名称判断给歌曲添加哪些音效模块，这些模块包括过载，失真，延迟，混响，压缩，相位，合唱，镶边，均衡，噪声门，返回这些音效的 JSON 格式的参数列表，例如: {{"overload": "yes", "distortion": "yes", "delay": "yes", "reverb": "yes", "compression": "no", "phase": "no", "chorus": "no", "flanger": "no", "equalization": "yes", "noise_gate": "no"}}用户输入的歌曲是: {chat_message}，返回结果格式严格参照给的例子。具体参数可以参考{resu}中的内容，这些参数是用户查询的歌曲的相似歌曲所配置的参数（参数值结合了用户的喜好，你需要从中学习用户喜好，比如该歌曲中没有镶边模块，但是参考的数据中有FlangerOn，那就要考虑开启镶边模块），其中CompressorOn表示需要开启压缩模块，CompressorOff表示关闭压缩模块，其他模块同理。如果参考中的参数值不一致（比如第一个参数有CompressorOn而第二个是CompressorOff）则以第一个的参数值为基准。'
+user_prompt1 = chat_message
+response1 = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[
+        {"role": "system", "content": system_prompt1},
+        {"role": "user", "content": user_prompt1},
+    ],
+    stream=False
+)
+
+# 获取 response1 响应数据并转换为 JSON
+response_content1 = response1.choices[0].message.content
+# 提取有效的JSON部分
+start_index = response_content1.find("{")
+end_index = response_content1.rfind("}") + 1
+if start_index != -1 and end_index != -1:
+    cleaned_content1 = response_content1[start_index:end_index]
+else:
+    print("Error: 未找到有效的JSON内容")
+    sys.exit(1)
+
+try:
+    result1 = json.loads(cleaned_content1)
+    print(json.dumps(result1, ensure_ascii=False, indent=2))
+except json.JSONDecodeError:
+    print(f"Error: 无效的JSON响应: {cleaned_content1}")
+    sys.exit(1)
+
+
 # 使用 for 循环处理不同的音效模块
 for effector in effectors:
     effector_name = effector["name"]
     if result1.get(effector_name) == "yes":
         if resu is not None:
-           system_prompt = f'你是一位专业音效调整师，请返回该音效的 JSON 格式的参数列表，例如: {effector["example_with"]}你的回答需要在列表之中，不要有任何多余数据。具体参数可以参考{resu}中的内容，这些参数是用户查询的歌曲的相似歌曲所配置的参数，其中CompressorOn表示需要开启压缩模块，CompressorOff表示关闭压缩模块，其他模块同理。如果模块关闭则不需要参考里面具体的参数。'
+           system_prompt = f'你是一位专业音效调整师，请返回该音效的 JSON 格式的参数列表，例如: {effector["example_with"]}你的回答需要在列表之中，不要有任何多余数据。具体参数值可以参考{resu}中的内容，这些参数是用户查询的歌曲的相似歌曲所配置的参数（参数值结合了用户的喜好，你需要从中学习用户喜好，比如该歌曲中没有镶边模块，但是参考的数据中有FlangerOn，那就要考虑开启镶边模块），其中CompressorOn表示需要开启压缩模块，CompressorOff表示关闭压缩模块，其他模块同理。如果参考中的模块关闭则不需要参考里面具体的参数。如果参考中的模块开启则考虑也开启该模块，并为模块生成具体参数值。如果参考中的参数值不一致（比如第一个参数有CompressorOn而第二个是CompressorOff）则以第一个的参数值为基准。'
         else:
            system_prompt = f'你是一位专业音效调整师，请返回该音效的 JSON 格式的参数列表，例如: {effector["example_with"]}你的回答需要在列表之中，不要有任何多余数据。'
-        #print(f"system_prompt:{system_prompt}")
+        print(f"system_prompt:{system_prompt}")
         user_prompt = effector["prompt_with"] + effector["example_with"]
         response = client.chat.completions.create(
             model="deepseek-chat",

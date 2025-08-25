@@ -108,6 +108,11 @@ try:
            # Linux/macOS通常使用UTF-8
            user_message = sys.argv[2]
            currentPresetName = sys.argv[3]
+
+        # 添加判断：如果user_message为空，则用currentPresetName代替
+        if not user_message.strip():  # 处理空字符串或仅含空白字符的情况
+           user_message = currentPresetName
+
         print(f"User message: {user_message}")  # 获取命令行中c++程序传入的第二个参数  
         print(f"currentPresetName: {currentPresetName}")
 
@@ -139,11 +144,16 @@ try:
                     # 综合相似度 (权重可以调整)
                     similarity = 0.7 * tag_similarity + 0.3 * desc_similarity
         
-                    if similarity> 0:
+                    if similarity> 0.1:
                         similar_songs.append((song_name, similarity, style_str, feature_str, parameter_str))
                         # 存储检索到的歌曲的信息
-                        note = MemoryNote(index, song_name, style, feature, parameter_str)
-                        memory_notes.append(note)
+                        # 限制memory_notes最大长度为3
+                        if len(memory_notes) < 3:
+                            note = MemoryNote(index, song_name, style, feature, parameter_str)
+                            memory_notes.append(note)
+                        else:
+                            # 已达到最大长度，可根据需要选择是否跳出循环
+                            break  # 如果想只保留前3个符合条件的，可以加上break
 
                 except json.JSONDecodeError:
                         print(f"Error: 无效的JSON响应: {style_str}")
@@ -500,7 +510,7 @@ try:
                                 2. What specific actions should be taken (strengthen, update_neighbor)?
                                    2.1 If choose to strengthen the connection, which memory should it be connected to? Can you give the updated tags of this memory?
                                    2.2 If choose to update_neighbor, you must update the parameters of these memories based on the following rules:
-                                           - For effectors (e.g., Flanger, Compressor, Screamer, etc.), if the new memory has an effector in "On" state (e.g., "FlangerOn") and the neighbor memory has the same effector in "Off" state (e.g., "FlangerOff"), update the neighbor's effector state to "On" (e.g., replace "FlangerOff" with "FlangerOn") and retain/adjust the parameter values to maintain consistency with the new memory's characteristics.
+                                           - For effectors (such as flangers, compressors, screamers, etc.), if a certain effector in the new memory is in the "On" state (e.g., "FlangerOn", which means the flanger is on), while the same effector in the neighboring memory is in the "Off" state (e.g., "FlangerOff", which means the flanger is off), it is necessary to update the state of this effector in the neighboring memory to "On" (e.g., replace "FlangerOff" with "FlangerOn") and adjust the specific parameter values. The parameter values do not need to be completely consistent with those of the new memory, but they must be ensured to align with the characteristics of the new memory.
                                            - For other parameters (values of effectors), adjust them based on the understanding of these memories' characteristics to ensure they are more consistent with the new memory's features and style.
                                            - If no update is needed for certain parameters, keep them the same as the original.
                                            Generate the new parameters in the sequential order of the input neighbors.
