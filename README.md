@@ -29,7 +29,7 @@ It's capabilities, in a rough order:
 It is a work in progress, but I've made a strong effort to keep it portable and buildable with basic knowledge of JUCE. To get it working, simply:
 
 ```bash
-git clone --recurse-submodules https://github.com/pauljonescodes/supertonal
+git clone --recurse-submodules https://github.com/Horusxxhsh/supertonal
 ```
 
 Then you should be able to open up the `.jucer` file and work in your environment of choice.
