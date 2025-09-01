@@ -302,9 +302,9 @@ for effector in effectors:
     effector_name = effector["name"]
     if result1.get(effector_name) == "yes":
         if resu is not None:
-            system_prompt = f'你是一位专业音效调整师，请返回该音效的 JSON 格式的参数列表，例如: {effector["example_with"]}你的回答需要在列表之中，不要有任何多余数据。具体参数值可以参考{resu}中的内容，这些参数是用户查询的歌曲的相似歌曲所配置的参数（参数值结合了用户的喜好，你需要从中学习用户喜好，比如该歌曲中没有镶边模块，但是参考的数据中有FlangerOn，那就要考虑开启镶边模块），其中CompressorOn表示需要开启压缩模块，CompressorOff表示关闭压缩模块，其他模块同理。如果参考中的模块关闭则不需要参考里面具体的参数。如果参考中的模块开启则考虑也开启该模块，并为模块生成具体参数值。如果参考中的参数值不一致（比如第一个参数有CompressorOn而第二个是CompressorOff）则以第一个的参数值为基准。'
+            system_prompt = f'你是一位专业音效调整师，请返回该音效的 JSON 格式的参数列表，例如: {effector["example_with"]}，你只需要参考格式，请不要参考列表中的任何参数值，你的回答需要在列表之中，不要有任何多余数据。具体参数值可以参考{resu}中的内容，这些参数是用户查询的歌曲的相似歌曲所配置的参数（参数值结合了用户的喜好，你需要从中学习用户喜好，比如该歌曲中没有镶边模块，但是参考的数据中有FlangerOn，那就要考虑开启镶边模块），其中CompressorOn表示需要开启压缩模块，CompressorOff表示关闭压缩模块，其他模块同理。如果参考中的模块关闭则不需要参考里面具体的参数。如果参考中的模块开启则考虑也开启该模块，并为模块生成具体参数值，这些参数值尽量要和参考中的参数值不相同（波动范围不要太大）。如果参考中的参数值不一致（比如第一个参数有CompressorOn而第二个是CompressorOff）则以第一个的参数值为基准。'
         else:
-            system_prompt = f'你是一位专业音效调整师，请返回该音效的 JSON 格式的参数列表，例如: {effector["example_with"]}你的回答需要在列表之中，不要有任何多余数据。'
+            system_prompt = f'你是一位专业音效调整师，请返回该音效的 JSON 格式的参数列表，例如: {effector["example_with"]}，你只需要参考格式，请不要参考列表中的任何参数值，你的回答需要在列表之中，不要有任何多余数据。'
         print(f"system_prompt:{system_prompt}")
         user_prompt = effector["prompt_with"] + effector["example_with"]
         response = client.chat.completions.create(
