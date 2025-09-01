@@ -84,6 +84,7 @@ private:
         if (button == &sqlButton)
         {
             std::string userMessage = readEnvWithType<std::string>("user_Message");
+            std::string audioPath = readEnvWithType<std::string>("audio_File_Path");
             // 在日志中打印 userMessage 的值
             juce::Logger::writeToLog("userMessage:" + juce::String(userMessage));
             std::string currentPresetName = presetManager.getCurrentPreset().toStdString();
@@ -308,9 +309,9 @@ private:
             juce::Logger::writeToLog("paramString:" + juce::String(paramString));
             
             // 定义 Python 解释器路径和 Python 脚本路径
-            const char* pythonInterpreterPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\env\Scripts\python.exe)";
+            const char* pythonInterpreterPath = R"(E:\pythonproject\Scripts\python.exe)";
             //const char* pythonScriptPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\sql.py)";
-            const char* pythonScriptPath = R"("C:\Users\80753\Documents\GitHub\supertonal\Source\sql.py")";
+            const char* pythonScriptPath = R"("C:\Users\Lenovo56\Documents\GitHub\supertonal\Source\sql.py")";
             
             // 构建执行 Python 脚本的命令，将所有参数传递给 Python 脚本
             std::string command = pythonInterpreterPath;
@@ -319,6 +320,7 @@ private:
             command += " \"" + paramString + "\"";  // 第一个参数: 所有效果器参数
             command += " \"" + userMessage + "\"";  // 第二个参数: 用户消息currentPresetName
             command += " \"" + currentPresetName + "\"";
+            command += " \"" + audioPath + "\"";
             // 执行 Python 脚本
             int returnCode = std::system(command.c_str());
             if (returnCode != 0) {

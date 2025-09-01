@@ -10,6 +10,10 @@ import pandas as pd
 import xml.etree.ElementTree as ET
 import os
 import platform
+import torch
+import librosa
+from transformers import Wav2Vec2Processor, Wav2Vec2Model
+import numpy as np
 
 # 定义 MemoryNote 类
 class MemoryNote:
@@ -22,6 +26,38 @@ class MemoryNote:
 
     def __str__(self):
         return f"ID: {self.id}, Song Name: {self.songName}, Style: {self.style}, Feature: {self.feature}, Parameter: {self.parameter}"
+
+
+def audio_to_vector(file_path):
+    # 加载预训练的处理器和模型
+    processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
+    model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h")
+
+    # 加载音频文件（librosa默认采样率为22050Hz，wav2vec2通常期望16000Hz）
+    audio, sample_rate = librosa.load(file_path, sr=16000)
+
+    # 预处理音频：转换为输入特征
+    inputs = processor(audio, sampling_rate=16000, return_tensors="pt")
+
+    # 获取模型输出（不计算梯度以提高效率）
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    # outputs.last_hidden_state是序列级特征，形状为 [1, seq_len, hidden_size]
+    # 可以通过平均等方式得到整个音频的向量表示
+    audio_vector = outputs.last_hidden_state.mean(dim=1).squeeze()
+
+    return audio_vector.numpy()  # 转换为numpy数组返回
+
+# 定义向量余弦相似度计算函数
+def vector_cosine_similarity(vec1, vec2):
+    """计算两个向量的余弦相似度"""
+    dot_product = np.dot(vec1, vec2)
+    norm_vec1 = np.linalg.norm(vec1)
+    norm_vec2 = np.linalg.norm(vec2)
+    if norm_vec1 == 0 or norm_vec2 == 0:
+        return 0.0
+    return dot_product / (norm_vec1 * norm_vec2)
 
 # 定义Jaccard相似度函数
 def jaccard_similarity(set1, set2):
@@ -60,7 +96,7 @@ def update_preset_in_file(file_path, params_dict):
 
 try:
     # 读取 result1.txt 文件
-    with open(r"C:\Users\80753\Desktop\result1.txt", 'r', encoding='utf-8') as file:
+    with open(r"C:\Users\Lenovo56\Desktop\result1.txt", 'r', encoding='utf-8') as file:
         result1_str = file.read()
         # 将字符串转换为集合
         result1_set = set(result1_str.split(',')) if result1_str else set()
@@ -69,7 +105,7 @@ except FileNotFoundError:
 
 try:
     # 读取 result2.txt 文件
-    with open(r"C:\Users\80753\Desktop\result2.txt", 'r', encoding='utf-8') as file:
+    with open(r"C:\Users\Lenovo56\Desktop\result2.txt", 'r', encoding='utf-8') as file:
         result2_str = file.read()
 except FileNotFoundError:
     print("无法打开 result2.txt 文件")
@@ -99,25 +135,38 @@ try:
     # 获取index的值
     if len(sys.argv) > 3:         
         chat_message = sys.argv[1]  # 获取命令行中c++程序传入的第一个参数
-        print(f"Chat message: {chat_message}")
+        print(f"Parameter: {chat_message}")
         if platform.system() == "Windows":
            # Windows命令行通常使用GBK编码
            user_message = sys.argv[2].encode('cp936').decode('utf-8', errors='replace')
            currentPresetName = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
+           if len(sys.argv) > 4:
+                audio_File_Path = sys.argv[4].encode('cp936').decode('utf-8', errors='replace')
+           else:
+                audio_File_Path = ""
         else:
            # Linux/macOS通常使用UTF-8
            user_message = sys.argv[2]
            currentPresetName = sys.argv[3]
-
+           if len(sys.argv) > 4:
+                audio_File_Path = sys.argv[4]
+           else:
+                audio_File_Path = ""
         # 添加判断：如果user_message为空，则用currentPresetName代替
         if not user_message.strip():  # 处理空字符串或仅含空白字符的情况
            user_message = currentPresetName
 
         print(f"User message: {user_message}")  # 获取命令行中c++程序传入的第二个参数  
         print(f"currentPresetName: {currentPresetName}")
-
+        print(f"audio_File_Path: {audio_File_Path}")
+        if audio_File_Path and audio_File_Path.strip():
+           vector = audio_to_vector(audio_File_Path)
+           print("音频向量形状：", vector)
+        else:
+           vector = None  # 或空列表[]，根据后续使用场景确定
+           print("未提供有效的文件路径，音频向量为空")
         # 从数据库中获取所有歌曲信息并计算相似度
-        cursor.execute("SELECT SongName, Style, Feature, Parameters FROM music_responses")
+        cursor.execute("SELECT SongName, Style, Feature, Parameters, Vector FROM music_responses")
         rows = cursor.fetchall()
         similar_songs = []
         memory_notes = []  # 存储 MemoryNote 实例的列表
@@ -128,6 +177,7 @@ try:
             style_str = row[1]
             feature_str = row[2]
             parameter_str = row[3]
+            vector_str = row[4]
             if song_name != user_message:
                 try:
                     style = json.loads(style_str)
@@ -140,9 +190,25 @@ try:
                     # 计算描述相似度
                     description = " ".join(feature)
                     desc_similarity = text_similarity(result2_str, description)
+                   
+                   # 计算向量相似度（如果file_path不为空且向量存在）
+                    vector_similarity = 0.0
+                    if audio_File_Path and audio_File_Path.strip() and vector_str:
+                        try:
+                          # 将数据库中的向量字符串转换为numpy数组
+                          db_vector = np.array([float(x.strip()) for x in vector_str.split(',')])
+                          # 计算与目标音频向量的余弦相似度
+                          vector_similarity = vector_cosine_similarity(vector, db_vector)
+                        except (ValueError, TypeError) as e:
+                          print(f"处理歌曲 {song_name} 的向量时出错: {e}")
         
-                    # 综合相似度 (权重可以调整)
-                    similarity = 0.7 * tag_similarity + 0.3 * desc_similarity
+                    # 综合相似度（根据是否有向量调整权重）
+                    if audio_File_Path and audio_File_Path.strip() and vector_str:
+                       # 有音频向量时，增加向量相似度的权重
+                       similarity = 0.3 * tag_similarity + 0.2 * desc_similarity + 0.5 * vector_similarity
+                    else:
+                       # 无音频向量时使用原权重
+                       similarity = 0.7 * tag_similarity + 0.3 * desc_similarity
         
                     if similarity> 0.1:
                         similar_songs.append((song_name, similarity, style_str, feature_str, parameter_str))
@@ -172,7 +238,7 @@ try:
 
 
                 # 查询匹配的记录
-                cursor.execute("SELECT SongName, Style, Feature, Parameters FROM music_responses WHERE SongName =?", (user_message,))
+                cursor.execute("SELECT SongName, Style, Feature, Parameters, Vector FROM music_responses WHERE SongName =?", (user_message,))
                 row = cursor.fetchone()
 
                 if row:

@@ -6,9 +6,6 @@
 #include <juce_core/juce_core.h>
 #include "../PluginPresetManager.h"
 
-
-
-
 // 存储环境变量时添加引号并转义内部引号
 void storeEnvWithType(const std::string& key, const juce::String& value, const std::string& type) {
     std::string escapedValue = value.toStdString();
@@ -470,15 +467,17 @@ EffectParameters extractParameters(const juce::String& jsonString) {
     return params;
 }
 
-// 实现 ChatComponent 类的构造函数
+// Implement the constructor of ChatComponent class
 ChatComponent::ChatComponent(PluginPresetManager& pm)
-    : juce::Thread("NetworkThread"),  // 初始化网络线程
+    : juce::Thread("NetworkThread"),  // Initialize network thread
     presetManager(pm),
     sendButton("Send"),
-    statusLabel("Status", "Ready")
+    statusLabel("Status", "Ready"),
+    audioFileLabel("AudioFileLabel", "No file selected"),  // Initialize label
+    audioFileButton("Select audio file")
 {
     currentPresetName = presetManager.getCurrentPreset();
-    // 初始化UI组件
+    // Initialize UI components
     addAndMakeVisible(inputEditor);
     addAndMakeVisible(sendButton);
     addAndMakeVisible(responseEditor);
@@ -491,13 +490,29 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     responseEditor.setMultiLine(true);
     responseEditor.setReadOnly(true);
 
+    // Initialize audio file selection button
+    addAndMakeVisible(audioFileButton);
+    audioFileButton.addListener(this);  // Listen for button clicks
+    audioFileButton.setTooltip("Select audio file (supports wav, mp3, aif, flac, etc.)");
+
+    // Initialize audio file path label (optional, used to display selected file)
+    addAndMakeVisible(audioFileLabel);
+    audioFileLabel.setColour(juce::Label::textColourId, juce::Colours::darkgrey);
+
     setSize(600, 400);
 }
 
-// 实现 ChatComponent 类的 resized 方法
+// Implement the resized method of ChatComponent class
 void ChatComponent::resized()
 {
     auto area = getLocalBounds().reduced(8);
+
+    // First allocate area for audio file selection (e.g., below input area)
+    auto audioArea = area.removeFromTop(40);  // Reserve 40 pixels height for audio selection button
+    audioFileButton.setBounds(audioArea.removeFromLeft(220).reduced(2));  // Button width 120
+    audioFileLabel.setBounds(audioArea.reduced(2));  // Label occupies remaining area
+
+    // Allocate remaining area to original input area, button area, etc. (keep original logic)
     auto inputArea = area.removeFromTop(100);
     auto buttonArea = area.removeFromTop(24);
     auto responseArea = area;
@@ -511,14 +526,14 @@ void ChatComponent::resized()
 
 void ChatComponent::callAsync(const juce::String& response)
 {
-    // 使用 callAsync 确保在主线程中更新 UI
+    // Use callAsync to ensure UI update on main thread
     juce::MessageManager::callAsync([this, response]() {
-        responseEditor.setText(response, juce::dontSendNotification); // 更新响应内容到 responseEditor
-        juce::Logger::writeToLog("Response updated in UI: " + response); // 打印日志
+        responseEditor.setText(response, juce::dontSendNotification); // Update response content to responseEditor
+        juce::Logger::writeToLog("Response updated in UI: " + response); // Print log
         });
 }
 
-// 实现 ChatComponent 类的 buttonClicked 方法
+// Implement the buttonClicked method of ChatComponent class
 void ChatComponent::buttonClicked(juce::Button* button)
 {
     if (button == &sendButton)
@@ -526,79 +541,111 @@ void ChatComponent::buttonClicked(juce::Button* button)
         auto message = inputEditor.getText();
         if (message.isNotEmpty())
         {
-            userMessageToSend = message; // 保存用户消息
+            userMessageToSend = message; // Save user message
             inputEditor.clear();
-            startThread();  // 启动线程
+            startThread();  // Start thread
+        }
+    }else if (button == &audioFileButton){
+        // Create file chooser, specify title and default path (here, user's desktop)
+        juce::FileChooser fileChooser("Select audio file",
+            juce::File::getSpecialLocation(juce::File::userDesktopDirectory),
+            "Audio files (*.wav;*.WAV;*.mp3;*.MP3;*.aif;*.AIF;*.flac;*.FLAC)");  // Supported formats
+
+        // Show open file dialog (modal window)
+        if (fileChooser.browseForFileToOpen())
+        {
+            // Get selected file path
+            juce::File selectedFile = fileChooser.getResult();
+            audioFilePath = selectedFile.getFullPathName();
+
+            // Update label to display selected file name (or full path)
+            audioFileLabel.setText("Selected: " + selectedFile.getFileName(), juce::dontSendNotification);
+
+            // Optional: Add file validation logic here (e.g., check file size, format, etc.)
+            if (selectedFile.getSize() == 0)
+            {
+                juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                    "Error",
+                    "The selected file is empty!");
+                audioFilePath.clear();
+                audioFileLabel.setText("No file selected", juce::dontSendNotification);
+            }
         }
     }
 }
 
+
 // 实现 ChatComponent 类的 run 方法
-void ChatComponent::run()
-{
-    // 获取待发送的用户消息
+void ChatComponent::run() {
+    // 获取用户消息
     updateStatus("sending request");
     auto userMessage = userMessageToSend;
     if (userMessage.isNotEmpty()) {
         juce::Logger::writeToLog("send request: " + userMessage);
-        // 打印到日志
         juce::Logger::writeToLog("currentPresetName: " + currentPresetName);
     }
 
-    // 定义 Python 解释器路径和 Python 脚本路径
-    const char* pythonInterpreterPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\env\Scripts\python.exe)";
-    const char* pythonScriptPath = R"(C:\Users\80753\Documents\GitHub\supertonal\Source\llm.py)";
+    // 检查音频文件路径是否存在
+    if (!audioFilePath.isEmpty()) {
+        juce::Logger::writeToLog("Audio file path: " + audioFilePath);
+    }
+    else {
+        juce::Logger::writeToLog("No audio file selected");
+    }
 
-    // 构建执行 Python 脚本的命令，正确处理中文
-    juce::String command = juce::String(pythonInterpreterPath);
-    command += " ";
-    command += juce::String(pythonScriptPath);
-    command += " \"";
-    command += userMessage; // 直接使用 juce::String，避免转换
-    command += "\"";
+    // 定义 Python 解释器和脚本路径
+    const char* pythonInterpreterPath = R"(E:\pythonproject\Scripts\python.exe)";
+    const char* pythonScriptPath = R"(C:\Users\Lenovo56\Documents\GitHub\supertonal\Source\llm.py)";
 
-    // 存储环境变量，使用正确的编码
+    // 构建命令行：解释器 + 脚本 + 用户消息 + 音频路径（若有）
+    juce::String command;
+    command << pythonInterpreterPath << " " << pythonScriptPath;
+
+    // 添加用户消息参数（用引号包裹，处理空格）
+    command << " \"" << userMessage << "\"";
+
+    // 添加音频文件路径参数（若存在，用引号包裹）
+    if (!audioFilePath.isEmpty()) {
+        command << " \"" << audioFilePath << "\"";
+    }
+
+    // 存储环境变量（可选，也可仅通过命令行传递）
     storeEnvWithType("user_Message", userMessage, "string");
+    if (!audioFilePath.isEmpty()) {
+        storeEnvWithType("audio_File_Path", audioFilePath, "string");
+    }
 
-    // 将命令转换为 UTF-8 编码的 std::string 用于 system 调用
+    // 执行命令
     std::string utf8Command = command.toStdString();
-
-    // 执行 Python 脚本
     int returnCode = std::system(utf8Command.c_str());
+
     if (returnCode != 0) {
-        std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
-        std::cerr << "执行的命令: " << utf8Command << std::endl;
+        std::cerr << "Python script failed, return code: " << returnCode << std::endl;
+        std::cerr << "Command: " << utf8Command << std::endl;
         updateStatus("Python script execution failed");
     }
     else {
         updateStatus("Python script executed successfully");
 
-        // 读取 result.txt 文件，使用正确的编码处理
-        std::ifstream file(R"(C:\Users\80753\Desktop\result.txt)", std::ios::binary);
+        // 读取并处理结果（原有逻辑不变）
+        std::ifstream file(R"(C:\Users\Lenovo56\Desktop\result.txt)", std::ios::binary);
         if (!file.is_open()) {
-            std::cerr << "无法打开 result.txt 文件" << std::endl;
-            updateStatus("无法打开 result.txt 文件");
+            std::cerr << "Failed to open result.txt" << std::endl;
+            updateStatus("Failed to open result.txt");
             return;
         }
 
-        // 读取文件内容为二进制数据
         std::stringstream buffer;
         buffer << file.rdbuf();
         std::string resultBytes = buffer.str();
-
-        // 关闭文件
         file.close();
 
-        // 将字节数据转换为 juce::String（假设文件是UTF-8编码）
         juce::String resultStr = juce::String::fromUTF8(resultBytes.data(), resultBytes.size());
-
-        // 调用提取参数的函数
         EffectParameters params = extractParameters(resultStr);
-
-        // 将结果显示在 UI 上
         callAsync(juce::String(params.toString()));
     }
 }
+
 
 
 // 实现 ChatComponent 类的 updateStatus 方法
