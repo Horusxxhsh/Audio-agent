@@ -302,7 +302,11 @@ if not found_similar:
     print("未找到相似歌曲")
 
 # 第一个系统提示
-system_prompt1 = f'你是音效参数专家，需要从用户输入的歌曲名称判断给歌曲添加哪些音效模块，这些模块包括过载，失真，延迟，混响，压缩，相位，合唱，镶边，均衡，噪声门，返回这些音效的 JSON 格式的参数列表，例如: {{"overload": "yes", "distortion": "yes", "delay": "yes", "reverb": "yes", "compression": "no", "phase": "no", "chorus": "no", "flanger": "no", "equalization": "yes", "noise_gate": "no"}}用户输入的歌曲是: {chat_message}，返回结果格式严格参照给的例子。具体参数可以参考{resu}中的内容，这些参数是用户查询的歌曲的相似歌曲所配置的参数（参数值结合了用户的喜好，你需要从中学习用户喜好，比如该歌曲中没有镶边模块，但是参考的数据中有FlangerOn，那就要考虑开启镶边模块），其中CompressorOn表示需要开启压缩模块，CompressorOff表示关闭压缩模块，其他模块同理。如果参考中的参数值不一致（比如第一个参数有CompressorOn而第二个是CompressorOff）则以第一个的参数值为基准。'
+if memoryEnabled == "true" and resu is not None:
+    system_prompt1 = f'你是音效参数专家，需要从用户输入的歌曲名称判断给歌曲添加哪些音效模块，这些模块包括过载，失真，延迟，混响，压缩，相位，合唱，镶边，均衡，噪声门，返回这些音效的 JSON 格式的参数列表，例如: {{"overload": "yes", "distortion": "yes", "delay": "yes", "reverb": "yes", "compression": "no", "phase": "no", "chorus": "no", "flanger": "no", "equalization": "yes", "noise_gate": "no"}}用户输入的歌曲是: {chat_message}，返回结果格式严格参照给的例子。具体参数可以参考{resu}中的内容，这些参数是用户查询的歌曲的相似歌曲所配置的参数（参数值结合了用户的喜好，你需要从中学习用户喜好，比如该歌曲中没有镶边模块，但是参考的数据中有FlangerOn，那就要考虑开启镶边模块），其中CompressorOn表示需要开启压缩模块，CompressorOff表示关闭压缩模块，其他模块同理。如果参考中的参数值不一致（比如第一个参数有CompressorOn而第二个是CompressorOff）则以第一个的参数值为基准。'
+else:
+    system_prompt1 = f'你是音效参数专家，需要从用户输入的歌曲名称判断给歌曲添加哪些音效模块，这些模块包括过载，失真，延迟，混响，压缩，相位，合唱，镶边，均衡，噪声门，返回这些音效的 JSON 格式的参数列表，例如: {{"overload": "yes", "distortion": "yes", "delay": "yes", "reverb": "yes", "compression": "no", "phase": "no", "chorus": "no", "flanger": "no", "equalization": "yes", "noise_gate": "no"}}用户输入的歌曲是: {chat_message}，返回结果格式严格参照给的例子。'
+print(f"system_prompt:{system_prompt1}")
 user_prompt1 = chat_message
 response1 = client.chat.completions.create(
     model="deepseek-chat",
