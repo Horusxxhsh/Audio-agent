@@ -59,7 +59,7 @@ Note: Please replace the paths with your actual paths.
 It is a work in progress, but I've made a strong effort to keep it portable and buildable with basic knowledge of JUCE. To get it working, simply:
 
 ```bash
-git clone --recurse-submodules https://github.com/Horusxxhsh/supertonal
+git clone -b master --single-branch --recurse-submodules https://github.com/Horusxxhsh/Audio--agent.git
 ```
 
 Then you should be able to open up the `.jucer` file and work in your environment of choice.
