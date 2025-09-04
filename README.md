@@ -28,8 +28,13 @@ It's capabilities, in a rough order:
 
 # Work Progress:
 1. Added a large language model interaction interface, implementing AI-generated parameter functionality.
+
 ![Alt text](Screenshots/chat.png "CHAT UI")
-2. Added a music memory module, achieving personalized learning.
+
+After a successful response, click the reset button to transfer parameters with one click.
+
+2. Added a music memory module, achieving personalized learning.By turning the memory function on/off (MemoryOn/Off), you can decide whether to enable personalized generation.
+(Click the SQL button to update the database information. If the memory function is enabled, it will update parameters of similar songs stored in the database based on your preferences.)
 
 # Experiment Preparation:
 
