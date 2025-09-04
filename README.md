@@ -34,6 +34,7 @@ It's capabilities, in a rough order:
 After a successful response, click the reset button to transfer parameters with one click.
 
 2. Added a music memory module, achieving personalized learning.By turning the memory function on/off (MemoryOn/Off), you can decide whether to enable personalized generation.You can simultaneously upload the target song's audio file, which will be stored in the database. This serves as a metric for retrieving similar songs.
+   
 (Click the SQL button to update the database information. If the memory function is enabled, it will update parameters of similar songs stored in the database based on your preferences.)
 
 # Experiment Preparation:
