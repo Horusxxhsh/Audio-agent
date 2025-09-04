@@ -1,4 +1,4 @@
-![Alt text](Screenshots/wide.JPG "Supertonal")
+![Alt text](Screenshots/wide.JPG "Audio agent")
 
 # Audio agent
 
