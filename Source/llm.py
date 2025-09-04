@@ -11,6 +11,36 @@ import torch
 import librosa
 from transformers import Wav2Vec2Processor, Wav2Vec2Model
 import numpy as np
+import tempfile
+
+# 定义一个函数来安全地写入文件
+def safe_write_file(filename, content):
+    try:
+        # 首先尝试在当前目录写入
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(content)
+            print(f"文件已保存到当前目录: {os.path.abspath(filename)}")
+    except (IOError, PermissionError):
+        try:
+            # 如果失败，尝试在环境变量指定的文档目录写入
+            docs_dir = os.environ.get('DOCUMENTS_DIR')  # 获取环境变量
+            
+            if docs_dir:
+                full_path = os.path.join(docs_dir, filename)
+                with open(full_path, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                print(f"文件已保存到文档目录: {full_path}")
+            else:
+                # 如果环境变量不存在，抛出异常以进入下一个尝试
+                raise FileNotFoundError("环境变量 DOCUMENTS_DIR 未设置")
+                
+        except (IOError, PermissionError, FileNotFoundError):
+            # 如果仍然失败，尝试在系统临时目录写入
+            temp_dir = tempfile.gettempdir()
+            full_path = os.path.join(temp_dir, filename)
+            with open(full_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            print(f"文件已保存到临时目录: {full_path}")
 
 def audio_to_vector(file_path):
     # 加载预训练的处理器和模型
@@ -430,14 +460,13 @@ except sqlite3.Error as e:
     sys.exit(1)
 
 # 将风格结果字符串写入文件
-with open("result1.txt", 'w', encoding='utf-8') as f:
-    f.write(song_style_str)
+safe_write_file("result1.txt", song_style_str)
+
 # 将特征结果字符串写入文件
-with open("result2.txt", 'w', encoding='utf-8') as f:
-    f.write(guitar_features_str)
+safe_write_file("result2.txt", guitar_features_str)
+
 # 将参数结果字符串写入文件
-with open("result.txt", 'w', encoding='utf-8') as f:
-    f.write(result_str)
+safe_write_file("result.txt", result_str)
 
 # 关闭数据库连接
 conn.close()

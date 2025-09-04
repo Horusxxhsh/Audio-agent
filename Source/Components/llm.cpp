@@ -684,7 +684,7 @@ void ChatComponent::run() {
         //storeEnvWithType("memory_Enabled", "false", "bool");
     }
 
-    //// 假设您知道项目根目录与当前工作目录的关系
+    //// 方法一：假设您知道项目根目录与当前工作目录的关系
     //juce::File currentDir = juce::File::getCurrentWorkingDirectory();
     //juce::Logger::writeToLog("Current working directory: " + currentDir.getFullPathName());
 
@@ -708,11 +708,11 @@ void ChatComponent::run() {
     //juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
     //juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
 
-    // 定义 Python 解释器和脚本路径
-    /*const char* pythonInterpreterPath = R"(C:\Users\80753\Documents\GitHub\supertonal\Source\Components\PythonApplication\env\Scripts\python.exe)";
-    const char* pythonScriptPath = R"(C:\Users\80753\Documents\GitHub\supertonal\Source\llm.py)";*/
+    //// 方法二：定义 Python 解释器和脚本路径
+    //const char* pythonInterpreterPath = R"(C:\Users\80753\Documents\GitHub\Audio-agent\Source\Components\PythonApplication\env\Scripts\python.exe)";
+    //const char* pythonScriptPath = R"(C:\Users\80753\Documents\GitHub\Audio-agent\Source\llm.py)";
     
-    // 定义 Python 解释器和脚本的文件对象
+    // 方法三：定义 Python 解释器和脚本的文件对象
     juce::File pythonInterpreterFile;
     juce::File pythonScriptFile;
     // 获取环境变量并记录原始值
@@ -753,9 +753,10 @@ void ChatComponent::run() {
     juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
     juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
     
+
     // 构建命令行：解释器 + 脚本 + 用户消息 + 音频路径（若有）+ 记忆状态
     juce::String command;
-    command << pythonInterpreterPath << " " << pythonScriptPath;
+    command << pythonInterpreterPath.toStdString() << " " << pythonScriptPath.toStdString();
 
     // 添加用户消息参数（用引号包裹，处理空格）
     command << " \"" << userMessage << "\"";
@@ -779,32 +780,41 @@ void ChatComponent::run() {
 
     // 执行命令
     std::string utf8Command = command.toStdString();
-    std::string commandWithErrorCapture = utf8Command + " 2>\"" +
-        juce::File::getCurrentWorkingDirectory().getChildFile("error_log.txt").getFullPathName().toStdString() + "\"";
-    int returnCode = std::system(commandWithErrorCapture.c_str());
-    juce::Logger::writeToLog("utf8Command: " + juce::String(utf8Command) + ", return code: " + juce::String(returnCode));
+    int returnCode = std::system(utf8Command.c_str());
+    juce::Logger::writeToLog("commandWithErrorCapture: " + juce::String(utf8Command) + ", return code: " + juce::String(returnCode));
     if (returnCode != 0) {
-    // 使用完整路径读取错误日志
-    juce::File errorFile = juce::File::getCurrentWorkingDirectory().getChildFile("error_log.txt");
-    if (errorFile.existsAsFile()) {
-        juce::String errorText = errorFile.loadFileAsString();
-        juce::Logger::writeToLog("Python error: " + errorText);
-        updateStatus("Python script failed: " + errorText.substring(0, 100));
-    } else {
-        juce::Logger::writeToLog("Error log file not found");
-        //callAsync(currentDir.getFullPathName() + pythonInterpreterPath + pythonScriptPath);
-        updateStatus("Python script failed but no error log was created");
+        std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
+        std::cerr << "执行的命令: " << command << std::endl;
+        updateStatus("Python script execution failed");
     }
-}
     else {
         updateStatus("Python script executed successfully");
 
-        // 读取并处理结果（原有逻辑不变）
+        // 读取并处理结果
         std::ifstream file(R"(result.txt)", std::ios::binary);
         if (!file.is_open()) {
             std::cerr << "Failed to open result.txt" << std::endl;
-            updateStatus("Failed to open result.txt");
-            return;
+            file.close(); // 确保关闭之前的尝试
+
+            // 使用JUCE的SystemStats来获取环境变量
+            juce::String documentsPath = juce::SystemStats::getEnvironmentVariable("DOCUMENTS_DIR", "");
+
+            if (documentsPath.isEmpty()) {
+                // 如果环境变量未设置，记录警告
+                std::cerr << "DOCUMENTS_DIR environment variable not set" << std::endl;
+                updateStatus("Failed to open DOCUMENTS_DIR");
+            }
+            else {
+                // 使用JUCE的File类构建路径
+                juce::File resultFile = juce::File(documentsPath).getChildFile("result.txt");
+                file.open(resultFile.getFullPathName().toStdString(), std::ios::binary);
+            }
+
+            if (!file.is_open()) {
+                std::cerr << "Failed to open file from alternative location" << std::endl;
+                updateStatus("Failed to open result file from all locations");
+                return; // 或者尝试其他位置
+            }
         }
 
         std::stringstream buffer;

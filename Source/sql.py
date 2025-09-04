@@ -94,21 +94,43 @@ def update_preset_in_file(file_path, params_dict):
         print(f"更新预设文件出错: {e}")
         return False
 
-try:
-    # 读取 result1.txt 文件
-    with open(r"result1.txt", 'r', encoding='utf-8') as file:
-        result1_str = file.read()
-        # 将字符串转换为集合
-        result1_set = set(result1_str.split(',')) if result1_str else set()
-except FileNotFoundError:
-    print("无法打开 result1.txt 文件")
+def safe_open_file(relative_path, absolute_dir=None):
+    """尝试打开文件，如果相对路径失败则尝试使用环境变量指定的路径"""
+    
+    # 如果没有提供绝对路径，尝试从环境变量获取
+    if absolute_dir is None:
+        absolute_dir = os.environ.get('DOCUMENTS_DIR')
+        # 如果环境变量也不存在，使用默认值
+        if not absolute_dir:
+            print("警告: 环境变量 DOCUMENTS_DIR 未设置，使用当前目录")
+            absolute_dir = os.getcwd()  # 使用当前工作目录作为备选
+    
+    try:
+        # 首先尝试相对路径
+        with open(relative_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+            print(f"成功从相对路径打开文件: {relative_path}")
+            return content
+    except FileNotFoundError:
+        try:
+            # 如果相对路径失败，尝试环境变量指定的路径
+            absolute_path = os.path.join(absolute_dir, relative_path)
+            with open(absolute_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+                print(f"成功从环境变量指定路径打开文件: {absolute_path}")
+                return content
+        except FileNotFoundError:
+            print(f"无法打开文件 {relative_path}，相对路径和环境变量路径都失败")
+            return ""
 
-try:
-    # 读取 result2.txt 文件
-    with open(r"result2.txt", 'r', encoding='utf-8') as file:
-        result2_str = file.read()
-except FileNotFoundError:
-    print("无法打开 result2.txt 文件")
+# 读取 result1.txt 文件
+result1_str = safe_open_file("result1.txt")
+# 将字符串转换为集合
+result1_set = set(result1_str.split(',')) if result1_str else set()
+
+# 读取 result2.txt 文件
+result2_str = safe_open_file("result2.txt")
+
 
 def get_ratio(value):
     mapping = {
