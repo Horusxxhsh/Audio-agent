@@ -2,7 +2,7 @@
 
 # Audio agent
 
-Audio agent is a work-in-progress guitar multi-effects processor.
+Audio agent is a smart guitar multi-effects processor.
 
 Take a listen to a [sample](https://github.com/pauljonescodes/supertonal/tree/master/Sounds).
 
