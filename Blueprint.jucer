@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="gKYDzO" name="Blueprint Cory Bergeron2" projectType="audioplug"
-              useAppConfig="0" addUsingNamespaceToJuceHeader="0" displaySplashScreen="1"
-              jucerFormatVersion="1" version="0.2.2" companyName="Supertonal DSP"
-              companyCopyright="2024" pluginFormats="buildAAX,buildAU,buildStandalone,buildVST3"
-              pluginAAXCategory="8192" headerPath="../../Modules/math_approx/include&#10;../../Modules/chowdsp_wdf/include/chowdsp_wdf"
+<JUCERPROJECT id="gKYDzO" name="Audio agent" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              version="0.2.2" companyName="Supertonal DSP" companyCopyright="2024"
+              pluginFormats="buildAAX,buildAU,buildStandalone,buildVST3" pluginAAXCategory="8192"
+              headerPath="../../Modules/math_approx/include&#10;../../Modules/chowdsp_wdf/include/chowdsp_wdf"
               cppLanguageStandard="20">
-  <MAINGROUP id="Pdzbsi" name="Blueprint Cory Bergeron2">
+  <MAINGROUP id="Pdzbsi" name="Audio agent">
     <GROUP id="{65D798E1-9C8B-A651-44AD-20290FC60DD9}" name="New Group"/>
     <GROUP id="{2ED2996E-C3B4-16E6-D794-2D6A2D1A240A}" name="Assets">
       <FILE id="MsarIr" name="croy_cab.wav" compile="0" resource="1" file="Assets/croy_cab.wav"/>

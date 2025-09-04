@@ -138,6 +138,10 @@ private:
     juce::TextButton audioFileButton{ "选择音频文件" };  // 触发文件选择的按钮
     juce::String audioFilePath;  // 存储选中的音频文件路径
     juce::Label audioFileLabel;  // 显示选中的文件路径（可选）
+    // 在 ChatComponent 类的私有成员变量部分添加
+    juce::TextButton memoryToggleButton;  // 记忆开关按钮
+    bool memoryEnabled = false;  // 记忆状态标志
+    juce::TextButton cancelAudioButton;
 
     void run() override;
     void updateStatus(const juce::String& text);

@@ -85,6 +85,12 @@ private:
         {
             std::string userMessage = readEnvWithType<std::string>("user_Message");
             std::string audioPath = readEnvWithType<std::string>("audio_File_Path");
+            std::string memoryEnabled = readEnvWithType<std::string>("memory_Enabled");
+            if (memoryEnabled == "") {
+				memoryEnabled = "false";
+            }
+            // 记录实际读取到的 memoryEnabled 值
+            juce::Logger::writeToLog("memoryEnabled (raw):" + juce::String(memoryEnabled));
             // 在日志中打印 userMessage 的值
             juce::Logger::writeToLog("userMessage:" + juce::String(userMessage));
             std::string currentPresetName = presetManager.getCurrentPreset().toStdString();
@@ -308,21 +314,87 @@ private:
             paramString += "," + std::to_string(paramCount);
             juce::Logger::writeToLog("paramString:" + juce::String(paramString));
             
-            // 定义 Python 解释器路径和 Python 脚本路径
-            const char* pythonInterpreterPath = R"(E:\pythonproject\Scripts\python.exe)";
-            //const char* pythonScriptPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\sql.py)";
-            const char* pythonScriptPath = R"("C:\Users\Lenovo56\Documents\GitHub\supertonal\Source\sql.py")";
-            
-            // 构建执行 Python 脚本的命令，将所有参数传递给 Python 脚本
-            std::string command = pythonInterpreterPath;
+            //// 定义 Python 解释器路径和 Python 脚本路径
+            //const char* pythonInterpreterPath = R"(C:\Users\80753\Documents\GitHub\supertonal\Source\Components\PythonApplication\env\Scripts\python.exe)";
+            ////const char* pythonScriptPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\sql.py)";
+            //const char* pythonScriptPath = R"("C:\Users\80753\Documents\GitHub\supertonal\Source\sql.py")";
+
+            //// 假设您知道项目根目录与当前工作目录的关系
+            //juce::File currentDir = juce::File::getCurrentWorkingDirectory();
+            //juce::Logger::writeToLog("Current working directory: " + currentDir.getFullPathName());
+
+            //// 如果当前目录是 Builds，则向上一级再找到 supertonal 目录
+            //juce::File projectDir = currentDir;
+            //while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
+            //    projectDir = projectDir.getParentDirectory();
+            //}
+
+            //juce::Logger::writeToLog("Project directory: " + projectDir.getFullPathName());
+
+            //// Python 解释器路径
+            //juce::File pythonInterpreterFile = projectDir.getChildFile("Source/Components/PythonApplication/env/Scripts/python.exe");
+            //const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
+
+            //// Python 脚本路径
+            //juce::File pythonScriptFile = projectDir.getChildFile("Source/sql.py");
+            //const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
+
+            //// 记录路径用于调试
+            //juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
+            //juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
+
+            // 定义 Python 解释器和脚本的文件对象
+            juce::File pythonInterpreterFile;
+            juce::File pythonScriptFile;
+            // 获取环境变量并记录原始值
+            const char* pythonInterpreterEnv = std::getenv("SUPERTONAL_PYTHON_INTERPRETER");
+            const char* pythonScriptEnv = std::getenv("SUPERTONAL_PYTHON_SCRIPT2"); // 修正名称，添加了"1"
+
+            // 记录环境变量的原始值
+            juce::Logger::writeToLog("Raw interpreter env value: " +
+                (pythonInterpreterEnv != nullptr ? juce::String(pythonInterpreterEnv) : "null"));
+            juce::Logger::writeToLog("Raw script env value: " +
+                (pythonScriptEnv != nullptr ? juce::String(pythonScriptEnv) : "null"));
+            if (pythonInterpreterEnv != nullptr && pythonInterpreterEnv[0] != '\0') {
+                pythonInterpreterFile = juce::File(pythonInterpreterEnv);
+            }
+            else {
+                juce::File currentDir = juce::File::getCurrentWorkingDirectory();
+                juce::File projectDir = currentDir;
+                while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
+                   projectDir = projectDir.getParentDirectory();
+                }
+                pythonInterpreterFile = projectDir.getChildFile("Source/Components/PythonApplication/env/Scripts/python.exe");
+            }
+            if (pythonScriptEnv != nullptr && pythonScriptEnv[0] != '\0') {
+                pythonScriptFile = juce::File(pythonScriptEnv);
+            }
+            else {
+                juce::File currentDir = juce::File::getCurrentWorkingDirectory();
+                juce::File projectDir = currentDir;
+                while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
+                    projectDir = projectDir.getParentDirectory();
+                }
+                pythonScriptFile = projectDir.getChildFile("Source/sql.py");
+            }
+            const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
+            const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
+            juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
+            juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
+
+            /// 构建执行 Python 脚本的命令，将所有参数传递给 Python 脚本
+            std::string command = pythonInterpreterPath.toStdString(); // 使用 toStdString() 进行转换
             command += " ";
-            command += pythonScriptPath;
+            command += pythonScriptPath.toStdString(); // 使用 toStdString() 进行转换
             command += " \"" + paramString + "\"";  // 第一个参数: 所有效果器参数
-            command += " \"" + userMessage + "\"";  // 第二个参数: 用户消息currentPresetName
-            command += " \"" + currentPresetName + "\"";
-            command += " \"" + audioPath + "\"";
+            command += " \"" + userMessage + "\"";  // 第二个参数: 用户消息
+            command += " \"" + currentPresetName + "\"";  // 第三个参数: 当前预设名称
+            command += " \"" + memoryEnabled + "\"";  // 第四个参数: 记忆功能状态
+            command += " \"" + audioPath + "\"";  // 第五个参数: 音频文件路径
+
             // 执行 Python 脚本
             int returnCode = std::system(command.c_str());
+            juce::Logger::writeToLog("command: " + juce::String(command) + ", return code: " + juce::String(returnCode));
             if (returnCode != 0) {
                 std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
                 std::cerr << "执行的命令: " << command << std::endl;

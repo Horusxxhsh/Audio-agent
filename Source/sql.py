@@ -96,7 +96,7 @@ def update_preset_in_file(file_path, params_dict):
 
 try:
     # 读取 result1.txt 文件
-    with open(r"C:\Users\Lenovo56\Desktop\result1.txt", 'r', encoding='utf-8') as file:
+    with open(r"result1.txt", 'r', encoding='utf-8') as file:
         result1_str = file.read()
         # 将字符串转换为集合
         result1_set = set(result1_str.split(',')) if result1_str else set()
@@ -105,7 +105,7 @@ except FileNotFoundError:
 
 try:
     # 读取 result2.txt 文件
-    with open(r"C:\Users\Lenovo56\Desktop\result2.txt", 'r', encoding='utf-8') as file:
+    with open(r"result2.txt", 'r', encoding='utf-8') as file:
         result2_str = file.read()
 except FileNotFoundError:
     print("无法打开 result2.txt 文件")
@@ -133,23 +133,25 @@ try:
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     # 获取index的值
-    if len(sys.argv) > 3:         
+    if len(sys.argv) > 4:         
         chat_message = sys.argv[1]  # 获取命令行中c++程序传入的第一个参数
         print(f"Parameter: {chat_message}")
         if platform.system() == "Windows":
            # Windows命令行通常使用GBK编码
            user_message = sys.argv[2].encode('cp936').decode('utf-8', errors='replace')
            currentPresetName = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
-           if len(sys.argv) > 4:
-                audio_File_Path = sys.argv[4].encode('cp936').decode('utf-8', errors='replace')
+           memoryEnabled = sys.argv[4]
+           if len(sys.argv) > 5:
+                audio_File_Path = sys.argv[5].encode('cp936').decode('utf-8', errors='replace')
            else:
                 audio_File_Path = ""
         else:
            # Linux/macOS通常使用UTF-8
            user_message = sys.argv[2]
            currentPresetName = sys.argv[3]
-           if len(sys.argv) > 4:
-                audio_File_Path = sys.argv[4]
+           memoryEnabled = sys.argv[4]
+           if len(sys.argv) > 5:
+                audio_File_Path = sys.argv[5]
            else:
                 audio_File_Path = ""
         # 添加判断：如果user_message为空，则用currentPresetName代替
@@ -158,6 +160,7 @@ try:
 
         print(f"User message: {user_message}")  # 获取命令行中c++程序传入的第二个参数  
         print(f"currentPresetName: {currentPresetName}")
+        print(f"memoryEnabled: {memoryEnabled}")
         print(f"audio_File_Path: {audio_File_Path}")
         if audio_File_Path and audio_File_Path.strip():
            vector = audio_to_vector(audio_File_Path)
@@ -553,6 +556,10 @@ try:
                         print(f"Style: {json.dumps(style, ensure_ascii=False, indent=2)}")
                         print(f"Parameters: {json.dumps(parameters, ensure_ascii=False, indent=2)}")
                         print("-" * 50)
+                        
+                        if memoryEnabled == "false":
+                            similar_songs = []
+                            memory_notes = []
 
                         sqlParameters = json.dumps(parameters, ensure_ascii=False, indent=2)
                         # 格式化 system_prompt3

@@ -66,19 +66,23 @@ client = OpenAI(api_key="sk-1b73586fde854a329ec187dc371f53ef", base_url="https:/
 
 import platform
 
-if len(sys.argv) > 2:
+if len(sys.argv) > 3:
     if platform.system() == "Windows":
         # Windows命令行通常使用GBK编码
         chat_message = sys.argv[1].encode('cp936').decode('utf-8', errors='replace')
-        file_path = sys.argv[2].encode('cp936').decode('utf-8', errors='replace')
+        memoryEnabled = sys.argv[2]
+        file_path = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
     else:
         # Linux/macOS通常使用UTF-8
         chat_message = sys.argv[1]
-        file_path = sys.argv[2]
+        memoryEnabled = sys.argv[2]
+        file_path = sys.argv[3]
 else:
     chat_message = sys.argv[1].encode('cp936').decode('utf-8', errors='replace')
+    memoryEnabled = sys.argv[2]
     file_path = ""
 print(f"Chat message: {chat_message}")
+print(f"memoryEnabled: {memoryEnabled}")
 print(f"File path: {file_path}")
 if file_path and file_path.strip():
    vector = audio_to_vector(file_path)
@@ -137,7 +141,7 @@ effectors = [
     {
         "name": "delay",
         "example_with": ' {"DelayOn":{"Feedback":"0.25","Delay":450.00,"Mix":"0.52"}}',
-        "prompt_with": f'对于歌曲{chat_message}，应该如何设置专业的音效模块中的延迟器的参数，专业的延迟器模块中可能的参数为Feedback，Delay，Mix，Feedback的可能范围为0.00~1.00，Delay(Time)的可能范围为1.00ms~10000.00ms，Mix的可能范围为0.00~1.00，请以JSON格式详细输出'
+        "prompt_with": f'对于歌曲{chat_message}，应该如何设置专业的音效模块中的延迟器的参数，专业的延迟器模块中可能的参数为Feedback，Delay，Mix，Feedback的可能范围为0.00~1.00，Delay(Time)的可能范围为1.00ms~400.00ms，Mix的可能范围为0.00~1.00，请以JSON格式详细输出'
     },
     {
         "name": "reverb",
@@ -301,7 +305,7 @@ except json.JSONDecodeError:
 for effector in effectors:
     effector_name = effector["name"]
     if result1.get(effector_name) == "yes":
-        if resu is not None:
+        if memoryEnabled == "true" and resu is not None:
             system_prompt = f'你是一位专业音效调整师，请返回该音效的 JSON 格式的参数列表，例如: {effector["example_with"]}，你只需要参考格式，请不要参考列表中的任何参数值，你的回答需要在列表之中，不要有任何多余数据。具体参数值可以参考{resu}中的内容，这些参数是用户查询的歌曲的相似歌曲所配置的参数（参数值结合了用户的喜好，你需要从中学习用户喜好，比如该歌曲中没有镶边模块，但是参考的数据中有FlangerOn，那就要考虑开启镶边模块），其中CompressorOn表示需要开启压缩模块，CompressorOff表示关闭压缩模块，其他模块同理。如果参考中的模块关闭则不需要参考里面具体的参数。如果参考中的模块开启则考虑也开启该模块，并为模块生成具体参数值，这些参数值尽量要和参考中的参数值不相同（波动范围不要太大）。如果参考中的参数值不一致（比如第一个参数有CompressorOn而第二个是CompressorOff）则以第一个的参数值为基准。'
         else:
             system_prompt = f'你是一位专业音效调整师，请返回该音效的 JSON 格式的参数列表，例如: {effector["example_with"]}，你只需要参考格式，请不要参考列表中的任何参数值，你的回答需要在列表之中，不要有任何多余数据。'
@@ -426,13 +430,13 @@ except sqlite3.Error as e:
     sys.exit(1)
 
 # 将风格结果字符串写入文件
-with open(r"C:\Users\Lenovo56\Desktop\result1.txt", 'w', encoding='utf-8') as f:
+with open("result1.txt", 'w', encoding='utf-8') as f:
     f.write(song_style_str)
 # 将特征结果字符串写入文件
-with open(r"C:\Users\Lenovo56\Desktop\result2.txt", 'w', encoding='utf-8') as f:
+with open("result2.txt", 'w', encoding='utf-8') as f:
     f.write(guitar_features_str)
 # 将参数结果字符串写入文件
-with open(r"C:\Users\Lenovo56\Desktop\result.txt", 'w', encoding='utf-8') as f:
+with open("result.txt", 'w', encoding='utf-8') as f:
     f.write(result_str)
 
 # 关闭数据库连接

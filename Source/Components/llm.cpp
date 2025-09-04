@@ -5,6 +5,7 @@
 #include <fstream>
 #include <juce_core/juce_core.h>
 #include "../PluginPresetManager.h"
+#include <windows.h> 
 
 // 存储环境变量时添加引号并转义内部引号
 void storeEnvWithType(const std::string& key, const juce::String& value, const std::string& type) {
@@ -474,7 +475,9 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     sendButton("Send"),
     statusLabel("Status", "Ready"),
     audioFileLabel("AudioFileLabel", "No file selected"),  // Initialize label
-    audioFileButton("Select audio file")
+    audioFileButton("Select audio file"),
+    cancelAudioButton("Clear selection"),  // 新增取消按钮
+    memoryToggleButton("MemoryOff")  // 初始化为 MemoryOff
 {
     currentPresetName = presetManager.getCurrentPreset();
     // Initialize UI components
@@ -499,18 +502,39 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     addAndMakeVisible(audioFileLabel);
     audioFileLabel.setColour(juce::Label::textColourId, juce::Colours::darkgrey);
 
+    // 初始化取消按钮
+    addAndMakeVisible(cancelAudioButton);
+    cancelAudioButton.addListener(this);
+    cancelAudioButton.setTooltip("Clear selected audio file");
+    cancelAudioButton.setEnabled(false);  // 初始状态下禁用，因为没有文件被选择
+
+    // 初始化记忆开关按钮
+    addAndMakeVisible(memoryToggleButton);
+    memoryToggleButton.addListener(this);
+    memoryToggleButton.setClickingTogglesState(true);  // 设置为开关按钮
+    memoryToggleButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::green);  // 开启状态颜色
+    memoryToggleButton.setTooltip("Toggle memory feature on/off");
+
     setSize(600, 400);
 }
+
 
 // Implement the resized method of ChatComponent class
 void ChatComponent::resized()
 {
     auto area = getLocalBounds().reduced(8);
 
-    // First allocate area for audio file selection (e.g., below input area)
-    auto audioArea = area.removeFromTop(40);  // Reserve 40 pixels height for audio selection button
-    audioFileButton.setBounds(audioArea.removeFromLeft(220).reduced(2));  // Button width 120
-    audioFileLabel.setBounds(audioArea.reduced(2));  // Label occupies remaining area
+
+    // 为记忆开关按钮分配空间（放在顶部）
+    auto topButtonArea = area.removeFromTop(30);  // 为顶部按钮预留空间
+    memoryToggleButton.setBounds(topButtonArea.removeFromRight(100).reduced(2));  // 记忆开关按钮
+
+    // 音频文件选择区域
+    auto audioArea = area.removeFromTop(40);
+    // 分配空间给音频文件选择按钮和取消按钮
+    audioFileButton.setBounds(audioArea.removeFromLeft(150).reduced(2));  // 减小宽度以适应取消按钮
+    cancelAudioButton.setBounds(audioArea.removeFromLeft(120).reduced(2));  // 为取消按钮分配空间
+    audioFileLabel.setBounds(audioArea.reduced(2));  // 标签占据剩余区域
 
     // Allocate remaining area to original input area, button area, etc. (keep original logic)
     auto inputArea = area.removeFromTop(100);
@@ -522,6 +546,7 @@ void ChatComponent::resized()
     statusLabel.setBounds(buttonArea.reduced(2));
     responseEditor.setBounds(responseArea.reduced(2));
 }
+
 
 
 void ChatComponent::callAsync(const juce::String& response)
@@ -545,32 +570,89 @@ void ChatComponent::buttonClicked(juce::Button* button)
             inputEditor.clear();
             startThread();  // Start thread
         }
-    }else if (button == &audioFileButton){
-        // Create file chooser, specify title and default path (here, user's desktop)
-        juce::FileChooser fileChooser("Select audio file",
+    }else if (button == &audioFileButton) {
+        // 现有代码...
+        std::shared_ptr<juce::FileChooser> chooser = std::make_shared<juce::FileChooser>(
+            "Select audio file",
             juce::File::getSpecialLocation(juce::File::userDesktopDirectory),
-            "Audio files (*.wav;*.WAV;*.mp3;*.MP3;*.aif;*.AIF;*.flac;*.FLAC)");  // Supported formats
+            "Audio files (*.wav;*.WAV;*.mp3;*.MP3;*.aif;*.AIF;*.flac;*.FLAC)");
 
-        // Show open file dialog (modal window)
-        if (fileChooser.browseForFileToOpen())
-        {
-            // Get selected file path
-            juce::File selectedFile = fileChooser.getResult();
-            audioFilePath = selectedFile.getFullPathName();
+        chooser->launchAsync(juce::FileBrowserComponent::openMode |
+            juce::FileBrowserComponent::canSelectFiles,
+            [this, chooser](const juce::FileChooser& fc) {
+                auto result = fc.getResult();
+                if (result.existsAsFile()) {
+                    audioFilePath = result.getFullPathName();
+                    storeEnvWithType("audio_File_Path", audioFilePath, "string");
+                    audioFileLabel.setText("Selected: " + result.getFileName(),
+                        juce::dontSendNotification);
 
-            // Update label to display selected file name (or full path)
-            audioFileLabel.setText("Selected: " + selectedFile.getFileName(), juce::dontSendNotification);
+                    // 启用取消按钮，因为现在有文件被选择
+                    cancelAudioButton.setEnabled(true);
 
-            // Optional: Add file validation logic here (e.g., check file size, format, etc.)
-            if (selectedFile.getSize() == 0)
-            {
-                juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                    "Error",
-                    "The selected file is empty!");
-                audioFilePath.clear();
-                audioFileLabel.setText("No file selected", juce::dontSendNotification);
-            }
+                    if (result.getSize() == 0) {
+                        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                            "Error",
+                            "The selected file is empty!");
+                        audioFilePath.clear();
+                        audioFileLabel.setText("No file selected", juce::dontSendNotification);
+                        cancelAudioButton.setEnabled(false);  // 禁用取消按钮
+                    }
+                }
+            });
+    }
+
+    //根据juce版本调节代码
+    //else if (button == &audioFileButton) {
+    //    // Create file chooser, specify title and default path (here, user's desktop)
+    //    juce::FileChooser fileChooser("Select audio file",
+    //        juce::File::getSpecialLocation(juce::File::userDesktopDirectory),
+    //        "Audio files (*.wav;*.WAV;*.mp3;*.MP3;*.aif;*.AIF;*.flac;*.FLAC)");  // Supported formats
+
+    //    // Show open file dialog (modal window)
+    //    if (fileChooser.browseForFileToOpen())
+    //    {
+    //        // Get selected file path
+    //        juce::File selectedFile = fileChooser.getResult();
+    //        audioFilePath = selectedFile.getFullPathName();
+
+    //        // Update label to display selected file name (or full path)
+    //        audioFileLabel.setText("Selected: " + selectedFile.getFileName(), juce::dontSendNotification);
+
+    //        // Optional: Add file validation logic here (e.g., check file size, format, etc.)
+    //        if (selectedFile.getSize() == 0)
+    //        {
+    //            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+    //                "Error",
+    //                "The selected file is empty!");
+    //            audioFilePath.clear();
+    //            audioFileLabel.setText("No file selected", juce::dontSendNotification);
+    //        }
+    //    }
+    //}
+    else if (button == &cancelAudioButton) {
+        // 取消按钮的处理逻辑
+        audioFilePath.clear();  // 清除文件路径
+        storeEnvWithType("audio_File_Path", "", "string");  // 清除环境变量
+        audioFileLabel.setText("No file selected", juce::dontSendNotification);  // 重置标签
+        cancelAudioButton.setEnabled(false);  // 禁用取消按钮，因为没有文件可以取消
+
+        // 记录日志
+        juce::Logger::writeToLog("Audio file selection cleared");
+    }
+    else if (button == &memoryToggleButton) {
+        // 切换记忆状态
+        memoryEnabled = memoryToggleButton.getToggleState();
+        // 根据状态更新按钮文本
+        if (memoryEnabled) {
+            memoryToggleButton.setButtonText("MemoryOn");
+            storeEnvWithType("memory_Enabled", "true", "string");
         }
+        else {
+            memoryToggleButton.setButtonText("MemoryOff");
+            storeEnvWithType("memory_Enabled", "false", "string");
+        }
+
     }
 }
 
@@ -593,21 +675,99 @@ void ChatComponent::run() {
         juce::Logger::writeToLog("No audio file selected");
     }
 
-    // 定义 Python 解释器和脚本路径
-    const char* pythonInterpreterPath = R"(E:\pythonproject\Scripts\python.exe)";
-    const char* pythonScriptPath = R"(C:\Users\Lenovo56\Documents\GitHub\supertonal\Source\llm.py)";
+    if (memoryEnabled) {
+        juce::Logger::writeToLog("Memory feature is enabled");
+        //storeEnvWithType("memory_Enabled", "true", "bool");
+    }
+    else {
+        juce::Logger::writeToLog("Memory feature is disabled");
+        //storeEnvWithType("memory_Enabled", "false", "bool");
+    }
 
-    // 构建命令行：解释器 + 脚本 + 用户消息 + 音频路径（若有）
+    //// 假设您知道项目根目录与当前工作目录的关系
+    //juce::File currentDir = juce::File::getCurrentWorkingDirectory();
+    //juce::Logger::writeToLog("Current working directory: " + currentDir.getFullPathName());
+
+    //// 如果当前目录是 Builds，则向上一级再找到 supertonal 目录
+    //juce::File projectDir = currentDir;
+    //while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
+    //    projectDir = projectDir.getParentDirectory();
+    //}
+
+    //juce::Logger::writeToLog("Project directory: " + projectDir.getFullPathName());
+
+    //// Python 解释器路径
+    //juce::File pythonInterpreterFile = projectDir.getChildFile("Source/Components/PythonApplication/env/Scripts/python.exe");
+    //const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
+
+    //// Python 脚本路径
+    //juce::File pythonScriptFile = projectDir.getChildFile("Source/llm.py");
+    //const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
+
+    //// 记录路径用于调试
+    //juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
+    //juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
+
+    // 定义 Python 解释器和脚本路径
+    /*const char* pythonInterpreterPath = R"(C:\Users\80753\Documents\GitHub\supertonal\Source\Components\PythonApplication\env\Scripts\python.exe)";
+    const char* pythonScriptPath = R"(C:\Users\80753\Documents\GitHub\supertonal\Source\llm.py)";*/
+    
+    // 定义 Python 解释器和脚本的文件对象
+    juce::File pythonInterpreterFile;
+    juce::File pythonScriptFile;
+    // 获取环境变量并记录原始值
+    const char* pythonInterpreterEnv = std::getenv("SUPERTONAL_PYTHON_INTERPRETER");
+    const char* pythonScriptEnv = std::getenv("SUPERTONAL_PYTHON_SCRIPT1"); // 修正名称，添加了"1"
+
+    // 记录环境变量的原始值
+    juce::Logger::writeToLog("Raw interpreter env value: " +
+        (pythonInterpreterEnv != nullptr ? juce::String(pythonInterpreterEnv) : "null"));
+    juce::Logger::writeToLog("Raw script env value: " +
+        (pythonScriptEnv != nullptr ? juce::String(pythonScriptEnv) : "null"));
+   
+    if (pythonInterpreterEnv != nullptr && pythonInterpreterEnv[0] != '\0') {
+        pythonInterpreterFile = juce::File(pythonInterpreterEnv);
+    }
+    else {
+        juce::File currentDir = juce::File::getCurrentWorkingDirectory();
+        juce::File projectDir = currentDir;
+        while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
+            projectDir = projectDir.getParentDirectory();
+        }
+        pythonInterpreterFile = projectDir.getChildFile("Source/Components/PythonApplication/env/Scripts/python.exe");
+    }
+    
+    if (pythonScriptEnv != nullptr && pythonScriptEnv[0] != '\0') {
+        pythonScriptFile = juce::File(pythonScriptEnv);
+    }
+    else {
+        juce::File currentDir = juce::File::getCurrentWorkingDirectory();
+        juce::File projectDir = currentDir;
+        while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
+            projectDir = projectDir.getParentDirectory();
+        }
+        pythonScriptFile = projectDir.getChildFile("Source/sql.py");
+    }
+	const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
+	const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
+    juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
+    juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
+    
+    // 构建命令行：解释器 + 脚本 + 用户消息 + 音频路径（若有）+ 记忆状态
     juce::String command;
     command << pythonInterpreterPath << " " << pythonScriptPath;
 
     // 添加用户消息参数（用引号包裹，处理空格）
     command << " \"" << userMessage << "\"";
 
+    // 添加记忆状态参数（作为第三个参数）
+    command << " \"" << (memoryEnabled ? "true" : "false") << "\"";
+
     // 添加音频文件路径参数（若存在，用引号包裹）
     if (!audioFilePath.isEmpty()) {
         command << " \"" << audioFilePath << "\"";
     }
+
 
     // 存储环境变量（可选，也可仅通过命令行传递）
     storeEnvWithType("user_Message", userMessage, "string");
@@ -615,20 +775,32 @@ void ChatComponent::run() {
         storeEnvWithType("audio_File_Path", audioFilePath, "string");
     }
 
+   
+
     // 执行命令
     std::string utf8Command = command.toStdString();
-    int returnCode = std::system(utf8Command.c_str());
-
+    std::string commandWithErrorCapture = utf8Command + " 2>\"" +
+        juce::File::getCurrentWorkingDirectory().getChildFile("error_log.txt").getFullPathName().toStdString() + "\"";
+    int returnCode = std::system(commandWithErrorCapture.c_str());
+    juce::Logger::writeToLog("utf8Command: " + juce::String(utf8Command) + ", return code: " + juce::String(returnCode));
     if (returnCode != 0) {
-        std::cerr << "Python script failed, return code: " << returnCode << std::endl;
-        std::cerr << "Command: " << utf8Command << std::endl;
-        updateStatus("Python script execution failed");
+    // 使用完整路径读取错误日志
+    juce::File errorFile = juce::File::getCurrentWorkingDirectory().getChildFile("error_log.txt");
+    if (errorFile.existsAsFile()) {
+        juce::String errorText = errorFile.loadFileAsString();
+        juce::Logger::writeToLog("Python error: " + errorText);
+        updateStatus("Python script failed: " + errorText.substring(0, 100));
+    } else {
+        juce::Logger::writeToLog("Error log file not found");
+        //callAsync(currentDir.getFullPathName() + pythonInterpreterPath + pythonScriptPath);
+        updateStatus("Python script failed but no error log was created");
     }
+}
     else {
         updateStatus("Python script executed successfully");
 
         // 读取并处理结果（原有逻辑不变）
-        std::ifstream file(R"(C:\Users\Lenovo56\Desktop\result.txt)", std::ios::binary);
+        std::ifstream file(R"(result.txt)", std::ios::binary);
         if (!file.is_open()) {
             std::cerr << "Failed to open result.txt" << std::endl;
             updateStatus("Failed to open result.txt");
@@ -645,6 +817,7 @@ void ChatComponent::run() {
         callAsync(juce::String(params.toString()));
     }
 }
+
 
 
 
