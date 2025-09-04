@@ -1,8 +1,8 @@
 ![Alt text](Screenshots/wide.JPG "Supertonal")
 
-# Supertonal
+# Audio agent
 
-Supertonal is a work-in-progress guitar multi-effects processor.
+Audio agent is a work-in-progress guitar multi-effects processor.
 
 Take a listen to a [sample](https://github.com/pauljonescodes/supertonal/tree/master/Sounds).
 
