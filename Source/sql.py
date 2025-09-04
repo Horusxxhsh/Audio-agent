@@ -758,7 +758,7 @@ try:
                                         new_memory_excel_params[param_id] = value
 
                             # 3. 定义新记忆的预设文件路径
-                            new_memory_preset_path = fr"C:\Users\Public\Documents\Supertonal DSP\Blueprint Cory Bergeron2\{song_name}.preset"
+                            new_memory_preset_path = fr"C:\Users\Public\Documents\Supertonal DSP\Audio agent\{song_name}.preset"
 
                             # 4. 更新新记忆的预设文件
                             try:
@@ -818,7 +818,7 @@ try:
                                         # 预设文件路径
                                         if index < len(similar_songs):
                                             song_name = similar_songs[index][0]
-                                            preset_file_path = fr"C:\Users\Public\Documents\Supertonal DSP\Blueprint Cory Bergeron2\{song_name}.preset"  
+                                            preset_file_path = fr"C:\Users\Public\Documents\Supertonal DSP\Audio agent\{song_name}.preset"  
                                             try:
                                              # 更新预设文件
                                               if update_preset_in_file(preset_file_path, excel_params):
