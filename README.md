@@ -28,7 +28,7 @@ It's capabilities, in a rough order:
 
 # Work Progress:
 1. Added a large language model interaction interface, implementing AI-generated parameter functionality.
-![Alt text](Screenshots/chat.JPG "CHAT UI")
+![Alt text](Screenshots/chat.PNG "CHAT UI")
 2. Added a music memory module, achieving personalized learning.
 
 # Experiment Preparation:
