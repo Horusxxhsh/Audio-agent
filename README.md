@@ -50,10 +50,11 @@ After a successful response, click the reset button to transfer parameters with 
    - transformers
 
 ## Environment Variable Configuration:
-1. Add the following three items to your system environment variables:
+1. Add the following four items to your system environment variables:
    - SUPERTONAL_PYTHON_INTERPRETER: "C:\path\to\your\python\env\Scripts\python.exe"
    - SUPERTONAL_PYTHON_SCRIPT1: "C:\path\to\your\supertonal\Source\llm.py"
    - SUPERTONAL_PYTHON_SCRIPT2: "C:\path\to\your\supertonal\Source\sql.py"
+   - DOCUMENTS_DIR: "C:\path\to\your\Documents"
 
 Note: Please replace the paths with your actual paths.
 It is a work in progress, but I've made a strong effort to keep it portable and buildable with basic knowledge of JUCE. To get it working, simply:
