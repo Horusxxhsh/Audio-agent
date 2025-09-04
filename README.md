@@ -25,6 +25,11 @@ It's capabilities, in a rough order:
 - Cabinet simulation with IR-loading
 - Lo-fi mode
 - Limiting
+
+# Work Progress:
+1. Added a large language model interaction interface, implementing AI-generated parameter functionality.
+2. Added a music memory module, achieving personalized learning.
+
 # Experiment Preparation:
 
 ## Environment Setup:
