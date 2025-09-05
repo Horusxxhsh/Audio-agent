@@ -13,6 +13,7 @@ from transformers import Wav2Vec2Processor, Wav2Vec2Model
 import numpy as np
 import tempfile
 
+
 # 定义一个函数来安全地写入文件
 def safe_write_file(filename, content):
     try:
@@ -24,7 +25,7 @@ def safe_write_file(filename, content):
         try:
             # 如果失败，尝试在环境变量指定的文档目录写入
             docs_dir = os.environ.get('DOCUMENTS_DIR')  # 获取环境变量
-            
+
             if docs_dir:
                 full_path = os.path.join(docs_dir, filename)
                 with open(full_path, 'w', encoding='utf-8') as f:
@@ -33,7 +34,7 @@ def safe_write_file(filename, content):
             else:
                 # 如果环境变量不存在，抛出异常以进入下一个尝试
                 raise FileNotFoundError("环境变量 DOCUMENTS_DIR 未设置")
-                
+
         except (IOError, PermissionError, FileNotFoundError):
             # 如果仍然失败，尝试在系统临时目录写入
             temp_dir = tempfile.gettempdir()
@@ -41,6 +42,7 @@ def safe_write_file(filename, content):
             with open(full_path, 'w', encoding='utf-8') as f:
                 f.write(content)
             print(f"文件已保存到临时目录: {full_path}")
+
 
 def audio_to_vector(file_path):
     # 加载预训练的处理器和模型
@@ -115,23 +117,35 @@ print(f"Chat message: {chat_message}")
 print(f"memoryEnabled: {memoryEnabled}")
 print(f"File path: {file_path}")
 if file_path and file_path.strip():
-   vector = audio_to_vector(file_path)
-   print("音频向量形状：", vector)
+    vector = audio_to_vector(file_path)
+    print("音频向量形状：", vector)
 else:
     vector = None  # 或空列表[]，根据后续使用场景确定
     print("未提供有效的文件路径，音频向量为空")
 
+# 创建对话历史列表
+conversation_history = []
 # 第二个系统提示
 system_prompt2 = f'你是音乐分析师，需要根据用户输入的歌曲名称判断该歌曲的风格(尽量具体)，并描述该歌曲中吉他solo的演奏特点，返回这些信息的 JSON 格式的参数列表，例如: {{"tags": ["tag_1",..."tag_n"],"description":["..."]}}'
 user_prompt2 = f'请分析歌曲{chat_message}的风格，并描述该歌曲中吉他solo的演奏特点，请用英文回答'
+# 保存系统消息
+system_message = {"role": "system", "content": system_prompt2}
+conversation_history.append(system_message)
+# 保存用户消息
+user_message = {"role": "user", "content": user_prompt2}
+conversation_history.append(user_message)
+# 发送请求
 response2 = client.chat.completions.create(
     model="deepseek-chat",
-    messages=[
-        {"role": "system", "content": system_prompt2},
-        {"role": "user", "content": user_prompt2},
-    ],
+    messages=[system_message, user_message],
     stream=False
 )
+# 保存助手回复
+assistant_message = {
+    "role": "assistant",
+    "content": response2.choices[0].message.content
+}
+conversation_history.append(assistant_message)
 
 # 获取 response2 响应数据并转换为 JSON
 response_content2 = response2.choices[0].message.content
@@ -213,11 +227,13 @@ def vector_cosine_similarity(vec1, vec2):
         return 0.0
     return dot_product / (norm_vec1 * norm_vec2)
 
+
 # 定义Jaccard相似度函数
 def jaccard_similarity(set1, set2):
     intersection = len(set1.intersection(set2))
     union = len(set1.union(set2))
     return intersection / union if union != 0 else 0
+
 
 # 定义文本相似度函数
 def text_similarity(text1, text2):
@@ -226,6 +242,7 @@ def text_similarity(text1, text2):
     vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform([text1, text2])
     return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+
 
 # 直接使用result2中的tags和description作为检索内容
 target_tags = set(result2.get("tags", []))
@@ -242,7 +259,7 @@ for index, row in enumerate(rows, start=1):
     feature_str = row[2]
     parameter_str = row[3]
     vector_str = row[4]  # 获取数据库中的音频向量字符串
-    
+
     try:
         style = json.loads(style_str)
         feature = json.loads(feature_str)
@@ -308,14 +325,24 @@ else:
     system_prompt1 = f'你是音效参数专家，需要从用户输入的歌曲名称判断给歌曲添加哪些音效模块，这些模块包括过载，失真，延迟，混响，压缩，相位，合唱，镶边，均衡，噪声门，返回这些音效的 JSON 格式的参数列表，例如: {{"overload": "yes", "distortion": "yes", "delay": "yes", "reverb": "yes", "compression": "no", "phase": "no", "chorus": "no", "flanger": "no", "equalization": "yes", "noise_gate": "no"}}用户输入的歌曲是: {chat_message}，返回结果格式严格参照给的例子。'
 print(f"system_prompt:{system_prompt1}")
 user_prompt1 = chat_message
+# 保存系统消息
+system_message = {"role": "system", "content": system_prompt1}
+conversation_history.append(system_message)
+# 保存用户消息
+user_message = {"role": "user", "content": user_prompt1}
+conversation_history.append(user_message)
+# 发送请求
 response1 = client.chat.completions.create(
     model="deepseek-chat",
-    messages=[
-        {"role": "system", "content": system_prompt1},
-        {"role": "user", "content": user_prompt1},
-    ],
+    messages=[system_message, user_message],
     stream=False
 )
+# 保存助手回复
+assistant_message = {
+    "role": "assistant",
+    "content": response1.choices[0].message.content
+}
+conversation_history.append(assistant_message)
 
 # 获取 response1 响应数据并转换为 JSON
 response_content1 = response1.choices[0].message.content
@@ -345,14 +372,24 @@ for effector in effectors:
             system_prompt = f'你是一位专业音效调整师，请返回该音效的 JSON 格式的参数列表，例如: {effector["example_with"]}，你只需要参考格式，请不要参考列表中的任何参数值，你的回答需要在列表之中，不要有任何多余数据。'
         print(f"system_prompt:{system_prompt}")
         user_prompt = effector["prompt_with"] + effector["example_with"]
+        # 保存系统消息
+        system_message = {"role": "system", "content": system_prompt}
+        conversation_history.append(system_message)
+        # 保存用户消息
+        user_message = {"role": "user", "content": user_prompt}
+        conversation_history.append(user_message)
+        # 发送请求
         response = client.chat.completions.create(
             model="deepseek-chat",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
+            messages=[system_message, user_message],
             stream=False
         )
+        # 保存助手回复
+        assistant_message = {
+            "role": "assistant",
+            "content": response.choices[0].message.content
+        }
+        conversation_history.append(assistant_message)
 
         # 获取响应数据并转换为 JSON
         response_content = response.choices[0].message.content
@@ -397,6 +434,26 @@ print("-" * 50)
 # 将列表转换为JSON字符串
 song_style_str = json.dumps(song_style, ensure_ascii=False)
 guitar_features_str = json.dumps(guitar_features, ensure_ascii=False)
+
+
+
+print(f"完整的对话历史：{conversation_history}")
+# 系统提示
+system_prompt3 = f'{conversation_history}这是之前的对话记录。假设你是智能音乐效果器小助手，你要解决用户对效果器提出的各种问题。'
+user_prompt3 = f'分析用户的音乐喜好，并说明你之前生成那些歌曲效果器具体参数的理由。回答开头必须以“参数生成完成！\n”开头'
+# 保存系统消息
+system_message = {"role": "system", "content": system_prompt3}
+# 保存用户消息
+user_message = {"role": "user", "content": user_prompt3}
+# 发送请求
+response3 = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[system_message, user_message],
+    stream=False
+)
+response3_content = response3.choices[0].message.content
+print(f"清理后的响应：{response3_content}")
+
 
 # 检查 chat_message 是否已经存在于数据库中
 cursor.execute("SELECT SongName FROM music_responses WHERE SongName =?", (chat_message,))
@@ -471,6 +528,9 @@ safe_write_file("result2.txt", guitar_features_str)
 
 # 将参数结果字符串写入文件
 safe_write_file("result.txt", result_str)
+
+# 将参数结果字符串写入文件
+safe_write_file("result3.txt", response3_content)
 
 # 关闭数据库连接
 conn.close()

@@ -822,9 +822,41 @@ void ChatComponent::run() {
         std::string resultBytes = buffer.str();
         file.close();
 
+        // 读取并处理result3.txt
+        std::ifstream file3(R"(result3.txt)", std::ios::binary);
+        if (!file3.is_open()) {
+            std::cerr << "Failed to open result3.txt" << std::endl;
+            file3.close(); // 确保关闭之前的尝试
+
+            // 使用JUCE的SystemStats来获取环境变量
+            juce::String documentsPath = juce::SystemStats::getEnvironmentVariable("DOCUMENTS_DIR", "");
+
+            if (!documentsPath.isEmpty()) {
+                // 使用JUCE的File类构建路径
+                juce::File result3File = juce::File(documentsPath).getChildFile("result3.txt");
+                file3.open(result3File.getFullPathName().toStdString(), std::ios::binary);
+            }
+
+            if (!file3.is_open()) {
+                std::cerr << "Failed to open result3.txt from alternative location" << std::endl;
+                // 这里我们不返回，因为我们已经有了result.txt的数据
+            }
+        }
+        // 如果成功打开了result3.txt，则读取其内容
+        std::string result3Bytes;
+        if (file3.is_open()) {
+            std::stringstream buffer3;
+            buffer3 << file3.rdbuf();
+            result3Bytes = buffer3.str();
+            file3.close();
+        }
+        else {
+			result3Bytes = "No data"; // 或者其他默认值
+        }
         juce::String resultStr = juce::String::fromUTF8(resultBytes.data(), resultBytes.size());
         EffectParameters params = extractParameters(resultStr);
-        callAsync(juce::String(params.toString()));
+        juce::String result3Str = juce::String::fromUTF8(result3Bytes.data(), result3Bytes.size());
+        callAsync(juce::String(result3Str));
     }
 }
 
