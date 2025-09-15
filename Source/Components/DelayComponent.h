@@ -79,11 +79,15 @@ public:
         const std::string& toggleParameterId) noexcept :
         mApvts(apvts)
     {
-
         // Start delayLeftPerBeatParameterId
         mLeftPerBeatSliderPtr = std::make_unique<juce::Slider>(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
         mLeftPerBeatSliderPtr->setTextValueSuffix(" division");
         mLeftPerBeatSliderPtr->setScrollWheelEnabled(false);
+        // 设置滑块文本为黑色
+        mLeftPerBeatSliderPtr->setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        mLeftPerBeatSliderPtr->setColour(juce::Slider::thumbColourId, juce::Colours::black);
+        mLeftPerBeatSliderPtr->setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::black);
+        mLeftPerBeatSliderPtr->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
 
         mLeftPerBeatAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             apvts, delayLeftPerBeatParameterId, *mLeftPerBeatSliderPtr);
@@ -91,6 +95,8 @@ public:
         mLeftPerBeatLabelPtr = std::make_unique<juce::Label>();
         mLeftPerBeatLabelPtr->setText("Left delay", juce::dontSendNotification);
         mLeftPerBeatLabelPtr->attachToComponent(mLeftPerBeatSliderPtr.get(), false);
+        // 设置标签文本为黑色
+        mLeftPerBeatLabelPtr->setColour(juce::Label::textColourId, juce::Colours::black);
 
         addAndMakeVisible(mLeftPerBeatSliderPtr.get());
         addAndMakeVisible(mLeftPerBeatLabelPtr.get());
@@ -100,6 +106,11 @@ public:
         mRightPerBeatSliderPtr = std::make_unique<juce::Slider>(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
         mRightPerBeatSliderPtr->setTextValueSuffix(" division");
         mRightPerBeatSliderPtr->setScrollWheelEnabled(false);
+        // 设置滑块文本为黑色
+        mRightPerBeatSliderPtr->setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        mRightPerBeatSliderPtr->setColour(juce::Slider::thumbColourId, juce::Colours::black);
+        mRightPerBeatSliderPtr->setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::black);
+        mRightPerBeatSliderPtr->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
 
         mRightPerBeatAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             apvts, delayRightPerBeatParameterId, *mRightPerBeatSliderPtr);
@@ -107,6 +118,8 @@ public:
         mRightPerBeatLabelPtr = std::make_unique<juce::Label>();
         mRightPerBeatLabelPtr->setText("Right delay", juce::dontSendNotification);
         mRightPerBeatLabelPtr->attachToComponent(mRightPerBeatSliderPtr.get(), false);
+        // 设置标签文本为黑色
+        mRightPerBeatLabelPtr->setColour(juce::Label::textColourId, juce::Colours::black);
 
         addAndMakeVisible(mRightPerBeatSliderPtr.get());
         addAndMakeVisible(mRightPerBeatLabelPtr.get());
@@ -116,6 +129,11 @@ public:
         mLeftMillisecondSliderPtr = std::make_unique<juce::Slider>(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
         mLeftMillisecondSliderPtr->setTextValueSuffix(" ms");
         mLeftMillisecondSliderPtr->setScrollWheelEnabled(false);
+        // 设置滑块文本为黑色
+        mLeftMillisecondSliderPtr->setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        mLeftMillisecondSliderPtr->setColour(juce::Slider::thumbColourId, juce::Colours::black);
+        mLeftMillisecondSliderPtr->setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::black);
+        mLeftMillisecondSliderPtr->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
 
         mLeftMillisecondAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             apvts, delayLeftMillisecondParameterId, *mLeftMillisecondSliderPtr);
@@ -123,6 +141,8 @@ public:
         mLeftMillisecondLabelPtr = std::make_unique<juce::Label>();
         mLeftMillisecondLabelPtr->setText("Left delay", juce::dontSendNotification);
         mLeftMillisecondLabelPtr->attachToComponent(mLeftMillisecondSliderPtr.get(), false);
+        // 设置标签文本为黑色
+        mLeftMillisecondLabelPtr->setColour(juce::Label::textColourId, juce::Colours::black);
 
         addAndMakeVisible(mLeftMillisecondSliderPtr.get());
         addAndMakeVisible(mLeftMillisecondLabelPtr.get());
@@ -132,6 +152,11 @@ public:
         mRightMillisecondSliderPtr = std::make_unique<juce::Slider>(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
         mRightMillisecondSliderPtr->setTextValueSuffix(" ms");
         mRightMillisecondSliderPtr->setScrollWheelEnabled(false);
+        // 设置滑块文本为黑色
+        mRightMillisecondSliderPtr->setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        mRightMillisecondSliderPtr->setColour(juce::Slider::thumbColourId, juce::Colours::black);
+        mRightMillisecondSliderPtr->setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::black);
+        mRightMillisecondSliderPtr->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
 
         mRightMillisecondAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             apvts, delayRightMillisecondParameterId, *mRightMillisecondSliderPtr);
@@ -140,6 +165,8 @@ public:
         mRightMillisecondLabelPtr->setText("Right delay", juce::dontSendNotification);
         // mRightMillisecondSliderPtr->setValue(100.0f);
         mRightMillisecondLabelPtr->attachToComponent(mRightMillisecondSliderPtr.get(), false);
+        // 设置标签文本为黑色
+        mRightMillisecondLabelPtr->setColour(juce::Label::textColourId, juce::Colours::black);
 
         addAndMakeVisible(mRightMillisecondSliderPtr.get());
         addAndMakeVisible(mRightMillisecondLabelPtr.get());
@@ -149,6 +176,11 @@ public:
         mHighPassFrequencySliderPtr = std::make_unique<juce::Slider>(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
         mHighPassFrequencySliderPtr->setTextValueSuffix(" Hz");
         mHighPassFrequencySliderPtr->setScrollWheelEnabled(false);
+        // 设置滑块文本为黑色
+        mHighPassFrequencySliderPtr->setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        mHighPassFrequencySliderPtr->setColour(juce::Slider::thumbColourId, juce::Colours::black);
+        mHighPassFrequencySliderPtr->setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::black);
+        mHighPassFrequencySliderPtr->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
 
         mHighPassFrequencyAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             apvts, delayHighPassFrequencyParameterId, *mHighPassFrequencySliderPtr);
@@ -156,6 +188,8 @@ public:
         mHighPassFrequencyLabelPtr = std::make_unique<juce::Label>();
         mHighPassFrequencyLabelPtr->setText("HPF", juce::dontSendNotification);
         mHighPassFrequencyLabelPtr->attachToComponent(mHighPassFrequencySliderPtr.get(), false);
+        // 设置标签文本为黑色
+        mHighPassFrequencyLabelPtr->setColour(juce::Label::textColourId, juce::Colours::black);
 
         addAndMakeVisible(mHighPassFrequencySliderPtr.get());
         addAndMakeVisible(mHighPassFrequencyLabelPtr.get());
@@ -165,6 +199,11 @@ public:
         mLowPassFrequencySliderPtr = std::make_unique<juce::Slider>(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
         mLowPassFrequencySliderPtr->setTextValueSuffix(" Hz");
         mLowPassFrequencySliderPtr->setScrollWheelEnabled(false);
+        // 设置滑块文本为黑色
+        mLowPassFrequencySliderPtr->setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        mLowPassFrequencySliderPtr->setColour(juce::Slider::thumbColourId, juce::Colours::black);
+        mLowPassFrequencySliderPtr->setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::black);
+        mLowPassFrequencySliderPtr->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
 
         mLowPassFrequencyAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             apvts, delayLowPassFrequencyParameterId, *mLowPassFrequencySliderPtr);
@@ -172,6 +211,8 @@ public:
         mLowPassFrequencyLabelPtr = std::make_unique<juce::Label>();
         mLowPassFrequencyLabelPtr->setText("LPF", juce::dontSendNotification);
         mLowPassFrequencyLabelPtr->attachToComponent(mLowPassFrequencySliderPtr.get(), false);
+        // 设置标签文本为黑色
+        mLowPassFrequencyLabelPtr->setColour(juce::Label::textColourId, juce::Colours::black);
 
         addAndMakeVisible(mLowPassFrequencySliderPtr.get());
         addAndMakeVisible(mLowPassFrequencyLabelPtr.get());
@@ -181,6 +222,11 @@ public:
         mFeedbackSliderPtr = std::make_unique<juce::Slider>(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
         //mFeedbackSliderPtr->setTextValueSuffix(" %");
         mFeedbackSliderPtr->setScrollWheelEnabled(false);
+        // 设置滑块文本为黑色
+        mFeedbackSliderPtr->setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        mFeedbackSliderPtr->setColour(juce::Slider::thumbColourId, juce::Colours::black);
+        mFeedbackSliderPtr->setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::black);
+        mFeedbackSliderPtr->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
 
         mFeedbackAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             apvts, delayFeedbackParameterId, *mFeedbackSliderPtr);
@@ -190,6 +236,8 @@ public:
         double hsh1 = readEnvWithType<double>("de_Feedback");
         mFeedbackSliderPtr->setValue(hsh1);
         mFeedbackLabelPtr->attachToComponent(mFeedbackSliderPtr.get(), false);
+        // 设置标签文本为黑色
+        mFeedbackLabelPtr->setColour(juce::Label::textColourId, juce::Colours::black);
 
         addAndMakeVisible(mFeedbackSliderPtr.get());
         addAndMakeVisible(mFeedbackLabelPtr.get());
@@ -199,6 +247,11 @@ public:
         mDryWetSliderPtr = std::make_unique<juce::Slider>(juce::Slider::RotaryVerticalDrag, juce::Slider::TextBoxBelow);
         //mDryWetSliderPtr->setTextValueSuffix(" %");
         mDryWetSliderPtr->setScrollWheelEnabled(false);
+        // 设置滑块文本为黑色
+        mDryWetSliderPtr->setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        mDryWetSliderPtr->setColour(juce::Slider::thumbColourId, juce::Colours::black);
+        mDryWetSliderPtr->setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::black);
+        mDryWetSliderPtr->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::black);
 
         mDryWetAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
             apvts, delayDryWetParameterId, *mDryWetSliderPtr);
@@ -208,6 +261,8 @@ public:
         double hsh2 = readEnvWithType<double>("de_Mix");
         mDryWetSliderPtr->setValue(hsh2);
         mDryWetLabelPtr->attachToComponent(mDryWetSliderPtr.get(), false);
+        // 设置标签文本为黑色
+        mDryWetLabelPtr->setColour(juce::Label::textColourId, juce::Colours::black);
 
         addAndMakeVisible(mDryWetSliderPtr.get());
         addAndMakeVisible(mDryWetLabelPtr.get());
@@ -216,11 +271,20 @@ public:
         mGroupComponentPtr.reset(new juce::GroupComponent(title, title));
         addAndMakeVisible(mGroupComponentPtr.get());
 
+        // 设置组件边框和文本颜色为黑色
+        mGroupComponentPtr->setColour(juce::GroupComponent::outlineColourId, juce::Colours::black);
+        mGroupComponentPtr->setColour(juce::GroupComponent::textColourId, juce::Colours::black);
+
         // Sync Button
         mDelayIsSyncedParameterId = delayIsSyncedParameterId;
         mSyncButtonPtr = std::make_unique<juce::ToggleButton>("BPM Sync");
         mSyncButtonAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             apvts, delayIsSyncedParameterId, *mSyncButtonPtr);
+        // 设置按钮文本为黑色
+        mSyncButtonPtr->setColour(juce::ToggleButton::textColourId, juce::Colours::black);
+        // 设置按钮勾选标记为黑色
+        mSyncButtonPtr->setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
+        mSyncButtonPtr->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
         addAndMakeVisible(mSyncButtonPtr.get());
 
         apvts.addParameterListener(mDelayIsSyncedParameterId, this);
@@ -230,12 +294,15 @@ public:
         mLinkedButtonPtr = std::make_unique<juce::ToggleButton>("Linked");
         mLinkedButtonAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             apvts, delayIsLinkedParameterId, *mLinkedButtonPtr);
+        // 设置按钮文本为黑色
+        mLinkedButtonPtr->setColour(juce::ToggleButton::textColourId, juce::Colours::black);
+        // 设置按钮勾选标记为黑色
+        mLinkedButtonPtr->setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
+        mLinkedButtonPtr->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
         addAndMakeVisible(mLinkedButtonPtr.get());
 
         apvts.addParameterListener(mDelayIsLinkedParameterId, this);
         parameterChanged(mDelayIsLinkedParameterId, *apvts.getRawParameterValue(mDelayIsLinkedParameterId));
-
-
 
         // Toggle Button
         mToggleButtonPtr = std::make_unique<juce::ToggleButton>();
@@ -243,13 +310,15 @@ public:
         /*mToggleButtonPtr->setToggleState(true, juce::NotificationType::dontSendNotification);*/
         mToggleButtonAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             apvts, toggleParameterId, *mToggleButtonPtr);
+        // 设置按钮文本和勾选标记为黑色
+        mToggleButtonPtr->setColour(juce::ToggleButton::textColourId, juce::Colours::black);
+        mToggleButtonPtr->setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
+        mToggleButtonPtr->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
         addAndMakeVisible(mToggleButtonPtr.get());
         // 设置按钮默认状态为开启
-       // mToggleButtonPtr->setToggleState(true, juce::NotificationType::dontSendNotification);
-
-
-
+        // mToggleButtonPtr->setToggleState(true, juce::NotificationType::dontSendNotification);
     }
+
 
 
     void parameterChanged(const juce::String& parameterID, float newValue) override

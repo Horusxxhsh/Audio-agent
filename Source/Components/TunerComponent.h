@@ -1,19 +1,19 @@
 /*
-    This code is part of the Supertonal guitar effects multi-processor.
-    Copyright (C) 2023-2024  Paul Jones
+	This code is part of the Supertonal guitar effects multi-processor.
+	Copyright (C) 2023-2024  Paul Jones
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #pragma once
@@ -27,15 +27,27 @@ public:
 
 	explicit TunerPedalComponent(
 		PluginAudioProcessor& processorRef,
-		const std::string& toggleOnParameterId) : mAudioProcessorRef(processorRef) 
+		const std::string& toggleOnParameterId) : mAudioProcessorRef(processorRef)
 	{
 		mGroupComponentPtr.reset(new juce::GroupComponent("tuner", "Tuner"));
 		addAndMakeVisible(*mGroupComponentPtr);
 
+		// 设置组件边框和文本颜色 - 深蓝色与白色背景形成对比
+		mGroupComponentPtr->setColour(juce::GroupComponent::outlineColourId, juce::Colours::black);
+		mGroupComponentPtr->setColour(juce::GroupComponent::textColourId, juce::Colours::black);
+
 		mPitchLabel = std::make_unique<juce::Label>("Pitch", "Pitch");
+		// 设置标签颜色 - 深色文本在白色背景上更易读
+		mPitchLabel->setColour(juce::Label::textColourId, juce::Colour(20, 20, 20));
+		mPitchLabel->setJustificationType(juce::Justification::centred);
+		mPitchLabel->setFont(juce::Font(18.0f, juce::Font::bold));
 		addAndMakeVisible(*mPitchLabel);
 
 		mRemainderLabel = std::make_unique<juce::Label>("Remainder", "Remainder");
+		// 设置标签颜色 - 深色文本在白色背景上更易读
+		mRemainderLabel->setColour(juce::Label::textColourId, juce::Colour(20, 20, 20));
+		mRemainderLabel->setJustificationType(juce::Justification::centred);
+		mRemainderLabel->setFont(juce::Font(18.0f, juce::Font::bold));
 		addAndMakeVisible(*mRemainderLabel);
 
 		juce::Timer::startTimerHz(4);
@@ -44,6 +56,11 @@ public:
 		mToggleButtonPtr = std::make_unique<juce::ToggleButton>();
 		mToggleButtonAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
 			processorRef.getAudioProcessorValueTreeState(), toggleOnParameterId, *mToggleButtonPtr);
+
+		// 设置开关按钮颜色
+		mToggleButtonPtr->setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
+		mToggleButtonPtr->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
+		mToggleButtonPtr->setColour(juce::ToggleButton::textColourId, juce::Colours::black);
 		addAndMakeVisible(*mToggleButtonPtr);
 	}
 
@@ -122,7 +139,7 @@ private:
 			mLastPitch = newPitch;
 
 			const auto result = PluginUtils::getNoteNameAndCentsFromFrequency(mLastPitch);
-			
+
 			mPitchLabel->setText(std::get<0>(result), juce::dontSendNotification);
 			mRemainderLabel->setText(juce::String::formatted("%.1f Hz", std::get<1>(result)), juce::dontSendNotification);
 		}

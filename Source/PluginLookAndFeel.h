@@ -14,99 +14,56 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>
- */
+*/
 #pragma once
+
 #include <JuceHeader.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
-static juce::Colour g_primaryColour = juce::Colours::indianred;
-static juce::Colour g_secondaryColour = juce::Colour(34, 34, 34);
-static int g_fontSize = 22;
+// 如果后续需要对外暴露主题切换接口，可在此添加 enum ThemeVariant { Light, Dark, ... } 等
+// 目前主题色集中在 PluginLookAndFeel.cpp 内部的 UITheme 命名空间中。
 
 class PluginLookAndFeel : public juce::LookAndFeel_V4
 {
 public:
-	PluginLookAndFeel()
-	{
-		setColourScheme({
-			juce::Colour::fromRGB(12, 12, 12), // windowBackground - Black
-			g_secondaryColour, // widgetBackground - Dark grey
-			juce::Colours::grey, // menuBackground - Grey
-			juce::Colours::white, // outline - White
-			juce::Colours::white, // defaultText - White
-			g_primaryColour, // defaultFill - Pink (Hot Pink)
-			juce::Colours::white, // highlightedText - White
-			g_primaryColour, // highlightedFill - Deep Pink
-			juce::Colours::white // menuText - White
-		});
+    PluginLookAndFeel();
+    ~PluginLookAndFeel() override;
 
-		setColour(juce::TabbedComponent::outlineColourId, juce::Colours::grey);
-		setColour(juce::GroupComponent::outlineColourId, juce::Colours::grey);
-		//setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::black);
+    // 旋钮（圆形滑块）绘制
+    void drawRotarySlider(juce::Graphics&,
+        int x, int y, int width, int height,
+        float sliderPosProportional,
+        const float rotaryStartAngle,
+        const float rotaryEndAngle,
+        juce::Slider&) override;
 
-		static juce::Typeface::Ptr customTypeface = juce::Typeface::createSystemTypefaceFor(
-			BinaryData::WorkSansRegular_ttf,
-			BinaryData::WorkSansRegular_ttfSize);
-		juce::LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface(customTypeface);
-	}
+    // 按钮背景
+    void drawButtonBackground(juce::Graphics& g,
+        juce::Button& button,
+        const juce::Colour& backgroundColour,
+        bool isMouseOverButton,
+        bool isButtonDown) override;
 
-	void drawRotarySlider(juce::Graphics&, int x, int y, int width, int height,
-		float sliderPosProportional, float rotaryStartAngle,
-		float rotaryEndAngle, juce::Slider&) override;
+    // 按钮文字
+    void drawButtonText(juce::Graphics& g,
+        juce::TextButton& button,
+        bool isMouseOverButton,
+        bool isButtonDown) override;
 
-	void drawButtonBackground(juce::Graphics& g, juce::Button& button,
-		const juce::Colour& backgroundColour,
-		bool isMouseOverButton, bool isButtonDown) override;
+    // 为滑块创建文本框
+    juce::Label* createSliderTextBox(juce::Slider& slider) override;
 
-	int getDefaultScrollbarWidth() override;
-	bool areScrollbarButtonsVisible() override { return false; }
-	void drawScrollbarButton(juce::Graphics& g, juce::ScrollBar& bar,
-		int width, int height, int buttonDirection,
-		bool isScrollbarVertical, bool isMouseOverButton,
-		bool isButtonDown) override {}
+    // ToggleButton（复选/开关）
+    void drawToggleButton(juce::Graphics& g,
+        juce::ToggleButton& button,
+        bool isMouseOverButton,
+        bool isButtonDown) override;
 
-	void drawCornerResizer(juce::Graphics& g, int w, int h, bool /*isMouseOver*/, bool /*isMouseDragging*/) override;
-	void drawComboBox(juce::Graphics& g, int width, int height, bool isButtonDown, int buttonX, int buttonY, int buttonW, int buttonH, juce::ComboBox& cb) override;
-	void positionComboBoxText(juce::ComboBox& cb, juce::Label& labelToPosition) override;
-	void drawScrollbar(juce::Graphics& g, juce::ScrollBar& scrollbar, int x, int y, int width, int height, bool isScrollbarVertical, int thumbStartPosition, int thumbSize, bool isMouseOver, bool isMouseDown) override;
-	void drawPopupMenuBackground(juce::Graphics& g, int width, int height) override;
-	void drawPopupMenuItem(juce::Graphics& g, const juce::Rectangle<int>& area, bool isSeparator, bool isActive, bool isHighlighted, bool isTicked, bool hasSubMenu, const juce::String& text, const juce::String& shortcutKeyText, const juce::Drawable* icon, const juce::Colour* textColour) override;
-	void drawTabButton(juce::TabBarButton& button, juce::Graphics& g, bool isMouseOver, bool isMouseDown) override;
-	juce::Font getTextButtonFont(juce::TextButton&, int buttonHeight) override;
-	juce::Font getLabelFont(juce::Label&) override;
-	
-	void drawToggleButton(juce::Graphics& g, juce::ToggleButton& button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
-	{
-		using namespace juce; 
-		auto tickWidth = g_fontSize * 1.1f;
-
-		drawTickBox(g, button, 4.0f, ((float)button.getHeight() - tickWidth) * 0.5f,
-			tickWidth, tickWidth,
-			button.getToggleState(),
-			button.isEnabled(),
-			shouldDrawButtonAsHighlighted,
-			shouldDrawButtonAsDown);
-
-		g.setColour(button.findColour(ToggleButton::textColourId));
-		g.setFont(g_fontSize);
-
-		if (!button.isEnabled())
-			g.setOpacity(0.5f);
-
-		g.drawFittedText(button.getButtonText(),
-			button.getLocalBounds().withTrimmedLeft(roundToInt(tickWidth) + 10)
-			.withTrimmedRight(2),
-			Justification::centredLeft, 10);
-	}
-
-	int getTabButtonBestWidth(juce::TabBarButton& button, int tabDepth) override
-	{
-		return button.getTabbedButtonBar().getWidth() / button.getTabbedButtonBar().getNumTabs();
-	}
-
-	void drawButtonText(juce::Graphics& g, juce::TextButton& button, bool /*shouldDrawButtonAsHighlighted*/, bool /*shouldDrawButtonAsDown*/) override;
-
-
+    // PopupMenu 分节标题
+    void drawPopupMenuSectionHeader(juce::Graphics& g,
+        const juce::Rectangle<int>& area,
+        const juce::String& sectionName) override;
+   
+    int getTabButtonBestWidth(juce::TabBarButton& button, int tabDepth) override;
+    void positionComboBoxText(juce::ComboBox& box, juce::Label& label) override;
+    // 如需：可在此添加 setThemeVariant(ThemeVariant v) 等接口
 };

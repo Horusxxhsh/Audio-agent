@@ -118,14 +118,16 @@ struct EffectParameters {
 // 聊天组件
 class ChatComponent : public juce::Component,
     public juce::Button::Listener,
-    private juce::Thread
+    private juce::Thread,
+    public juce::TextEditor::Listener  // 添加这行
 {
 public:
     ChatComponent(PluginPresetManager& pm);
     void resized() override;
     void buttonClicked(juce::Button* button) override;
-
- 
+    void textEditorTextChanged(juce::TextEditor& editor) override;
+    //void textEditorFocusLost(juce::TextEditor& editor) override;
+    
 private:
     PluginPresetManager& presetManager;  // 添加引用成员
     juce::String currentPresetName;
@@ -140,12 +142,22 @@ private:
     juce::Label audioFileLabel;  // 显示选中的文件路径（可选）
     // 在 ChatComponent 类的私有成员变量部分添加
     juce::TextButton memoryToggleButton;  // 记忆开关按钮
+    juce::Label textWeightLabel;
+    juce::Label audioWeightLabel; 
+    juce::Label preferenceWeightLabel;
+    juce::TextEditor textWeightEditor;
+    juce::TextEditor audioWeightEditor;
+    juce::TextEditor preferenceWeightEditor;
     bool memoryEnabled = false;  // 记忆状态标志
     juce::TextButton cancelAudioButton;
+    juce::TextButton acceptAudioButton;   // 接受音频文件
+    juce::TextButton rejectAudioButton;   // 拒绝音频文件
 
     void run() override;
     void updateStatus(const juce::String& text);
     void callAsync(const juce::String& response);
+    void updateAudioWeightVisibility();
+    void adjustWeightsForAudio(bool includeAudio);
 };
 
 // 主窗口

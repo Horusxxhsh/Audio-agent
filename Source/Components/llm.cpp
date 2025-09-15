@@ -6,7 +6,7 @@
 #include <juce_core/juce_core.h>
 #include "../PluginPresetManager.h"
 #include <windows.h> 
-
+#include <algorithm>
 // 存储环境变量时添加引号并转义内部引号
 void storeEnvWithType(const std::string& key, const juce::String& value, const std::string& type) {
     std::string escapedValue = value.toStdString();
@@ -477,7 +477,12 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     audioFileLabel("AudioFileLabel", "No file selected"),  // Initialize label
     audioFileButton("Select audio file"),
     cancelAudioButton("Clear selection"),  // 新增取消按钮
-    memoryToggleButton("MemoryOff")  // 初始化为 MemoryOff
+    acceptAudioButton("Accept"),  // 接受音频文件
+    rejectAudioButton("Reject"),  // 拒绝音频文件
+    memoryToggleButton("MemoryOff"),  // 初始化为 MemoryOff
+    textWeightLabel("Text Weight:", "Text:"),  // 修改：添加文本内容
+    preferenceWeightLabel("Preference Weight:", "Preference:"),  // 修改：添加文本内容
+    audioWeightLabel("Audio Weight:", "Audio:")  // 修改：添加文本内容
 {
     currentPresetName = presetManager.getCurrentPreset();
     // Initialize UI components
@@ -490,8 +495,10 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     sendButton.setEnabled(true);
 
     inputEditor.setMultiLine(true);
+    //inputEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightyellow);
     responseEditor.setMultiLine(true);
     responseEditor.setReadOnly(true);
+    //responseEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightyellow);
 
     // Initialize audio file selection button
     addAndMakeVisible(audioFileButton);
@@ -502,11 +509,27 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     addAndMakeVisible(audioFileLabel);
     audioFileLabel.setColour(juce::Label::textColourId, juce::Colours::darkgrey);
 
+    // Set status label text color to black
+    statusLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+
     // 初始化取消按钮
     addAndMakeVisible(cancelAudioButton);
     cancelAudioButton.addListener(this);
     cancelAudioButton.setTooltip("Clear selected audio file");
     cancelAudioButton.setEnabled(false);  // 初始状态下禁用，因为没有文件被选择
+
+    // 初始化接受和拒绝按钮
+    addAndMakeVisible(acceptAudioButton);
+    acceptAudioButton.addListener(this);
+    acceptAudioButton.setTooltip("Accept selected audio file");
+    acceptAudioButton.setEnabled(true);  // 初始状态下禁用，因为没有文件被选择
+    acceptAudioButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::green);  // 接受状态颜色
+
+    addAndMakeVisible(rejectAudioButton);
+    rejectAudioButton.addListener(this);
+    rejectAudioButton.setTooltip("Reject selected audio file");
+    rejectAudioButton.setEnabled(true);  // 初始状态下禁用，因为没有文件被选择
+    rejectAudioButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::red);  // 拒绝状态颜色
 
     // 初始化记忆开关按钮
     addAndMakeVisible(memoryToggleButton);
@@ -515,7 +538,78 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     memoryToggleButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::green);  // 开启状态颜色
     memoryToggleButton.setTooltip("Toggle memory feature on/off");
 
+    // 初始化权重标签和输入框
+    // 修改：使用addChildComponent，并设置标签文本对齐方式
+    textWeightLabel.setJustificationType(juce::Justification::right);
+    preferenceWeightLabel.setJustificationType(juce::Justification::right);
+    audioWeightLabel.setJustificationType(juce::Justification::right);
+
+    addChildComponent(textWeightLabel);
+    addChildComponent(preferenceWeightLabel);
+    addChildComponent(audioWeightLabel);
+
+    addChildComponent(textWeightEditor);
+    textWeightEditor.setText("0.0");  // 设置默认值
+    textWeightEditor.setTooltip("Enter weight value for style (e.g., 1.0)");
+	//styleWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightyellow);
+
+    addChildComponent(preferenceWeightEditor);
+    preferenceWeightEditor.setText("0.0");  // 设置默认值
+    preferenceWeightEditor.setTooltip("Enter weight value for audio (e.g., 1.0)");
+    //audioWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightyellow);
+
+    addChildComponent(audioWeightEditor);
+    audioWeightEditor.setText("0.0");  // 设置默认值
+    audioWeightEditor.setTooltip("Enter weight value for feature (e.g., 1.0)");
+    //featureWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightyellow);
+
+    textWeightEditor.addListener(this);
+    preferenceWeightEditor.addListener(this);
+    audioWeightEditor.addListener(this);
+
+    // 设置输入框只接受数字和小数点
+    textWeightEditor.setInputRestrictions(10, "0123456789.");  // 限制为10个字符，只允许数字和小数点
+    preferenceWeightEditor.setInputRestrictions(10, "0123456789.");
+    audioWeightEditor.setInputRestrictions(10, "0123456789.");
+
     setSize(600, 400);
+    // ---- 统一设置编辑框的颜色（背景白色 / 边框黑色） ----
+    inputEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::white);
+    inputEditor.setColour(juce::TextEditor::outlineColourId, juce::Colours::black);
+    inputEditor.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::black);
+    inputEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    inputEditor.setColour(juce::TextEditor::highlightColourId, juce::Colours::lightblue);
+    //inputEditor.setColour(juce::TextEditor::caretColourId, juce::Colours::black);
+
+    responseEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::white);
+    responseEditor.setColour(juce::TextEditor::outlineColourId, juce::Colours::black);
+    responseEditor.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::black);
+    responseEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    responseEditor.setColour(juce::TextEditor::highlightColourId, juce::Colours::lightblue);
+    //responseEditor.setColour(juce::TextEditor::caretColourId, juce::Colours::black);
+
+    textWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::white);
+    textWeightEditor.setColour(juce::TextEditor::outlineColourId, juce::Colours::black);
+    textWeightEditor.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::black);
+    textWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    //styleWeightEditor.setColour(juce::TextEditor::caretColourId, juce::Colours::black);
+
+    preferenceWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::white);
+    preferenceWeightEditor.setColour(juce::TextEditor::outlineColourId, juce::Colours::black);
+    preferenceWeightEditor.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::black);
+    preferenceWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    //audioWeightEditor.setColour(juce::TextEditor::caretColourId, juce::Colours::black);
+
+    audioWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::white);
+    audioWeightEditor.setColour(juce::TextEditor::outlineColourId, juce::Colours::black);
+    audioWeightEditor.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::black);
+    audioWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    //featureWeightEditor.setColour(juce::TextEditor::caretColourId, juce::Colours::black);
+
+    textWeightLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    preferenceWeightLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+    audioWeightLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+
 }
 
 
@@ -524,17 +618,43 @@ void ChatComponent::resized()
 {
     auto area = getLocalBounds().reduced(8);
 
-
     // 为记忆开关按钮分配空间（放在顶部）
     auto topButtonArea = area.removeFromTop(30);  // 为顶部按钮预留空间
     memoryToggleButton.setBounds(topButtonArea.removeFromRight(100).reduced(2));  // 记忆开关按钮
 
+    // 权重输入区域 - 修改布局以确保标签和输入框正确显示
+    auto weightsArea = area.removeFromTop(30);
+
+    // 将区域分为三等份
+    int oneThird = weightsArea.getWidth() / 3;
+
+    // 风格权重区域
+    auto styleWeightArea = weightsArea.removeFromLeft(oneThird);
+    textWeightLabel.setBounds(styleWeightArea.removeFromLeft(80).reduced(2));
+    textWeightEditor.setBounds(styleWeightArea.reduced(2));
+
+    // 音频权重区域
+	auto preferenceWeightArea = weightsArea.removeFromLeft(oneThird);
+    preferenceWeightLabel.setBounds(preferenceWeightArea.removeFromLeft(80).reduced(2));
+    preferenceWeightEditor.setBounds(preferenceWeightArea.reduced(2));
+
+    // 特征权重区域
+    auto featureWeightArea = weightsArea.removeFromLeft(oneThird);
+    audioWeightLabel.setBounds(featureWeightArea.removeFromLeft(80).reduced(2));
+    audioWeightEditor.setBounds(featureWeightArea.reduced(2));
+
+    
+
     // 音频文件选择区域
     auto audioArea = area.removeFromTop(40);
-    // 分配空间给音频文件选择按钮和取消按钮
-    audioFileButton.setBounds(audioArea.removeFromLeft(150).reduced(2));  // 减小宽度以适应取消按钮
-    cancelAudioButton.setBounds(audioArea.removeFromLeft(120).reduced(2));  // 为取消按钮分配空间
+    // 分配空间给音频文件选择按钮
+    audioFileButton.setBounds(audioArea.removeFromLeft(150).reduced(2));  // 选择文件按钮
+    cancelAudioButton.setBounds(audioArea.removeFromLeft(120).reduced(2));  // 取消按钮
     audioFileLabel.setBounds(audioArea.reduced(2));  // 标签占据剩余区域
+    
+    // 将接受和拒绝按钮移到最右边
+    rejectAudioButton.setBounds(audioArea.removeFromRight(80).reduced(2));  // 拒绝按钮
+    acceptAudioButton.setBounds(audioArea.removeFromRight(80).reduced(2));  // 接受按钮
 
     // Allocate remaining area to original input area, button area, etc. (keep original logic)
     auto inputArea = area.removeFromTop(100);
@@ -546,6 +666,7 @@ void ChatComponent::resized()
     statusLabel.setBounds(buttonArea.reduced(2));
     responseEditor.setBounds(responseArea.reduced(2));
 }
+
 
 
 
@@ -567,10 +688,22 @@ void ChatComponent::buttonClicked(juce::Button* button)
         if (message.isNotEmpty())
         {
             userMessageToSend = message; // Save user message
+
+            // 如果记忆功能开启，存储权重值到环境变量
+            storeEnvWithType("text_Weight", "0.0", "double");
+            storeEnvWithType("audio_Weight", "0.0", "double");
+            storeEnvWithType("preference_Weight", "0.0", "double");
+            if (memoryEnabled) {
+                storeEnvWithType("text_Weight", textWeightEditor.getText(), "double");
+                storeEnvWithType("audio_Weight", audioWeightEditor.getText(), "double");
+                storeEnvWithType("preference_Weight", preferenceWeightEditor.getText(), "double");
+            }
+
             inputEditor.clear();
             startThread();  // Start thread
         }
-    }else if (button == &audioFileButton) {
+    }
+    else if (button == &audioFileButton) {
         // 现有代码...
         std::shared_ptr<juce::FileChooser> chooser = std::make_shared<juce::FileChooser>(
             "Select audio file",
@@ -597,39 +730,28 @@ void ChatComponent::buttonClicked(juce::Button* button)
                         audioFilePath.clear();
                         audioFileLabel.setText("No file selected", juce::dontSendNotification);
                         cancelAudioButton.setEnabled(false);  // 禁用取消按钮
+                        //acceptAudioButton.setEnabled(false);  // 禁用接受按钮
+                        //rejectAudioButton.setEnabled(false);  // 禁用拒绝按钮
+
+                        // 隐藏音频权重控件，因为没有有效的音频文件
+                        audioWeightLabel.setVisible(false);
+                        audioWeightEditor.setVisible(false);
+                    }
+                    else {
+                        // 启用接受和拒绝按钮，允许用户确认或拒绝文件
+                        //acceptAudioButton.setEnabled(true);
+                        //rejectAudioButton.setEnabled(true);
+                        //cancelAudioButton.setEnabled(false);  // 暂时禁用取消按钮
+
+                        // 如果记忆功能已开启，显示音频权重控件
+                        updateAudioWeightVisibility();
+                        storeEnvWithType("text_Weight", textWeightEditor.getText(), "double");
+                        storeEnvWithType("audio_Weight", audioWeightEditor.getText(), "double");
+                        storeEnvWithType("preference_Weight", preferenceWeightEditor.getText(), "double");
                     }
                 }
             });
     }
-
-    //根据juce版本调节代码
-    //else if (button == &audioFileButton) {
-    //    // Create file chooser, specify title and default path (here, user's desktop)
-    //    juce::FileChooser fileChooser("Select audio file",
-    //        juce::File::getSpecialLocation(juce::File::userDesktopDirectory),
-    //        "Audio files (*.wav;*.WAV;*.mp3;*.MP3;*.aif;*.AIF;*.flac;*.FLAC)");  // Supported formats
-
-    //    // Show open file dialog (modal window)
-    //    if (fileChooser.browseForFileToOpen())
-    //    {
-    //        // Get selected file path
-    //        juce::File selectedFile = fileChooser.getResult();
-    //        audioFilePath = selectedFile.getFullPathName();
-
-    //        // Update label to display selected file name (or full path)
-    //        audioFileLabel.setText("Selected: " + selectedFile.getFileName(), juce::dontSendNotification);
-
-    //        // Optional: Add file validation logic here (e.g., check file size, format, etc.)
-    //        if (selectedFile.getSize() == 0)
-    //        {
-    //            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-    //                "Error",
-    //                "The selected file is empty!");
-    //            audioFilePath.clear();
-    //            audioFileLabel.setText("No file selected", juce::dontSendNotification);
-    //        }
-    //    }
-    //}
     else if (button == &cancelAudioButton) {
         // 取消按钮的处理逻辑
         audioFilePath.clear();  // 清除文件路径
@@ -637,8 +759,108 @@ void ChatComponent::buttonClicked(juce::Button* button)
         audioFileLabel.setText("No file selected", juce::dontSendNotification);  // 重置标签
         cancelAudioButton.setEnabled(false);  // 禁用取消按钮，因为没有文件可以取消
 
+        // 隐藏音频权重控件，因为没有音频文件
+        audioWeightLabel.setVisible(false);
+        audioWeightEditor.setVisible(false);
+
         // 记录日志
         juce::Logger::writeToLog("Audio file selection cleared");
+    }
+    else if (button == &acceptAudioButton) {
+        auto userMessage = userMessageToSend;
+        juce::Logger::writeToLog("userMessage: " + juce::String(userMessage));
+        if (userMessage.isNotEmpty()) {
+            // 接受按钮的处理逻辑 - 确认当前选择的音频文件
+            juce::Logger::writeToLog("accept ");
+            // 方法三：定义 Python 解释器和脚本的文件对象
+            juce::File pythonInterpreterFile;
+            juce::File pythonScriptFile;
+            // 获取环境变量并记录原始值
+            const char* pythonInterpreterEnv = std::getenv("SUPERTONAL_PYTHON_INTERPRETER");
+            const char* pythonScriptEnv = std::getenv("SUPERTONAL_PYTHON_SCRIPT3"); // 修正名称，添加了"1"
+            // 记录环境变量的原始值
+            juce::Logger::writeToLog("Raw interpreter env value: " +
+                (pythonInterpreterEnv != nullptr ? juce::String(pythonInterpreterEnv) : "null"));
+            juce::Logger::writeToLog("Raw script env value: " +
+                (pythonScriptEnv != nullptr ? juce::String(pythonScriptEnv) : "null"));
+            pythonInterpreterFile = juce::File(pythonInterpreterEnv);
+            pythonScriptFile = juce::File(pythonScriptEnv);
+            const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
+            const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
+            juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
+            juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
+
+            // 构建命令行：解释器 + 脚本 + 用户消息 + 音频路径（若有）+ 记忆状态
+            juce::String command;
+            command << pythonInterpreterPath.toStdString() << " " << pythonScriptPath.toStdString();
+
+            // 添加用户消息参数（作为第一个参数）
+            command << " \"" << userMessage << "\"";
+
+            // 执行命令
+            std::string utf8Command = command.toStdString();
+            int returnCode = std::system(utf8Command.c_str());
+            juce::Logger::writeToLog("commandWithErrorCapture: " + juce::String(utf8Command) + ", return code: " + juce::String(returnCode));
+            if (returnCode != 0) {
+                std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
+                std::cerr << "执行的命令: " << command << std::endl;
+                updateStatus("Python script execution failed");
+            }
+            else {
+                updateStatus("accepted");
+            }
+        }
+        else {
+            updateStatus("No input");
+        }
+    }
+    else if (button == &rejectAudioButton) {
+        // 拒绝按钮的处理逻辑 - 清除当前选择的音频文件
+        auto userMessage = userMessageToSend;
+        if (userMessage.isNotEmpty()) {
+            // 接受按钮的处理逻辑 - 确认当前选择的音频文件
+            juce::Logger::writeToLog("reject");
+            // 方法三：定义 Python 解释器和脚本的文件对象
+            juce::File pythonInterpreterFile;
+            juce::File pythonScriptFile;
+            // 获取环境变量并记录原始值
+            const char* pythonInterpreterEnv = std::getenv("SUPERTONAL_PYTHON_INTERPRETER");
+            const char* pythonScriptEnv = std::getenv("SUPERTONAL_PYTHON_SCRIPT4"); // 修正名称，添加了"1"
+            // 记录环境变量的原始值
+            juce::Logger::writeToLog("Raw interpreter env value: " +
+                (pythonInterpreterEnv != nullptr ? juce::String(pythonInterpreterEnv) : "null"));
+            juce::Logger::writeToLog("Raw script env value: " +
+                (pythonScriptEnv != nullptr ? juce::String(pythonScriptEnv) : "null"));
+            pythonInterpreterFile = juce::File(pythonInterpreterEnv);
+            pythonScriptFile = juce::File(pythonScriptEnv);
+            const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
+            const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
+            juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
+            juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
+
+            // 构建命令行：解释器 + 脚本 + 用户消息 + 音频路径（若有）+ 记忆状态
+            juce::String command;
+            command << pythonInterpreterPath.toStdString() << " " << pythonScriptPath.toStdString();
+
+            // 添加用户消息参数（作为第一个参数）
+            command << " \"" << userMessage << "\"";
+
+            // 执行命令
+            std::string utf8Command = command.toStdString();
+            int returnCode = std::system(utf8Command.c_str());
+            juce::Logger::writeToLog("commandWithErrorCapture: " + juce::String(utf8Command) + ", return code: " + juce::String(returnCode));
+            if (returnCode != 0) {
+                std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
+                std::cerr << "执行的命令: " << command << std::endl;
+                updateStatus("Python script execution failed");
+            }
+            else {
+                updateStatus("rejected");
+            }
+        }
+        else {
+            updateStatus("No input");
+        }
     }
     else if (button == &memoryToggleButton) {
         // 切换记忆状态
@@ -646,13 +868,125 @@ void ChatComponent::buttonClicked(juce::Button* button)
         // 根据状态更新按钮文本
         if (memoryEnabled) {
             memoryToggleButton.setButtonText("MemoryOn");
+
+            // 显示风格和特征权重输入控件
+            textWeightLabel.setVisible(true);
+            preferenceWeightLabel.setVisible(true);
+            textWeightEditor.setVisible(true);
+            preferenceWeightEditor.setVisible(true);
+
+            // 只有当有音频文件时才显示音频权重控件
+            updateAudioWeightVisibility();
             storeEnvWithType("memory_Enabled", "true", "string");
+            storeEnvWithType("text_Weight", textWeightEditor.getText(), "double");
+            storeEnvWithType("audio_Weight", audioWeightEditor.getText(), "double");
+            storeEnvWithType("preference_Weight", preferenceWeightEditor.getText(), "double");
         }
         else {
             memoryToggleButton.setButtonText("MemoryOff");
             storeEnvWithType("memory_Enabled", "false", "string");
+            storeEnvWithType("text_Weight", "0.0", "double");
+            storeEnvWithType("audio_Weight", "0.0", "double");
+            storeEnvWithType("preference_Weight", "0.0", "double");
+            // 隐藏所有权重输入控件
+            textWeightLabel.setVisible(false);
+            preferenceWeightLabel.setVisible(false);
+            audioWeightLabel.setVisible(false);
+            textWeightEditor.setVisible(false);
+            preferenceWeightEditor.setVisible(false);
+            audioWeightEditor.setVisible(false);
         }
+    }
+}
 
+// 添加一个新的辅助方法来更新音频权重控件的可见性
+void ChatComponent::updateAudioWeightVisibility()
+{
+    // 只有当记忆功能开启且有音频文件时，才显示音频权重控件
+    bool shouldShowAudioWeight = memoryEnabled && !audioFilePath.isEmpty();
+
+    audioWeightLabel.setVisible(shouldShowAudioWeight);
+    audioWeightEditor.setVisible(shouldShowAudioWeight);
+
+    // 如果需要显示音频权重，确保权重值合理调整
+    if (shouldShowAudioWeight) {
+        // 重新计算权重，确保总和为1
+        adjustWeightsForAudio(true);
+    }
+    else {
+        // 如果不显示音频权重，则将权重重新分配给其他两个
+        adjustWeightsForAudio(false);
+    }
+}
+
+// 添加一个方法来调整权重值
+void ChatComponent::adjustWeightsForAudio(bool includeAudio)
+{
+    if (!memoryEnabled) return;
+
+    double textWeight = textWeightEditor.getText().getDoubleValue();
+    double audioWeight = includeAudio ? audioWeightEditor.getText().getDoubleValue() : 0.0;
+    double preferenceWeight = preferenceWeightEditor.getText().getDoubleValue();
+
+    // 确保权重不为负
+    if (textWeight < 0.0) textWeight = 0.0;
+    if (audioWeight < 0.0) audioWeight = 0.0;
+    if (preferenceWeight < 0.0) preferenceWeight = 0.0;
+
+    double totalWeight = textWeight + audioWeight + preferenceWeight;
+
+    // 如果总和接近0，设置默认值
+    if (totalWeight < 0.001) {
+        if (includeAudio) {
+            // 三个权重均等
+            textWeight = audioWeight = preferenceWeight = 1.0 / 3.0;
+        }
+        else {
+            // 两个权重均等
+            textWeight = preferenceWeight = 0.5;
+            audioWeight = 0.0;
+        }
+    }
+    else {
+        // 归一化权重
+        textWeight /= totalWeight;
+        preferenceWeight /= totalWeight;
+        if (includeAudio) {
+            audioWeight /= totalWeight;
+        }
+        else {
+            audioWeight = 0.0;
+        }
+    }
+
+    // 更新UI
+    textWeightEditor.setText(juce::String(textWeight, 2), false);
+    if (includeAudio) {
+        audioWeightEditor.setText(juce::String(audioWeight, 2), false);
+    }
+    preferenceWeightEditor.setText(juce::String(preferenceWeight, 2), false);
+}
+
+// 当文本内容改变时调用（实时监听）
+void ChatComponent::textEditorTextChanged(juce::TextEditor& editor)
+{
+    // 如果记忆功能未开启，不处理
+    if (!memoryEnabled) {
+        return;
+    }
+
+    // 根据是哪个编辑器来更新对应的环境变量
+    if (&editor == &textWeightEditor) {
+        storeEnvWithType("text_Weight", editor.getText(), "double");
+        juce::Logger::writeToLog("Text weight updated: " + editor.getText());
+    }
+    else if (&editor == &preferenceWeightEditor) {
+        storeEnvWithType("preference_Weight", editor.getText(), "double");
+        juce::Logger::writeToLog("Preference weight updated: " + editor.getText());
+    }
+    else if (&editor == &audioWeightEditor) {
+        storeEnvWithType("audio_Weight", editor.getText(), "double");
+        juce::Logger::writeToLog("Audio weight updated: " + editor.getText());
     }
 }
 
@@ -674,43 +1008,33 @@ void ChatComponent::run() {
     else {
         juce::Logger::writeToLog("No audio file selected");
     }
-
+    auto text_Weight = textWeightEditor.getText();
+    auto audio_Weight = audioWeightEditor.getText();
+    auto preference_Weight = preferenceWeightEditor.getText();
+    juce::Logger::writeToLog("textWeight:" + text_Weight);
+    juce::Logger::writeToLog("audioWeight:" + audio_Weight);
+    juce::Logger::writeToLog("preferenceWeight:" + preference_Weight);
     if (memoryEnabled) {
         juce::Logger::writeToLog("Memory feature is enabled");
         //storeEnvWithType("memory_Enabled", "true", "bool");
+        double audioWeight = 0.0;
+        // 获取权重值
+        double textWeight = textWeightEditor.getText().getDoubleValue();
+        double preferenceWeight = preferenceWeightEditor.getText().getDoubleValue();
+        if (!audioFilePath.isEmpty()) {
+            audioWeight = audioWeightEditor.getText().getDoubleValue();
+        }
+        // 计算总和
+        double totalWeight = textWeight + preferenceWeight + audioWeight;
+        if (std::abs(totalWeight - 1.0) > 0.001) {
+            updateStatus("The sum of weights must be one, Please enter again");
+            return;
+        }
     }
     else {
         juce::Logger::writeToLog("Memory feature is disabled");
         //storeEnvWithType("memory_Enabled", "false", "bool");
     }
-
-    //// 方法一：假设您知道项目根目录与当前工作目录的关系
-    //juce::File currentDir = juce::File::getCurrentWorkingDirectory();
-    //juce::Logger::writeToLog("Current working directory: " + currentDir.getFullPathName());
-
-    //// 如果当前目录是 Builds，则向上一级再找到 supertonal 目录
-    //juce::File projectDir = currentDir;
-    //while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
-    //    projectDir = projectDir.getParentDirectory();
-    //}
-
-    //juce::Logger::writeToLog("Project directory: " + projectDir.getFullPathName());
-
-    //// Python 解释器路径
-    //juce::File pythonInterpreterFile = projectDir.getChildFile("Source/Components/PythonApplication/env/Scripts/python.exe");
-    //const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
-
-    //// Python 脚本路径
-    //juce::File pythonScriptFile = projectDir.getChildFile("Source/llm.py");
-    //const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
-
-    //// 记录路径用于调试
-    //juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
-    //juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
-
-    //// 方法二：定义 Python 解释器和脚本路径
-    //const char* pythonInterpreterPath = R"(C:\Users\80753\Documents\GitHub\Audio-agent\Source\Components\PythonApplication\env\Scripts\python.exe)";
-    //const char* pythonScriptPath = R"(C:\Users\80753\Documents\GitHub\Audio-agent\Source\llm.py)";
     
     // 方法三：定义 Python 解释器和脚本的文件对象
     juce::File pythonInterpreterFile;
@@ -758,16 +1082,26 @@ void ChatComponent::run() {
     juce::String command;
     command << pythonInterpreterPath.toStdString() << " " << pythonScriptPath.toStdString();
 
-    // 添加用户消息参数（用引号包裹，处理空格）
+    // 添加用户消息参数（作为第一个参数）
     command << " \"" << userMessage << "\"";
 
-    // 添加记忆状态参数（作为第三个参数）
+    // 添加记忆状态参数（作为第二个参数）
     command << " \"" << (memoryEnabled ? "true" : "false") << "\"";
 
-    // 添加音频文件路径参数（若存在，用引号包裹）
     if (!audioFilePath.isEmpty()) {
         command << " \"" << audioFilePath << "\"";
     }
+    if (memoryEnabled) {
+        // 添加文本权重参数（作为第三个参数）
+        command << " \"" << text_Weight << "\"";
+        // 添加用户偏好权重参数（作为第四个参数）
+        command << " \"" << preference_Weight << "\"";
+                // 添加音频权重参数（用引号包裹，处理空格）
+        command << " \"" << audio_Weight << "\"";
+
+    }
+
+
 
 
     // 存储环境变量（可选，也可仅通过命令行传递）
@@ -866,9 +1200,12 @@ void ChatComponent::run() {
 // 实现 ChatComponent 类的 updateStatus 方法
 void ChatComponent::updateStatus(const juce::String& text)
 {
-    juce::MessageManager::callAsync(
-        [this, text]() { statusLabel.setText(text, juce::dontSendNotification); });
+    juce::MessageManager::callAsync([this, text]() {
+        statusLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+        statusLabel.setText(text, juce::dontSendNotification);
+        });
 }
+
 
 // 实现MainWindow构造函数，用参数初始化presetManager引用
 MainWindow::MainWindow(PluginPresetManager& pm)

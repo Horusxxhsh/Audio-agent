@@ -149,7 +149,18 @@ public:
 
 	void paint(juce::Graphics& g) override
 	{
-		g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+		//g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+		// 创建一个从中心向外的径向渐变，从白色到浅蓝色
+		juce::ColourGradient gradient(
+			juce::Colours::white,                   // 中心色为白色
+			getWidth() * 0.5f, getHeight() * 0.5f,  // 中心点
+			juce::Colour::fromRGB(173, 216, 230),   // 边缘色为浅蓝色 (#ADD8E6)
+			0.0f, 0.0f,                             // 任意边缘点
+			true);                                  // 径向渐变
+
+
+		g.setGradientFill(gradient);
+		g.fillAll();
 	};
 
 	void resized() override

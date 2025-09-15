@@ -25,6 +25,11 @@ public:
 
         presetList.setTextWhenNothingSelected("No Preset Selected");
         presetList.setMouseCursor(juce::MouseCursor::PointingHandCursor);
+        presetList.setColour(juce::ComboBox::textColourId, juce::Colours::black); // 浅橘色文本
+        presetList.setColour(juce::ComboBox::backgroundColourId, juce::Colour::fromRGB(0xB0, 0xB0, 0xB0));
+        presetList.setColour(juce::ComboBox::arrowColourId, juce::Colours::black);
+		presetList.setColour(juce::ComboBox::outlineColourId, juce::Colour::fromRGB(0xB0, 0xC4, 0xD9)); // 边框颜色
+
         addAndMakeVisible(presetList);
         presetList.addListener(this);
 
@@ -85,6 +90,15 @@ private:
         {
             std::string userMessage = readEnvWithType<std::string>("user_Message");
             std::string audioPath = readEnvWithType<std::string>("audio_File_Path");
+            double text_Weight = readEnvWithType<double>("text_Weight");
+            double audio_Weight = readEnvWithType<double>("audio_Weight");
+            double preference_Weight = readEnvWithType<double>("preference_Weight");
+			std::string text_Weight_str = std::to_string(text_Weight);
+			std::string audio_Weight_str = std::to_string(audio_Weight);
+			std::string preference_Weight_str = std::to_string(preference_Weight);
+            juce::Logger::writeToLog("text_Weight:" + text_Weight_str);
+            juce::Logger::writeToLog("audio_Weight:" + audio_Weight_str);
+            juce::Logger::writeToLog("preference_Weight:" + preference_Weight_str);
             std::string memoryEnabled = readEnvWithType<std::string>("memory_Enabled");
             if (memoryEnabled == "") {
 				memoryEnabled = "false";
@@ -111,7 +125,7 @@ private:
             const auto index7 = presetManager.getParameterValue("flanger_on");
             const auto index8 = presetManager.getParameterValue("phaser_on");
             const auto index9 = presetManager.getParameterValue("pre_eq_on");
-
+			
             // 构建参数字符串，以开关状态开始
             std::string paramString = std::to_string(index1) + "," + std::to_string(index2) + ","
                 + std::to_string(index3) + "," + std::to_string(index4) + ","
@@ -391,6 +405,9 @@ private:
             command += " \"" + currentPresetName + "\"";  // 第三个参数: 当前预设名称
             command += " \"" + memoryEnabled + "\"";  // 第四个参数: 记忆功能状态
             command += " \"" + audioPath + "\"";  // 第五个参数: 音频文件路径
+			command += " " + text_Weight_str;  // 第六个参数: 文字权重
+			command += " " + audio_Weight_str;  // 第七个参数: 音频权重
+			command += " " + preference_Weight_str;  // 第八个参数: 偏好权重
 
             // 执行 Python 脚本
             int returnCode = std::system(command.c_str());
@@ -442,9 +459,17 @@ private:
     void configureButton(juce::Button& button, const juce::String& buttonText)
     {
         button.setButtonText(buttonText);
-        button.setMouseCursor(juce::MouseCursor::PointingHandCursor);
-        addAndMakeVisible(button);
         button.addListener(this);
+        // 设置浅蓝色背景
+        button.setColour(juce::TextButton::buttonColourId, juce::Colour(220, 235, 250)); // 浅蓝色背景
+
+        // 设置按下时为橘色
+        button.setColour(juce::TextButton::buttonOnColourId, juce::Colour(255, 175, 100)); // 橘色
+
+        // 设置文本为浅橘色
+        button.setColour(juce::TextButton::textColourOffId, juce::Colour(255, 160, 80)); // 浅橘色文本
+
+        addAndMakeVisible(button);
     }
 
     void loadPresetList()

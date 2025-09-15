@@ -1,19 +1,19 @@
 /*
-    This code is part of the Supertonal guitar effects multi-processor.
-    Copyright (C) 2023-2024  Paul Jones
+	This code is part of the Supertonal guitar effects multi-processor.
+	Copyright (C) 2023-2024  Paul Jones
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #pragma once
@@ -34,7 +34,13 @@ public:
 		mViewportPtr = std::make_unique<juce::Viewport>();
 		mContainerPtr = std::make_unique<juce::Component>();
 
+		// 设置电平表颜色
 		lnf.setColour(foleys::LevelMeter::lmMeterGradientLowColour, juce::Colours::green);
+		lnf.setColour(foleys::LevelMeter::lmMeterGradientMidColour, juce::Colours::orange);
+		lnf.setColour(foleys::LevelMeter::lmMeterGradientMaxColour, juce::Colours::red);
+		lnf.setColour(foleys::LevelMeter::lmMeterBackgroundColour, juce::Colours::darkgrey);
+		lnf.setColour(foleys::LevelMeter::lmBackgroundColour, juce::Colours::lightblue);      // 外层
+		lnf.setColour(foleys::LevelMeter::lmTicksColour, juce::Colours::black);
 
 		mInputLevelMeter.setLookAndFeel(&lnf);
 		mInputLevelMeter.setMeterSource(&audioProcessor.getInputMeterSource());
@@ -44,6 +50,7 @@ public:
 		mOutputLevelMeter.setMeterSource(&audioProcessor.getOutputMeterSource());
 		addAndMakeVisible(mOutputLevelMeter);
 
+		// 添加视口，不设置不存在的颜色ID
 		addAndMakeVisible(mViewportPtr.get());
 		mViewportPtr->setViewedComponent(mContainerPtr.get(), false);
 
@@ -72,6 +79,12 @@ public:
 				if (PluginUtils::isToggleId(parameterId))
 				{
 					auto* button = new juce::ToggleButton(PluginUtils::toTitleCase(parameterId));
+					// 设置按钮文本颜色为黑色
+					button->setColour(juce::ToggleButton::textColourId, juce::Colours::black);
+					// 设置按钮勾选标记颜色为黑色
+					button->setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
+					button->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
+
 					mComponentRows[row]->add(button);
 					mButtonAttachments.add(new juce::AudioProcessorValueTreeState::ButtonAttachment(
 						mAudioProcessorValueTreeState,
@@ -83,6 +96,15 @@ public:
 				else if (PluginUtils::isWaveshaperId(parameterId))
 				{
 					auto* comboBox = new juce::ComboBox(PluginUtils::toTitleCase(parameterId));
+					// 设置下拉框文本颜色为黑色
+					comboBox->setColour(juce::ComboBox::textColourId, juce::Colours::black);
+					// 设置下拉框背景颜色
+					comboBox->setColour(juce::ComboBox::backgroundColourId, juce::Colours::white);
+					// 设置下拉框边框颜色
+					comboBox->setColour(juce::ComboBox::outlineColourId, juce::Colours::black);
+					// 设置下拉框箭头颜色
+					comboBox->setColour(juce::ComboBox::arrowColourId, juce::Colours::black);
+
 					for (int waveshaperIndex = 0; waveshaperIndex < apvts::waveShaperIds.size(); waveshaperIndex++) {
 						comboBox->addItem(apvts::waveShaperIds.at(waveshaperIndex), waveshaperIndex + 1);
 					}
@@ -100,7 +122,24 @@ public:
 					slider->setTitle(PluginUtils::toTitleCase(parameterId));
 					slider->setScrollWheelEnabled(false);
 
+					// 设置滑块文本颜色为黑色
+					slider->setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+					// 设置滑块文本框背景颜色
+					slider->setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::white);
+					// 设置滑块文本框边框颜色
+					slider->setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::black);
+					// 设置滑块旋钮颜色
+					slider->setColour(juce::Slider::thumbColourId, juce::Colours::black);
+					// 设置旋转滑块填充颜色
+					slider->setColour(juce::Slider::rotarySliderFillColourId, juce::Colours::black);
+					// 设置旋转滑块轮廓颜色
+					slider->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colours::darkgrey);
+
 					auto* label = new juce::Label(parameterId, PluginUtils::toTitleCase(parameterId));
+					// 设置标签文本颜色为黑色
+					label->setColour(juce::Label::textColourId, juce::Colours::black);
+					// 设置标签背景颜色为透明
+					label->setColour(juce::Label::backgroundColourId, juce::Colours::transparentBlack);
 					label->attachToComponent(slider, false);
 
 					mComponentRows[row]->add(slider);
@@ -112,7 +151,6 @@ public:
 					mContainerPtr->addAndMakeVisible(slider);
 				}
 			}
-
 		}
 	};
 
@@ -129,7 +167,19 @@ public:
 
 	void paint(juce::Graphics& g) override
 	{
-		g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+		// 创建一个从中心向外的径向渐变，从白色到浅蓝色
+		juce::ColourGradient gradient(
+			juce::Colours::white,                   // 中心色为白色
+			getWidth() * 0.5f, getHeight() * 0.5f,  // 中心点
+			juce::Colour::fromRGB(173, 216, 230),   // 边缘色为浅蓝色 (#ADD8E6)
+			0.0f, 0.0f,                             // 任意边缘点
+			true);                                  // 径向渐变
+
+
+		g.setGradientFill(gradient);
+		g.fillAll();
+		g.setColour(juce::Colours::black);
+		g.drawRect(getLocalBounds(), 1);
 	};
 
 	void resized() override

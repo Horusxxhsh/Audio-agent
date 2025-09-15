@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+
 import sys
 import json
 import sqlite3
@@ -15,57 +15,423 @@ import librosa
 from transformers import Wav2Vec2Processor, Wav2Vec2Model
 import numpy as np
 
-# ¶¨Òå MemoryNote Àà
+
+def parameters_update(parameters):
+    # å½“ first_47[0] == 1.0 æ—¶ï¼Œå°† "CompressorOff" æ›¿æ¢ä¸º "CompressorOn"
+    if first_47[0] == 1.0 and 'CompressorOff' in parameters:
+        compressor_settings = parameters.pop('CompressorOff')
+        parameters['CompressorOn'] = compressor_settings
+    if first_47[0] == 0.0 and 'CompressorOn' in parameters:
+        compressor_settings = parameters.pop('CompressorOn')
+        parameters['CompressorOff'] = compressor_settings
+    if 'CompressorOff' in parameters:
+        parameters['CompressorOff']['Threshold'] = -128.00
+        parameters['CompressorOff']['Ratio'] = 1
+        parameters['CompressorOff']['Attack'] = 0.00
+        parameters['CompressorOff']['Release'] = 0.00
+        parameters['CompressorOff']['Makeup'] = -12.00
+        parameters['CompressorOff']['Mix'] = 0.00
+
+    # å½“ first_47[1] == 1.0 æ—¶ï¼Œå°† "ScreamerOff" æ›¿æ¢ä¸º "ScreamerOn"
+    if first_47[1] == 1.0 and 'ScreamerOff' in parameters:
+        compressor_settings = parameters.pop('ScreamerOff')
+        parameters['ScreamerOn'] = compressor_settings
+    if first_47[1] == 0.0 and 'ScreamerOn' in parameters:
+        compressor_settings = parameters.pop('ScreamerOn')
+        parameters['ScreamerOff'] = compressor_settings
+    if 'ScreamerOff' in parameters:
+        parameters['ScreamerOff']['Drive'] = 0.00
+        parameters['ScreamerOff']['Tone'] = 0.00
+        parameters['ScreamerOff']['Level'] = -64.0000000
+
+    # å½“ first_47[2] == 1.0 æ—¶ï¼Œå°† "DriverOff" æ›¿æ¢ä¸º "DriverOn"
+    if first_47[2] == 1.0 and 'DriverOff' in parameters:
+        compressor_settings = parameters.pop('DriverOff')
+        parameters['DriverOn'] = compressor_settings
+    if first_47[2] == 0.0 and 'DriverOn' in parameters:
+        compressor_settings = parameters.pop('DriverOn')
+        parameters['DriverOff'] = compressor_settings
+    if 'DriverOff' in parameters:
+        parameters['DriverOff']['Distortion'] = 0.00
+        parameters['DriverOff']['Volume'] = -64.0
+
+        # å½“ first_47[3] == 1.0 æ—¶ï¼Œå°† "DelayOff" æ›¿æ¢ä¸º "DelayOn"
+    if first_47[3] == 1.0 and 'DelayOff' in parameters:
+        compressor_settings = parameters.pop('DelayOff')
+        parameters['DelayOn'] = compressor_settings
+    if first_47[3] == 0.0 and 'DelayOn' in parameters:
+        compressor_settings = parameters.pop('DelayOn')
+        parameters['DelayOff'] = compressor_settings
+    if 'DelayOff' in parameters:
+        parameters['DelayOff']['Feedback'] = 0.00
+        parameters['DelayOff']['Delay'] = 1.00
+        parameters['DelayOff']['Mix'] = 0.00
+
+        # å½“ first_47[4] == 1.0 æ—¶ï¼Œå°† "ReverbOff" æ›¿æ¢ä¸º "ReverbOn"
+    if first_47[4] == 1.0 and 'ReverbOff' in parameters:
+        compressor_settings = parameters.pop('ReverbOff')
+        parameters['ReverbOn'] = compressor_settings
+    if first_47[4] == 0.0 and 'ReverbOn' in parameters:
+        compressor_settings = parameters.pop('ReverbOn')
+        parameters['ReverbOff'] = compressor_settings
+    if 'ReverbOff' in parameters:
+        parameters['ReverbOff']['Size'] = 0.00
+        parameters['ReverbOff']['Damping'] = 0.00
+        parameters['ReverbOff']['Width'] = 0.00
+        parameters['ReverbOff']['Mix'] = 0.00
+
+        # å½“ first_47[5] == 1.0 æ—¶ï¼Œå°† "ChorusOff" æ›¿æ¢ä¸º "ChorusOn"
+    if first_47[5] == 1.0 and 'ChorusOff' in parameters:
+        compressor_settings = parameters.pop('ChorusOff')
+        parameters['ChorusOn'] = compressor_settings
+    if first_47[5] == 0.0 and 'ChorusOn' in parameters:
+        compressor_settings = parameters.pop('ChorusOn')
+        parameters['ChorusOff'] = compressor_settings
+    if 'ChorusOff' in parameters:
+        parameters['ChorusOff']['Delay'] = 0.010
+        parameters['ChorusOff']['Depth'] = 0.00
+        parameters['ChorusOff']['Frequency'] = 0.05
+        parameters['ChorusOff']['Width'] = 0.010
+
+        # å½“ first_47[6] == 1.0 æ—¶ï¼Œå°† "FlangerOff" æ›¿æ¢ä¸º "FlangerOn"
+    if first_47[6] == 1.0 and 'FlangerOff' in parameters:
+        compressor_settings = parameters.pop('FlangerOff')
+        parameters['FlangerOn'] = compressor_settings
+    if first_47[6] == 0.0 and 'FlangerOn' in parameters:
+        compressor_settings = parameters.pop('FlangerOn')
+        parameters['FlangerOff'] = compressor_settings
+    if 'FlangerOff' in parameters:
+        parameters['FlangerOff']['Delay'] = 0.00100
+        parameters['FlangerOff']['Depth'] = 0.00
+        parameters['FlangerOff']['Feedback'] = 0.00
+        parameters['FlangerOff']['Frequency'] = 0.05
+        parameters['FlangerOff']['Width'] = 0.001
+
+    # å½“ first_47[7] == 1.0 æ—¶ï¼Œå°† "PhaserOff" æ›¿æ¢ä¸º "PhaserOn"
+    if first_47[7] == 1.0 and 'PhaserOff' in parameters:
+        compressor_settings = parameters.pop('PhaserOff')
+        parameters['PhaserOn'] = compressor_settings
+    if first_47[7] == 0.0 and 'PhaserOn' in parameters:
+        compressor_settings = parameters.pop('PhaserOn')
+        parameters['PhaserOff'] = compressor_settings
+    if 'PhaserOff' in parameters:
+        parameters['PhaserOff']['Depth'] = 0.00
+        parameters['PhaserOff']['Feedback'] = 0.00
+        parameters['PhaserOff']['Frequency'] = -64.0000000
+        parameters['PhaserOff']['Width'] = -64.0000000
+
+    # å½“ first_47[8] == 1.0 æ—¶ï¼Œå°† "EqualiserOff" æ›¿æ¢ä¸º "EqualiserOn"
+    if first_47[8] == 1.0 and 'EqualiserOff' in parameters:
+        compressor_settings = parameters.pop('EqualiserOff')
+        parameters['EqualiserOn'] = compressor_settings
+    if first_47[8] == 0.0 and 'EqualiserOn' in parameters:
+        compressor_settings = parameters.pop('EqualiserOn')
+        parameters['EqualiserOff'] = compressor_settings
+    if 'EqualiserOff' in parameters:
+        parameters['EqualiserOff']['100hz'] = 0.00
+        parameters['EqualiserOff']['200hz'] = 0.00
+        parameters['EqualiserOff']['400hz'] = 0.00
+        parameters['EqualiserOff']['800hz'] = 0.00
+        parameters['EqualiserOff']['1600hz'] = 0.00
+        parameters['EqualiserOff']['3200hz'] = 0.00
+        parameters['EqualiserOff']['6400hz'] = 0.00
+        parameters['EqualiserOff']['Level'] = 0.00
+
+        # æ›´æ–°æ•°æ®åº“ä¸­çš„å‚æ•°å€¼
+    if first_47[0] == 1.0:
+        if 'CompressorOn' in parameters:
+
+            # å°† first_47[9] è½¬æ¢ä¸º Threshold èŒƒå›´çš„å€¼
+            first_47[9] = float(first_47[9])
+            threshold = -128 + (0 - (-128)) * first_47[9]
+            parameters['CompressorOn']['Threshold'] = threshold
+
+            # è·å– Ratio å€¼
+            first_47[11] = float(first_47[11])
+            ratio = get_ratio(first_47[11])
+            if ratio is not None:
+                parameters['CompressorOn']['Ratio'] = ratio
+            else:
+                print(f"æœªæ‰¾åˆ° first_47[11] = {first_47[11]} å¯¹åº”çš„ Ratio å€¼")
+
+            parameters['CompressorOn']['Attack'] = first_47[10]
+            parameters['CompressorOn']['Release'] = first_47[12]
+
+            # å°† first_47[13] è½¬æ¢ä¸º Makeup èŒƒå›´çš„å€¼
+            first_47[13] = float(first_47[13])
+            makeup = -128 + (64 - (-128)) * first_47[13]
+            parameters['CompressorOn']['Makeup'] = makeup
+
+            parameters['CompressorOn']['Mix'] = first_47[14]
+
+    if first_47[2] == 1.0:
+        if 'DriverOn' in parameters:
+            parameters['DriverOn']['Distortion'] = first_47[18]
+            # å°† first_47[19] è½¬æ¢ä¸º Volume èŒƒå›´çš„å€¼
+            first_47[19] = float(first_47[19])
+            volume = -64 + (0 - (-64)) * first_47[19]
+            parameters['DriverOn']['Volume'] = volume
+
+    if first_47[1] == 1.0:
+        if 'ScreamerOn' in parameters:
+            parameters['ScreamerOn']['Drive'] = first_47[15]
+            parameters['ScreamerOn']['Tone'] = first_47[17]
+            # å°† first_47[16] è½¬æ¢ä¸º Volume èŒƒå›´çš„å€¼
+            first_47[16] = float(first_47[16])
+            volume = -64 + (0 - (-64)) * first_47[16]
+            parameters['ScreamerOn']['Level'] = volume
+
+    if first_47[3] == 1.0:
+        if 'DelayOn' in parameters:
+            parameters['DelayOn']['Feedback'] = first_47[20]
+
+            parameters['DelayOn']['Delay'] = "450.00"
+
+            parameters['DelayOn']['Mix'] = first_47[22]
+
+    if first_47[4] == 1.0:
+        if 'ReverbOn' in parameters:
+            parameters['ReverbOn']['Size'] = first_47[23]
+            parameters['ReverbOn']['Damping'] = first_47[24]
+            parameters['ReverbOn']['Width'] = first_47[25]
+            parameters['ReverbOn']['Mix'] = first_47[26]
+
+    if first_47[8] == 1.0:
+        if 'EqualiserOn' in parameters:
+            if len(first_47) > 46:
+                # å°† first_47[40] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+                first_47[40] = float(first_47[40])
+                fz = -15.00 + (15.00 - (-15.00)) * first_47[40]
+                parameters['EqualiserOn']['100hz'] = fz
+
+                # å°† first_47[41] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+                first_47[41] = float(first_47[41])
+                fz = -15.00 + (15.00 - (-15.00)) * first_47[41]
+                parameters['EqualiserOn']['200hz'] = fz
+
+                # å°† first_47[42] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+                first_47[42] = float(first_47[42])
+                fz = -15.00 + (15.00 - (-15.00)) * first_47[42]
+                parameters['EqualiserOn']['400hz'] = fz
+
+                # å°† first_47[43] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+                first_47[43] = float(first_47[43])
+                fz = -15.00 + (15.00 - (-15.00)) * first_47[43]
+                parameters['EqualiserOn']['800hz'] = fz
+
+                # å°† first_47[44] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+                first_47[44] = float(first_47[44])
+                fz = -15.00 + (15.00 - (-15.00)) * first_47[44]
+                parameters['EqualiserOn']['1600hz'] = fz
+
+                # å°† first_47[45] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+                first_47[45] = float(first_47[45])
+                fz = -15.00 + (15.00 - (-15.00)) * first_47[45]
+                parameters['EqualiserOn']['3200hz'] = fz
+
+                # å°† first_47[46] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+                first_47[46] = float(first_47[46])
+                fz = -15.00 + (15.00 - (-15.00)) * first_47[46]
+                parameters['EqualiserOn']['6400hz'] = fz
+            if len(first_47) > 47:
+                # å°† first_47[47] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+                first_47[47] = float(first_47[47])
+                fz = -15.00 + (15.00 - (-15.00)) * first_47[47]
+                parameters['EqualiserOn']['Level'] = fz
+
+    if first_47[5] == 1.0:
+        if 'ChorusOn' in parameters:
+            # å°† first_47[27] è½¬æ¢ä¸º Depth èŒƒå›´çš„å€¼
+            first_47[27] = float(first_47[27])
+            depth = 0.010 + (0.050 - 0.010) * first_47[27]
+            parameters['ChorusOn']['Delay'] = depth
+
+            parameters['ChorusOn']['Depth'] = first_47[28]
+
+            # å°† first_47[29] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+            first_47[29] = float(first_47[29])
+            frequency = 0.05 + (2.00 - 0.05) * first_47[29]
+            parameters['ChorusOn']['Frequency'] = frequency
+
+            # å°† first_47[30] è½¬æ¢ä¸º Width èŒƒå›´çš„å€¼
+            first_47[30] = float(first_47[30])
+            width = 0.010 + (0.050 - 0.010) * first_47[30]
+            parameters['ChorusOn']['Width'] = width
+
+    if first_47[6] == 1.0:
+        if 'FlangerOn' in parameters:
+            # å°† first_47[31] è½¬æ¢ä¸º Delay èŒƒå›´çš„å€¼
+            first_47[31] = float(first_47[31])
+            delay = 0.00100 + (0.02000 - 0.00100) * first_47[31]
+            parameters['FlangerOn']['Delay'] = delay
+
+            parameters['FlangerOn']['Depth'] = first_47[32]
+
+            # å°† first_47[33] è½¬æ¢ä¸º Feedback èŒƒå›´çš„å€¼
+            first_47[33] = float(first_47[33])
+            feedback = 0.00 + (0.50 - 0.00) * first_47[33]
+            parameters['FlangerOn']['Feedback'] = feedback
+
+            # å°† first_47[34] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+            first_47[34] = float(first_47[34])
+            frequency = 0.05 + (2.00 - 0.05) * first_47[34]
+            parameters['FlangerOn']['Frequency'] = frequency
+
+            # å°† first_47[35] è½¬æ¢ä¸º Width èŒƒå›´çš„å€¼
+            first_47[35] = float(first_47[35])
+            width = 0.001 + (0.020 - 0.001) * first_47[35]
+            parameters['FlangerOn']['Width'] = width
+
+    if first_47[7] == 1.0:
+        if 'PhaserOn' in parameters:
+            parameters['PhaserOn']['Depth'] = first_47[36]
+
+            # å°† first_47[37] è½¬æ¢ä¸º Feedback èŒƒå›´çš„å€¼
+            first_47[37] = float(first_47[37])
+            feedback = 0.00 + (0.09 - 0.00) * first_47[37]
+            parameters['PhaserOn']['Feedback'] = feedback
+
+            # å°† first_47[38] è½¬æ¢ä¸º Frequency èŒƒå›´çš„å€¼
+            first_47[38] = float(first_47[38])
+            frequency = 0.00 + (2.00 - 0.00) * first_47[38]
+            parameters['PhaserOn']['Frequency'] = frequency
+
+            # å°† first_47[39] è½¬æ¢ä¸º Width èŒƒå›´çš„å€¼
+            first_47[39] = float(first_47[39])
+            width = 50 + (3000 - 50) * first_47[39]
+            parameters['PhaserOn']['Width'] = width
+
+    return parameters
+
+
+
+# 1. å®šä¹‰å‚æ•°æ˜ å°„ï¼ˆå¤ç”¨ç°æœ‰æ˜ å°„ï¼‰
+param_mapping = {
+    # å¼€å…³æ§åˆ¶æ˜ å°„
+    "CompressorOn": ("pre_compressor_on", 1),
+    "CompressorOff": ("pre_compressor_on", 0),
+    "ScreamerOn": ("tube_screamer_on", 1),
+    "ScreamerOff": ("tube_screamer_on", 0),
+    "DriverOn": ("mouse_drive_on", 1),
+    "DriverOff": ("mouse_drive_on", 0),
+    "DelayOn": ("delay_on", 1),
+    "DelayOff": ("delay_on", 0),
+    "ReverbOn": ("room_on", 1),
+    "ReverbOff": ("room_on", 0),
+    "ChorusOn": ("chorus_on", 1),
+    "ChorusOff": ("chorus_on", 0),
+    "FlangerOn": ("flanger_on", 1),
+    "FlangerOff": ("flanger_on", 0),
+    "PhaserOn": ("phaser_on", 1),
+    "PhaserOff": ("phaser_on", 0),
+    "EqualiserOn": ("pre_eq_on", 1),
+    "EqualiserOff": ("pre_eq_on", 0),
+
+    # å‚æ•°å€¼æ˜ å°„
+    "CompressorOn.Threshold": "pre_comp_thresh",
+    "CompressorOn.Ratio": "pre_comp_ratio",
+    "CompressorOn.Attack": "pre_comp_attack",
+    "CompressorOn.Release": "pre_comp_release",
+    "CompressorOn.Mix": "pre_comp_blend",
+    "CompressorOn.Makeup": "pre_comp_gain",
+    "CompressorOff.Threshold": "pre_comp_thresh",
+    "CompressorOff.Ratio": "pre_comp_ratio",
+    "CompressorOff.Attack": "pre_comp_attack",
+    "CompressorOff.Release": "pre_comp_release",
+    "CompressorOff.Mix": "pre_comp_blend",
+    "CompressorOff.Makeup": "pre_comp_gain",
+    "ScreamerOn.Drive": "tube_screamer_drive",
+    "ScreamerOn.Tone": "tube_screamer_tone",
+    "ScreamerOn.Level": "tube_screamer_level",
+    "ScreamerOff.Drive": "tube_screamer_drive",
+    "ScreamerOff.Tone": "tube_screamer_tone",
+    "ScreamerOff.Level": "tube_screamer_level",
+    "DriverOn.Distortion": "mouse_drive_distortion",
+    "DriverOn.Volume": "mouse_drive_volume",
+    "DriverOff.Distortion": "mouse_drive_distortion",
+    "DriverOff.Volume": "mouse_drive_volume",
+    "DelayOn.Feedback": "delay_feedback",
+    "DelayOn.Delay": "delay_left_millisecond",
+    "DelayOn.Mix": "delay_mix",
+    "DelayOff.Feedback": "delay_feedback",
+    "DelayOff.Delay": "delay_left_millisecond",
+    "DelayOff.Mix": "delay_mix",
+    "ReverbOn.Size": "room_size",
+    "ReverbOn.Damping": "room_damping",
+    "ReverbOn.Width": "room_width",
+    "ReverbOn.Mix": "room_mix",
+    "ReverbOff.Size": "room_size",
+    "ReverbOff.Damping": "room_damping",
+    "ReverbOff.Width": "room_width",
+    "ReverbOff.Mix": "room_mix",
+    "ChorusOn.Delay": "chorus_delay",
+    "ChorusOn.Depth": "chorus_depth",
+    "ChorusOn.Frequency": "chorus_frequency",
+    "ChorusOn.Width": "chorus_width",
+    "ChorusOff.Delay": "chorus_delay",
+    "ChorusOff.Depth": "chorus_depth",
+    "ChorusOff.Frequency": "chorus_frequency",
+    "ChorusOff.Width": "chorus_width",
+    "FlangerOn.Delay": "flanger_delay",
+    "FlangerOn.Depth": "flanger_depth",
+    "FlangerOn.Feedback": "flanger_feedback",
+    "FlangerOn.Frequency": "flanger_frequency",
+    "FlangerOn.Width": "flanger_width",
+    "FlangerOff.Delay": "flanger_delay",
+    "FlangerOff.Depth": "flanger_depth",
+    "FlangerOff.Feedback": "flanger_feedback",
+    "FlangerOff.Frequency": "flanger_frequency",
+    "FlangerOff.Width": "flanger_width",
+    "PhaserOn.Depth": "phaser_depth",
+    "PhaserOn.Feedback": "phaser_feedback",
+    "PhaserOn.Frequency": "phaser_frequency",
+    "PhaserOn.Width": "phaser_width",
+    "PhaserOff.Depth": "phaser_depth",
+    "PhaserOff.Feedback": "phaser_feedback",
+    "PhaserOff.Frequency": "phaser_frequency",
+    "PhaserOff.Width": "phaser_width",
+    "EqualiserOn.100hz": "pre_eq_100_gain",
+    "EqualiserOn.200hz": "pre_eq_200_gain",
+    "EqualiserOn.400hz": "pre_eq_400_gain",
+    "EqualiserOn.800hz": "pre_eq_800_gain",
+    "EqualiserOn.1600hz": "pre_eq_1600_gain",
+    "EqualiserOn.3200hz": "pre_eq_3200_gain",
+    "EqualiserOn.6400hz": "pre_eq_6400_gain",
+    "EqualiserOn.Level": "pre_eq_level_gain",
+    "EqualiserOff.100hz": "pre_eq_100_gain",
+    "EqualiserOff.200hz": "pre_eq_200_gain",
+    "EqualiserOff.400hz": "pre_eq_400_gain",
+    "EqualiserOff.800hz": "pre_eq_800_gain",
+    "EqualiserOff.1600hz": "pre_eq_1600_gain",
+    "EqualiserOff.3200hz": "pre_eq_3200_gain",
+    "EqualiserOff.6400hz": "pre_eq_6400_gain",
+    "EqualiserOff.Level": "pre_eq_level_gain"
+}
+
+# å®šä¹‰ MemoryNote ç±»
 class MemoryNote:
-    def __init__(self, id, songName, style, feature, parameter):
+    def __init__(self, id, songName, style, feature, parameter, preference):
         self.id = id
         self.songName = songName
         self.style = style
         self.feature = feature
         self.parameter = parameter
+        self.preference = preference
 
     def __str__(self):
-        return f"ID: {self.id}, Song Name: {self.songName}, Style: {self.style}, Feature: {self.feature}, Parameter: {self.parameter}"
+        return f"ID: {self.id}, Song Name: {self.songName}, Style: {self.style}, Feature: {self.feature}, Parameter: {self.parameter}, Preference: {self.preference}"
 
 
-def audio_to_vector(file_path):
-    # ¼ÓÔØÔ¤ÑµÁ·µÄ´¦ÀíÆ÷ºÍÄ£ĞÍ
-    processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
-    model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h")
 
-    # ¼ÓÔØÒôÆµÎÄ¼ş£¨librosaÄ¬ÈÏ²ÉÑùÂÊÎª22050Hz£¬wav2vec2Í¨³£ÆÚÍû16000Hz£©
-    audio, sample_rate = librosa.load(file_path, sr=16000)
 
-    # Ô¤´¦ÀíÒôÆµ£º×ª»»ÎªÊäÈëÌØÕ÷
-    inputs = processor(audio, sampling_rate=16000, return_tensors="pt")
-
-    # »ñÈ¡Ä£ĞÍÊä³ö£¨²»¼ÆËãÌİ¶ÈÒÔÌá¸ßĞ§ÂÊ£©
-    with torch.no_grad():
-        outputs = model(**inputs)
-
-    # outputs.last_hidden_stateÊÇĞòÁĞ¼¶ÌØÕ÷£¬ĞÎ×´Îª [1, seq_len, hidden_size]
-    # ¿ÉÒÔÍ¨¹ıÆ½¾ùµÈ·½Ê½µÃµ½Õû¸öÒôÆµµÄÏòÁ¿±íÊ¾
-    audio_vector = outputs.last_hidden_state.mean(dim=1).squeeze()
-
-    return audio_vector.numpy()  # ×ª»»ÎªnumpyÊı×é·µ»Ø
-
-# ¶¨ÒåÏòÁ¿ÓàÏÒÏàËÆ¶È¼ÆËãº¯Êı
-def vector_cosine_similarity(vec1, vec2):
-    """¼ÆËãÁ½¸öÏòÁ¿µÄÓàÏÒÏàËÆ¶È"""
-    dot_product = np.dot(vec1, vec2)
-    norm_vec1 = np.linalg.norm(vec1)
-    norm_vec2 = np.linalg.norm(vec2)
-    if norm_vec1 == 0 or norm_vec2 == 0:
-        return 0.0
-    return dot_product / (norm_vec1 * norm_vec2)
-
-# ¶¨ÒåJaccardÏàËÆ¶Èº¯Êı
+# å®šä¹‰Jaccardç›¸ä¼¼åº¦å‡½æ•°
 def jaccard_similarity(set1, set2):
     intersection = len(set1.intersection(set2))
     union = len(set1.union(set2))
     return intersection / union if union != 0 else 0
 
-# ¶¨ÒåÎÄ±¾ÏàËÆ¶Èº¯Êı
+
+# å®šä¹‰æ–‡æœ¬ç›¸ä¼¼åº¦å‡½æ•°
 def text_similarity(text1, text2):
     if not text1 or not text2:
         return 0.0
@@ -74,63 +440,55 @@ def text_similarity(text1, text2):
     return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
 
 
-# ¸üĞÂÔ¤ÉèÎÄ¼ş
+# æ›´æ–°é¢„è®¾æ–‡ä»¶
 def update_preset_in_file(file_path, params_dict):
     try:
         tree = ET.parse(file_path)
         root = tree.getroot()
-        
-        # ¸üĞÂ²ÎÊı
+
+        # æ›´æ–°å‚æ•°
         for param in root.findall('PARAM'):
             param_id = param.get('id')
             if param_id in params_dict:
                 param.set('value', str(params_dict[param_id]))
-        
-        # ±£´æ¸üĞÂºóµÄÄÚÈİ
+
+        # ä¿å­˜æ›´æ–°åçš„å†…å®¹
         tree.write(file_path, encoding='utf-8', xml_declaration=True)
-        print(f"Ô¤ÉèÎÄ¼ş {file_path} ÒÑ¸üĞÂ")
+        print(f"é¢„è®¾æ–‡ä»¶ {file_path} å·²æ›´æ–°")
         return True
     except Exception as e:
-        print(f"¸üĞÂÔ¤ÉèÎÄ¼ş³ö´í: {e}")
+        print(f"æ›´æ–°é¢„è®¾æ–‡ä»¶å‡ºé”™: {e}")
         return False
 
+
 def safe_open_file(relative_path, absolute_dir=None):
-    """³¢ÊÔ´ò¿ªÎÄ¼ş£¬Èç¹ûÏà¶ÔÂ·¾¶Ê§°ÜÔò³¢ÊÔÊ¹ÓÃ»·¾³±äÁ¿Ö¸¶¨µÄÂ·¾¶"""
-    
-    # Èç¹ûÃ»ÓĞÌá¹©¾ø¶ÔÂ·¾¶£¬³¢ÊÔ´Ó»·¾³±äÁ¿»ñÈ¡
+    """å°è¯•æ‰“å¼€æ–‡ä»¶ï¼Œå¦‚æœç›¸å¯¹è·¯å¾„å¤±è´¥åˆ™å°è¯•ä½¿ç”¨ç¯å¢ƒå˜é‡æŒ‡å®šçš„è·¯å¾„"""
+
+    # å¦‚æœæ²¡æœ‰æä¾›ç»å¯¹è·¯å¾„ï¼Œå°è¯•ä»ç¯å¢ƒå˜é‡è·å–
     if absolute_dir is None:
         absolute_dir = os.environ.get('DOCUMENTS_DIR')
-        # Èç¹û»·¾³±äÁ¿Ò²²»´æÔÚ£¬Ê¹ÓÃÄ¬ÈÏÖµ
+        # å¦‚æœç¯å¢ƒå˜é‡ä¹Ÿä¸å­˜åœ¨ï¼Œä½¿ç”¨é»˜è®¤å€¼
         if not absolute_dir:
-            print("¾¯¸æ: »·¾³±äÁ¿ DOCUMENTS_DIR Î´ÉèÖÃ£¬Ê¹ÓÃµ±Ç°Ä¿Â¼")
-            absolute_dir = os.getcwd()  # Ê¹ÓÃµ±Ç°¹¤×÷Ä¿Â¼×÷Îª±¸Ñ¡
-    
+            print("è­¦å‘Š: ç¯å¢ƒå˜é‡ DOCUMENTS_DIR æœªè®¾ç½®ï¼Œä½¿ç”¨å½“å‰ç›®å½•")
+            absolute_dir = os.getcwd()  # ä½¿ç”¨å½“å‰å·¥ä½œç›®å½•ä½œä¸ºå¤‡é€‰
+
     try:
-        # Ê×ÏÈ³¢ÊÔÏà¶ÔÂ·¾¶
+        # é¦–å…ˆå°è¯•ç›¸å¯¹è·¯å¾„
         with open(relative_path, 'r', encoding='utf-8') as file:
             content = file.read()
-            print(f"³É¹¦´ÓÏà¶ÔÂ·¾¶´ò¿ªÎÄ¼ş: {relative_path}")
+            print(f"æˆåŠŸä»ç›¸å¯¹è·¯å¾„æ‰“å¼€æ–‡ä»¶: {relative_path}")
             return content
     except FileNotFoundError:
         try:
-            # Èç¹ûÏà¶ÔÂ·¾¶Ê§°Ü£¬³¢ÊÔ»·¾³±äÁ¿Ö¸¶¨µÄÂ·¾¶
+            # å¦‚æœç›¸å¯¹è·¯å¾„å¤±è´¥ï¼Œå°è¯•ç¯å¢ƒå˜é‡æŒ‡å®šçš„è·¯å¾„
             absolute_path = os.path.join(absolute_dir, relative_path)
             with open(absolute_path, 'r', encoding='utf-8') as file:
                 content = file.read()
-                print(f"³É¹¦´Ó»·¾³±äÁ¿Ö¸¶¨Â·¾¶´ò¿ªÎÄ¼ş: {absolute_path}")
+                print(f"æˆåŠŸä»ç¯å¢ƒå˜é‡æŒ‡å®šè·¯å¾„æ‰“å¼€æ–‡ä»¶: {absolute_path}")
                 return content
         except FileNotFoundError:
-            print(f"ÎŞ·¨´ò¿ªÎÄ¼ş {relative_path}£¬Ïà¶ÔÂ·¾¶ºÍ»·¾³±äÁ¿Â·¾¶¶¼Ê§°Ü")
+            print(f"æ— æ³•æ‰“å¼€æ–‡ä»¶ {relative_path}ï¼Œç›¸å¯¹è·¯å¾„å’Œç¯å¢ƒå˜é‡è·¯å¾„éƒ½å¤±è´¥")
             return ""
-
-# ¶ÁÈ¡ result1.txt ÎÄ¼ş
-result1_str = safe_open_file("result1.txt")
-# ½«×Ö·û´®×ª»»Îª¼¯ºÏ
-result1_set = set(result1_str.split(',')) if result1_str else set()
-
-# ¶ÁÈ¡ result2.txt ÎÄ¼ş
-result2_str = safe_open_file("result2.txt")
-
 
 def get_ratio(value):
     mapping = {
@@ -147,753 +505,366 @@ def get_ratio(value):
     }
     return mapping.get(value)
 
-try:
-    db_dir = "C:\\MusicData"
-    if not os.path.exists(db_dir):
-           os.makedirs(db_dir)  # ´´½¨Ä¿Â¼£¨Èç¹û²»´æÔÚ£©
-    db_path = os.path.join(db_dir, "music_info.db")
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    # »ñÈ¡indexµÄÖµ
-    if len(sys.argv) > 4:         
-        chat_message = sys.argv[1]  # »ñÈ¡ÃüÁîĞĞÖĞc++³ÌĞò´«ÈëµÄµÚÒ»¸ö²ÎÊı
-        print(f"Parameter: {chat_message}")
-        if platform.system() == "Windows":
-           # WindowsÃüÁîĞĞÍ¨³£Ê¹ÓÃGBK±àÂë
-           user_message = sys.argv[2].encode('cp936').decode('utf-8', errors='replace')
-           currentPresetName = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
-           memoryEnabled = sys.argv[4]
-           if len(sys.argv) > 5:
-                audio_File_Path = sys.argv[5].encode('cp936').decode('utf-8', errors='replace')
-           else:
-                audio_File_Path = ""
-        else:
-           # Linux/macOSÍ¨³£Ê¹ÓÃUTF-8
-           user_message = sys.argv[2]
-           currentPresetName = sys.argv[3]
-           memoryEnabled = sys.argv[4]
-           if len(sys.argv) > 5:
-                audio_File_Path = sys.argv[5]
-           else:
-                audio_File_Path = ""
-        # Ìí¼ÓÅĞ¶Ï£ºÈç¹ûuser_messageÎª¿Õ£¬ÔòÓÃcurrentPresetName´úÌæ
-        if not user_message.strip():  # ´¦Àí¿Õ×Ö·û´®»ò½öº¬¿Õ°××Ö·ûµÄÇé¿ö
-           user_message = currentPresetName
 
-        print(f"User message: {user_message}")  # »ñÈ¡ÃüÁîĞĞÖĞc++³ÌĞò´«ÈëµÄµÚ¶ş¸ö²ÎÊı  
-        print(f"currentPresetName: {currentPresetName}")
-        print(f"memoryEnabled: {memoryEnabled}")
-        print(f"audio_File_Path: {audio_File_Path}")
-        if audio_File_Path and audio_File_Path.strip():
-           vector = audio_to_vector(audio_File_Path)
-           print("ÒôÆµÏòÁ¿ĞÎ×´£º", vector)
-        else:
-           vector = None  # »ò¿ÕÁĞ±í[]£¬¸ù¾İºóĞøÊ¹ÓÃ³¡¾°È·¶¨
-           print("Î´Ìá¹©ÓĞĞ§µÄÎÄ¼şÂ·¾¶£¬ÒôÆµÏòÁ¿Îª¿Õ")
-        # ´ÓÊı¾İ¿âÖĞ»ñÈ¡ËùÓĞ¸èÇúĞÅÏ¢²¢¼ÆËãÏàËÆ¶È
-        cursor.execute("SELECT SongName, Style, Feature, Parameters, Vector FROM music_responses")
+def update_parameters_to_database(parameters):
+    # åªæœ‰è®°å¿†ç³»ç»Ÿå¼€å¯æ‰ä¼šæ‰§è¡Œè¿™éƒ¨åˆ†ä»£ç 
+    if memoryEnabled == "true":
+        # ä»æ•°æ®åº“ä¸­è·å–æ‰€æœ‰æ­Œæ›²ä¿¡æ¯å¹¶è®¡ç®—ç›¸ä¼¼åº¦,å¾—åˆ°similar_songså’Œmemory_notes
+        cursor.execute("SELECT SongName, Style, Feature, Parameters, Preferences FROM music_responses")
         rows = cursor.fetchall()
         similar_songs = []
-        memory_notes = []  # ´æ´¢ MemoryNote ÊµÀıµÄÁĞ±í
+        memory_notes = []  # å­˜å‚¨ MemoryNote å®ä¾‹çš„åˆ—è¡¨
 
-        
         for index, row in enumerate(rows, start=1):
             song_name = row[0]
             style_str = row[1]
             feature_str = row[2]
             parameter_str = row[3]
-            vector_str = row[4]
+            preferences_str = row[4]  # åå¥½å­—æ®µï¼Œæš‚æœªä½¿ç”¨
             if song_name != user_message:
                 try:
+                    print(f"R song_name: {song_name}")
+                    print(f"R style_str: {style_str}")
+                    print(f"R feature_str: {feature_str}")
+                    print(f"R parameter_str: {parameter_str}")
+                    print(f"R preferences_str: {preferences_str}")
                     style = json.loads(style_str)
                     feature = json.loads(feature_str)
-        
-                    # ¼ÆËã±êÇ©ÏàËÆ¶È
+
+                    # è®¡ç®—æ ‡ç­¾ç›¸ä¼¼åº¦
                     tags = set(style)
                     tag_similarity = jaccard_similarity(result1_set, tags)
-        
-                    # ¼ÆËãÃèÊöÏàËÆ¶È
+
+                    # è®¡ç®—æè¿°ç›¸ä¼¼åº¦
                     description = " ".join(feature)
                     desc_similarity = text_similarity(result2_str, description)
-                   
-                   # ¼ÆËãÏòÁ¿ÏàËÆ¶È£¨Èç¹ûfile_path²»Îª¿ÕÇÒÏòÁ¿´æÔÚ£©
-                    vector_similarity = 0.0
-                    if audio_File_Path and audio_File_Path.strip() and vector_str:
-                        try:
-                          # ½«Êı¾İ¿âÖĞµÄÏòÁ¿×Ö·û´®×ª»»ÎªnumpyÊı×é
-                          db_vector = np.array([float(x.strip()) for x in vector_str.split(',')])
-                          # ¼ÆËãÓëÄ¿±êÒôÆµÏòÁ¿µÄÓàÏÒÏàËÆ¶È
-                          vector_similarity = vector_cosine_similarity(vector, db_vector)
-                        except (ValueError, TypeError) as e:
-                          print(f"´¦Àí¸èÇú {song_name} µÄÏòÁ¿Ê±³ö´í: {e}")
-        
-                    # ×ÛºÏÏàËÆ¶È£¨¸ù¾İÊÇ·ñÓĞÏòÁ¿µ÷ÕûÈ¨ÖØ£©
-                    if audio_File_Path and audio_File_Path.strip() and vector_str:
-                       # ÓĞÒôÆµÏòÁ¿Ê±£¬Ôö¼ÓÏòÁ¿ÏàËÆ¶ÈµÄÈ¨ÖØ
-                       similarity = 0.3 * tag_similarity + 0.2 * desc_similarity + 0.5 * vector_similarity
-                    else:
-                       # ÎŞÒôÆµÏòÁ¿Ê±Ê¹ÓÃÔ­È¨ÖØ
-                       similarity = 0.7 * tag_similarity + 0.3 * desc_similarity
-        
-                    if similarity> 0.1:
+
+                    similarity = 0.7 * tag_similarity + 0.3 * desc_similarity
+                    print(f"similarity:{similarity}")
+                    if similarity > 0.15:
                         similar_songs.append((song_name, similarity, style_str, feature_str, parameter_str))
-                        # ´æ´¢¼ìË÷µ½µÄ¸èÇúµÄĞÅÏ¢
-                        # ÏŞÖÆmemory_notes×î´ó³¤¶ÈÎª3
+                        # å­˜å‚¨æ£€ç´¢åˆ°çš„æ­Œæ›²çš„ä¿¡æ¯
+                        # é™åˆ¶memory_notesæœ€å¤§é•¿åº¦ä¸º3
                         if len(memory_notes) < 3:
-                            note = MemoryNote(index, song_name, style, feature, parameter_str)
+                            note = MemoryNote(index, song_name, style, feature, parameter_str, preferences_str)
                             memory_notes.append(note)
                         else:
-                            # ÒÑ´ïµ½×î´ó³¤¶È£¬¿É¸ù¾İĞèÒªÑ¡ÔñÊÇ·ñÌø³öÑ­»·
-                            break  # Èç¹ûÏëÖ»±£ÁôÇ°3¸ö·ûºÏÌõ¼şµÄ£¬¿ÉÒÔ¼ÓÉÏbreak
+                            # å·²è¾¾åˆ°æœ€å¤§é•¿åº¦ï¼Œå¯æ ¹æ®éœ€è¦é€‰æ‹©æ˜¯å¦è·³å‡ºå¾ªç¯
+                            break  # å¦‚æœæƒ³åªä¿ç•™å‰3ä¸ªç¬¦åˆæ¡ä»¶çš„ï¼Œå¯ä»¥åŠ ä¸Šbreak
 
                 except json.JSONDecodeError:
-                        print(f"Error: ÎŞĞ§µÄJSONÏìÓ¦: {style_str}")
-        # ´òÓ¡ MemoryNote ÊµÀıµÄĞÅÏ¢
+                    print(f"Error: æ— æ•ˆçš„JSONå“åº”: {style_str}")
+        # æ‰“å° MemoryNote å®ä¾‹çš„ä¿¡æ¯
         for note in memory_notes:
-            print(note)
-        parts = chat_message.split(',')
-        if len(parts) < 48:
-            print("ÃüÁîĞĞ²ÎÊı·Ö¸îºóÁĞ±í³¤¶È²»×ã 48£¬Çë¼ì²éÊäÈë¡£")
-        else:
-            first_47 = parts[:48]
-            try:
-                # ½« first_47[0] µ½ first_47[8] ×ª»»Îª¸¡µãÊı
-                for i in range(9):
-                    first_47[i] = float(first_47[i])
+            print(f"note:{note}")
 
+        # è®°å¿†æ›´æ–°
+        song_name = user_message
+        sqlParameters = json.dumps(parameters, ensure_ascii=False, indent=2)
+        print(f"sqlParameters:{sqlParameters}")
+        # æ ¼å¼åŒ– system_prompt3
+        memory_notes_str = "\n".join([str(note) for note in memory_notes])
+        system_prompt3 = f'''
+                                        You are an AI memory evolution agent responsible for managing and evolving a knowledge base.
+                                        Analyze the new memory note according to style, feature and parameter, also with their several nearest neighbors memory.
+                                        Make decisions about its evolution.  
 
-                # ²éÑ¯Æ¥ÅäµÄ¼ÇÂ¼
-                cursor.execute("SELECT SongName, Style, Feature, Parameters, Vector FROM music_responses WHERE SongName =?", (user_message,))
-                row = cursor.fetchone()
+                                        The new memory name:
+                                        {song_name}
+                                        style: {result1_str}
+                                        feature: {result2_str}
+                                        parameter: {sqlParameters}
 
-                if row:
-                    song_name = row[0]
-                    try:
-                        style = json.loads(row[1])
-                        parameters = json.loads(row[3])
+                                        The nearest neighbors memories:
+                                        {memory_notes_str}
 
-                        # µ± first_47[0] == 1.0 Ê±£¬½« "CompressorOff" Ìæ»»Îª "CompressorOn"
-                        if first_47[0] == 1.0 and 'CompressorOff' in parameters:
-                            compressor_settings = parameters.pop('CompressorOff')
-                            parameters['CompressorOn'] = compressor_settings
-                        if first_47[0] == 0.0 and 'CompressorOn' in parameters:
-                            compressor_settings = parameters.pop('CompressorOn')   
-                            parameters['CompressorOff'] = compressor_settings
-                        if 'CompressorOff' in parameters:
-                            parameters['CompressorOff']['Threshold'] = -128.00  
-                            parameters['CompressorOff']['Ratio'] = 1
-                            parameters['CompressorOff']['Attack'] = 0.00
-                            parameters['CompressorOff']['Release'] = 0.00  
-                            parameters['CompressorOff']['Makeup'] = -12.00
-                            parameters['CompressorOff']['Mix'] = 0.00
+                                        Based on this information, determine:
+                                        1. Should this memory be evolved? Consider its relationships with other memories.
+                                        2. What specific actions should be taken (strengthen, update_neighbor)?
+                                           2.1 If choose to strengthen the connection, which memory should it be connected to? Can you give the updated tags of this memory?
+                                           2.2 If choose to update_neighbor, you must update the parameters of these memories based on the following rules:
+                                                   - For audio effectors (such as flangers, compressors, screamers, etc.), if a specific effector in the new memory unit is in the "On/Off" state (e.g., "FlangerOn/FlangerOff", indicating the flanger is activated/deactivated), while the same effector in an adjacent memory unit is in the "Off/On" state (e.g., "FlangerOff/FlangerOn", indicating the flanger is deactivated/activated), it is necessary to update the state of this effector in the adjacent memory unit to "On/Off" (e.g., replace "FlangerOff/FlangerOn" with "FlangerOn/FlangerOff") and adjust its specific parameter values. These specific parameter values should be as different as possible from those in the new memory unit, but the difference should not be excessive; additionally, the specific parameter values of each adjacent memory unit should not be identical to one another.
+                                                   - For other parameters (i.e., the parameter values of effectors), adjustments shall be made based on an understanding of the characteristics of these memory units. For instance, if the parameter value of a certain adjacent memory unit is smaller/larger than the corresponding parameter value of the new memory unit, it is necessary to increase/decrease that parameter value accordingly. This ensures that these parameters are more consistent with the features and style of the new memory unit.
+                                                   - If no update is needed for certain parameters, keep them the same as the original.
+                                                   Generate the new parameters in the sequential order of the input neighbors.
+                                        3. Extract user preferences from the new memory parameters:
+                                           - Identify which audio effects are consistently turned ON in the current memory
+                                           - Determine preferred parameter values for each effect
+                                           - Note any patterns in parameter combinations
+                                           - Consider how these preferences align with the style and feature tags
+                                        4. For each neighbor memory, analyze its parameters to extract user preferences following the same approach.
 
-                           # µ± first_47[1] == 1.0 Ê±£¬½« "ScreamerOff" Ìæ»»Îª "ScreamerOn"
-                        if first_47[1] == 1.0 and 'ScreamerOff' in parameters:
-                            compressor_settings = parameters.pop('ScreamerOff')
-                            parameters['ScreamerOn'] = compressor_settings 
-                        if first_47[1] == 0.0 and 'ScreamerOn' in parameters:
-                            compressor_settings = parameters.pop('ScreamerOn')
-                            parameters['ScreamerOff'] = compressor_settings
-                        if 'ScreamerOff' in parameters:
-                            parameters['ScreamerOff']['Drive'] = 0.00 
-                            parameters['ScreamerOff']['Tone'] = 0.00
-                            parameters['ScreamerOff']['Level'] = -64.0000000
-                        
-                           # µ± first_47[2] == 1.0 Ê±£¬½« "DriverOff" Ìæ»»Îª "DriverOn"
-                        if first_47[2] == 1.0 and 'DriverOff' in parameters:
-                            compressor_settings = parameters.pop('DriverOff')
-                            parameters['DriverOn'] = compressor_settings
-                        if first_47[2] == 0.0 and 'DriverOn' in parameters:
-                            compressor_settings = parameters.pop('DriverOn')
-                            parameters['DriverOff'] = compressor_settings
-                        if 'DriverOff' in parameters:
-                            parameters['DriverOff']['Distortion'] = 0.00 
-                            parameters['DriverOff']['Volume'] = -64.0
-                            
+                                        Parameter should be determined by the content of these characteristic of these memories, which can be used to retrieve them later and categorize them.
 
-                            # µ± first_47[3] == 1.0 Ê±£¬½« "DelayOff" Ìæ»»Îª "DelayOn"
-                        if first_47[3] == 1.0 and 'DelayOff' in parameters:
-                            compressor_settings = parameters.pop('DelayOff')
-                            parameters['DelayOn'] = compressor_settings                           
-                        if first_47[3] == 0.0 and 'DelayOn' in parameters:
-                            compressor_settings = parameters.pop('DelayOn')
-                            parameters['DelayOff'] = compressor_settings
-                        if 'DelayOff' in parameters:
-                            parameters['DelayOff']['Feedback'] = 0.00 
-                            parameters['DelayOff']['Delay'] = 1.00
-                            parameters['DelayOff']['Mix'] = 0.00 
+                                        IMPORTANT: Return ONLY valid JSON format. Ensure all objects use curly braces {{}} and arrays use square brackets [].
 
-                           # µ± first_47[4] == 1.0 Ê±£¬½« "ReverbOff" Ìæ»»Îª "ReverbOn"
-                        if first_47[4] == 1.0 and 'ReverbOff' in parameters:
-                            compressor_settings = parameters.pop('ReverbOff')
-                            parameters['ReverbOn'] = compressor_settings
-                        if first_47[4] == 0.0 and 'ReverbOn' in parameters:
-                            compressor_settings = parameters.pop('ReverbOn')
-                            parameters['ReverbOff'] = compressor_settings
-                        if 'ReverbOff' in parameters:
-                            parameters['ReverbOff']['Size'] = 0.00 
-                            parameters['ReverbOff']['Damping'] = 0.00
-                            parameters['ReverbOff']['Width'] = 0.00
-                            parameters['ReverbOff']['Mix'] = 0.00                   
-                            
+                                        Return your decision in JSON format with the following structure:
+                                        {{
+                                            "should_evolve": true,
+                                            "actions": ["strengthen", "update_neighbor"],
+                                            "suggested_connections": ["neighbor_memory_ids"],
+                                            "new_parameter_neighborhood": [
+                                                {{"parameters_1": "å¯¹åº”ç¬¬ä¸€é¦–æ­Œæ›²çš„å‚æ•°"}},
+                                                {{"parameters_n": "å¯¹åº”ç¬¬né¦–æ­Œæ›²çš„å‚æ•°"}}
+                                            ]
+                                        }}
+                                        '''
 
-                            # µ± first_47[5] == 1.0 Ê±£¬½« "ChorusOff" Ìæ»»Îª "ChorusOn"
-                        if first_47[5] == 1.0 and 'ChorusOff' in parameters:
-                            compressor_settings = parameters.pop('ChorusOff')
-                            parameters['ChorusOn'] = compressor_settings
-                        if first_47[5] == 0.0 and 'ChorusOn' in parameters:
-                            compressor_settings = parameters.pop('ChorusOn')
-                            parameters['ChorusOff'] = compressor_settings
-                        if 'ChorusOff' in parameters:
-                            parameters['ChorusOff']['Delay'] = 0.010 
-                            parameters['ChorusOff']['Depth'] = 0.00
-                            parameters['ChorusOff']['Frequency'] = 0.05
-                            parameters['ChorusOff']['Width'] = 0.010
+        print(f"system_prompt3:{system_prompt3}")
+        client = OpenAI(api_key="sk-1b73586fde854a329ec187dc371f53ef",
+                        base_url="https://api.deepseek.com")
+        user_prompt3 = f''
+        response3 = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": system_prompt3},
+                {"role": "user", "content": user_prompt3},
+            ],
+            stream=False
+        )
 
-                            # µ± first_47[6] == 1.0 Ê±£¬½« "FlangerOff" Ìæ»»Îª "FlangerOn"
-                        if first_47[6] == 1.0 and 'FlangerOff' in parameters:
-                            compressor_settings = parameters.pop('FlangerOff')
-                            parameters['FlangerOn'] = compressor_settings
-                        if first_47[6] == 0.0 and 'FlangerOn' in parameters:
-                            compressor_settings = parameters.pop('FlangerOn')
-                            parameters['FlangerOff'] = compressor_settings
-                        if 'FlangerOff' in parameters:  
-                            parameters['FlangerOff']['Delay'] = 0.00100 
-                            parameters['FlangerOff']['Depth'] = 0.00
-                            parameters['FlangerOff']['Feedback'] = 0.00
-                            parameters['FlangerOff']['Frequency'] = 0.05
-                            parameters['FlangerOff']['Width'] = 0.001
+        # è·å– response3 å“åº”æ•°æ®å¹¶è½¬æ¢ä¸º JSON
+        response_content3 = response3.choices[0].message.content
+        # å»é™¤å‰åçš„ä»£ç å—æ ‡è®°å’Œæ¢è¡Œ
+        cleaned_content3 = response_content3.replace("```json", "").replace("```", "").strip()
+        try:
+            result3 = json.loads(cleaned_content3)
+            result3_str = json.dumps(result3, ensure_ascii=False)
+            # è·å–æ˜¯å¦æ›´æ–°è®°å¿†
+            should_evolve = result3.get("should_evolve", [])
+            # è·å–åŠ¨ä½œ
+            actions = result3.get("actions", [])
+            # è·å–è¿æ¥å»ºè®®
+            suggested_connections = result3.get("suggested_connections", [])
+            # è·å–é‚»å±…çš„æ–°å‚æ•°
+            new_parameter_neighborhood = result3.get("new_parameter_neighborhood", [])
 
-                           # µ± first_47[7] == 1.0 Ê±£¬½« "PhaserOff" Ìæ»»Îª "PhaserOn"
-                        if first_47[7] == 1.0 and 'PhaserOff' in parameters:
-                            compressor_settings = parameters.pop('PhaserOff')
-                            parameters['PhaserOn'] = compressor_settings
-                        if first_47[7] == 0.0 and 'PhaserOn' in parameters:
-                            compressor_settings = parameters.pop('PhaserOn')
-                            parameters['PhaserOff'] = compressor_settings
-                        if 'PhaserOff' in parameters:
-                            parameters['PhaserOff']['Depth'] = 0.00 
-                            parameters['PhaserOff']['Feedback'] = 0.00
-                            parameters['PhaserOff']['Frequency'] = -64.0000000
-                            parameters['PhaserOff']['Width'] = -64.0000000
+            # æ‰“å°ä¿¡æ¯
+            print(f"è®°å¿†æ›´æ–°æ¨¡å‹å“åº”: {result3_str}")
+            print(f"user_message:{user_message}")
 
-                           # µ± first_47[8] == 1.0 Ê±£¬½« "EqualiserOff" Ìæ»»Îª "EqualiserOn"
-                        if first_47[8] == 1.0 and 'EqualiserOff' in parameters:
-                            compressor_settings = parameters.pop('EqualiserOff')
-                            parameters['EqualiserOn'] = compressor_settings
-                        if first_47[8] == 0.0 and 'EqualiserOn' in parameters:
-                            compressor_settings = parameters.pop('EqualiserOn')
-                            parameters['EqualiserOff'] = compressor_settings
-                        if 'EqualiserOff' in parameters:
-                            parameters['EqualiserOff']['100hz'] = 0.00
-                            parameters['EqualiserOff']['200hz'] = 0.00
-                            parameters['EqualiserOff']['400hz'] = 0.00
-                            parameters['EqualiserOff']['800hz'] = 0.00
-                            parameters['EqualiserOff']['1600hz'] = 0.00
-                            parameters['EqualiserOff']['3200hz'] = 0.00
-                            parameters['EqualiserOff']['6400hz'] = 0.00
-                            parameters['EqualiserOff']['Level'] = 0.00
-                            
+            # åœ¨è·å– OpenAI å“åº”å¹¶è§£æ JSON ä¹‹åæ·»åŠ ä»¥ä¸‹ä»£ç 
+            if 'new_parameter_neighborhood' in result3:
+                new_params_list = result3['new_parameter_neighborhood']
+                total_updates = 0
 
-                            # ¸üĞÂÊı¾İ¿âÖĞµÄ²ÎÊıÖµ
-                        if first_47[0] == 1.0:
-                            if 'CompressorOn' in parameters:
-                               
-                               # ½« first_47[9] ×ª»»Îª Threshold ·¶Î§µÄÖµ
-                                first_47[9] = float(first_47[9])
-                                threshold = -128 + (0 - (-128)) * first_47[9]                               
-                                parameters['CompressorOn']['Threshold'] = threshold
-                               
-                               # »ñÈ¡ Ratio Öµ
-                                first_47[11] = float(first_47[11])
-                                ratio = get_ratio(first_47[11])
-                                if ratio is not None:
-                                    parameters['CompressorOn']['Ratio'] = ratio
-                                else:
-                                    print(f"Î´ÕÒµ½ first_47[11] = {first_47[11]} ¶ÔÓ¦µÄ Ratio Öµ")
+                # å‡è®¾ä½¿ç”¨ç¬¬ä¸€ä¸ªé‚»å±…çš„å‚æ•°æ¥æ›´æ–°é¢„è®¾æ–‡ä»¶
+                if new_params_list:
+                    for index, neighbor_params in enumerate(new_params_list):
+                        print(f"new_params_list:{neighbor_params}")
+                        # è½¬æ¢å‚æ•°æ ¼å¼ä»¥åŒ¹é…Excelé¢„è®¾æ–‡ä»¶
+                        excel_params = {}
 
-                                parameters['CompressorOn']['Attack'] = first_47[10]
-                                parameters['CompressorOn']['Release'] = first_47[12]
+                        # ç¤ºä¾‹ï¼šæ ¹æ®é‚»å±…å‚æ•°æ›´æ–°é¢„è®¾æ–‡ä»¶ä¸­çš„å‚æ•°
+                        # æ³¨æ„ï¼šéœ€è¦æ ¹æ®å®é™…å‚æ•°æ˜ å°„å…³ç³»è°ƒæ•´
+                        # ï¼ˆæ­¤å¤„å¤ç”¨param_mappingï¼Œä¸æ–°è®°å¿†å¤„ç†é€»è¾‘ä¸€è‡´ï¼‰
 
-                                 # ½« first_47[13] ×ª»»Îª Makeup ·¶Î§µÄÖµ
-                                first_47[13] = float(first_47[13])
-                                makeup = -128 + (64 - (-128)) * first_47[13]
-                                parameters['CompressorOn']['Makeup'] = makeup
-
-                                parameters['CompressorOn']['Mix'] = first_47[14]
-
-                        if first_47[2] == 1.0:
-                            if 'DriverOn' in parameters:
-                                parameters['DriverOn']['Distortion'] = first_47[18]
-                                # ½« first_47[19] ×ª»»Îª Volume ·¶Î§µÄÖµ
-                                first_47[19] = float(first_47[19])
-                                volume = -64 + (0 - (-64)) * first_47[19]                               
-                                parameters['DriverOn']['Volume'] = volume                        
-
-                        if first_47[1] == 1.0:
-                            if 'ScreamerOn' in parameters:
-                                parameters['ScreamerOn']['Drive'] = first_47[15]
-                                parameters['ScreamerOn']['Tone'] = first_47[17]
-                                # ½« first_47[16] ×ª»»Îª Volume ·¶Î§µÄÖµ
-                                first_47[16] = float(first_47[16])
-                                volume = -64 + (0 - (-64)) * first_47[16]                               
-                                parameters['ScreamerOn']['Level'] = volume                                
-
-                        if first_47[3] == 1.0:
-                            if 'DelayOn' in parameters:
-                                parameters['DelayOn']['Feedback'] = first_47[20]
-                                
-                                parameters['DelayOn']['Delay'] = "450.00"
-                                
-                                parameters['DelayOn']['Mix'] = first_47[22]
-
-                        if first_47[4] == 1.0:
-                            if 'ReverbOn' in parameters:
-                                parameters['ReverbOn']['Size'] = first_47[23]
-                                parameters['ReverbOn']['Damping'] = first_47[24]
-                                parameters['ReverbOn']['Width'] = first_47[25]
-                                parameters['ReverbOn']['Mix'] = first_47[26]
-
-                        if first_47[8] == 1.0:
-                            if 'EqualiserOn' in parameters:
-                                if len(first_47) > 46:
-                                    # ½« first_47[40] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                    first_47[40] = float(first_47[40])
-                                    fz = -15.00 + (15.00 - (-15.00)) * first_47[40] 
-                                    parameters['EqualiserOn']['100hz'] = fz
-                                   
-                                   # ½« first_47[41] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                    first_47[41] = float(first_47[41])
-                                    fz = -15.00 + (15.00 - (-15.00)) * first_47[41] 
-                                    parameters['EqualiserOn']['200hz'] = fz
-                                    
-
-                                    # ½« first_47[42] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                    first_47[42] = float(first_47[42])
-                                    fz = -15.00 + (15.00 - (-15.00)) * first_47[42] 
-                                    parameters['EqualiserOn']['400hz'] = fz
-                                    
-
-                                    # ½« first_47[43] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                    first_47[43] = float(first_47[43])
-                                    fz = -15.00 + (15.00 - (-15.00)) * first_47[43] 
-                                    parameters['EqualiserOn']['800hz'] = fz
-                                    
-
-                                    # ½« first_47[44] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                    first_47[44] = float(first_47[44])
-                                    fz = -15.00 + (15.00 - (-15.00)) * first_47[44] 
-                                    parameters['EqualiserOn']['1600hz'] = fz
-                                    
-
-                                    # ½« first_47[45] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                    first_47[45] = float(first_47[45])
-                                    fz = -15.00 + (15.00 - (-15.00)) * first_47[45] 
-                                    parameters['EqualiserOn']['3200hz'] = fz
-                                    
-
-                                    # ½« first_47[46] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                    first_47[46] = float(first_47[46])
-                                    fz = -15.00 + (15.00 - (-15.00)) * first_47[46] 
-                                    parameters['EqualiserOn']['6400hz'] = fz
-                                if len(first_47) > 47:
-                                   
-                                   # ½« first_47[47] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                    first_47[47] = float(first_47[47])
-                                    fz = -15.00 + (15.00 - (-15.00)) * first_47[47] 
-                                    parameters['EqualiserOn']['Level'] = fz
-
-                        if first_47[5] == 1.0:
-                            if 'ChorusOn' in parameters:
-                                # ½« first_47[27] ×ª»»Îª Depth ·¶Î§µÄÖµ
-                                first_47[27] = float(first_47[27])
-                                depth = 0.010 + (0.050 - 0.010) * first_47[27]  
-                                parameters['ChorusOn']['Delay'] = depth
-                                
-                                parameters['ChorusOn']['Depth'] = first_47[28]
-                              
-                              # ½« first_47[29] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                first_47[29] = float(first_47[29])
-                                frequency = 0.05 + (2.00 - 0.05) * first_47[29]  
-                                parameters['ChorusOn']['Frequency'] = frequency
-                               
-                               # ½« first_47[30] ×ª»»Îª Width ·¶Î§µÄÖµ
-                                first_47[30] = float(first_47[30])
-                                width = 0.010 + (0.050 - 0.010) * first_47[30]  
-                                parameters['ChorusOn']['Width'] = width
-
-                        if first_47[6] == 1.0:
-                            if 'FlangerOn' in parameters:
-
-                                # ½« first_47[31] ×ª»»Îª Delay ·¶Î§µÄÖµ
-                                first_47[31] = float(first_47[31])
-                                delay = 0.00100 + (0.02000 - 0.00100) * first_47[31] 
-                                parameters['FlangerOn']['Delay'] = delay
-                                
-                                parameters['FlangerOn']['Depth'] = first_47[32]
-
-                                # ½« first_47[33] ×ª»»Îª Feedback ·¶Î§µÄÖµ
-                                first_47[33] = float(first_47[33])
-                                feedback = 0.00 + (0.50 - 0.00) * first_47[33] 
-                                parameters['FlangerOn']['Feedback'] = feedback
-                                
-                                # ½« first_47[34] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                first_47[34] = float(first_47[34])
-                                frequency = 0.05 + (2.00 - 0.05) * first_47[34] 
-                                parameters['FlangerOn']['Frequency'] = frequency
-
-                                # ½« first_47[35] ×ª»»Îª Width ·¶Î§µÄÖµ
-                                first_47[35] = float(first_47[35])
-                                width = 0.001 + (0.020 - 0.001) * first_47[35] 
-                                parameters['FlangerOn']['Width'] = width
-
-                        if first_47[7] == 1.0:
-                            if 'PhaserOn' in parameters:
-                                parameters['PhaserOn']['Depth'] = first_47[36]
-
-                                # ½« first_47[37] ×ª»»Îª Feedback ·¶Î§µÄÖµ
-                                first_47[37] = float(first_47[37])
-                                feedback = 0.00 + (0.09 - 0.00) * first_47[37]  
-                                parameters['PhaserOn']['Feedback'] = feedback
-
-                                # ½« first_47[38] ×ª»»Îª Frequency ·¶Î§µÄÖµ
-                                first_47[38] = float(first_47[38])
-                                frequency = 0.00 + (2.00 - 0.00) * first_47[38]  
-                                parameters['PhaserOn']['Frequency'] = frequency
-
-                                # ½« first_47[39] ×ª»»Îª Width ·¶Î§µÄÖµ
-                                first_47[39] = float(first_47[39])
-                                width = 50 + (3000 - 50) * first_47[39]  
-                                parameters['PhaserOn']['Width'] = width
-
-                        # ½«¸üĞÂºóµÄ²ÎÊı×ª»»Îª×Ö·û´®
-                        updated_parameters_str = json.dumps(parameters, ensure_ascii=False)
-
-                        # ¸üĞÂÊı¾İ¿âÖĞµÄ¼ÇÂ¼
-                        cursor.execute("UPDATE music_responses SET Parameters =? WHERE SongName =?", (updated_parameters_str, song_name))
-                        conn.commit()
-
-                        # ´òÓ¡¸üĞÂºóµÄĞÅÏ¢
-                        print(f"SongName: {song_name}")
-                        print(f"Style: {json.dumps(style, ensure_ascii=False, indent=2)}")
-                        print(f"Parameters: {json.dumps(parameters, ensure_ascii=False, indent=2)}")
-                        print("-" * 50)
-                        
-                        if memoryEnabled == "false":
-                            similar_songs = []
-                            memory_notes = []
-
-                        sqlParameters = json.dumps(parameters, ensure_ascii=False, indent=2)
-                        # ¸ñÊ½»¯ system_prompt3
-                        memory_notes_str = "\n".join([str(note) for note in memory_notes])
-                        system_prompt3 = f'''
-                                You are an AI memory evolution agent responsible for managing and evolving a knowledge base.
-                                Analyze the the new memory note according to style, feature and parameter, also with their several nearest neighbors memory.
-                                Make decisions about its evolution.  
-
-                                The new memory name:
-                                {song_name}
-                                style: {result1_str}
-                                feature: {result2_str}
-                                parameter: {sqlParameters}
-
-                                The nearest neighbors memories:
-                                {memory_notes_str}
-
-                                Based on this information, determine:
-                                1. Should this memory be evolved? Consider its relationships with other memories.
-                                2. What specific actions should be taken (strengthen, update_neighbor)?
-                                   2.1 If choose to strengthen the connection, which memory should it be connected to? Can you give the updated tags of this memory?
-                                   2.2 If choose to update_neighbor, you must update the parameters of these memories based on the following rules:
-                                           - For audio effectors (such as flangers, compressors, screamers, etc.), if a specific effector in the new memory unit is in the "On/Off" state (e.g., "FlangerOn/FlangerOff", indicating the flanger is activated/deactivated), while the same effector in an adjacent memory unit is in the "Off/On" state (e.g., "FlangerOff/FlangerOn", indicating the flanger is deactivated/activated), it is necessary to update the state of this effector in the adjacent memory unit to "On/Off" (e.g., replace "FlangerOff/FlangerOn" with "FlangerOn/FlangerOff") and adjust its specific parameter values. These specific parameter values should be as different as possible from those in the new memory unit, but the difference should not be excessive; additionally, the specific parameter values of each adjacent memory unit should not be identical to one another.
-                                           - For other parameters (i.e., the parameter values of effectors), adjustments shall be made based on an understanding of the characteristics of these memory units. For instance, if the parameter value of a certain adjacent memory unit is smaller/larger than the corresponding parameter value of the new memory unit, it is necessary to increase/decrease that parameter value accordingly. This ensures that these parameters are more consistent with the features and style of the new memory unit.
-                                           - If no update is needed for certain parameters, keep them the same as the original.
-                                           Generate the new parameters in the sequential order of the input neighbors.
-                                Parameter should be determined by the content of these characteristic of these memories, which can be used to retrieve them later and categorize them.
-                                Return your decision in JSON format with the following structure:
-                                {{
-                                    "should_evolve": True or False,
-                                    "actions": ["strengthen", "update_neighbor"],
-                                    "suggested_connections": ["neighbor_memory_ids"],
-                                    "new_parameter_neighborhood": [
-                                            [parameters_1],  // ¶ÔÓ¦µÚÒ»Ê×¸èÇú
-                                            ..............,
-                                            [parameters_n]   // ¶ÔÓ¦µÚnÊ×¸èÇú
-                            ]
-                                }}
-                        '''
-                        print(f"system_prompt3:{system_prompt3}")
-                        client = OpenAI(api_key="sk-1b73586fde854a329ec187dc371f53ef", base_url="https://api.deepseek.com")
-                        user_prompt3 = f''
-                        response3 = client.chat.completions.create(
-                                      model="deepseek-chat",
-                                      messages=[
-                                          {"role": "system", "content": system_prompt3},
-                                          {"role": "user", "content": user_prompt3},
-                                      ],
-                                      stream=False
-                        )
-
-                        # »ñÈ¡ response3 ÏìÓ¦Êı¾İ²¢×ª»»Îª JSON
-                        response_content3 = response3.choices[0].message.content
-                        # È¥³ıÇ°ºóµÄ´úÂë¿é±ê¼ÇºÍ»»ĞĞ
-                        cleaned_content3 = response_content3.replace("```json", "").replace("```", "").strip()
-                        try:
-                            result3 = json.loads(cleaned_content3)
-                            result3_str = json.dumps(result3, ensure_ascii=False)
-                            # »ñÈ¡ÊÇ·ñ¸üĞÂ¼ÇÒä
-                            should_evolve = result3.get("should_evolve", [])
-                            # »ñÈ¡¶¯×÷
-                            actions = result3.get("actions", [])
-                            # »ñÈ¡Á¬½Ó½¨Òé
-                            suggested_connections = result3.get("suggested_connections", [])
-                            # »ñÈ¡ÁÚ¾ÓµÄĞÂ²ÎÊı
-                            new_parameter_neighborhood = result3.get("new_parameter_neighborhood", [])
-                            # ´òÓ¡ĞÅÏ¢
-                            print(f"¼ÇÒä¸üĞÂÄ£ĞÍÏìÓ¦: {result3_str}")
-
-
-                            # ---------------------- ĞÂÔö£º¸üĞÂĞÂ¼ÇÒä£¨µ±Ç°song£©µÄÔ¤ÉèÎÄ¼ş ----------------------
-                            # 1. ¶¨Òå²ÎÊıÓ³Éä£¨¸´ÓÃÏÖÓĞÓ³Éä£©
-                            param_mapping = {
-                                # ¿ª¹Ø¿ØÖÆÓ³Éä
-                                "CompressorOn": ("pre_compressor_on", 1),
-                                "CompressorOff": ("pre_compressor_on", 0),
-                                "ScreamerOn": ("tube_screamer_on", 1),
-                                "ScreamerOff": ("tube_screamer_on", 0),
-                                "DriverOn": ("mouse_drive_on", 1),
-                                "DriverOff": ("mouse_drive_on", 0),
-                                "DelayOn": ("delay_on", 1),
-                                "DelayOff": ("delay_on", 0),
-                                "ReverbOn": ("room_on", 1),
-                                "ReverbOff": ("room_on", 0),
-                                "ChorusOn": ("chorus_on", 1),
-                                "ChorusOff": ("chorus_on", 0),
-                                "FlangerOn": ("flanger_on", 1),
-                                "FlangerOff": ("flanger_on", 0),
-                                "PhaserOn": ("phaser_on", 1),
-                                "PhaserOff": ("phaser_on", 0),
-                                "EqualiserOn": ("pre_eq_on", 1),
-                                "EqualiserOff": ("pre_eq_on", 0),
-
-                                # ²ÎÊıÖµÓ³Éä
-                                "CompressorOn.Threshold": "pre_comp_thresh",
-                                "CompressorOn.Ratio": "pre_comp_ratio",
-                                "CompressorOn.Attack": "pre_comp_attack",
-                                "CompressorOn.Release": "pre_comp_release",
-                                "CompressorOn.Mix": "pre_comp_blend",
-                                "CompressorOn.Makeup": "pre_comp_gain",
-                                "CompressorOff.Threshold": "pre_comp_thresh",
-                                "CompressorOff.Ratio": "pre_comp_ratio",
-                                "CompressorOff.Attack": "pre_comp_attack",
-                                "CompressorOff.Release": "pre_comp_release",
-                                "CompressorOff.Mix": "pre_comp_blend",
-                                "CompressorOff.Makeup": "pre_comp_gain",
-                                "ScreamerOn.Drive": "tube_screamer_drive",
-                                "ScreamerOn.Tone": "tube_screamer_tone",
-                                "ScreamerOn.Level": "tube_screamer_level",
-                                "ScreamerOff.Drive": "tube_screamer_drive",
-                                "ScreamerOff.Tone": "tube_screamer_tone",
-                                "ScreamerOff.Level": "tube_screamer_level",
-                                "DriverOn.Distortion": "mouse_drive_distortion",
-                                "DriverOn.Volume": "mouse_drive_volume",
-                                "DriverOff.Distortion": "mouse_drive_distortion",
-                                "DriverOff.Volume": "mouse_drive_volume",
-                                "DelayOn.Feedback": "delay_feedback",
-                                "DelayOn.Delay": "delay_left_millisecond",
-                                "DelayOn.Mix": "delay_mix",
-                                "DelayOff.Feedback": "delay_feedback",
-                                "DelayOff.Delay": "delay_left_millisecond",
-                                "DelayOff.Mix": "delay_mix",
-                                "ReverbOn.Size": "room_size",
-                                "ReverbOn.Damping": "room_damping",
-                                "ReverbOn.Width": "room_width",
-                                "ReverbOn.Mix": "room_mix",
-                                "ReverbOff.Size": "room_size",
-                                "ReverbOff.Damping": "room_damping",
-                                "ReverbOff.Width": "room_width",
-                                "ReverbOff.Mix": "room_mix",
-                                "ChorusOn.Delay": "chorus_delay",
-                                "ChorusOn.Depth": "chorus_depth",
-                                "ChorusOn.Frequency": "chorus_frequency",
-                                "ChorusOn.Width": "chorus_width",
-                                "ChorusOff.Delay": "chorus_delay",
-                                "ChorusOff.Depth": "chorus_depth",
-                                "ChorusOff.Frequency": "chorus_frequency",
-                                "ChorusOff.Width": "chorus_width",
-                                "FlangerOn.Delay": "flanger_delay",
-                                "FlangerOn.Depth": "flanger_depth",
-                                "FlangerOn.Feedback": "flanger_feedback",
-                                "FlangerOn.Frequency": "flanger_frequency",
-                                "FlangerOn.Width": "flanger_width",
-                                "FlangerOff.Delay": "flanger_delay",
-                                "FlangerOff.Depth": "flanger_depth",
-                                "FlangerOff.Feedback": "flanger_feedback",
-                                "FlangerOff.Frequency": "flanger_frequency",
-                                "FlangerOff.Width": "flanger_width",
-                                "PhaserOn.Depth": "phaser_depth",
-                                "PhaserOn.Feedback": "phaser_feedback",
-                                "PhaserOn.Frequency": "phaser_frequency",
-                                "PhaserOn.Width": "phaser_width",
-                                "PhaserOff.Depth": "phaser_depth",
-                                "PhaserOff.Feedback": "phaser_feedback",
-                                "PhaserOff.Frequency": "phaser_frequency",
-                                "PhaserOff.Width": "phaser_width",
-                                "EqualiserOn.100hz": "pre_eq_100_gain",
-                                "EqualiserOn.200hz": "pre_eq_200_gain",
-                                "EqualiserOn.400hz": "pre_eq_400_gain",
-                                "EqualiserOn.800hz": "pre_eq_800_gain",
-                                "EqualiserOn.1600hz": "pre_eq_1600_gain",
-                                "EqualiserOn.3200hz": "pre_eq_3200_gain",
-                                "EqualiserOn.6400hz": "pre_eq_6400_gain",
-                                "EqualiserOn.Level": "pre_eq_level_gain",
-                                "EqualiserOff.100hz": "pre_eq_100_gain",
-                                "EqualiserOff.200hz": "pre_eq_200_gain",
-                                "EqualiserOff.400hz": "pre_eq_400_gain",
-                                "EqualiserOff.800hz": "pre_eq_800_gain",
-                                "EqualiserOff.1600hz": "pre_eq_1600_gain",
-                                "EqualiserOff.3200hz": "pre_eq_3200_gain",
-                                "EqualiserOff.6400hz": "pre_eq_6400_gain",
-                                "EqualiserOff.Level": "pre_eq_level_gain"
-                            }
-
-                            # 2. ½«ĞÂ¼ÇÒäµÄparameters×ª»»ÎªÔ¤ÉèÎÄ¼ş¸ñÊ½
-                            new_memory_excel_params = {}
-                            # ´¦Àí¶¥²ã¿ª¹Ø×´Ì¬
-                            for key in parameters:
-                                if key in param_mapping and isinstance(param_mapping[key], tuple):
+                        # 1. ä¼˜å…ˆå¤„ç†é¡¶å±‚å¼€å…³çŠ¶æ€ï¼ˆå¦‚ CompressorOffï¼‰
+                        for key in neighbor_params:
+                            if key in param_mapping:
+                                # è‹¥ä¸ºå¼€å…³çŠ¶æ€ï¼ˆæ˜ å°„å€¼ä¸ºå…ƒç»„ï¼‰ï¼Œæå–å‚æ•°åå’Œå€¼
+                                if isinstance(param_mapping[key], tuple):
                                     param_id, param_value = param_mapping[key]
-                                    new_memory_excel_params[param_id] = param_value
-                                    print(f"ĞÂ¼ÇÒä¿ª¹Ø×´Ì¬´¦Àí: {key} -> {param_id} = {param_value}")
+                                    excel_params[param_id] = param_value
+                                    print(f"å¤„ç†å¼€å…³çŠ¶æ€: {key} -> {param_id} = {param_value}")  # æ—¥å¿—è·Ÿè¸ª
 
-                            # ´¦ÀíÇ¶Ì×²ÎÊı
-                            for key, value in parameters.items():
-                                if isinstance(value, dict):
-                                    for sub_key, sub_value in value.items():
-                                        full_key = f"{key}.{sub_key}"
-                                        if full_key in param_mapping:
-                                            param_id = param_mapping[full_key]
-                                            new_memory_excel_params[param_id] = sub_value
-                                else:
-                                    if key in param_mapping and not isinstance(param_mapping[key], tuple):
-                                        param_id = param_mapping[key]
-                                        new_memory_excel_params[param_id] = value
-
-                            # 3. ¶¨ÒåĞÂ¼ÇÒäµÄÔ¤ÉèÎÄ¼şÂ·¾¶
-                            new_memory_preset_path = fr"C:\Users\Public\Documents\Supertonal DSP\Audio agent\{song_name}.preset"
-
-                            # 4. ¸üĞÂĞÂ¼ÇÒäµÄÔ¤ÉèÎÄ¼ş
-                            try:
-                                if update_preset_in_file(new_memory_preset_path, new_memory_excel_params):
-                                    print(f"ĞÂ¼ÇÒä '{song_name}' µÄÔ¤ÉèÎÄ¼ş¸üĞÂ³É¹¦")
-                                else:
-                                    print(f"ĞÂ¼ÇÒä '{song_name}' µÄÔ¤ÉèÎÄ¼ş¸üĞÂÊ§°Ü")
-                            except FileNotFoundError:
-                                print(f"ĞÂ¼ÇÒäÔ¤ÉèÎÄ¼şÂ·¾¶²»´æÔÚ: {new_memory_preset_path}")
-                            except Exception as e:
-                                print(f"¸üĞÂĞÂ¼ÇÒäÔ¤ÉèÎÄ¼şÊ±³ö´í: {e}")
-                            # ---------------------- ĞÂÔö½áÊø ----------------------
-
-
-                            # ÔÚ»ñÈ¡ OpenAI ÏìÓ¦²¢½âÎö JSON Ö®ºóÌí¼ÓÒÔÏÂ´úÂë
-                            if 'new_parameter_neighborhood' in result3:
-                                new_params_list = result3['new_parameter_neighborhood']
-                                total_updates = 0
-        
-                                # ¼ÙÉèÊ¹ÓÃµÚÒ»¸öÁÚ¾ÓµÄ²ÎÊıÀ´¸üĞÂÔ¤ÉèÎÄ¼ş
-                                if new_params_list:
-                                    for index, neighbor_params in enumerate(new_params_list):
-                                        print(f"new_params_list:{neighbor_params}")
-                                        # ×ª»»²ÎÊı¸ñÊ½ÒÔÆ¥ÅäExcelÔ¤ÉèÎÄ¼ş
-                                        excel_params = {}
-
-                                        # Ê¾Àı£º¸ù¾İÁÚ¾Ó²ÎÊı¸üĞÂÔ¤ÉèÎÄ¼şÖĞµÄ²ÎÊı
-                                        # ×¢Òâ£ºĞèÒª¸ù¾İÊµ¼Ê²ÎÊıÓ³Éä¹ØÏµµ÷Õû
-                                        # £¨´Ë´¦¸´ÓÃparam_mapping£¬ÓëĞÂ¼ÇÒä´¦ÀíÂß¼­Ò»ÖÂ£©
-
-                                        # 1. ÓÅÏÈ´¦Àí¶¥²ã¿ª¹Ø×´Ì¬£¨Èç CompressorOff£©
-                                        for key in neighbor_params:
-                                            if key in param_mapping:
-                                                # ÈôÎª¿ª¹Ø×´Ì¬£¨Ó³ÉäÖµÎªÔª×é£©£¬ÌáÈ¡²ÎÊıÃûºÍÖµ
-                                                if isinstance(param_mapping[key], tuple):
-                                                    param_id, param_value = param_mapping[key]
-                                                    excel_params[param_id] = param_value
-                                                    print(f"´¦Àí¿ª¹Ø×´Ì¬: {key} -> {param_id} = {param_value}")  # ÈÕÖ¾¸ú×Ù
-
-                                        # 2. ´¦ÀíÇ¶Ì×²ÎÊı£¨Èç CompressorOn.Threshold µÈ£©
-                                        for key, value in neighbor_params.items():
-                                            if isinstance(value, dict):
-                                                # ´¦ÀíÇ¶Ì××Öµä£¨Èç DriverOn.Distortion£©
-                                                for sub_key, sub_value in value.items():
-                                                    full_key = f"{key}.{sub_key}"
-                                                    if full_key in param_mapping:
-                                                        param_id = param_mapping[full_key]
-                                                        excel_params[param_id] = sub_value
-                                            else:
-                                                # ´¦Àí·ÇÇ¶Ì×µÄ²ÎÊıÖµ£¨ÈôÓĞ£©
-                                                if key in param_mapping and not isinstance(param_mapping[key], tuple):
-                                                    param_id = param_mapping[key]
-                                                    excel_params[param_id] = value
-
-                                        # ´òÓ¡Éú³ÉµÄ excel_params£¬ÑéÖ¤ pre_compressor_on ÊÇ·ñÎª 0
-                                        print(f"Éú³ÉµÄÔ¤Éè²ÎÊı: {excel_params.get('pre_compressor_on')}")
-                                        # Ô¤ÉèÎÄ¼şÂ·¾¶
-                                        if index < len(similar_songs):
-                                            song_name = similar_songs[index][0]
-                                            preset_file_path = fr"C:\Users\Public\Documents\Supertonal DSP\Audio agent\{song_name}.preset"  
-                                            try:
-                                             # ¸üĞÂÔ¤ÉèÎÄ¼ş
-                                              if update_preset_in_file(preset_file_path, excel_params):
-                                                print(f"Ô¤ÉèÎÄ¼ş {song_name}.preset ¸üĞÂ³É¹¦")
-                                              else:
-                                                print(f"Ô¤ÉèÎÄ¼ş {song_name}.preset ¸üĞÂÊ§°Ü£¬¼ÌĞøÖ´ĞĞºóĞø´úÂë")
-                                            except FileNotFoundError:
-                                                print(f"Ô¤ÉèÎÄ¼şÂ·¾¶ {preset_file_path} ²»´æÔÚ£¬¼ÌĞøÖ´ĞĞºóĞø´úÂë")
-                                            except Exception as e:
-                                                print(f"¸üĞÂÔ¤ÉèÎÄ¼şÊ±³öÏÖÎ´Öª´íÎó: {e}£¬¼ÌĞøÖ´ĞĞºóĞø´úÂë")
-                
-
-                                # ±éÀúËùÓĞÏàËÆ¸èÇú
-                                for i, (song_name, similarity, _, _, _) in enumerate(similar_songs):
-                                    # ¼ì²éÊÇ·ñÓĞ¶ÔÓ¦µÄĞÂ²ÎÊı
-                                    if i < len(new_params_list):
-                                        new_params = new_params_list[i]
-                                        try:
-                                            # ½«²ÎÊı×ª»»Îª JSON ×Ö·û´®
-                                            new_params_str = json.dumps(new_params, ensure_ascii=False)
-                                            cursor.execute("UPDATE music_responses SET Parameters =? WHERE SongName =?", 
-                                                            (new_params_str, song_name))
-                                            conn.commit()
-                                            print(f"³É¹¦¸üĞÂ '{song_name}' µÄ²ÎÊı (ÏàËÆ¶È: {similarity:.4f})")
-                                            total_updates += 1
-                                        except Exception as e:
-                                            print(f"¸üĞÂ '{song_name}' ²ÎÊıÊ±³ö´í: {e}")
-                                            conn.rollback()
-
-                                print(f"×Ü¹²¸üĞÂÁË {total_updates} Ê×¸èÇúµÄ²ÎÊı")
-
-                                if total_updates < len(similar_songs):
-                                    print(f"×¢Òâ: ÓĞ {len(similar_songs) - total_updates} Ê×¸èÇúÃ»ÓĞ¶ÔÓ¦µÄĞÂ²ÎÊı")
+                        # 2. å¤„ç†åµŒå¥—å‚æ•°ï¼ˆå¦‚ CompressorOn.Threshold ç­‰ï¼‰
+                        for key, value in neighbor_params.items():
+                            if isinstance(value, dict):
+                                # å¤„ç†åµŒå¥—å­—å…¸ï¼ˆå¦‚ DriverOn.Distortionï¼‰
+                                for sub_key, sub_value in value.items():
+                                    full_key = f"{key}.{sub_key}"
+                                    if full_key in param_mapping:
+                                        param_id = param_mapping[full_key]
+                                        excel_params[param_id] = sub_value
                             else:
-                                print("Î´ÕÒµ½ new_parameter_neighborhood Êı¾İ£¬ÎŞ·¨¸üĞÂ²ÎÊı")
+                                # å¤„ç†éåµŒå¥—çš„å‚æ•°å€¼ï¼ˆè‹¥æœ‰ï¼‰
+                                if key in param_mapping and not isinstance(param_mapping[key], tuple):
+                                    param_id = param_mapping[key]
+                                    excel_params[param_id] = value
 
-                           
-                        except json.JSONDecodeError:
-                               print(f"Error: ÎŞĞ§µÄJSONÏìÓ¦: {cleaned_content3}")
-                               sys.exit(1)
-                    except json.JSONDecodeError:
-                        print("´ÓÊı¾İ¿â¶ÁÈ¡µÄ JSON Êı¾İ¸ñÊ½´íÎó£¬Çë¼ì²éÊı¾İ¿âÊı¾İ¡£")
-                else:
-                    print(f"Î´ÕÒµ½Óë {user_message} Æ¥ÅäµÄ¼ÇÂ¼")
-            except ValueError:
-                print("ÃüÁîĞĞ²ÎÊıÎŞ·¨×ª»»ÎªÊı×Ö£¬Çë¼ì²éÊäÈë¡£")
+                        # æ‰“å°ç”Ÿæˆçš„ excel_paramsï¼ŒéªŒè¯ pre_compressor_on æ˜¯å¦ä¸º 0
+                        print(f"ç”Ÿæˆçš„é¢„è®¾å‚æ•°: {excel_params.get('pre_compressor_on')}")
+                        # é¢„è®¾æ–‡ä»¶è·¯å¾„
+                        if index < len(similar_songs):
+                            song_name = similar_songs[index][0]
+                            preset_file_path = fr"C:\Users\Public\Documents\Supertonal DSP\HCAP\{song_name}.preset"
+                            try:
+                                # æ›´æ–°é¢„è®¾æ–‡ä»¶
+                                if update_preset_in_file(preset_file_path, excel_params):
+                                    print(f"é¢„è®¾æ–‡ä»¶ {song_name}.preset æ›´æ–°æˆåŠŸ")
+                                else:
+                                    print(f"é¢„è®¾æ–‡ä»¶ {song_name}.preset æ›´æ–°å¤±è´¥ï¼Œç»§ç»­æ‰§è¡Œåç»­ä»£ç ")
+                            except FileNotFoundError:
+                                print(f"é¢„è®¾æ–‡ä»¶è·¯å¾„ {preset_file_path} ä¸å­˜åœ¨ï¼Œç»§ç»­æ‰§è¡Œåç»­ä»£ç ")
+                            except Exception as e:
+                                print(f"æ›´æ–°é¢„è®¾æ–‡ä»¶æ—¶å‡ºç°æœªçŸ¥é”™è¯¯: {e}ï¼Œç»§ç»­æ‰§è¡Œåç»­ä»£ç ")
+
+                # éå†æ‰€æœ‰ç›¸ä¼¼æ­Œæ›²
+                for i, (song_name, similarity, _, _, _) in enumerate(similar_songs):
+                    # æ£€æŸ¥æ˜¯å¦æœ‰å¯¹åº”çš„æ–°å‚æ•°
+                    if i < len(new_params_list):
+                        new_params = new_params_list[i]
+                        try:
+                            # å°†å‚æ•°è½¬æ¢ä¸º JSON å­—ç¬¦ä¸²
+                            new_params_str = json.dumps(new_params, ensure_ascii=False)
+                            cursor.execute(
+                                "UPDATE music_responses SET Parameters =? WHERE SongName =?",
+                                (new_params_str, song_name))
+                            conn.commit()
+                            print(f"æˆåŠŸæ›´æ–° '{song_name}' çš„å‚æ•° (ç›¸ä¼¼åº¦: {similarity:.4f})")
+                            total_updates += 1
+                        except Exception as e:
+                            print(f"æ›´æ–° '{song_name}' å‚æ•°æ—¶å‡ºé”™: {e}")
+                            conn.rollback()
+
+                print(f"æ€»å…±æ›´æ–°äº† {total_updates} é¦–æ­Œæ›²çš„å‚æ•°")
+
+                if total_updates < len(similar_songs):
+                    print(f"æ³¨æ„: æœ‰ {len(similar_songs) - total_updates} é¦–æ­Œæ›²æ²¡æœ‰å¯¹åº”çš„æ–°å‚æ•°")
+            else:
+                print("æœªæ‰¾åˆ° new_parameter_neighborhood æ•°æ®ï¼Œæ— æ³•æ›´æ–°å‚æ•°")
+        except json.JSONDecodeError:
+            print(f"Error: æ— æ•ˆçš„JSONå“åº”: {cleaned_content3}")
+            sys.exit(1)
     else:
-        print("ÃüÁîĞĞ²ÎÊı²»×ã£¬ÇëÌá¹©±ØÒªµÄ²ÎÊı")
-except sqlite3.Error as e:
-    print(f"Êı¾İ¿â²Ù×÷³ö´í: {e}")
-finally:
-    if 'conn' in locals() and conn:
-        conn.close()
+        print(f"è®°å¿†ç³»ç»Ÿå…³é—­")
 
-# ĞÂÔö£ºµÈ´ıÓÃ»§ÊäÈëºóÔÙ¹Ø±Õ´°¿Ú
-input("³ÌĞòÖ´ĞĞÍê±Ï£¬°´»Ø³µ¼ü¹Ø±Õ´°¿Ú...")
+
+
+# è¯»å– result1.txt æ–‡ä»¶
+result1_str = safe_open_file("result1.txt")
+# å°†å­—ç¬¦ä¸²è½¬æ¢ä¸ºé›†åˆ
+result1_set = set(result1_str.split(',')) if result1_str else set()
+
+# è¯»å– result2.txt æ–‡ä»¶
+result2_str = safe_open_file("result2.txt")
+
+# è¯»å– result.txt æ–‡ä»¶
+result_str = safe_open_file("result.txt")
+
+#è¿æ¥æ•°æ®åº“
+db_dir = "C:\\MusicData"
+if not os.path.exists(db_dir):
+    os.makedirs(db_dir)  # åˆ›å»ºç›®å½•ï¼ˆå¦‚æœä¸å­˜åœ¨ï¼‰
+db_path = os.path.join(db_dir, "music_info.db")
+conn = sqlite3.connect(db_path)
+cursor = conn.cursor()
+
+# è·å–indexçš„å€¼
+if len(sys.argv) > 0:
+    if platform.system() == "Windows":
+        chat_message = sys.argv[1]
+        user_message = sys.argv[2].encode('cp936').decode('utf-8', errors='replace')
+        currentPresetName = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
+        memoryEnabled = sys.argv[4]
+    else:
+        chat_message = sys.argv[1]
+        user_message = sys.argv[2]
+        currentPresetName = sys.argv[3]
+        memoryEnabled = sys.argv[4]
+else:
+    chat_message = sys.argv[1]
+    user_message = sys.argv[2].encode('cp936').decode('utf-8', errors='replace')
+    currentPresetName = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
+    memoryEnabled = sys.argv[4]
+ # æ·»åŠ åˆ¤æ–­ï¼šå¦‚æœuser_messageä¸ºç©ºï¼Œåˆ™ç”¨currentPresetNameä»£æ›¿
+if not user_message.strip():  # å¤„ç†ç©ºå­—ç¬¦ä¸²æˆ–ä»…å«ç©ºç™½å­—ç¬¦çš„æƒ…å†µ
+    user_message = currentPresetName
+print(f"chat_message: {chat_message}")  # è·å–å‘½ä»¤è¡Œä¸­c++ç¨‹åºä¼ å…¥çš„ç¬¬ä¸€ä¸ªå‚æ•°)
+print(f"User message: {user_message}")  # è·å–å‘½ä»¤è¡Œä¸­c++ç¨‹åºä¼ å…¥çš„ç¬¬äºŒä¸ªå‚æ•°
+print(f"currentPresetName: {currentPresetName}")
+print(f"memoryEnabled: {memoryEnabled}")
+
+parts = chat_message.split(',')
+if len(parts) < 48:
+    print("å‘½ä»¤è¡Œå‚æ•°åˆ†å‰²ååˆ—è¡¨é•¿åº¦ä¸è¶³ 48ï¼Œè¯·æ£€æŸ¥è¾“å…¥ã€‚")
+else:
+    first_47 = parts[:48]
+    # å°† first_47[0] åˆ° first_47[8] è½¬æ¢ä¸ºæµ®ç‚¹æ•°
+    for i in range(9):
+        first_47[i] = float(first_47[i])
+
+    # æŸ¥è¯¢åŒ¹é…çš„è®°å½•
+    cursor.execute(
+        "SELECT SongName, Parameters FROM music_responses WHERE SongName =?",
+        (user_message,))
+    row = cursor.fetchone()
+    # å¦‚æœæ²¡æœ‰åŒ¹é…çš„è®°å½•ï¼Œåˆ™æ·»åŠ æ–°æ•°æ®
+    if row is None:
+        parameters = json.loads(result_str)
+        parameters = parameters_update(parameters)
+        print(f"Update SongName: {user_message}")
+        print(f"Update Parameters: {parameters}")
+        print("-" * 50)
+        cursor.execute("""
+            INSERT INTO music_responses (SongName, Parameters, Preferences, Style, Feature)
+            VALUES (?, ?, ?, ?, ?)
+        """, (user_message, result_str, 'edit', result1_str, result2_str))
+        conn.commit()
+        update_parameters_to_database(parameters)
+        input("å·²æ–°å¢è®°å½•ï¼ŒæŒ‰å›è½¦é”®å…³é—­çª—å£...")
+        sys.exit(1)
+    # å¦‚æœæœ‰åŒ¹é…çš„è®°å½•ï¼Œåˆ™æ›´æ–°æ•°æ®
+    else:
+        song_name = row[0]
+        parameters = json.loads(row[1])
+        print(f"present parameters:{parameters}")
+
+        parameters = parameters_update(parameters)
+
+        # å°†æ›´æ–°åçš„å‚æ•°è½¬æ¢ä¸ºå­—ç¬¦ä¸²
+        updated_parameters_str = json.dumps(parameters, ensure_ascii=False)
+
+        # æ›´æ–°æ•°æ®åº“ä¸­çš„è®°å½•
+        cursor.execute("UPDATE music_responses SET Parameters =?, Preferences =? WHERE SongName =?",
+                       (updated_parameters_str, "edit", song_name))
+        conn.commit()
+        # æ‰“å°æ›´æ–°åçš„ä¿¡æ¯
+        print(f"Update SongName: {song_name}")
+        print(f"Update Parameters: {parameters}")
+        print("-" * 50)
+
+        # ---------------------- æ–°å¢ï¼šæ›´æ–°æ–°è®°å¿†ï¼ˆå½“å‰songï¼‰çš„é¢„è®¾æ–‡ä»¶ ----------------------
+
+        # 2. å°†æ–°è®°å¿†çš„parametersè½¬æ¢ä¸ºé¢„è®¾æ–‡ä»¶æ ¼å¼
+        new_memory_excel_params = {}
+        # å¤„ç†é¡¶å±‚å¼€å…³çŠ¶æ€
+        for key in parameters:
+            if key in param_mapping and isinstance(param_mapping[key], tuple):
+                param_id, param_value = param_mapping[key]
+                new_memory_excel_params[param_id] = param_value
+                print(f"æ–°è®°å¿†å¼€å…³çŠ¶æ€å¤„ç†: {key} -> {param_id} = {param_value}")
+
+        # å¤„ç†åµŒå¥—å‚æ•°
+        for key, value in parameters.items():
+            if isinstance(value, dict):
+                for sub_key, sub_value in value.items():
+                    full_key = f"{key}.{sub_key}"
+                    if full_key in param_mapping:
+                        param_id = param_mapping[full_key]
+                        new_memory_excel_params[param_id] = sub_value
+            else:
+                if key in param_mapping and not isinstance(param_mapping[key], tuple):
+                    param_id = param_mapping[key]
+                    new_memory_excel_params[param_id] = value
+
+        # 3. å®šä¹‰æ–°è®°å¿†çš„é¢„è®¾æ–‡ä»¶è·¯å¾„
+        new_memory_preset_path = fr"C:\Users\Public\Documents\Supertonal DSP\HCAP\{song_name}.preset"
+        # 4. æ›´æ–°æ–°è®°å¿†çš„é¢„è®¾æ–‡ä»¶
+        try:
+            if update_preset_in_file(new_memory_preset_path, new_memory_excel_params):
+                print(f"æ–°è®°å¿† '{song_name}' çš„é¢„è®¾æ–‡ä»¶æ›´æ–°æˆåŠŸ")
+            else:
+                print(f"æ–°è®°å¿† '{song_name}' çš„é¢„è®¾æ–‡ä»¶æ›´æ–°å¤±è´¥")
+        except FileNotFoundError:
+            print(f"æ–°è®°å¿†é¢„è®¾æ–‡ä»¶è·¯å¾„ä¸å­˜åœ¨: {new_memory_preset_path}")
+        except Exception as e:
+            print(f"æ›´æ–°æ–°è®°å¿†é¢„è®¾æ–‡ä»¶æ—¶å‡ºé”™: {e}")
+        # ---------------------- æ–°å¢ç»“æŸ ----------------------
+
+    update_parameters_to_database(parameters)
+
+conn.close()
+
+input("ç¨‹åºæ‰§è¡Œå®Œæ¯•ï¼ŒæŒ‰å›è½¦é”®å…³é—­çª—å£...")

@@ -37,6 +37,9 @@ public:
     {
         mGroupComponentPtr.reset(new juce::GroupComponent(title, title));
         addAndMakeVisible(mGroupComponentPtr.get());
+        // 设置组件边框和文本颜色 - 深蓝色与白色背景形成对比
+        mGroupComponentPtr->setColour(juce::GroupComponent::outlineColourId, juce::Colours::black);
+        mGroupComponentPtr->setColour(juce::GroupComponent::textColourId, juce::Colours::black);
 
         for (const auto& setting : parameterSettings) {
             auto sliderPtr = std::make_unique<juce::Slider>(juce::Slider::LinearVertical, juce::Slider::TextBoxBelow);
@@ -44,12 +47,25 @@ public:
             sliderPtr->setTextValueSuffix(setting.suffix);
             sliderPtr->setScrollWheelEnabled(false);
 
+            // 设置滑块颜色 - 使用深色和高对比度颜色
+            sliderPtr->setColour(juce::Slider::thumbColourId, juce::Colour(30, 60, 120));
+            sliderPtr->setColour(juce::Slider::trackColourId, juce::Colour(100, 120, 160));
+            sliderPtr->setColour(juce::Slider::backgroundColourId, juce::Colour(220, 220, 220));
+            sliderPtr->setColour(juce::Slider::textBoxTextColourId, juce::Colour(20, 20, 20));
+            sliderPtr->setColour(juce::Slider::textBoxBackgroundColourId, juce::Colour(240, 240, 240));
+            sliderPtr->setColour(juce::Slider::textBoxOutlineColourId, juce::Colour(100, 100, 100));
+
             auto attachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
                 apvts, setting.parameterId, *sliderPtr);
 
             auto labelPtr = std::make_unique<juce::Label>();
             labelPtr->setText(setting.title, juce::dontSendNotification);
             labelPtr->attachToComponent(sliderPtr.get(), false);
+
+            // 设置标签颜色 - 黑色文本在白色背景上更易读
+            labelPtr->setColour(juce::Label::textColourId, juce::Colour(20, 20, 20));
+            labelPtr->setJustificationType(juce::Justification::centred);
+            labelPtr->setFont(juce::Font(14.0f, juce::Font::bold));
 
             addAndMakeVisible(sliderPtr.get());
             addAndMakeVisible(labelPtr.get());
@@ -63,6 +79,12 @@ public:
         mToggleButtonPtr = std::make_unique<juce::ToggleButton>();
         mToggleButtonAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             apvts, toggleParameterId, *mToggleButtonPtr);
+
+        // 设置开关按钮颜色
+        mToggleButtonPtr->setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
+        mToggleButtonPtr->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
+        mToggleButtonPtr->setColour(juce::ToggleButton::textColourId, juce::Colours::black);
+
         addAndMakeVisible(mToggleButtonPtr.get());
     }
 
