@@ -52,8 +52,10 @@ After a successful response, click the reset button to transfer parameters with 
 ## Environment Variable Configuration:
 1. Add the following four items to your system environment variables:
    - SUPERTONAL_PYTHON_INTERPRETER: "C:\path\to\your\python\env\Scripts\python.exe"
-   - SUPERTONAL_PYTHON_SCRIPT1: "C:\path\to\your\supertonal\Source\llm.py"
-   - SUPERTONAL_PYTHON_SCRIPT2: "C:\path\to\your\supertonal\Source\sql.py"
+   - SUPERTONAL_PYTHON_SCRIPT1: "C:\path\to\your\Audio-agent\Source\llm.py"
+   - SUPERTONAL_PYTHON_SCRIPT2: "C:\path\to\your\Audio-agent\Source\sql.py"
+   - SUPERTONAL_PYTHON_SCRIPT3: "C:\path\to\your\Audio-agent\Source\Components\accept.py"
+   - SUPERTONAL_PYTHON_SCRIPT4: "C:\path\to\your\Audio-agent\Source\Components\reject.py"
    - DOCUMENTS_DIR: "C:\path\to\your\Documents"
 
 Note: Please replace the paths with your actual paths.
