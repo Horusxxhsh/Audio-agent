@@ -8,6 +8,14 @@
 #include <fstream>
 #include <juce_core/juce_core.h>
 #include "DelayComponent.h"
+
+// Windows 特定头文件
+#ifdef _WIN32
+#include <windows.h>
+#undef min  // 避免与 std::min 冲突
+#undef max  // 避免与 std::max 冲突
+#endif
+
 class PresetComponent : public juce::Component, juce::Button::Listener, juce::ComboBox::Listener
 {
 public:
@@ -25,17 +33,15 @@ public:
 
         presetList.setTextWhenNothingSelected("No Preset Selected");
         presetList.setMouseCursor(juce::MouseCursor::PointingHandCursor);
-        presetList.setColour(juce::ComboBox::textColourId, juce::Colours::black); // 浅橘色文本
+        presetList.setColour(juce::ComboBox::textColourId, juce::Colours::black);
         presetList.setColour(juce::ComboBox::backgroundColourId, juce::Colour::fromRGB(0xB0, 0xB0, 0xB0));
         presetList.setColour(juce::ComboBox::arrowColourId, juce::Colours::black);
-		presetList.setColour(juce::ComboBox::outlineColourId, juce::Colour::fromRGB(0xB0, 0xC4, 0xD9)); // 边框颜色
+        presetList.setColour(juce::ComboBox::outlineColourId, juce::Colour::fromRGB(0xB0, 0xC4, 0xD9));
 
         addAndMakeVisible(presetList);
         presetList.addListener(this);
 
         loadPresetList();
-
-    
     }
 
     ~PresetComponent()
@@ -49,8 +55,6 @@ public:
         previousPresetButton.removeListener(this);
         nextPresetButton.removeListener(this);
         presetList.removeListener(this);
-
-
     }
 
     void resized() override
@@ -93,28 +97,30 @@ private:
             double text_Weight = readEnvWithType<double>("text_Weight");
             double audio_Weight = readEnvWithType<double>("audio_Weight");
             double preference_Weight = readEnvWithType<double>("preference_Weight");
-			std::string text_Weight_str = std::to_string(text_Weight);
-			std::string audio_Weight_str = std::to_string(audio_Weight);
-			std::string preference_Weight_str = std::to_string(preference_Weight);
+            std::string text_Weight_str = std::to_string(text_Weight);
+            std::string audio_Weight_str = std::to_string(audio_Weight);
+            std::string preference_Weight_str = std::to_string(preference_Weight);
+
             juce::Logger::writeToLog("text_Weight:" + text_Weight_str);
             juce::Logger::writeToLog("audio_Weight:" + audio_Weight_str);
             juce::Logger::writeToLog("preference_Weight:" + preference_Weight_str);
+
             std::string memoryEnabled = readEnvWithType<std::string>("memory_Enabled");
             if (memoryEnabled == "") {
-				memoryEnabled = "false";
+                memoryEnabled = "false";
             }
-            // 记录实际读取到的 memoryEnabled 值
+
             juce::Logger::writeToLog("memoryEnabled (raw):" + juce::String(memoryEnabled));
-            // 在日志中打印 userMessage 的值
             juce::Logger::writeToLog("userMessage:" + juce::String(userMessage));
+
             std::string currentPresetName = presetManager.getCurrentPreset().toStdString();
             juce::Logger::writeToLog("currentPresetName:" + juce::String(currentPresetName));
+
             if (userMessage.empty() && currentPresetName.empty()) {
-                // 在日志中打印相关信息
                 juce::Logger::writeToLog("userMessage and currentPresetName are both empty");
                 return;
             }
-            
+
             // 收集所有效果器的开关状态
             const auto index1 = presetManager.getParameterValue("pre_compressor_on");
             const auto index2 = presetManager.getParameterValue("tube_screamer_on");
@@ -125,7 +131,7 @@ private:
             const auto index7 = presetManager.getParameterValue("flanger_on");
             const auto index8 = presetManager.getParameterValue("phaser_on");
             const auto index9 = presetManager.getParameterValue("pre_eq_on");
-			
+
             // 构建参数字符串，以开关状态开始
             std::string paramString = std::to_string(index1) + "," + std::to_string(index2) + ","
                 + std::to_string(index3) + "," + std::to_string(index4) + ","
@@ -137,7 +143,7 @@ private:
             int paramCount = 9; // 初始为9个开关状态参数
 
             // 根据开关状态添加对应效果器的参数
-            //1
+            //1 - Compressor
             if (index1 == true) {
                 const auto comp1 = presetManager.getParameterValue("pre_comp_thresh");
                 juce::Logger::writeToLog("pre_comp_thresh:" + juce::String(comp1));
@@ -153,7 +159,6 @@ private:
             }
             else {
                 const auto comp1 = -128.00;
-                juce::Logger::writeToLog("pre_comp_thresh:" + juce::String(comp1));
                 const auto comp2 = 0.00;
                 const auto comp3 = 1;
                 const auto comp4 = 0.00;
@@ -164,7 +169,8 @@ private:
                     + "," + std::to_string(comp5) + "," + std::to_string(comp6);
                 paramCount += 6;
             }
-            //2
+
+            //2 - Tube Screamer
             if (index2 == true) {
                 const auto screamer1 = presetManager.getParameterValue("tube_screamer_drive");
                 const auto screamer2 = presetManager.getParameterValue("tube_screamer_level");
@@ -181,7 +187,8 @@ private:
                     + "," + std::to_string(screamer3);
                 paramCount += 3;
             }
-            //3
+
+            //3 - Mouse Drive
             if (index3 == true) {
                 const auto drive1 = presetManager.getParameterValue("mouse_drive_distortion");
                 const auto drive2 = presetManager.getParameterValue("mouse_drive_volume");
@@ -194,7 +201,8 @@ private:
                 paramString += "," + std::to_string(drive1) + "," + std::to_string(drive2);
                 paramCount += 2;
             }
-            //4
+
+            //4 - Delay
             if (index4 == true) {
                 const auto delay1 = presetManager.getParameterValue("delay_feedback");
                 const auto delay2 = presetManager.getParameterValue("delay_left_millisecond");
@@ -211,7 +219,8 @@ private:
                     + "," + std::to_string(delay3);
                 paramCount += 3;
             }
-            //5
+
+            //5 - Room
             if (index5 == true) {
                 const auto room1 = presetManager.getParameterValue("room_size");
                 const auto room2 = presetManager.getParameterValue("room_damping");
@@ -230,7 +239,8 @@ private:
                     + "," + std::to_string(room3) + "," + std::to_string(room4);
                 paramCount += 4;
             }
-            //6
+
+            //6 - Chorus
             if (index6 == true) {
                 const auto chorus1 = presetManager.getParameterValue("chorus_delay");
                 const auto chorus2 = presetManager.getParameterValue("chorus_depth");
@@ -249,7 +259,8 @@ private:
                     + "," + std::to_string(chorus3) + "," + std::to_string(chorus4);
                 paramCount += 4;
             }
-            //7
+
+            //7 - Flanger
             if (index7 == true) {
                 const auto flanger1 = presetManager.getParameterValue("flanger_delay");
                 const auto flanger2 = presetManager.getParameterValue("flanger_depth");
@@ -272,7 +283,8 @@ private:
                     + "," + std::to_string(flanger5);
                 paramCount += 5;
             }
-            //8
+
+            //8 - Phaser
             if (index8 == true) {
                 const auto phaser1 = presetManager.getParameterValue("phaser_depth");
                 const auto phaser2 = presetManager.getParameterValue("phaser_feedback");
@@ -291,7 +303,8 @@ private:
                     + "," + std::to_string(phaser3) + "," + std::to_string(phaser4);
                 paramCount += 4;
             }
-            //9
+
+            //9 - EQ
             if (index9 == true) {
                 const auto eq1 = presetManager.getParameterValue("pre_eq_100_gain");
                 const auto eq2 = presetManager.getParameterValue("pre_eq_200_gain");
@@ -307,7 +320,7 @@ private:
                     + "," + std::to_string(eq7) + "," + std::to_string(eq8);
                 paramCount += 8;
             }
-            else{
+            else {
                 const auto eq1 = 0.00;
                 const auto eq2 = 0.00;
                 const auto eq3 = 0.00;
@@ -322,53 +335,25 @@ private:
                     + "," + std::to_string(eq7) + "," + std::to_string(eq8);
                 paramCount += 8;
             }
+
             juce::Logger::writeToLog("paramCount:" + juce::String(paramCount));
-           
+
             // 添加参数总数作为最后一个元素
             paramString += "," + std::to_string(paramCount);
             juce::Logger::writeToLog("paramString:" + juce::String(paramString));
-            
-            //// 定义 Python 解释器路径和 Python 脚本路径
-            //const char* pythonInterpreterPath = R"(C:\Users\80753\Documents\GitHub\supertonal\Source\Components\PythonApplication\env\Scripts\python.exe)";
-            ////const char* pythonScriptPath = R"(E:\c++\juceproject\juceEffector\supertonal\Source\Components\PythonApplication\sql.py)";
-            //const char* pythonScriptPath = R"("C:\Users\80753\Documents\GitHub\supertonal\Source\sql.py")";
 
-            //// 假设您知道项目根目录与当前工作目录的关系
-            //juce::File currentDir = juce::File::getCurrentWorkingDirectory();
-            //juce::Logger::writeToLog("Current working directory: " + currentDir.getFullPathName());
-
-            //// 如果当前目录是 Builds，则向上一级再找到 supertonal 目录
-            //juce::File projectDir = currentDir;
-            //while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
-            //    projectDir = projectDir.getParentDirectory();
-            //}
-
-            //juce::Logger::writeToLog("Project directory: " + projectDir.getFullPathName());
-
-            //// Python 解释器路径
-            //juce::File pythonInterpreterFile = projectDir.getChildFile("Source/Components/PythonApplication/env/Scripts/python.exe");
-            //const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
-
-            //// Python 脚本路径
-            //juce::File pythonScriptFile = projectDir.getChildFile("Source/sql.py");
-            //const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
-
-            //// 记录路径用于调试
-            //juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
-            //juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
-
-            // 定义 Python 解释器和脚本的文件对象
+            // 获取 Python 解释器和脚本路径
             juce::File pythonInterpreterFile;
             juce::File pythonScriptFile;
-            // 获取环境变量并记录原始值
-            const char* pythonInterpreterEnv = std::getenv("SUPERTONAL_PYTHON_INTERPRETER");
-            const char* pythonScriptEnv = std::getenv("SUPERTONAL_PYTHON_SCRIPT2"); // 修正名称，添加了"1"
 
-            // 记录环境变量的原始值
+            const char* pythonInterpreterEnv = std::getenv("SUPERTONAL_PYTHON_INTERPRETER");
+            const char* pythonScriptEnv = std::getenv("SUPERTONAL_PYTHON_SCRIPT2");
+
             juce::Logger::writeToLog("Raw interpreter env value: " +
                 (pythonInterpreterEnv != nullptr ? juce::String(pythonInterpreterEnv) : "null"));
             juce::Logger::writeToLog("Raw script env value: " +
                 (pythonScriptEnv != nullptr ? juce::String(pythonScriptEnv) : "null"));
+
             if (pythonInterpreterEnv != nullptr && pythonInterpreterEnv[0] != '\0') {
                 pythonInterpreterFile = juce::File(pythonInterpreterEnv);
             }
@@ -376,10 +361,11 @@ private:
                 juce::File currentDir = juce::File::getCurrentWorkingDirectory();
                 juce::File projectDir = currentDir;
                 while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
-                   projectDir = projectDir.getParentDirectory();
+                    projectDir = projectDir.getParentDirectory();
                 }
                 pythonInterpreterFile = projectDir.getChildFile("Source/Components/PythonApplication/env/Scripts/python.exe");
             }
+
             if (pythonScriptEnv != nullptr && pythonScriptEnv[0] != '\0') {
                 pythonScriptFile = juce::File(pythonScriptEnv);
             }
@@ -391,33 +377,114 @@ private:
                 }
                 pythonScriptFile = projectDir.getChildFile("Source/sql.py");
             }
+
             const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
             const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
+
             juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
             juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
 
-            /// 构建执行 Python 脚本的命令，将所有参数传递给 Python 脚本
-            std::string command = pythonInterpreterPath.toStdString(); // 使用 toStdString() 进行转换
-            command += " ";
-            command += pythonScriptPath.toStdString(); // 使用 toStdString() 进行转换
-            command += " \"" + paramString + "\"";  // 第一个参数: 所有效果器参数
-            command += " \"" + userMessage + "\"";  // 第二个参数: 用户消息
-            command += " \"" + currentPresetName + "\"";  // 第三个参数: 当前预设名称
-            command += " \"" + memoryEnabled + "\"";  // 第四个参数: 记忆功能状态
-            command += " \"" + audioPath + "\"";  // 第五个参数: 音频文件路径
-			command += " " + text_Weight_str;  // 第六个参数: 文字权重
-			command += " " + audio_Weight_str;  // 第七个参数: 音频权重
-			command += " " + preference_Weight_str;  // 第八个参数: 偏好权重
+            // 构建完整的命令行
+            std::string command = "\"" + pythonInterpreterPath.toStdString() + "\" \"" + pythonScriptPath.toStdString() + "\"";
+            command += " \"" + paramString + "\"";                    // 第一个参数: 所有效果器参数
+            command += " \"" + userMessage + "\"";                    // 第二个参数: 用户消息
+            command += " \"" + currentPresetName + "\"";              // 第三个参数: 当前预设名称
+            command += " \"" + memoryEnabled + "\"";                  // 第四个参数: 记忆功能状态
+            command += " \"" + audioPath + "\"";                      // 第五个参数: 音频文件路径
+            command += " " + text_Weight_str;                         // 第六个参数: 文字权重
+            command += " " + audio_Weight_str;                        // 第七个参数: 音频权重
+            command += " " + preference_Weight_str;                   // 第八个参数: 偏好权重
 
-            // 执行 Python 脚本
-            int returnCode = std::system(command.c_str());
-            juce::Logger::writeToLog("command: " + juce::String(command) + ", return code: " + juce::String(returnCode));
-            if (returnCode != 0) {
-                std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
-                std::cerr << "执行的命令: " << command << std::endl;
-                //updateStatus("Python script execution failed");
+            juce::Logger::writeToLog("Executing command: " + juce::String(command));
+
+#ifdef _WIN32
+            // Windows 特定的进程创建代码
+            STARTUPINFOA si = { sizeof(si) };
+            PROCESS_INFORMATION pi = { 0 };
+
+            // 设置启动信息，隐藏窗口
+            si.dwFlags = STARTF_USESHOWWINDOW;
+            si.wShowWindow = SW_HIDE;
+
+            // 创建进程
+            if (!CreateProcessA(
+                NULL,                                    // 应用程序名称
+                const_cast<LPSTR>(command.c_str()),     // 命令行
+                NULL,                                    // 进程安全属性
+                NULL,                                    // 线程安全属性
+                FALSE,                                   // 不继承句柄
+                CREATE_NO_WINDOW,                        // 创建标志：无窗口
+                NULL,                                    // 环境变量
+                NULL,                                    // 当前目录
+                &si,                                     // 启动信息
+                &pi                                      // 进程信息
+            )) {
+                DWORD error = GetLastError();
+                std::cerr << "CreateProcess failed with error: " << error << std::endl;
+                juce::Logger::writeToLog("Failed to execute Python script with error: " + juce::String(error));
+
+                // 如果 CreateProcess 失败，尝试使用 system() 作为备用方案
+                juce::Logger::writeToLog("Falling back to system() call");
+                int returnCode = std::system(command.c_str());
+                juce::Logger::writeToLog("System call return code: " + juce::String(returnCode));
+                return;
             }
+
+            juce::Logger::writeToLog("Python process created successfully");
+
+            // 等待进程完成
+            DWORD waitResult = WaitForSingleObject(pi.hProcess, 30000); // 30秒超时
+
+            if (waitResult == WAIT_TIMEOUT) {
+                juce::Logger::writeToLog("Python process timed out, terminating...");
+                TerminateProcess(pi.hProcess, 1);
+                CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread);
+                return;
+            }
+            else if (waitResult == WAIT_FAILED) {
+                DWORD error = GetLastError();
+                juce::Logger::writeToLog("Wait failed with error: " + juce::String(error));
+            }
+
+            // 获取进程退出码
+            DWORD exitCode;
+            if (GetExitCodeProcess(pi.hProcess, &exitCode)) {
+                int returnCode = static_cast<int>(exitCode);
+                juce::Logger::writeToLog("Python script executed with return code: " + juce::String(returnCode));
+
+                if (returnCode != 0) {
+                    juce::Logger::writeToLog("Python script execution failed");
+                }
+                else {
+                    juce::Logger::writeToLog("Python script executed successfully");
+                }
+            }
+            else {
+                DWORD error = GetLastError();
+                juce::Logger::writeToLog("GetExitCodeProcess failed with error: " + juce::String(error));
+            }
+
+            // 清理句柄
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
+
+#else
+            // 非 Windows 系统使用 system() 调用
+            juce::Logger::writeToLog("Using system() call for non-Windows platform");
+            int returnCode = std::system(command.c_str());
+
+            juce::Logger::writeToLog("Python script executed with return code: " + juce::String(returnCode));
+
+            if (returnCode != 0) {
+                juce::Logger::writeToLog("Python script execution failed");
+            }
+            else {
+                juce::Logger::writeToLog("Python script executed successfully");
+            }
+#endif
         }
+
         if (button == &previousPresetButton)
         {
             const auto index = presetManager.loadPreviousPreset();
@@ -443,7 +510,6 @@ private:
         }
         if (button == &resetButton)
         {
-            // 调用 PluginAudioProcessor 的方法重置参数
             audioProcessor.resetParametersToDefault();
         }
     }
@@ -460,15 +526,9 @@ private:
     {
         button.setButtonText(buttonText);
         button.addListener(this);
-        // 设置浅蓝色背景
-        button.setColour(juce::TextButton::buttonColourId, juce::Colour(220, 235, 250)); // 浅蓝色背景
-
-        // 设置按下时为橘色
-        button.setColour(juce::TextButton::buttonOnColourId, juce::Colour(255, 175, 100)); // 橘色
-
-        // 设置文本为浅橘色
-        button.setColour(juce::TextButton::textColourOffId, juce::Colour(255, 160, 80)); // 浅橘色文本
-
+        button.setColour(juce::TextButton::buttonColourId, juce::Colour(220, 235, 250));
+        button.setColour(juce::TextButton::buttonOnColourId, juce::Colour(255, 175, 100));
+        button.setColour(juce::TextButton::textColourOffId, juce::Colour(255, 160, 80));
         addAndMakeVisible(button);
     }
 
@@ -480,9 +540,6 @@ private:
         presetList.addItemList(allPresets, 1);
         presetList.setSelectedItemIndex(allPresets.indexOf(currentPreset), juce::dontSendNotification);
     }
-
-    
-
 
     PluginAudioProcessor& audioProcessor;
     PluginPresetManager& presetManager;

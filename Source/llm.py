@@ -1,4 +1,4 @@
-﻿from asyncio.windows_events import NULL
+from asyncio.windows_events import NULL
 from pickle import FLOAT
 import sys
 import json
@@ -45,6 +45,20 @@ def safe_write_file(filename, content):
                 f.write(content)
             print(f"文件已保存到临时目录: {full_path}")
 
+# 定义Jaccard相似度函数
+def jaccard_similarity(set1, set2):
+    intersection = len(set1.intersection(set2))
+    union = len(set1.union(set2))
+    return intersection / union if union != 0 else 0
+
+
+# 定义文本相似度函数
+def text_similarity(text1, text2):
+    if not text1 or not text2:
+        return 0.0
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform([text1, text2])
+    return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
 
 def audio_to_vector(file_path):
     # 加载预训练的处理器和模型
@@ -125,20 +139,20 @@ if len(sys.argv) > 1:
         preference_Weight = ""
         audio_Weight = ""
         if len(sys.argv) == 4:
-           file_path = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
-           text_Weight = ""
-           preference_Weight = ""
-           audio_Weight = ""
+            file_path = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
+            text_Weight = ""
+            preference_Weight = ""
+            audio_Weight = ""
         if 4 < len(sys.argv) < 7:
-           file_path = ""
-           text_Weight = sys.argv[3]
-           preference_Weight = sys.argv[4]
-           audio_Weight = ""
+            file_path = ""
+            text_Weight = sys.argv[3]
+            preference_Weight = sys.argv[4]
+            audio_Weight = ""
         if len(sys.argv) > 6:
-           file_path = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
-           text_Weight = sys.argv[4]
-           preference_Weight = sys.argv[5]
-           audio_Weight = sys.argv[6]
+            file_path = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
+            text_Weight = sys.argv[4]
+            preference_Weight = sys.argv[5]
+            audio_Weight = sys.argv[6]
     else:
         # Linux/macOS通常使用UTF-8
         chat_message = sys.argv[1]
@@ -148,20 +162,20 @@ if len(sys.argv) > 1:
         preference_Weight = ""
         audio_Weight = ""
         if len(sys.argv) == 4:
-           file_path = sys.argv[3]
-           text_Weight = ""
-           preference_Weight = ""
-           audio_Weight = ""
+            file_path = sys.argv[3]
+            text_Weight = ""
+            preference_Weight = ""
+            audio_Weight = ""
         if 4 < len(sys.argv) < 7:
-           file_path = ""
-           text_Weight = sys.argv[3]
-           preference_Weight = sys.argv[4]
-           audio_Weight = ""
+            file_path = ""
+            text_Weight = sys.argv[3]
+            preference_Weight = sys.argv[4]
+            audio_Weight = ""
         if len(sys.argv) > 6:
-           file_path = sys.argv[3]
-           text_Weight = sys.argv[4]
-           preference_Weight = sys.argv[5]
-           audio_Weight = sys.argv[6]
+            file_path = sys.argv[3]
+            text_Weight = sys.argv[4]
+            preference_Weight = sys.argv[5]
+            audio_Weight = sys.argv[6]
 else:
     chat_message = sys.argv[1].encode('cp936').decode('utf-8', errors='replace')
     memoryEnabled = sys.argv[2]
@@ -565,6 +579,7 @@ effectors = [
 
 final_result = {}
 
+
 # 定义向量余弦相似度计算函数
 def vector_cosine_similarity(vec1, vec2):
     """计算两个向量的余弦相似度"""
@@ -608,48 +623,99 @@ if file_path and file_path.strip() and vector is not None:
 # 如果记忆模块开启，获取用户偏好参考参数
 if memoryEnabled == "true":
     # 查询music_responses表
-    cursor.execute("SELECT SongName, Parameters, Preferences FROM music_responses")
+    cursor.execute("SELECT SongName, Parameters, Preferences, Style, Feature FROM music_responses")
     preference_rows = cursor.fetchall()
 
     print(f"查询到 {len(preference_rows)} 条用户偏好记录")
 
+    # 直接使用result2中的tags和description作为检索内容
+    target_tags = set(result2.get("tags", []))
+    target_description = " ".join(result2.get("description", []))
     for pref_row in preference_rows:
         song_name = pref_row[0]
         param_str = pref_row[1]
         preference = pref_row[2]
+        style_str = pref_row[3]
+        feature_str = pref_row[4]
 
         print(f"处理记录: 歌曲={song_name}, 偏好={preference}")
+
+        # 检查歌曲名是否和当前用户输入相同，相同则跳过
+        if song_name == chat_message:
+            print(f"跳过相同歌曲: {song_name}")
+            continue
 
         try:
             if param_str and param_str.strip():
                 param_data = json.loads(param_str)
                 print(f"解析参数: {type(param_data)} - {param_data}")
 
-                # 如果偏好为空，默认为accept
-                actual_preference = preference if preference else "accept"
+                # 解析历史记录的风格标签和描述特征
+                try:
+                    hist_style = json.loads(style_str) if style_str else []
+                    hist_features = json.loads(feature_str) if feature_str else []
+                except json.JSONDecodeError:
+                    hist_style = []
+                    hist_features = []
 
-                if actual_preference == "accept":
-                    # accept参数优先级最高
-                    preference_params.insert(0, {
-                        "type": "accept",
-                        "parameters": param_data
-                    })
-                    print("添加accept参数到列表开头")
-                elif actual_preference == "edit":
-                    # edit参数次之，放在accept后面
-                    if not any(p["type"] == "edit" for p in preference_params):
-                        preference_params.append({
-                            "type": "edit",
-                            "parameters": param_data
+                # 计算相似度
+                tags_similarity = jaccard_similarity(set(target_tags), set(hist_style)) if target_tags and hist_style else 0.0
+                
+                # 改进的描述相似度计算：考虑多个句子的匹配程度
+                if target_description and hist_features:
+                    # 计算每个历史描述句子与目标描述的相似度
+                    desc_similarities = []
+                    for hist_feature in hist_features:
+                        if hist_feature.strip():  # 忽略空句子
+                            sim = text_similarity(target_description, hist_feature)
+                            desc_similarities.append(sim)
+                    
+                    # 取最大相似度作为描述相似度（至少有一个句子匹配就算有效）
+                    desc_similarity = max(desc_similarities) if desc_similarities else 0.0
+                    
+                    # 如果历史记录有多个描述句子，给予额外奖励
+                    if len(hist_features) > 1:
+                        desc_similarity = min(desc_similarity * 1.1, 1.0)  # 最高不超过1.0
+                else:
+                    desc_similarity = 0.0
+                
+                # 加权总体相似度：标签相似度权重0.6，描述相似度权重0.4
+                overall_similarity = tags_similarity * 0.6 + desc_similarity * 0.4
+                
+                print(f"相似度计算 - 标签相似度: {tags_similarity:.4f}, 描述相似度: {desc_similarity:.4f}, 总相似度: {overall_similarity:.4f}")
+                
+                # 只有当相似度大于0.15时才处理这个偏好记录
+                if overall_similarity > 0.3:
+                    # 如果偏好为空，默认为accept
+                    actual_preference = preference if preference else "accept"
+
+                    if actual_preference == "accept":
+                        # accept参数优先级最高
+                        preference_params.insert(0, {
+                            "type": "accept",
+                            "parameters": param_data,
+                            "similarity": overall_similarity
                         })
-                        print("添加edit参数")
-                elif actual_preference == "reject":
-                    # reject参数单独存储，用于避免
-                    preference_params.append({
-                        "type": "reject",
-                        "parameters": param_data
-                    })
-                    print("添加reject参数")
+                        print(f"添加accept参数到列表开头 (相似度: {overall_similarity:.4f})")
+                    elif actual_preference == "edit":
+                        # edit参数次之，放在accept后面
+                        if not any(p["type"] == "edit" for p in preference_params):
+                            preference_params.append({
+                                "type": "edit",
+                                "parameters": param_data,
+                                "similarity": overall_similarity
+                            })
+                            print(f"添加edit参数 (相似度: {overall_similarity:.4f})")
+                    elif actual_preference == "reject":
+                        # reject参数单独存储，用于避免
+                        preference_params.append({
+                            "type": "reject",
+                            "parameters": param_data,
+                            "similarity": overall_similarity
+                        })
+                        print(f"添加reject参数 (相似度: {overall_similarity:.4f})")
+                else:
+                    print(f"跳过记录，相似度不足: {overall_similarity:.4f}")
         except json.JSONDecodeError as e:
             print(f"处理用户偏好参数时出错: {e}")
         except Exception as e:
@@ -931,7 +997,7 @@ for effector in effectors:
     if result1.get(effector_name) == "yes":
         # 构建包含音频向量参考参数的系统提示（无论记忆是否开启）
         audio_ref_info = f"音频向量参考参数: {json.dumps(audio_vector_params, ensure_ascii=False) if audio_vector_params else '[]'}"
-        
+
         if memoryEnabled == "true":  # 简化条件检查
             system_prompt = f"""
 你是一位专业音效调整师。目标：针对当前单一音效模块，基于相似歌曲参考参数 {audio_vector_params} 与用户偏好，输出该模块的 JSON 参数。示例格式（仅参考结构，不参考数值）：{effector["example_with"]}
@@ -1176,7 +1242,6 @@ response3 = client.chat.completions.create(
 response3_content = response3.choices[0].message.content
 print(f"清理后的响应：{response3_content}")
 
-
 # 先将向量转换为字符串格式（与查询代码对应）
 vector_str = ','.join(map(str, vector)) if vector is not None else ''
 
@@ -1212,7 +1277,6 @@ if not valid:
     print(f"数据验证失败: {'; '.join(error_msg)}")
     sys.exit(1)
 
-
 # 将风格结果字符串写入文件
 safe_write_file("result1.txt", song_style_str)
 
@@ -1225,10 +1289,9 @@ safe_write_file("result.txt", result_str)
 # 将参数结果字符串写入文件
 safe_write_file("result3.txt", response3_content)
 
-
 # 关闭数据库连接
 conn.close()
 audio_conn.close()
 
 # 新增：等待用户输入后再关闭窗口
-input("程序执行完毕，按回车键关闭窗口...")
+#input("程序执行完毕，按回车键关闭窗口...")

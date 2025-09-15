@@ -533,14 +533,29 @@ def update_parameters_to_database(parameters):
                     # 计算标签相似度
                     tags = set(style)
                     tag_similarity = jaccard_similarity(result1_set, tags)
-
-                    # 计算描述相似度
-                    description = " ".join(feature)
-                    desc_similarity = text_similarity(result2_str, description)
-
-                    similarity = 0.7 * tag_similarity + 0.3 * desc_similarity
+                    
+                    # 改进的描述相似度计算：考虑多个句子的匹配程度
+                    if result2_str and feature:
+                        # 计算每个历史描述句子与目标描述的相似度
+                        desc_similarities = []
+                        for hist_feature in feature:
+                            if hist_feature.strip():  # 忽略空句子
+                                sim = text_similarity(result2_str, hist_feature)
+                                desc_similarities.append(sim)
+                        
+                        # 取最大相似度作为描述相似度（至少有一个句子匹配就算有效）
+                        desc_similarity = max(desc_similarities) if desc_similarities else 0.0
+                        
+                        # 如果历史记录有多个描述句子，给予额外奖励
+                        if len(feature) > 1:
+                            desc_similarity = min(desc_similarity * 1.1, 1.0)  # 最高不超过1.0
+                    else:
+                        desc_similarity = 0.0
+                    
+                    # 加权总体相似度：标签相似度权重0.6，描述相似度权重0.4
+                    similarity = tag_similarity * 0.6 + desc_similarity * 0.4
                     print(f"similarity:{similarity}")
-                    if similarity > 0.15:
+                    if similarity > 0.3:
                         similar_songs.append((song_name, similarity, style_str, feature_str, parameter_str))
                         # 存储检索到的歌曲的信息
                         # 限制memory_notes最大长度为3

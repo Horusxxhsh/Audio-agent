@@ -756,6 +756,7 @@ void ChatComponent::buttonClicked(juce::Button* button)
         // 取消按钮的处理逻辑
         audioFilePath.clear();  // 清除文件路径
         storeEnvWithType("audio_File_Path", "", "string");  // 清除环境变量
+        storeEnvWithType("user_Message", "", "string");
         audioFileLabel.setText("No file selected", juce::dontSendNotification);  // 重置标签
         cancelAudioButton.setEnabled(false);  // 禁用取消按钮，因为没有文件可以取消
 
@@ -797,9 +798,26 @@ void ChatComponent::buttonClicked(juce::Button* button)
             // 添加用户消息参数（作为第一个参数）
             command << " \"" << userMessage << "\"";
 
-            // 执行命令
+            // 执行命令（隐藏控制台窗口）
             std::string utf8Command = command.toStdString();
-            int returnCode = std::system(utf8Command.c_str());
+            STARTUPINFOA si = { sizeof(si) };
+            PROCESS_INFORMATION pi = { 0 };
+            
+            if (!CreateProcessA(NULL, const_cast<LPSTR>(utf8Command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+                DWORD error = GetLastError();
+                std::cerr << "CreateProcess failed with error: " << error << std::endl;
+                updateStatus("Failed to execute Python script");
+                return;
+            }
+            
+            WaitForSingleObject(pi.hProcess, INFINITE);
+            
+            DWORD exitCode;
+            GetExitCodeProcess(pi.hProcess, &exitCode);
+            int returnCode = static_cast<int>(exitCode);
+            
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
             juce::Logger::writeToLog("commandWithErrorCapture: " + juce::String(utf8Command) + ", return code: " + juce::String(returnCode));
             if (returnCode != 0) {
                 std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
@@ -845,9 +863,26 @@ void ChatComponent::buttonClicked(juce::Button* button)
             // 添加用户消息参数（作为第一个参数）
             command << " \"" << userMessage << "\"";
 
-            // 执行命令
+            // 执行命令（隐藏控制台窗口）
             std::string utf8Command = command.toStdString();
-            int returnCode = std::system(utf8Command.c_str());
+            STARTUPINFOA si = { sizeof(si) };
+            PROCESS_INFORMATION pi = { 0 };
+            
+            if (!CreateProcessA(NULL, const_cast<LPSTR>(utf8Command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+                DWORD error = GetLastError();
+                std::cerr << "CreateProcess failed with error: " << error << std::endl;
+                updateStatus("Failed to execute Python script");
+                return;
+            }
+            
+            WaitForSingleObject(pi.hProcess, INFINITE);
+            
+            DWORD exitCode;
+            GetExitCodeProcess(pi.hProcess, &exitCode);
+            int returnCode = static_cast<int>(exitCode);
+            
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
             juce::Logger::writeToLog("commandWithErrorCapture: " + juce::String(utf8Command) + ", return code: " + juce::String(returnCode));
             if (returnCode != 0) {
                 std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
@@ -1112,9 +1147,32 @@ void ChatComponent::run() {
 
    
 
-    // 执行命令
+    // 执行命令（隐藏控制台窗口）
+    // 重定向标准输出到nul来隐藏命令行界面
     std::string utf8Command = command.toStdString();
-    int returnCode = std::system(utf8Command.c_str());
+    
+    // Windows API方法：使用CREATE_NO_WINDOW标志
+    STARTUPINFOA si = { sizeof(si) };
+    PROCESS_INFORMATION pi = { 0 };
+    
+    if (!CreateProcessA(NULL, const_cast<LPSTR>(utf8Command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+        DWORD error = GetLastError();
+        std::cerr << "CreateProcess failed with error: " << error << std::endl;
+        updateStatus("Failed to execute Python script");
+        return;
+    }
+    
+    // 等待进程结束
+    WaitForSingleObject(pi.hProcess, INFINITE);
+    
+    // 获取进程退出码
+    DWORD exitCode;
+    GetExitCodeProcess(pi.hProcess, &exitCode);
+    int returnCode = static_cast<int>(exitCode);
+    
+    // 清理资源
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
     juce::Logger::writeToLog("commandWithErrorCapture: " + juce::String(utf8Command) + ", return code: " + juce::String(returnCode));
     if (returnCode != 0) {
         std::cerr << "Python script execution failed, return code: " << returnCode << std::endl;
