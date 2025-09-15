@@ -56,6 +56,7 @@ After a successful response, click the reset button to transfer parameters with 
    - SUPERTONAL_PYTHON_SCRIPT2: "C:\path\to\your\Audio-agent\Source\sql.py"
    - SUPERTONAL_PYTHON_SCRIPT3: "C:\path\to\your\Audio-agent\Source\Components\accept.py"
    - SUPERTONAL_PYTHON_SCRIPT4: "C:\path\to\your\Audio-agent\Source\Components\reject.py"
+   - SUPERTONAL_DIR: "C:\path\to\your\Audio-agent"
    - DOCUMENTS_DIR: "C:\path\to\your\Documents"
 
 Note: Please replace the paths with your actual paths.
