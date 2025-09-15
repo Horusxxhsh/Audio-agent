@@ -1,4 +1,5 @@
 from asyncio.windows_events import NULL
+from email.mime import audio
 from pickle import FLOAT
 import sys
 import json
@@ -91,7 +92,8 @@ conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 # 连接到外部音频信息数据库
-audio_db_path = os.path.join(db_dir, "audio_info.db")
+audio_db_dir = os.environ.get('SUPERTONAL_DIR')
+audio_db_path = os.path.join(audio_db_dir, "audio_info.db")
 audio_conn = sqlite3.connect(audio_db_path)
 audio_cursor = audio_conn.cursor()
 """
