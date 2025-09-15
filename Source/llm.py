@@ -94,7 +94,9 @@ cursor.execute('''
 CREATE TABLE IF NOT EXISTS music_responses (
     SongName TEXT PRIMARY KEY,
     Parameters TEXT,
-    Preferences TEXT
+    Preferences TEXT,
+    Style TEXT,
+    Feature TEXT 
 )
 ''')
 conn.commit()
@@ -136,7 +138,6 @@ if len(sys.argv) > 1:
            file_path = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
            text_Weight = sys.argv[4]
            preference_Weight = sys.argv[5]
-           audio_Weight = ""
            audio_Weight = sys.argv[6]
     else:
         # Linux/macOS通常使用UTF-8
@@ -160,9 +161,29 @@ if len(sys.argv) > 1:
            file_path = sys.argv[3]
            text_Weight = sys.argv[4]
            preference_Weight = sys.argv[5]
-           audio_Weight = ""
            audio_Weight = sys.argv[6]
-
+else:
+    chat_message = sys.argv[1].encode('cp936').decode('utf-8', errors='replace')
+    memoryEnabled = sys.argv[2]
+    file_path = ""
+    text_Weight = ""
+    preference_Weight = ""
+    audio_Weight = ""
+    if len(sys.argv) == 4:
+        file_path = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
+        text_Weight = ""
+        preference_Weight = ""
+        audio_Weight = ""
+    if 4 < len(sys.argv) < 7:
+        file_path = ""
+        text_Weight = sys.argv[3]
+        preference_Weight = sys.argv[4]
+        audio_Weight = ""
+    if len(sys.argv) > 6:
+        file_path = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
+        text_Weight = sys.argv[4]
+        preference_Weight = sys.argv[5]
+        audio_Weight = sys.argv[6]
 print(f"Chat message: {chat_message}")
 print(f"memoryEnabled: {memoryEnabled}")
 print(f"text_Weight: {text_Weight}")
@@ -178,7 +199,7 @@ else:
 
 # 创建对话历史列表
 conversation_history = []
-# 第二个系统提示
+# 第二个系统提示(风格和特征提示词)
 system_prompt2 = f"""
 你是资深音乐分析师与风格相似度检索描述顾问。基于用户输入 (变量: {chat_message}) 生成：
   1) 精炼、结构化的风格与技巧标签 (tags)
@@ -544,7 +565,6 @@ effectors = [
 
 final_result = {}
 
-
 # 定义向量余弦相似度计算函数
 def vector_cosine_similarity(vec1, vec2):
     """计算两个向量的余弦相似度"""
@@ -554,22 +574,6 @@ def vector_cosine_similarity(vec1, vec2):
     if norm_vec1 == 0 or norm_vec2 == 0:
         return 0.0
     return dot_product / (norm_vec1 * norm_vec2)
-
-
-# 定义Jaccard相似度函数
-def jaccard_similarity(set1, set2):
-    intersection = len(set1.intersection(set2))
-    union = len(set1.union(set2))
-    return intersection / union if union != 0 else 0
-
-
-# 定义文本相似度函数
-def text_similarity(text1, text2):
-    if not text1 or not text2:
-        return 0.0
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform([text1, text2])
-    return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
 
 
 # 初始化三个参考数据源
@@ -1224,6 +1228,7 @@ safe_write_file("result3.txt", response3_content)
 
 # 关闭数据库连接
 conn.close()
+audio_conn.close()
 
 # 新增：等待用户输入后再关闭窗口
 input("程序执行完毕，按回车键关闭窗口...")
