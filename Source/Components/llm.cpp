@@ -479,12 +479,23 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     cancelAudioButton("Clear selection"),  // 新增取消按钮
     acceptAudioButton("Accept"),  // 接受音频文件
     rejectAudioButton("Reject"),  // 拒绝音频文件
-    memoryToggleButton("MemoryOff"),  // 初始化为 MemoryOff
+    memoryToggleButton("MemoryOn"),  // 初始化为 MemoryOn
     textWeightLabel("Text Weight:", "Text:"),  // 修改：添加文本内容
     preferenceWeightLabel("Preference Weight:", "Preference:"),  // 修改：添加文本内容
     audioWeightLabel("Audio Weight:", "Audio:")  // 修改：添加文本内容
 {
+    // 初始启用记忆功能
+    memoryEnabled = true;
+    memoryToggleButton.setToggleState(true, juce::dontSendNotification);
     currentPresetName = presetManager.getCurrentPreset();
+    
+    // 存储记忆功能开启状态到环境变量
+    storeEnvWithType("memory_Enabled", "true", "string");
+    
+    // 初始化权重值到环境变量
+    storeEnvWithType("text_Weight", "0.0", "double");
+    storeEnvWithType("audio_Weight", "0.0", "double");
+    storeEnvWithType("preference_Weight", "0.0", "double");
     // Initialize UI components
     addAndMakeVisible(inputEditor);
     addAndMakeVisible(sendButton);
@@ -537,6 +548,29 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     memoryToggleButton.setClickingTogglesState(true);  // 设置为开关按钮
     memoryToggleButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::green);  // 开启状态颜色
     memoryToggleButton.setTooltip("Toggle memory feature on/off");
+    
+    // 设置颜色后再显示组件
+    // 确保颜色设置在组件完全初始化后生效
+    textWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    textWeightEditor.setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::black);
+    
+    preferenceWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    preferenceWeightEditor.setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::black);
+    
+    audioWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    audioWeightEditor.setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::black);
+    
+    // 现在显示组件
+    textWeightLabel.setVisible(true);
+    preferenceWeightLabel.setVisible(true);
+    textWeightEditor.setVisible(true);
+    preferenceWeightEditor.setVisible(true);
+    updateAudioWeightVisibility();  // 根据是否有音频文件来显示音频权重控件
+    
+    // 强制组件重绘以确保颜色生效
+    textWeightEditor.repaint();
+    preferenceWeightEditor.repaint();
+    audioWeightEditor.repaint();
 
     // 初始化权重标签和输入框
     // 修改：使用addChildComponent，并设置标签文本对齐方式
@@ -549,16 +583,18 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     addChildComponent(audioWeightLabel);
 
     addChildComponent(textWeightEditor);
+    addChildComponent(preferenceWeightEditor);
+    addChildComponent(audioWeightEditor);
+
+    // 设置默认值和颜色
     textWeightEditor.setText("0.0");  // 设置默认值
     textWeightEditor.setTooltip("Enter weight value for style (e.g., 1.0)");
-	//styleWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightyellow);
+    //styleWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightyellow);
 
-    addChildComponent(preferenceWeightEditor);
     preferenceWeightEditor.setText("0.0");  // 设置默认值
     preferenceWeightEditor.setTooltip("Enter weight value for audio (e.g., 1.0)");
     //audioWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightyellow);
 
-    addChildComponent(audioWeightEditor);
     audioWeightEditor.setText("0.0");  // 设置默认值
     audioWeightEditor.setTooltip("Enter weight value for feature (e.g., 1.0)");
     //featureWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::lightyellow);
@@ -588,22 +624,33 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     responseEditor.setColour(juce::TextEditor::highlightColourId, juce::Colours::lightblue);
     //responseEditor.setColour(juce::TextEditor::caretColourId, juce::Colours::black);
 
+    // 再次设置文字颜色，确保在所有组件初始化后生效
+    textWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    textWeightEditor.setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::black);
+    
+    preferenceWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    preferenceWeightEditor.setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::black);
+    
+    audioWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    audioWeightEditor.setColour(juce::TextEditor::highlightedTextColourId, juce::Colours::black);
+
+    // 其他颜色设置
     textWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::white);
     textWeightEditor.setColour(juce::TextEditor::outlineColourId, juce::Colours::black);
     textWeightEditor.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::black);
-    textWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    textWeightEditor.setColour(juce::TextEditor::highlightColourId, juce::Colours::lightblue);
     //styleWeightEditor.setColour(juce::TextEditor::caretColourId, juce::Colours::black);
 
     preferenceWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::white);
     preferenceWeightEditor.setColour(juce::TextEditor::outlineColourId, juce::Colours::black);
     preferenceWeightEditor.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::black);
-    preferenceWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    preferenceWeightEditor.setColour(juce::TextEditor::highlightColourId, juce::Colours::lightblue);
     //audioWeightEditor.setColour(juce::TextEditor::caretColourId, juce::Colours::black);
 
     audioWeightEditor.setColour(juce::TextEditor::backgroundColourId, juce::Colours::white);
     audioWeightEditor.setColour(juce::TextEditor::outlineColourId, juce::Colours::black);
     audioWeightEditor.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::black);
-    audioWeightEditor.setColour(juce::TextEditor::textColourId, juce::Colours::black);
+    audioWeightEditor.setColour(juce::TextEditor::highlightColourId, juce::Colours::lightblue);
     //featureWeightEditor.setColour(juce::TextEditor::caretColourId, juce::Colours::black);
 
     textWeightLabel.setColour(juce::Label::textColourId, juce::Colours::black);
