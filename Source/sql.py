@@ -758,7 +758,7 @@ result2_str = safe_open_file("result2.txt")
 result_str = safe_open_file("result.txt")
 
 #连接数据库
-db_dir = "C:\\MusicData"
+db_dir = os.environ.get('SUPERTONAL_DIR')
 if not os.path.exists(db_dir):
     os.makedirs(db_dir)  # 创建目录（如果不存在）
 db_path = os.path.join(db_dir, "music_info.db")
@@ -881,4 +881,4 @@ else:
 
 conn.close()
 
-input("程序执行完毕，按回车键关闭窗口...")
+#input("程序执行完毕，按回车键关闭窗口...")

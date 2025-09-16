@@ -71,7 +71,7 @@ result2_str = safe_open_file("result2.txt")
 # 读取 result.txt 文件
 result_str = safe_open_file("result.txt")
 
-db_dir = "C:\\MusicData"
+db_dir = os.environ.get('SUPERTONAL_DIR')
 if not os.path.exists(db_dir):
     os.makedirs(db_dir)  # 创建目录（如果不存在）
 db_path = os.path.join(db_dir, "music_info.db")

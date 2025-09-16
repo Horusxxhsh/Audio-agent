@@ -7,6 +7,7 @@
               headerPath="../../Modules/math_approx/include&#10;../../Modules/chowdsp_wdf/include/chowdsp_wdf"
               cppLanguageStandard="20">
   <MAINGROUP id="Pdzbsi" name="HCAP">
+    <FILE id="mxZi7i" name="music_info.db" compile="0" resource="1" file="music_info.db"/>
     <FILE id="Iwtt5O" name="audio_info.db" compile="0" resource="1" file="audio_info.db"/>
     <GROUP id="{2ED2996E-C3B4-16E6-D794-2D6A2D1A240A}" name="Assets">
       <FILE id="MsarIr" name="croy_cab.wav" compile="0" resource="1" file="Assets/croy_cab.wav"/>

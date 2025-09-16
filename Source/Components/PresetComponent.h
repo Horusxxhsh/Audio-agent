@@ -16,11 +16,35 @@
 #undef max  // 避免与 std::max 冲突
 #endif
 
-class PresetComponent : public juce::Component, juce::Button::Listener, juce::ComboBox::Listener
+class PresetComponent : public juce::Component, private juce::Thread, juce::Button::Listener, juce::ComboBox::Listener
 {
 public:
+    // 线程参数结构体
+    struct SqlThreadParam
+    {
+        juce::String paramString;
+        juce::String userMessage;
+        juce::String currentPresetName;
+        juce::String memoryEnabled;
+        juce::String audioPath;
+        juce::String textWeight;
+        juce::String audioWeight;
+        juce::String preferenceWeight;
+
+        SqlThreadParam(const juce::String& param, const juce::String& userMsg, 
+                      const juce::String& presetName, const juce::String& memEnabled,
+                      const juce::String& audioPathStr, const juce::String& textW,
+                      const juce::String& audioW, const juce::String& prefW)
+            : paramString(param), userMessage(userMsg), currentPresetName(presetName),
+              memoryEnabled(memEnabled), audioPath(audioPathStr), textWeight(textW),
+              audioWeight(audioW), preferenceWeight(prefW)
+        {
+        }
+    };
+
+      // 构造函数
     PresetComponent(PluginAudioProcessor& processor, PluginPresetManager& pm, juce::UndoManager& um)
-        : audioProcessor(processor), presetManager(pm), undoManager(um)
+        : audioProcessor(processor), presetManager(pm), undoManager(um), juce::Thread("SQL Thread")
     {
         configureButton(undoButton, "Undo");
         configureButton(redoButton, "Redo");
@@ -44,8 +68,10 @@ public:
         loadPresetList();
     }
 
+    // 析构函数
     ~PresetComponent()
     {
+        stopThread(1000); // 确保线程停止
         undoButton.removeListener(this);
         redoButton.removeListener(this);
         saveButton.removeListener(this);
@@ -71,6 +97,254 @@ public:
         nextPresetButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.1f)));
         deleteButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.1f)));
         resetButton.setBounds(bounds.removeFromLeft(localBounds.proportionOfWidth(0.1f)));
+    }
+
+    // Thread interface implementation
+    void run() override
+    {
+        juce::Logger::writeToLog("SQL thread started");
+
+        if (!sqlThreadParam)
+        {
+            juce::Logger::writeToLog("Error: No SQL thread parameters provided");
+            return;
+        }
+
+        try
+        {
+            // 获取 Python 解释器和脚本路径
+            juce::File pythonInterpreterFile;
+            juce::File pythonScriptFile;
+
+            const char* pythonInterpreterEnv = std::getenv("SUPERTONAL_PYTHON_INTERPRETER");
+            const char* pythonScriptEnv = std::getenv("SUPERTONAL_PYTHON_SCRIPT2");
+
+            if (pythonInterpreterEnv != nullptr && pythonInterpreterEnv[0] != '\0')
+            {
+                pythonInterpreterFile = juce::File(pythonInterpreterEnv);
+            }
+            else
+            {
+                juce::File currentDir = juce::File::getCurrentWorkingDirectory();
+                juce::File projectDir = currentDir;
+                while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir)
+                {
+                    projectDir = projectDir.getParentDirectory();
+                }
+                pythonInterpreterFile = projectDir.getChildFile("Source/Components/PythonApplication/env/Scripts/python.exe");
+            }
+
+            if (pythonScriptEnv != nullptr && pythonScriptEnv[0] != '\0')
+            {
+                pythonScriptFile = juce::File(pythonScriptEnv);
+            }
+            else
+            {
+                juce::File currentDir = juce::File::getCurrentWorkingDirectory();
+                juce::File projectDir = currentDir;
+                while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir)
+                {
+                    projectDir = projectDir.getParentDirectory();
+                }
+                pythonScriptFile = projectDir.getChildFile("Source/sql.py");
+            }
+
+            const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
+            const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
+
+            // 构建完整的命令行
+            std::string command = "\"" + pythonInterpreterPath.toStdString() + "\" \"" + pythonScriptPath.toStdString() + "\"";
+            command += " \"" + sqlThreadParam->paramString.toStdString() + "\"";
+            command += " \"" + sqlThreadParam->userMessage.toStdString() + "\"";
+            command += " \"" + sqlThreadParam->currentPresetName.toStdString() + "\"";
+            command += " \"" + sqlThreadParam->memoryEnabled.toStdString() + "\"";
+            command += " \"" + sqlThreadParam->audioPath.toStdString() + "\"";
+            command += " " + sqlThreadParam->textWeight.toStdString();
+            command += " " + sqlThreadParam->audioWeight.toStdString();
+            command += " " + sqlThreadParam->preferenceWeight.toStdString();
+
+            juce::Logger::writeToLog("Executing SQL script command: " + juce::String(command));
+
+#ifdef _WIN32
+            STARTUPINFOA si = { sizeof(si) };
+            PROCESS_INFORMATION pi = { 0 };
+
+            // 设置启动信息，隐藏窗口
+            si.dwFlags = STARTF_USESHOWWINDOW;
+            si.wShowWindow = SW_HIDE;
+
+            // 创建进程
+            if (!CreateProcessA(
+                NULL,
+                const_cast<LPSTR>(command.c_str()),
+                NULL,
+                NULL,
+                FALSE,
+                CREATE_NO_WINDOW,
+                NULL,
+                NULL,
+                &si,
+                &pi
+            )) {
+                DWORD error = GetLastError();
+                juce::Logger::writeToLog("CreateProcess failed with error: " + juce::String(error));
+                return;
+            }
+
+            // 等待进程完成
+            DWORD waitResult = WaitForSingleObject(pi.hProcess, 300000); // 300秒超时
+
+            if (waitResult == WAIT_TIMEOUT) {
+                juce::Logger::writeToLog("Python process timed out, terminating...");
+                TerminateProcess(pi.hProcess, 1);
+            }
+            else if (waitResult == WAIT_FAILED) {
+                DWORD error = GetLastError();
+                juce::Logger::writeToLog("Wait failed with error: " + juce::String(error));
+            }
+
+            // 获取进程退出码
+            DWORD exitCode;
+            if (GetExitCodeProcess(pi.hProcess, &exitCode)) {
+                int returnCode = static_cast<int>(exitCode);
+                juce::Logger::writeToLog("SQL script executed with return code: " + juce::String(returnCode));
+
+                if (returnCode != 0) {
+                    juce::Logger::writeToLog("SQL script execution failed");
+                    sqlScriptSuccess = false;
+                }
+                else {
+                    juce::Logger::writeToLog("SQL script executed successfully");
+                    sqlScriptSuccess = true;
+                }
+            }
+            else {
+                DWORD error = GetLastError();
+                juce::Logger::writeToLog("GetExitCodeProcess failed with error: " + juce::String(error));
+                sqlScriptSuccess = false;
+            }
+
+            // 清理句柄
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
+
+#else
+            // 非 Windows 系统使用 system() 调用
+            int returnCode = std::system(command.c_str());
+            juce::Logger::writeToLog("SQL script executed with return code: " + juce::String(returnCode));
+
+            if (returnCode != 0) {
+                juce::Logger::writeToLog("SQL script execution failed");
+                sqlScriptSuccess = false;
+            }
+            else {
+                juce::Logger::writeToLog("SQL script executed successfully");
+                sqlScriptSuccess = true;
+            }
+#endif
+
+        }
+        catch (const std::exception& e)
+        {
+            juce::Logger::writeToLog("Exception in SQL thread: " + juce::String(e.what()));
+            sqlScriptSuccess = false;
+        }
+        catch (...)
+        {
+            juce::Logger::writeToLog("Unknown exception in SQL thread");
+            sqlScriptSuccess = false;
+        }
+
+        juce::Logger::writeToLog("SQL thread finished");
+
+        // 在主线程中调用回调方法更新UI
+        juce::MessageManager::callAsync([this]() {
+            sqlScriptCompleted();
+        });
+    }
+
+    // 公共方法用于启动异步线程
+    void startSqlScriptAsync(const juce::String& paramString, 
+                           const juce::String& userMessage,
+                           const juce::String& currentPresetName,
+                           const juce::String& memoryEnabled,
+                           const juce::String& audioPath,
+                           const juce::String& textWeight,
+                           const juce::String& audioWeight,
+                           const juce::String& preferenceWeight)
+    {
+        if (isSqlScriptRunning)
+        {
+            juce::Logger::writeToLog("Warning: SQL script is already running, cancelling previous request");
+            // 如果已经在运行，先停止当前线程
+            stopThread(1000); // 等待1秒让线程停止
+            sqlThreadParam.reset();
+        }
+
+        // 重置执行状态
+        sqlScriptSuccess = false;
+
+        // 创建线程参数
+        sqlThreadParam = std::make_unique<SqlThreadParam>(
+            paramString, userMessage, currentPresetName, memoryEnabled,
+            audioPath, textWeight, audioWeight, preferenceWeight
+        );
+
+        isSqlScriptRunning = true;
+        startThread(); // 启动新线程执行Python脚本
+    }
+    
+    // 回调方法用于在主线程中更新UI
+    void sqlScriptCompleted()
+    {
+        isSqlScriptRunning = false;
+        sqlThreadParam.reset();
+        
+        // 更新预设列表
+        loadPresetList();
+        
+        // 根据执行结果显示相应的弹窗
+        if (sqlScriptSuccess) {
+            // Success dialog - green check icon
+            juce::AlertWindow::showMessageBoxAsync(
+                juce::AlertWindow::InfoIcon,
+                "Execution Successful",
+                "SQL script executed successfully! Parameters have been saved to the database.",
+                "OK"
+            );
+            juce::Logger::writeToLog("SQL script completed successfully");
+        } else {
+            // Failure dialog - red cross icon
+            juce::AlertWindow::showMessageBoxAsync(
+                juce::AlertWindow::WarningIcon,
+                "Execution Failed",
+                "SQL script execution failed! Please check the logs or try again.",
+                "OK"
+            );
+            juce::Logger::writeToLog("SQL script failed");
+        }
+        
+        // 重置执行状态
+        sqlScriptSuccess = false;
+    }
+
+    void configureButton(juce::Button& button, const juce::String& buttonText)
+    {
+        button.setButtonText(buttonText);
+        button.addListener(this);
+        button.setColour(juce::TextButton::buttonColourId, juce::Colour(220, 235, 250));
+        button.setColour(juce::TextButton::buttonOnColourId, juce::Colour(255, 175, 100));
+        button.setColour(juce::TextButton::textColourOffId, juce::Colour(255, 160, 80));
+        addAndMakeVisible(button);
+    }
+
+    void loadPresetList()
+    {
+        presetList.clear(juce::dontSendNotification);
+        const auto allPresets = presetManager.getAllPresets();
+        const auto currentPreset = presetManager.getCurrentPreset();
+        presetList.addItemList(allPresets, 1);
+        presetList.setSelectedItemIndex(allPresets.indexOf(currentPreset), juce::dontSendNotification);
     }
 
 private:
@@ -342,147 +616,19 @@ private:
             paramString += "," + std::to_string(paramCount);
             juce::Logger::writeToLog("paramString:" + juce::String(paramString));
 
-            // 获取 Python 解释器和脚本路径
-            juce::File pythonInterpreterFile;
-            juce::File pythonScriptFile;
+            // 启动异步线程执行Python脚本
+            startSqlScriptAsync(
+                juce::String(paramString),
+                juce::String(userMessage),
+                juce::String(currentPresetName),
+                juce::String(memoryEnabled),
+                juce::String(audioPath),
+                juce::String(text_Weight_str),
+                juce::String(audio_Weight_str),
+                juce::String(preference_Weight_str)
+            );
 
-            const char* pythonInterpreterEnv = std::getenv("SUPERTONAL_PYTHON_INTERPRETER");
-            const char* pythonScriptEnv = std::getenv("SUPERTONAL_PYTHON_SCRIPT2");
-
-            juce::Logger::writeToLog("Raw interpreter env value: " +
-                (pythonInterpreterEnv != nullptr ? juce::String(pythonInterpreterEnv) : "null"));
-            juce::Logger::writeToLog("Raw script env value: " +
-                (pythonScriptEnv != nullptr ? juce::String(pythonScriptEnv) : "null"));
-
-            if (pythonInterpreterEnv != nullptr && pythonInterpreterEnv[0] != '\0') {
-                pythonInterpreterFile = juce::File(pythonInterpreterEnv);
-            }
-            else {
-                juce::File currentDir = juce::File::getCurrentWorkingDirectory();
-                juce::File projectDir = currentDir;
-                while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
-                    projectDir = projectDir.getParentDirectory();
-                }
-                pythonInterpreterFile = projectDir.getChildFile("Source/Components/PythonApplication/env/Scripts/python.exe");
-            }
-
-            if (pythonScriptEnv != nullptr && pythonScriptEnv[0] != '\0') {
-                pythonScriptFile = juce::File(pythonScriptEnv);
-            }
-            else {
-                juce::File currentDir = juce::File::getCurrentWorkingDirectory();
-                juce::File projectDir = currentDir;
-                while (projectDir.getFileName() != "supertonal" && projectDir.getParentDirectory() != projectDir) {
-                    projectDir = projectDir.getParentDirectory();
-                }
-                pythonScriptFile = projectDir.getChildFile("Source/sql.py");
-            }
-
-            const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
-            const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
-
-            juce::Logger::writeToLog("Python interpreter path: " + pythonInterpreterPath);
-            juce::Logger::writeToLog("Python script path: " + pythonScriptPath);
-
-            // 构建完整的命令行
-            std::string command = "\"" + pythonInterpreterPath.toStdString() + "\" \"" + pythonScriptPath.toStdString() + "\"";
-            command += " \"" + paramString + "\"";                    // 第一个参数: 所有效果器参数
-            command += " \"" + userMessage + "\"";                    // 第二个参数: 用户消息
-            command += " \"" + currentPresetName + "\"";              // 第三个参数: 当前预设名称
-            command += " \"" + memoryEnabled + "\"";                  // 第四个参数: 记忆功能状态
-            command += " \"" + audioPath + "\"";                      // 第五个参数: 音频文件路径
-            command += " " + text_Weight_str;                         // 第六个参数: 文字权重
-            command += " " + audio_Weight_str;                        // 第七个参数: 音频权重
-            command += " " + preference_Weight_str;                   // 第八个参数: 偏好权重
-
-            juce::Logger::writeToLog("Executing command: " + juce::String(command));
-
-#ifdef _WIN32
-            // Windows 特定的进程创建代码
-            STARTUPINFOA si = { sizeof(si) };
-            PROCESS_INFORMATION pi = { 0 };
-
-            // 设置启动信息，隐藏窗口
-            si.dwFlags = STARTF_USESHOWWINDOW;
-            si.wShowWindow = SW_HIDE;
-
-            // 创建进程
-            if (!CreateProcessA(
-                NULL,                                    // 应用程序名称
-                const_cast<LPSTR>(command.c_str()),     // 命令行
-                NULL,                                    // 进程安全属性
-                NULL,                                    // 线程安全属性
-                FALSE,                                   // 不继承句柄
-                CREATE_NO_WINDOW,                        // 创建标志：无窗口
-                NULL,                                    // 环境变量
-                NULL,                                    // 当前目录
-                &si,                                     // 启动信息
-                &pi                                      // 进程信息
-            )) {
-                DWORD error = GetLastError();
-                std::cerr << "CreateProcess failed with error: " << error << std::endl;
-                juce::Logger::writeToLog("Failed to execute Python script with error: " + juce::String(error));
-
-                // 如果 CreateProcess 失败，尝试使用 system() 作为备用方案
-                juce::Logger::writeToLog("Falling back to system() call");
-                int returnCode = std::system(command.c_str());
-                juce::Logger::writeToLog("System call return code: " + juce::String(returnCode));
-                return;
-            }
-
-            juce::Logger::writeToLog("Python process created successfully");
-
-            // 等待进程完成
-            DWORD waitResult = WaitForSingleObject(pi.hProcess, 30000); // 30秒超时
-
-            if (waitResult == WAIT_TIMEOUT) {
-                juce::Logger::writeToLog("Python process timed out, terminating...");
-                TerminateProcess(pi.hProcess, 1);
-                CloseHandle(pi.hProcess);
-                CloseHandle(pi.hThread);
-                return;
-            }
-            else if (waitResult == WAIT_FAILED) {
-                DWORD error = GetLastError();
-                juce::Logger::writeToLog("Wait failed with error: " + juce::String(error));
-            }
-
-            // 获取进程退出码
-            DWORD exitCode;
-            if (GetExitCodeProcess(pi.hProcess, &exitCode)) {
-                int returnCode = static_cast<int>(exitCode);
-                juce::Logger::writeToLog("Python script executed with return code: " + juce::String(returnCode));
-
-                if (returnCode != 0) {
-                    juce::Logger::writeToLog("Python script execution failed");
-                }
-                else {
-                    juce::Logger::writeToLog("Python script executed successfully");
-                }
-            }
-            else {
-                DWORD error = GetLastError();
-                juce::Logger::writeToLog("GetExitCodeProcess failed with error: " + juce::String(error));
-            }
-
-            // 清理句柄
-            CloseHandle(pi.hProcess);
-            CloseHandle(pi.hThread);
-
-#else
-            // 非 Windows 系统使用 system() 调用
-            juce::Logger::writeToLog("Using system() call for non-Windows platform");
-            int returnCode = std::system(command.c_str());
-
-            juce::Logger::writeToLog("Python script executed with return code: " + juce::String(returnCode));
-
-            if (returnCode != 0) {
-                juce::Logger::writeToLog("Python script execution failed");
-            }
-            else {
-                juce::Logger::writeToLog("Python script executed successfully");
-            }
-#endif
+            juce::Logger::writeToLog("SQL script started asynchronously");
         }
 
         if (button == &previousPresetButton)
@@ -522,30 +668,17 @@ private:
         }
     }
 
-    void configureButton(juce::Button& button, const juce::String& buttonText)
-    {
-        button.setButtonText(buttonText);
-        button.addListener(this);
-        button.setColour(juce::TextButton::buttonColourId, juce::Colour(220, 235, 250));
-        button.setColour(juce::TextButton::buttonOnColourId, juce::Colour(255, 175, 100));
-        button.setColour(juce::TextButton::textColourOffId, juce::Colour(255, 160, 80));
-        addAndMakeVisible(button);
-    }
-
-    void loadPresetList()
-    {
-        presetList.clear(juce::dontSendNotification);
-        const auto allPresets = presetManager.getAllPresets();
-        const auto currentPreset = presetManager.getCurrentPreset();
-        presetList.addItemList(allPresets, 1);
-        presetList.setSelectedItemIndex(allPresets.indexOf(currentPreset), juce::dontSendNotification);
-    }
-
     PluginAudioProcessor& audioProcessor;
     PluginPresetManager& presetManager;
     juce::UndoManager& undoManager;
     juce::TextButton undoButton, redoButton, saveButton, sqlButton, deleteButton, previousPresetButton, nextPresetButton, resetButton;
     juce::ComboBox presetList;
     std::unique_ptr<juce::FileChooser> fileChooser;
+    
+    // 异步线程相关成员
+    std::unique_ptr<SqlThreadParam> sqlThreadParam;
+    bool isSqlScriptRunning = false;
+    bool sqlScriptSuccess = false; // 跟踪脚本执行状态
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PresetComponent)
 };

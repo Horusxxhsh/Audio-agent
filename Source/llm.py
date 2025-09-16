@@ -84,7 +84,7 @@ def audio_to_vector(file_path):
 
 
 # 使用C盘固定路径连接到数据库
-db_dir = "C:\\MusicData"
+db_dir = os.environ.get('SUPERTONAL_DIR')
 if not os.path.exists(db_dir):
     os.makedirs(db_dir)  # 创建目录（如果不存在）
 db_path = os.path.join(db_dir, "music_info.db")
@@ -92,8 +92,7 @@ conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
 # 连接到外部音频信息数据库
-audio_db_dir = os.environ.get('SUPERTONAL_DIR')
-audio_db_path = os.path.join(audio_db_dir, "audio_info.db")
+audio_db_path = os.path.join(db_dir, "audio_info.db")
 audio_conn = sqlite3.connect(audio_db_path)
 audio_cursor = audio_conn.cursor()
 """
