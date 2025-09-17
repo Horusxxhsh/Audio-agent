@@ -52,6 +52,35 @@ def jaccard_similarity(set1, set2):
     union = len(set1.union(set2))
     return intersection / union if union != 0 else 0
 
+# 改进的标签相似度计算函数，考虑标签的语义相似度和权重
+def enhanced_tag_similarity(target_tags, hist_tags):
+    """增强的标签相似度计算，考虑语义相似度和权重"""
+    if not target_tags or not hist_tags:
+        return 0.0
+    
+    # 计算基础Jaccard相似度
+    base_similarity = jaccard_similarity(set(target_tags), set(hist_tags))
+    
+    # 计算精确匹配数量
+    exact_matches = len(set(target_tags).intersection(set(hist_tags)))
+    
+    # 计算语义相似度（基于标签的前缀/后缀匹配）
+    semantic_matches = 0
+    for target_tag in target_tags:
+        for hist_tag in hist_tags:
+            # 如果标签有共同前缀或后缀
+            if target_tag == hist_tag:
+                semantic_matches += 1  # 精确匹配已经计过，这里不再重复
+            elif (target_tag.replace('_rock', '') == hist_tag.replace('_rock', '')) or \
+                 (target_tag.replace('_metal', '') == hist_tag.replace('_metal', '')) or \
+                 (target_tag.replace('_rhythm', '') == hist_tag.replace('_rhythm', '')):
+                semantic_matches += 0.5  # 部分语义相似
+    
+    # 综合计算：基础相似度占70%，语义匹配占30%
+    enhanced_sim = base_similarity * 0.7 + (semantic_matches / max(len(target_tags), len(hist_tags))) * 0.3
+    
+    return enhanced_sim
+
 
 # 定义文本相似度函数
 def text_similarity(text1, text2):
@@ -631,7 +660,25 @@ if memoryEnabled == "true":
 
     # 直接使用result2中的tags和description作为检索内容
     target_tags = set(result2.get("tags", []))
-    target_description = " ".join(result2.get("description", []))
+    target_description = result2.get("description", [])
+    
+    # 解析特征标签，处理结构化数据（如 guitar_solo: blues_rock_pentatonic, aggressive_bends...）
+    parsed_features = []
+    for feature in target_description:
+        if isinstance(feature, str):
+            # 检查是否包含结构化数据（以分号分隔的部分）
+            if ";" in feature:
+                # 分割普通描述和结构化部分
+                parts = feature.split(";", 1)
+                parsed_features.append(parts[0].strip())  # 添加描述部分
+                # 可以在这里进一步解析结构化数据
+                structured_part = parts[1].strip()
+                if structured_part:
+                    parsed_features.append(structured_part)
+            else:
+                parsed_features.append(feature)
+    
+    target_description = " ".join(parsed_features)
     for pref_row in preference_rows:
         song_name = pref_row[0]
         param_str = pref_row[1]
@@ -660,18 +707,56 @@ if memoryEnabled == "true":
                     hist_features = []
 
                 # 计算相似度
-                tags_similarity = jaccard_similarity(set(target_tags), set(hist_style)) if target_tags and hist_style else 0.0
+                tags_similarity = enhanced_tag_similarity(target_tags, hist_style) if target_tags and hist_style else 0.0
                 
-                # 改进的描述相似度计算：考虑多个句子的匹配程度
+                # 改进的描述相似度计算：考虑结构化特征的匹配
                 if target_description and hist_features:
-                    # 计算每个历史描述句子与目标描述的相似度
                     desc_similarities = []
-                    for hist_feature in hist_features:
-                        if hist_feature.strip():  # 忽略空句子
-                            sim = text_similarity(target_description, hist_feature)
-                            desc_similarities.append(sim)
                     
-                    # 取最大相似度作为描述相似度（至少有一个句子匹配就算有效）
+                    # 将目标描述转换为查找关键词
+                    target_keywords = []
+                    if isinstance(target_description, str):
+                        target_keywords.extend(target_description.lower().split())
+                    else:
+                        # 如果是数组，每个元素可能是结构化数据
+                        for feature in target_description:
+                            if isinstance(feature, str):
+                                if ";" in feature:
+                                    # 处理结构化数据
+                                    parts = feature.split(";", 1)
+                                    target_keywords.extend(parts[0].lower().split())
+                                    # 添加结构化部分的关键词
+                                    if ":" in parts[1]:
+                                        tech_name, tech_details = parts[1].split(":", 1)
+                                        target_keywords.append(tech_name.strip())
+                                        target_keywords.extend([d.strip() for d in tech_details.split(",")])
+                                else:
+                                    target_keywords.extend(feature.lower().split())
+                    
+                    # 对每个历史特征计算相似度
+                    for hist_feature in hist_features:
+                        if hist_feature.strip():
+                            hist_keywords = []
+                            if ";" in hist_feature:
+                                # 处理历史记录中的结构化数据
+                                parts = hist_feature.split(";", 1)
+                                hist_keywords.extend(parts[0].lower().split())
+                                if ":" in parts[1]:
+                                    tech_name, tech_details = parts[1].split(":", 1)
+                                    hist_keywords.append(tech_name.strip())
+                                    hist_keywords.extend([d.strip() for d in tech_details.split(",")])
+                            else:
+                                hist_keywords.extend(hist_feature.lower().split())
+                            
+                            # 计算关键词交集相似度
+                            common_keywords = set(target_keywords) & set(hist_keywords)
+                            union_keywords = set(target_keywords) | set(hist_keywords)
+                            
+                            if union_keywords:
+                                keyword_similarity = len(common_keywords) / len(union_keywords)
+                                desc_similarities.append(keyword_similarity)
+                    
+                    # 取最大相似度作为描述相似度
                     desc_similarity = max(desc_similarities) if desc_similarities else 0.0
                     
                     # 如果历史记录有多个描述句子，给予额外奖励

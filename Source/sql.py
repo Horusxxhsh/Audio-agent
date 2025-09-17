@@ -429,6 +429,42 @@ def jaccard_similarity(set1, set2):
     union = len(set1.union(set2))
     return intersection / union if union != 0 else 0
 
+# 改进的标签相似度计算函数，考虑标签的语义相似度和权重
+def enhanced_tag_similarity(target_tags, hist_tags):
+    """增强的标签相似度计算，考虑语义相似度和权重"""
+    if not target_tags or not hist_tags:
+        return 0.0
+    
+    # 计算基础Jaccard相似度
+    base_similarity = jaccard_similarity(set(target_tags), set(hist_tags))
+    
+    # 计算精确匹配数量
+    exact_matches = len(set(target_tags).intersection(set(hist_tags)))
+    
+    # 计算语义相似度（基于标签的前缀/后缀匹配）
+    semantic_matches = 0
+    for target_tag in target_tags:
+        for hist_tag in hist_tags:
+            # 如果标签有共同前缀或后缀
+            if target_tag == hist_tag:
+                semantic_matches += 1  # 精确匹配已经计过，这里不再重复
+            elif (target_tag.replace('_rock', '') == hist_tag.replace('_rock', '')) or \
+                 (target_tag.replace('_metal', '') == hist_tag.replace('_metal', '')) or \
+                 (target_tag.replace('_rhythm', '') == hist_tag.replace('_rhythm', '')) or \
+                 (target_tag.replace('_riffing', '') == hist_tag.replace('_riffs', '')) or \
+                 (target_tag.replace('_riffs', '') == hist_tag.replace('_riffing', '')) or \
+                 (target_tag.replace('_solos', '') == hist_tag.replace('_solo', '')) or \
+                 (target_tag.replace('_solo', '') == hist_tag.replace('_solos', '')) or \
+                 (target_tag.replace('_influenced', '') == hist_tag.replace('_influenced_solos', '')) or \
+                 (target_tag == hist_tag.replace('_solos', '')) or \
+                 (hist_tag == target_tag.replace('_solos', '')):
+                semantic_matches += 0.5  # 部分语义相似
+    
+    # 综合计算：基础相似度占70%，语义匹配占30%
+    enhanced_sim = base_similarity * 0.7 + (semantic_matches / max(len(target_tags), len(hist_tags))) * 0.3
+    
+    return enhanced_sim
+
 
 # 定义文本相似度函数
 def text_similarity(text1, text2):
@@ -437,6 +473,38 @@ def text_similarity(text1, text2):
     vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform([text1, text2])
     return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+
+def parse_structured_features(feature_array):
+    """解析结构化特征数组，提取所有关键词"""
+    all_keywords = []
+    if isinstance(feature_array, list):
+        for feature in feature_array:
+            if isinstance(feature, str):
+                # 检查是否包含结构化数据（以分号分隔的部分）
+                if ";" in feature:
+                    # 分割普通描述和结构化部分
+                    parts = feature.split(";", 1)
+                    all_keywords.extend(parts[0].lower().split())
+                    # 添加结构化部分的关键词
+                    if ":" in parts[1]:
+                        tech_name, tech_details = parts[1].split(":", 1)
+                        all_keywords.append(tech_name.strip())
+                        all_keywords.extend([d.strip() for d in tech_details.split(",")])
+                else:
+                    all_keywords.extend(feature.lower().split())
+    elif isinstance(feature_array, str):
+        # 处理字符串格式的情况
+        if ";" in feature_array:
+            parts = feature_array.split(";", 1)
+            all_keywords.extend(parts[0].lower().split())
+            if ":" in parts[1]:
+                tech_name, tech_details = parts[1].split(":", 1)
+                all_keywords.append(tech_name.strip())
+                all_keywords.extend([d.strip() for d in tech_details.split(",")])
+        else:
+            all_keywords.extend(feature_array.lower().split())
+    
+    return list(set(all_keywords))  # 去重
 
 
 # 更新预设文件
@@ -508,13 +576,43 @@ def get_ratio(value):
 def update_parameters_to_database(parameters):
     # 只有记忆系统开启才会执行这部分代码
     if memoryEnabled == "true":
+        # 首先查询数据库中是否有与当前user_message匹配的记录
+        cursor.execute("SELECT SongName, Style, Feature, Parameters, Preferences FROM music_responses WHERE SongName = ?", (user_message,))
+        matched_row = cursor.fetchone()
+        
+        if matched_row:
+            # 如果找到匹配记录，使用数据库中的数据
+            song_name = matched_row[0]
+            style_str = matched_row[1]
+            feature_str = matched_row[2]
+            parameter_str = matched_row[3]
+            preferences_str = matched_row[4]
+            
+            print(f"从数据库获取匹配记录: {song_name}")
+            print(f"数据库style_str: {style_str}")
+            print(f"数据库feature_str: {feature_str}")
+        else:
+            # 如果没有匹配记录，回退到result1.txt和result2.txt文件
+            song_name = user_message
+            style_str = result1_str
+            feature_str = result2_str
+            parameter_str = result_str
+            preferences_str = 'edit'
+            
+            print(f"未找到数据库匹配记录，使用result文件: {song_name}")
+            print(f"result1_str: {style_str}")
+            print(f"result2_str: {feature_str}")
+        
         # 从数据库中获取所有歌曲信息并计算相似度,得到similar_songs和memory_notes
         cursor.execute("SELECT SongName, Style, Feature, Parameters, Preferences FROM music_responses")
         rows = cursor.fetchall()
         similar_songs = []
         memory_notes = []  # 存储 MemoryNote 实例的列表
+        
+        # 从结果中排除当前处理的记录
+        db_rows = [row for row in rows if row[0] != user_message]
 
-        for index, row in enumerate(rows, start=1):
+        for index, row in enumerate(db_rows, start=1):
             song_name = row[0]
             style_str = row[1]
             feature_str = row[2]
@@ -532,18 +630,37 @@ def update_parameters_to_database(parameters):
 
                     # 计算标签相似度
                     tags = set(style)
-                    tag_similarity = jaccard_similarity(result1_set, tags)
+                    tag_similarity = enhanced_tag_similarity(list(result1_set), list(tags))
                     
-                    # 改进的描述相似度计算：考虑多个句子的匹配程度
-                    if result2_str and feature:
-                        # 计算每个历史描述句子与目标描述的相似度
-                        desc_similarities = []
-                        for hist_feature in feature:
-                            if hist_feature.strip():  # 忽略空句子
-                                sim = text_similarity(result2_str, hist_feature)
-                                desc_similarities.append(sim)
+                    # 改进的描述相似度计算：考虑结构化特征的匹配
+                    # 使用从数据库或文件获取的feature_str
+                    target_features_str = feature_str
+                    if target_features_str and feature:
+                        # 解析目标特征（从数据库或文件读取的字符串可能是JSON数组或字符串）
+                        try:
+                            target_features = json.loads(target_features_str)
+                        except json.JSONDecodeError:
+                            target_features = target_features_str
                         
-                        # 取最大相似度作为描述相似度（至少有一个句子匹配就算有效）
+                        # 使用新的解析函数提取所有关键词
+                        target_keywords = parse_structured_features(target_features)
+                        desc_similarities = []
+                        
+                        # 对每个历史特征计算相似度
+                        for hist_feature in feature:
+                            if hist_feature.strip():
+                                # 解析历史特征
+                                hist_keywords = parse_structured_features(hist_feature)
+                                
+                                # 计算关键词交集相似度
+                                common_keywords = set(target_keywords) & set(hist_keywords)
+                                union_keywords = set(target_keywords) | set(hist_keywords)
+                                
+                                if union_keywords:
+                                    keyword_similarity = len(common_keywords) / len(union_keywords)
+                                    desc_similarities.append(keyword_similarity)
+                        
+                        # 取最大相似度作为描述相似度
                         desc_similarity = max(desc_similarities) if desc_similarities else 0.0
                         
                         # 如果历史记录有多个描述句子，给予额外奖励
@@ -555,7 +672,7 @@ def update_parameters_to_database(parameters):
                     # 加权总体相似度：标签相似度权重0.6，描述相似度权重0.4
                     similarity = tag_similarity * 0.6 + desc_similarity * 0.4
                     print(f"similarity:{similarity}")
-                    if similarity > 0.3:
+                    if similarity > 0.11:
                         similar_songs.append((song_name, similarity, style_str, feature_str, parameter_str))
                         # 存储检索到的歌曲的信息
                         # 限制memory_notes最大长度为3
@@ -597,7 +714,19 @@ def update_parameters_to_database(parameters):
                                         2. What specific actions should be taken (strengthen, update_neighbor)?
                                            2.1 If choose to strengthen the connection, which memory should it be connected to? Can you give the updated tags of this memory?
                                            2.2 If choose to update_neighbor, you must update the parameters of these memories based on the following rules:
-                                                   - For audio effectors (such as flangers, compressors, screamers, etc.), if a specific effector in the new memory unit is in the "On/Off" state (e.g., "FlangerOn/FlangerOff", indicating the flanger is activated/deactivated), while the same effector in an adjacent memory unit is in the "Off/On" state (e.g., "FlangerOff/FlangerOn", indicating the flanger is deactivated/activated), it is necessary to update the state of this effector in the adjacent memory unit to "On/Off" (e.g., replace "FlangerOff/FlangerOn" with "FlangerOn/FlangerOff") and adjust its specific parameter values. These specific parameter values should be as different as possible from those in the new memory unit, but the difference should not be excessive; additionally, the specific parameter values of each adjacent memory unit should not be identical to one another.
+                                                   - **CRITICAL MODULE STATE RULE - ABSOLUTE REQUIREMENT**: For ALL audio effectors (Driver, Phaser, Equaliser, Flanger, Chorus, Reverb, Delay, Screamer, Compressor):
+                                                     * IF CURRENT MEMORY HAS "DRIVEROFF" -> ALL NEIGHBORS MUST HAVE "DRIVEROFF" (Distortion: 0.0, Volume: -64.0)
+                                                     * IF CURRENT MEMORY HAS "PHASEROFF" -> ALL NEIGHBORS MUST HAVE "PHASEROFF" (Depth: 0.0, Feedback: 0.0, Frequency: -64.0, Width: -64.0)
+                                                     * IF CURRENT MEMORY HAS "CHORUSOFF" -> ALL NEIGHBORS MUST HAVE "CHORUSOFF" (Depth: 0.0, Frequency: 0.05, Width: 0.01)
+                                                     * IF CURRENT MEMORY HAS "FLANGEROFF" -> ALL NEIGHBORS MUST HAVE "FLANGEROFF" (Depth: 0.0, Feedback: 0.0, Frequency: 0.05, Width: 0.001)
+                                                     * IF CURRENT MEMORY HAS "DELAYOFF" -> ALL NEIGHBORS MUST HAVE "DELAYOFF" (Feedback: 0.0, Delay: 1.0, Mix: 0.0)
+                                                     * IF CURRENT MEMORY HAS "MODULEON" -> SET NEIGHBOR'S MODULE TO "MODULEON" BUT WITH DIFFERENT PARAMETER VALUES (DO NOT COPY EXACT VALUES FROM CURRENT MEMORY)
+                                                     * THIS RULE OVERRIDES ALL OTHER PARAMETER ADJUSTMENT RULES
+                                                     * DO NOT IGNORE "MODULEOFF" STATES IN CURRENT MEMORY
+                                                   - For audio effectors that are "On", create parameter values that are:
+                                                   * DIFFERENT from current memory (e.g., if current has Drive: 0.72, neighbor should have 0.65 or 0.80, etc.)
+                                                   * NOT identical between adjacent memories (each neighbor should have unique values)
+                                                   * REALISTIC for the audio effect type (don't create extreme values that would sound bad)
                                                    - For other parameters (i.e., the parameter values of effectors), adjustments shall be made based on an understanding of the characteristics of these memory units. For instance, if the parameter value of a certain adjacent memory unit is smaller/larger than the corresponding parameter value of the new memory unit, it is necessary to increase/decrease that parameter value accordingly. This ensures that these parameters are more consistent with the features and style of the new memory unit.
                                                    - If no update is needed for certain parameters, keep them the same as the original.
                                                    Generate the new parameters in the sequential order of the input neighbors.
@@ -817,8 +946,7 @@ else:
         """, (user_message, result_str, 'edit', result1_str, result2_str))
         conn.commit()
         update_parameters_to_database(parameters)
-        input("已新增记录，按回车键关闭窗口...")
-        sys.exit(1)
+        #input("已新增记录，按回车键关闭窗口...")
     # 如果有匹配的记录，则更新数据
     else:
         song_name = row[0]

@@ -527,7 +527,7 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     addAndMakeVisible(cancelAudioButton);
     cancelAudioButton.addListener(this);
     cancelAudioButton.setTooltip("Clear selected audio file");
-    cancelAudioButton.setEnabled(false);  // 初始状态下禁用，因为没有文件被选择
+    cancelAudioButton.setEnabled(true);  // 始终可用
 
     // 初始化接受和拒绝按钮
     addAndMakeVisible(acceptAudioButton);
@@ -777,8 +777,8 @@ void ChatComponent::buttonClicked(juce::Button* button)
                         audioFilePath.clear();
                         audioFileLabel.setText("No file selected", juce::dontSendNotification);
                         cancelAudioButton.setEnabled(false);  // 禁用取消按钮
-                        //acceptAudioButton.setEnabled(false);  // 禁用接受按钮
-                        //rejectAudioButton.setEnabled(false);  // 禁用拒绝按钮
+                        acceptAudioButton.setEnabled(false);  // 禁用接受按钮
+                        rejectAudioButton.setEnabled(false);  // 禁用拒绝按钮
 
                         // 隐藏音频权重控件，因为没有有效的音频文件
                         audioWeightLabel.setVisible(false);
@@ -805,7 +805,7 @@ void ChatComponent::buttonClicked(juce::Button* button)
         storeEnvWithType("audio_File_Path", "", "string");  // 清除环境变量
         storeEnvWithType("user_Message", "", "string");
         audioFileLabel.setText("No file selected", juce::dontSendNotification);  // 重置标签
-        cancelAudioButton.setEnabled(false);  // 禁用取消按钮，因为没有文件可以取消
+        cancelAudioButton.setEnabled(true);  // 取消按钮始终保持可用
 
         // 隐藏音频权重控件，因为没有音频文件
         audioWeightLabel.setVisible(false);
