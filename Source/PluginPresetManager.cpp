@@ -135,7 +135,7 @@ juce::StringArray PluginPresetManager::getAllPresets() const
 	return presets;
 }
 
-// 在 PluginPresetManager.cpp 中实现方法
+
 float PluginPresetManager::getParameterValue(const juce::String& parameterID) const
 {
 	auto parameter = valueTreeState.getParameter(parameterID);
@@ -143,7 +143,7 @@ float PluginPresetManager::getParameterValue(const juce::String& parameterID) co
 	{
 		return parameter->getValue();
 	}
-	return 0.0f; // 如果参数不存在，返回默认值 0.0f
+	return 0.0f; 
 }
 
 juce::String PluginPresetManager::getCurrentPreset() const

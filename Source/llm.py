@@ -17,72 +17,72 @@ import numpy as np
 import tempfile
 
 
-# 定义一个函数来安全地写入文件
+# Define a function to safely write files
 def safe_write_file(filename, content):
     try:
-        # 首先尝试在当前目录写入
+        # First try to write in current directory
         with open(filename, 'w', encoding='utf-8') as f:
             f.write(content)
-            print(f"文件已保存到当前目录: {os.path.abspath(filename)}")
+            print(f"File saved to current directory: {os.path.abspath(filename)}")
     except (IOError, PermissionError):
         try:
-            # 如果失败，尝试在环境变量指定的文档目录写入
-            docs_dir = os.environ.get('DOCUMENTS_DIR')  # 获取环境变量
+            # If failed, try to write in documents directory specified by environment variable
+            docs_dir = os.environ.get('DOCUMENTS_DIR')  # Get environment variable
 
             if docs_dir:
                 full_path = os.path.join(docs_dir, filename)
                 with open(full_path, 'w', encoding='utf-8') as f:
                     f.write(content)
-                print(f"文件已保存到文档目录: {full_path}")
+                print(f"File saved to documents directory: {full_path}")
             else:
-                # 如果环境变量不存在，抛出异常以进入下一个尝试
-                raise FileNotFoundError("环境变量 DOCUMENTS_DIR 未设置")
+                # If environment variable doesn't exist, throw exception to enter next attempt
+                raise FileNotFoundError("Environment variable DOCUMENTS_DIR not set")
 
         except (IOError, PermissionError, FileNotFoundError):
-            # 如果仍然失败，尝试在系统临时目录写入
+            # If still failed, try to write in system temporary directory
             temp_dir = tempfile.gettempdir()
             full_path = os.path.join(temp_dir, filename)
             with open(full_path, 'w', encoding='utf-8') as f:
                 f.write(content)
-            print(f"文件已保存到临时目录: {full_path}")
+            print(f"File saved to temporary directory: {full_path}")
 
-# 定义Jaccard相似度函数
+# Define Jaccard similarity function
 def jaccard_similarity(set1, set2):
     intersection = len(set1.intersection(set2))
     union = len(set1.union(set2))
     return intersection / union if union != 0 else 0
 
-# 改进的标签相似度计算函数，考虑标签的语义相似度和权重
+# Improved tag similarity calculation function considering semantic similarity and weights
 def enhanced_tag_similarity(target_tags, hist_tags):
-    """增强的标签相似度计算，考虑语义相似度和权重"""
+    """Enhanced tag similarity calculation considering semantic similarity and weights"""
     if not target_tags or not hist_tags:
         return 0.0
     
-    # 计算基础Jaccard相似度
+    # Calculate basic Jaccard similarity
     base_similarity = jaccard_similarity(set(target_tags), set(hist_tags))
     
-    # 计算精确匹配数量
+    # Calculate exact match count
     exact_matches = len(set(target_tags).intersection(set(hist_tags)))
     
-    # 计算语义相似度（基于标签的前缀/后缀匹配）
+    # Calculate semantic similarity (based on prefix/suffix matching of tags)
     semantic_matches = 0
     for target_tag in target_tags:
         for hist_tag in hist_tags:
-            # 如果标签有共同前缀或后缀
+            # If tags have common prefix or suffix
             if target_tag == hist_tag:
-                semantic_matches += 1  # 精确匹配已经计过，这里不再重复
+                semantic_matches += 1  # Exact match already counted, no double counting here
             elif (target_tag.replace('_rock', '') == hist_tag.replace('_rock', '')) or \
                  (target_tag.replace('_metal', '') == hist_tag.replace('_metal', '')) or \
                  (target_tag.replace('_rhythm', '') == hist_tag.replace('_rhythm', '')):
-                semantic_matches += 0.5  # 部分语义相似
+                semantic_matches += 0.5  # Partial semantic similarity
     
-    # 综合计算：基础相似度占70%，语义匹配占30%
+    # Comprehensive calculation: basic similarity accounts for 70%, semantic matching accounts for 30%
     enhanced_sim = base_similarity * 0.7 + (semantic_matches / max(len(target_tags), len(hist_tags))) * 0.3
     
     return enhanced_sim
 
 
-# 定义文本相似度函数
+# Define text similarity function
 def text_similarity(text1, text2):
     if not text1 or not text2:
         return 0.0
@@ -91,41 +91,41 @@ def text_similarity(text1, text2):
     return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
 
 def audio_to_vector(file_path):
-    # 加载预训练的处理器和模型
+    # Load pre-trained processor and model
     processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
     model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base-960h")
 
-    # 加载音频文件（librosa默认采样率为22050Hz，wav2vec2通常期望16000Hz）
+    # Load audio file (librosa default sample rate is 22050Hz, wav2vec2 usually expects 16000Hz)
     audio, sample_rate = librosa.load(file_path, sr=16000)
 
-    # 预处理音频：转换为输入特征
+    # Preprocess audio: convert to input features
     inputs = processor(audio, sampling_rate=16000, return_tensors="pt")
 
-    # 获取模型输出（不计算梯度以提高效率）
+    # Get model output (without computing gradients for efficiency)
     with torch.no_grad():
         outputs = model(**inputs)
 
-    # outputs.last_hidden_state是序列级特征，形状为 [1, seq_len, hidden_size]
-    # 可以通过平均等方式得到整个音频的向量表示
+    # outputs.last_hidden_state is sequence-level features, shape [1, seq_len, hidden_size]
+    # Can get vector representation of entire audio through averaging etc.
     audio_vector = outputs.last_hidden_state.mean(dim=1).squeeze()
 
-    return audio_vector.numpy()  # 转换为numpy数组返回
+    return audio_vector.numpy()  # Convert to numpy array and return
 
 
-# 使用C盘固定路径连接到数据库
+# Use fixed C path to connect to database
 db_dir = os.environ.get('SUPERTONAL_DIR')
 if not os.path.exists(db_dir):
-    os.makedirs(db_dir)  # 创建目录（如果不存在）
+    os.makedirs(db_dir)  # Create directory if it doesn't exist
 db_path = os.path.join(db_dir, "music_info.db")
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
-# 连接到外部音频信息数据库
+# Connect to external audio information database
 audio_db_path = os.path.join(db_dir, "audio_info.db")
 audio_conn = sqlite3.connect(audio_db_path)
 audio_cursor = audio_conn.cursor()
 """
-# 删除表
+# Drop table
 try:
     cursor.execute("DROP TABLE IF EXISTS music_responses")
     conn.commit()
@@ -133,7 +133,7 @@ try:
 except sqlite3.Error as e:
     print(f"An error occurred while dropping the table: {e}")
 """
-# 修改表结构，仅保留需要的列
+# Modify table structure, keep only required columns
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS music_responses (
     SongName TEXT PRIMARY KEY,
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS music_responses (
 ''')
 conn.commit()
 
-# 检查audio_vector表是否存在，若不存在则创建
+# Check if audio_vector table exists, create if not
 audio_cursor.execute('''
 CREATE TABLE IF NOT EXISTS audio_vector (
     Parameters TEXT PRIMARY KEY,
@@ -161,7 +161,7 @@ import platform
 if len(sys.argv) > 1:
     if platform.system() == "Windows":
         print(f"sys.argv: {len(sys.argv)}")
-        # Windows命令行通常使用GBK编码
+        # Windows command line usually uses GBK encoding
         chat_message = sys.argv[1].encode('cp936').decode('utf-8', errors='replace')
         memoryEnabled = sys.argv[2]
         file_path = ""
@@ -184,7 +184,7 @@ if len(sys.argv) > 1:
             preference_Weight = sys.argv[5]
             audio_Weight = sys.argv[6]
     else:
-        # Linux/macOS通常使用UTF-8
+        # Linux/macOS usually uses UTF-8
         chat_message = sys.argv[1]
         memoryEnabled = sys.argv[2]
         file_path = ""
@@ -236,125 +236,124 @@ print(f"audio_Weight: {audio_Weight}")
 print(f"File path: {file_path}")
 if file_path and file_path.strip():
     vector = audio_to_vector(file_path)
-    print("音频向量形状：", vector)
+    print("Audio vector shape:", vector)
 else:
-    vector = None  # 或空列表[]，根据后续使用场景确定
-    print("未提供有效的文件路径，音频向量为空")
+    vector = None  # or empty list [], determine based on subsequent usage scenarios
+    print("No valid file path provided, audio vector is empty")
 
-# 创建对话历史列表
+# Create conversation history list
 conversation_history = []
-# 第二个系统提示(风格和特征提示词)
+# Second system prompt (style and feature prompt)
 system_prompt2 = f"""
-你是资深音乐分析师与风格相似度检索描述顾问。基于用户输入 (变量: {chat_message}) 生成：
-  1) 精炼、结构化的风格与技巧标签 (tags)
-  2) 多条结合用户偏好的有助于检索“相似风格歌曲”的英文扩展描述 (description)
+You are a senior music analyst and style similarity search consultant. Based on user input (variable: {chat_message}) generate:
+  1) Refined, structured style and technique tags (tags)
+  2) Multiple English extended descriptions that incorporate user preferences and help search for "similar style songs"
 
-
-（多语言增强版：支持中文、英文、日文、韩文、西/葡/法/德/俄等歌曲名或情绪描述）
-
-==============================
-总体目标
-- tags：主风格 + 子风格/质感 + 技巧 / 结构特征；≤6；面向检索
-- description：2~6 条英语句子；不同维度；可含 1 条 token bundle；高信息密度、无冗余
+(Multilingual enhanced version: supports Chinese, English, Japanese, Korean, Spanish/Portuguese/French/German/Russian song names or emotional descriptions)
 
 ==============================
-阶段0 输入初判
-  - 分类：明确音乐 / 可能音乐相关（情绪或可映射风格） / 非音乐
-  - 若明显非音乐 → 输出 {{ "tags": [], "description": [] }}
-  - 若仅给出疑似歌曲名（任一语种）→ 尝试歌曲名识别与风格推断
+Overall Goals
+- tags: main style + sub-styles/textures + techniques/structural features; ≤6; search-oriented
+- description: 2~6 English sentences; different dimensions; can include 1 token bundle; high information density, no redundancy
 
 ==============================
-阶段1 信息抽取 (Extraction)
-  A. 通用抽取：
-    - 歌曲 / 艺人（仅内部参考，不直接输出名称）
-    - 风格 / 子风格（post-rock, math_rock, jazz_fusion, shoegaze, dream_pop, city_pop, britpop, synthwave, vaporwave, gothic_metal, symphonic_metal, melodic_death_metal, bossa_nova_fusion, tango_nuevo, latin_rock, reggaeton, k_indie, j_rock, visual_keI(若有强烈视觉系暗示则可转化为 japanese_alternative_rock + theatrical_aesthetic)，k_pop_ballad 等）
-    - 情绪/氛围：melancholic / uplifting / introspective / ethereal / brooding / nostalgic / cinematic / aggressive / dreamy 等
-    - 时代信号：80s/90s/2000s/modern（仅在文本或风格显著暗示，如 city_pop → 80s inspired；synthwave → 80s retro；britpop → 90s；vaporwave → retro_digital）
-    - 技巧词：tapping, sweep, legato, hybrid_picking, polyrhythm, syncopated, palm_mute, ambient_swells, fuzz, clean_arpeggios, layered_delays, reverse_reverb, sidechain_pulse, gated_reverb
-    - 音色词：clean, glassy, chimey, mid-gain, saturated, high-gain, fuzzy, reverb-drenched, modulated, tape_warmth, compressed, lo_fi, analog, shimmering
-    - 节奏/速度：slow, mid-tempo 100-110 bpm, fast, driving 120+, syncopated groove, straight 16ths, swung, polyrhythmic, halftime, reggaeton_dembow
-    - 和声/调式：modal, aeolian melancholy, dorian tint, lydian lift, extended jazz chords, chromatic tension-release, droning pedal, pentatonic lyrical, harmonic_minor_color
-    - 纹理 / 编配：layered guitars, sparse minimal space, dense wall-of-sound, shimmering delay pads, pulsating synth bass, atmospheric pads, rhythmic stabs, cinematic swells
-  B. 多参考冲突处理：取主频率 + 用户明确强调；不强行融合对立风格除非文本暗示 hybrid
-  C. 纯情绪输入映射（跨语言）： 
-     - “孤独/宇宙/空/冷/寂静” → cinematic_ambient / atmospheric_post_rock / spacey_dream_pop
-     - “厚重/压抑/泥泞” → doom / sludge / dark_post_metal
-     - “律动/舞动/节奏感” → funk_rock / disco_funk / groove_metal / nu_disco
-     - “迷幻/恍惚” → psychedelic_rock / space_rock / shoegaze / dream_pop
-     - “复杂/错综/变拍/多层” → math_rock / progressive_metal / polyrhythmic_fusion
-     - “温柔/治愈/疗愈/抚慰” → dreamy_ambient / clean_post_rock / soft_dream_pop / lofi_chill
-     - “怀旧/复古” → retro_synthwave / city_pop_influence / vintage_analog_texture / nostalgic_90s_alt
-  D. 多语言情绪词（内部映射，示例）：
-     - 日文：切ない=melancholic, 懐かしい=nostalgic, 激しい=aggressive
-     - 韩文：우울한=melancholic, 몽환적인=dreamy, 강렬한=intense
-     - 西语：melancólico=melancholic, atmosférico=atmospheric, bailable=danceable
-     - 葡语：sonhador=dreamy, pesado=heavy, suave=soft
-     - 法语：rêveur=dreamy, nostalgique=nostalgic
-     - 德语：melancholisch=melancholic, treibend=driving
-     - 俄语：мрачный=dark, атмосферный=atmospheric
+Stage 0 Input Initial Judgment
+  - Classification: clear music / potentially music-related (emotions or mappable styles) / non-music
+  - If clearly non-music → output {{ "tags": [], "description": [] }}
+  - If only suspected song name (any language) → attempt song name recognition and style inference
 
 ==============================
-多语言歌曲名识别与风格推断 (关键增强)
-  1. 识别：若输入主要由（中文 / 假名 / 韩文 / 拉丁字母 + 少量标点/空格）构成且长度 2~40，无明确普通句式 → 优先视作“歌曲 / 标题片段”
-  2. 规范化：
-     - 去除引号、全角空格、尾部语气词，大小写统一
-     - 去除常见前后缀（如 "歌曲", "歌", "lyrics", "lyric", "翻唱"）
-     - 日文假名：片假名→平假名归一；可内部用于模糊匹配
-     - 去除重音与变音 (áàäâ→a, ñ→n, ü→u)
-  3. 模糊匹配策略（内部）：
-     - Levenshtein 距离 ≤ max(1, 标题长度*0.15) 视作可疑命中
-     - 去停用符号后 trigram Jaccard ≥0.72 视作可疑命中
-     - 中日韩：按字符 bigram；拉丁语系：按不含空格的子串与 n-gram
-  4. 可使用外部可注入词典（变量：{{multilingual_song_dict}} 若存在）：
-     - 结构建议:
+Stage 1 Information Extraction (Extraction)
+  A. General Extraction:
+    - Songs / Artists (for internal reference only, not directly output names)
+    - Styles / Substyles (post-rock, math_rock, jazz_fusion, shoegaze, dream_pop, city_pop, britpop, synthwave, vaporwave, gothic_metal, symphonic_metal, melodic_death_metal, bossa_nova_fusion, tango_nuevo, latin_rock, reggaeton, k_indie, j_rock, visual_keI (if strong visual kei hints, convert to japanese_alternative_rock + theatrical_aesthetic), k_pop_ballad, etc.)
+    - Mood/Atmosphere: melancholic / uplifting / introspective / ethereal / brooding / nostalgic / cinematic / aggressive / dreamy, etc.
+    - Era Signals: 80s/90s/2000s/modern (only when text or style significantly implies, e.g. city_pop → 80s inspired; synthwave → 80s retro; britpop → 90s; vaporwave → retro_digital)
+    - Technique Words: tapping, sweep, legato, hybrid_picking, polyrhythm, syncopated, palm_mute, ambient_swells, fuzz, clean_arpeggios, layered_delays, reverse_reverb, sidechain_pulse, gated_reverb
+    - Tone Words: clean, glassy, chimey, mid-gain, saturated, high-gain, fuzzy, reverb-drenched, modulated, tape_warmth, compressed, lo_fi, analog, shimmering
+    - Rhythm/Tempo: slow, mid-tempo 100-110 bpm, fast, driving 120+, syncopated groove, straight 16ths, swung, polyrhythmic, halftime, reggaeton_dembow
+    - Harmony/Mode: modal, aeolian melancholy, dorian tint, lydian lift, extended jazz chords, chromatic tension-release, droning pedal, pentatonic lyrical, harmonic_minor_color
+    - Texture / Arrangement: layered guitars, sparse minimal space, dense wall-of-sound, shimmering delay pads, pulsating synth bass, atmospheric pads, rhythmic stabs, cinematic swells
+  B. Multi-reference conflict handling: take main frequency + user emphasis; don't force fusion of conflicting styles unless text implies hybrid
+  C. Pure emotion input mapping (cross-language): 
+     - "lonely/cosmic/empty/cold/silent" → cinematic_ambient / atmospheric_post_rock / spacey_dream_pop
+     - "heavy/oppressive/muddy" → doom / sludge / dark_post_metal
+     - "rhythmic/dancing/beat" → funk_rock / disco_funk / groove_metal / nu_disco
+     - "psychedelic/dreamy" → psychedelic_rock / space_rock / shoegaze / dream_pop
+     - "complex/complicated/time signature changes/multi-layered" → math_rock / progressive_metal / polyrhythmic_fusion
+     - "gentle/healing/therapeutic/comforting" → dreamy_ambient / clean_post_rock / soft_dream_pop / lofi_chill
+     - "nostalgic/vintage" → retro_synthwave / city_pop_influence / vintage_analog_texture / nostalgic_90s_alt
+  D. Multilingual emotion words (internal mapping, examples):
+     - Japanese: setsunai=melancholic, natsukaかしい=nostalgic, gekishii=aggressive
+     - Korean: 우울한=melancholic, 몽환적인=dreamy, 강렬한=intense
+     - Spanish: melancólico=melancholic, atmosférico=atmospheric, bailable=danceable
+     - Portuguese: sonhador=dreamy, pesado=heavy, suave=soft
+     - French: rêveur=dreamy, nostalgique=nostalgic
+     - German: melancholisch=melancholic, treibend=driving
+     - Russian: мрачный=dark, атмосферный=atmospheric
+
+==============================
+Multilingual Song Name Recognition and Style Inference (Key Enhancement)
+  1. Recognition: If input consists mainly of (Chinese / kana / Korean / Latin alphabet +少量标点/空格) and length 2~40, no clear regular sentence structure → prioritize as "song title fragment"
+  2. Normalization:
+     - Remove quotes, full-width spaces, ending particles, unify case
+     - Remove common prefixes/suffixes (e.g. "song", "song", "lyrics", "lyric", "cover")
+     - Japanese kana: katakana → hiragana normalization; can be used for fuzzy matching internally
+     - Remove accents and diacritics (áàäâ→a, ñ→n, ü→u)
+  3. Fuzzy matching strategy (internal):
+     - Levenshtein distance ≤ max(1, title length*0.15) considered suspicious hit
+     - After removing stop symbols, trigram Jaccard ≥0.72 considered suspicious hit
+     - Chinese/Japanese/Korean: by character bigram; Latin languages: by substring without spaces and n-grams
+  4. External injectable dictionary (if exists, variable: {{multilingual_song_dict}}):
+     - Structure suggestion:
        {{
-         "zh": {{"灰色轨迹": {{"artist":"Beyond","style_hints":["cantonese_rock","melodic_emotional_rock"]}}}},
-         "ja": {{"残酷な天使のテーゼ": {{"style_hints":["anime_theme","90s_j_rock","anthemic"]}}}},
+         "zh": {{"Grey Track": {{"artist":"Beyond","style_hints":["cantonese_rock","melodic_emotional_rock"]}}}},
+         "ja": {{"cruelなtenshiのテーゼ": {{"style_hints":["anime_theme","90s_j_rock","anthemic"]}}}},
          "ko": {{"너의 의미": {{"style_hints":["k_pop_ballad","soft_acoustic"]}}}},
          "es": {{"despacito": {{"style_hints":["latin_pop","reggaeton","tropical_influence"]}}}}
        }}
-     - 若未注入则使用内部常识高频列表（不外显）
-  5. 高置信度命中时：
-     - 利用 style_hints 抽象出检索标签（不输出艺人名）
-     - 若 style_hints 中含地域/时代/结构特征，可择最具区分度 1~2 个作为 tags 前部
-  6. 低置信度或冲突：
-     - 不臆造具体歌曲；改用情绪 + 质感泛化
-  7. 永不在输出 description 中直接写真实艺人名（保持可泛化检索）
+     - If not injected, use internal common high-frequency list (not externally visible)
+  5. High confidence hit:
+     - Use style_hints to extract search tags (do not output artist names)
+     - If style_hints contain regional/era/structural features, choose 1~2 most distinctive as tag prefixes
+  6. Low confidence or conflict:
+     - Don't invent specific songs; use emotion + texture generalization instead
+  7. Never write actual artist names directly in output description (maintain generalizable search)
 
 ==============================
-跨语言风格归纳补充（仅在文本或映射暗示时使用）：
-  - city_pop：smooth_groove, soft_fusion_chords, retro_80s_gloss
-  - j_rock / japanese_alternative_rock：melodic hooks + emotive anthemic lift
-  - shoegaze：washed_fuzzy_layers, reverb_drenched_wall, hazy_vocals
-  - dream_pop：lush_airy_textures, soft_etherial_pads
-  - k_indie：intimate_clean_tones, mellow_midtempo
-  - latin_rock / latin_pop：rhythmic_percussion_layers, syncopated_groove, bright_melodic
-  - reggaeton：dembow_pattern, syncopated_percussion, tropical_atmosphere
-  - bossa_nova_fusion：soft syncopated jazz-influenced chords, gentle swing
-  - nordic_melodeath：melodic_harmonic_minor_riffs + driving double_kick（仅在明确极端金属信号时）
-  - synthwave：retro_analog_synths, steady_four_on_floor, neon_atmosphere
-  - vaporwave：lo_fi_sampled_loops, detuned_retro, slowed_reverbed_aesthetic
+Cross-lingual Style Inference Supplement (use only when text or mapping implies):
+  - city_pop: smooth_groove, soft_fusion_chords, retro_80s_gloss
+  - j_rock / japanese_alternative_rock: melodic hooks + emotive anthemic lift
+  - shoegaze: washed_fuzzy_layers, reverb_drenched_wall, hazy_vocals
+  - dream_pop: lush_airy_textures, soft_etherial_pads
+  - k_indie: intimate_clean_tones, mellow_midtempo
+  - latin_rock / latin_pop: rhythmic_percussion_layers, syncopated_groove, bright_melodic
+  - reggaeton: dembow_pattern, syncopated_percussion, tropical_atmosphere
+  - bossa_nova_fusion: soft syncopated jazz-influenced chords, gentle swing
+  - nordic_melodeath: melodic_harmonic_minor_riffs + driving double_kick (only when clear extreme metal signals)
+  - synthwave: retro_analog_synths, steady_four_on_floor, neon_atmosphere
+  - vaporwave: lo_fi_sampled_loops, detuned_retro, slowed_reverbed_aesthetic
 
 ==============================
-阶段2 风格推断 (Genre Inference)
-  - 基于抽取 & 多语言推断：给出 1~3 个具体方向（优先具体细分而非 broad）
-  - 允许地域/时代与质感组合：e.g. cantonese_melodic_rock, 90s_britpop_atmospheric, retro_synthwave, latin_pop_reggaeton, japanese_dream_pop
-  - 无足够信号：可用 broad+质感（ambient_dreamy, dark_atmospheric, melodic_clean）
+Stage 2 Style Inference (Genre Inference)
+  - Based on extraction & multilingual inference: give 1~3 specific directions (prefer specific subdivisions over broad)
+  - Allow regional/era + texture combinations: e.g. cantonese_melodic_rock, 90s_britpop_atmospheric, retro_synthwave, latin_pop_reggaeton, japanese_dream_pop
+  - Insufficient signals: can use broad+texture (ambient_dreamy, dark_atmospheric, melodic_clean)
 
 ==============================
-阶段3 标签构建 (Tags)
-  规则：
-    1. 数量 ≤6
-    2. 小写英文字母/数字/下划线/短横线
-    3. 排序：主/核心风格 → 次风格/地域/时代 → 质感/技巧 (ambient_swells, layered_textures, polyrhythmic_pulse, melodic_emotion, fuzzy_wall, clean_arpeggios, syncopated_groove)
-    4. 不重复；不产生未被暗示的极窄标签
-    5. 高置信度歌曲匹配：包含最具区分度地域或风格标签（≤2）；避免仅 "rock"
-    6. 信息不足：tags=[]
+Stage 3 Tag Construction (Tags)
+  Rules:
+    1. Quantity ≤6
+    2. Lowercase letters/numbers/underscores/dashes
+    3. Order: main/core style → substyles/regions/eras → textures/techniques (ambient_swells, layered_textures, polyrhythmic_pulse, melodic_emotion, fuzzy_wall, clean_arpeggios, syncopated_groove)
+    4. No duplicates; don't create very narrow tags not implied
+    5. High confidence song match: include most distinctive regional or style tags (≤2); avoid only "rock"
+    6. Insufficient information: tags=[]
 
 ==============================
-阶段4 英文扩展检索描述 (Descriptions for Similarity Retrieval)
-  - 2~6 条；每条 14~30 英文单词（信息极少可 ≥10）
-  - 各条侧重点不同，可组合维度：
+Stage 4 English Extended Search Descriptions (Descriptions for Similarity Retrieval)
+  - 2~6 sentences; each 14~30 English words (very little info can be ≥10)
+  - Each sentence has different focus, can combine dimensions:
      * Style / Subgenre Layering
      * Mood & Emotional Color
      * Tempo & Rhythmic Feel
@@ -364,91 +363,91 @@ system_prompt2 = f"""
      * Tone & Production
      * Dynamic / Structural Arc
      * Abstract Influence Qualifiers
-     * Token Bundle (1 条可用逗号分隔密集 tokens)
-  - 不出现中文 / 不写真实艺人名
-  - 不重复语序模板
-  - 若仍缺少信息：至少 1 条含 "general stylistic inference"
-  - Token bundle 示例格式：
+     * Token Bundle (1 sentence can use comma-separated dense tokens)
+  - No Chinese / no actual artist names
+  - No repeated sentence templates
+  - If still missing information: at least 1 contains "general stylistic inference"
+  - Token bundle example format:
      "melodic cantonese rock, emotional mid-gain guitars, clean-crunch layering, moderate tempo, lyrical phrasing, gradual lift"
 
 ==============================
-阶段5 质量与合规校验
-  - 去重句子
-  - 无中文、无未闭合引号、无艺人名
-  - 若无法确定音乐特征 → 输出 {{ "tags": [], "description": [] }}
+Stage 5 Quality & Compliance Check
+  - Remove duplicate sentences
+  - No Chinese, no unclosed quotes, no artist names
+  - If cannot determine musical features → output {{ "tags": [], "description": [] }}
 
 ==============================
-防幻觉与约束
-  - 不凭单一情绪词直接推断高度具体亚流派
-  - 没有节奏/多节奏暗示不写 polyrhythmic_pulse
-  - 没有重型失真不写 death_metal / djent 等
-  - 多语言标题若不在映射 / 字典且无上下文，不创造虚构风格
-  - 不把常见单词误判为曲名（如 "love", "rain" 单独出现 → 视作情绪/主题，除非格式强烈指向标题）
+Hallucination Prevention & Constraints
+  - Don't infer highly specific subgenres based on single emotion words
+  - No rhythm/multiple rhythm hints → don't write polyrhythmic_pulse
+  - No heavy distortion → don't write death_metal / djent, etc.
+  - Multilingual titles not in mapping/dictionary and no context → don't create fictional styles
+  - Don't misinterpret common words as song names (e.g. "love", "rain" alone → treat as emotion/theme unless format strongly indicates title)
 
 ==============================
-外部可注入资源（可选）
-  - {{multilingual_song_dict}} 若存在：
-    * 优先使用其 style_hints 补强标签
-    * 未匹配则按常规推断
-  - 允许未来扩展 {{style_alias_map}} 将用户俗称映射到规范标签（内部：{{"shoegazing":"shoegaze","mathrock":"math_rock"}}）
+External Injectable Resources (Optional)
+  - {{multilingual_song_dict}} if exists:
+    * Priority use its style_hints to strengthen tags
+    * If no match, use normal inference
+  - Future expansion {{style_alias_map}} to map user common terms to standard tags (internal: {{"shoegazing":"shoegaze","mathrock":"math_rock"}})
 
 ==============================
-输出格式（唯一合法）
+Output Format (Only Legal)
 {{
   "tags": ["tag1","tag2"],
   "description": ["sentence 1","sentence 2"]
 }}
 
 ==============================
-执行
-  - 基于 {chat_message} 完成分析，仅输出最终 JSON
+Execution
+  - Complete analysis based on {chat_message}, output only final JSON
 
 """
 
 user_prompt2 = f"""
-请根据：{chat_message}，
-1. 分析其具体音乐风格（尽量细致）。
-2. 生成 tags（英文、小写、具体）。
-3. 用英文描述吉他 solo 的可能演奏特点（数组形式，2~6 条）。
+Please based on: {chat_message},
+1. Analyze its specific music style (as detailed as possible).
+2. Generate tags (English, lowercase, specific).
+3. Describe possible guitar solo playing characteristics in English (array format, 2~6 sentences).
 
-仅输出 JSON（含 keys: tags, description），不要其它文本。
+Only output JSON (with keys: tags, description), no other text.
 """
 
-# 保存系统消息
+# Save system message
 system_message = {"role": "system", "content": system_prompt2}
 conversation_history.append(system_message)
-# 保存用户消息
+# Save user message
 user_message = {"role": "user", "content": user_prompt2}
 conversation_history.append(user_message)
-# 发送请求
+# Send request
 response2 = client.chat.completions.create(
     model="deepseek-chat",
     messages=[system_message, user_message],
     stream=False
 )
-# 保存助手回复
+# Save assistant reply
 assistant_message = {
     "role": "assistant",
     "content": response2.choices[0].message.content
 }
 conversation_history.append(assistant_message)
 
-# 获取 response2 响应数据并转换为 JSON
+# Get response2 response data and convert to JSON
 response_content2 = response2.choices[0].message.content
-# 去除前后的代码块标记和换行
+# Remove code block markers and newlines from front and back
 cleaned_content2 = response_content2.replace("```json", "").replace("```", "").strip()
 try:
     result2 = json.loads(cleaned_content2)
     result2_str = json.dumps(result2, ensure_ascii=False)
-    # 获取歌曲的风格
+    # Get song style
     song_style = result2.get("tags", [])
-    # 获取吉他演奏的特点
+    # Get guitar playing characteristics
     guitar_features = result2.get("description", [])
-    # 打印信息
-    print(f"风格: {song_style}")
-    print(f"吉他演奏的特点: {guitar_features}")
+    # Print information
+    print(f"Style: {song_style}")
+    print(f"Guitar playing characteristics: {guitar_features}")
 except json.JSONDecodeError:
-    print(f"Error: 无效的JSON响应: {cleaned_content2}")
+    print(f"Error: Invalid JSON response: {cleaned_content2}")
     sys.exit(1)
 
 effectors = [
@@ -456,153 +455,153 @@ effectors = [
         "name": "compression",
         "example_with": '{"CompressorOn":{"Threshold":-24.0,"Ratio":4.0,"Attack":0.012,"Release":0.180,"Makeup":6.0,"Mix":0.85}}',
         "prompt_with": (
-            f"基于风格标签(若已生成): {song_style} 与原始描述: {chat_message} 。"
-            "任务: 为吉他或总线路(根据语义自行判断)生成压缩器设置 JSON。"
-            "\n参数要求："
-            "\n1) Threshold (-128.00~0.00 dB, 越激进=值越低；清透保动态=偏高 -20~-10；强烈挤压= -40~-25 或更低)。"
-            "\n2) Ratio (1~100, 轻柔:1.5~3；常规控制:3~6；高度控制/现代金属:6~12；限制器式挤压:>12)。"
-            "\n3) Attack (0.00~1.00 ms, 数值越小越快。保留瞬态=略放大 ~0.10~0.30；金属高致密=极快 <0.05；若为营造呼吸感可适度放慢 >0.30)。"
-            "\n4) Release (0.00~1.00 ms，模拟这里是“秒的小数”概念，需相对 Attack 更长；平滑自然=0.10~0.30；泵感=0.05~0.12；持续铺垫氛围可更长 0.30~0.60)。"
-            "\n5) Makeup (-128.00~64.00 dB，补偿压缩导致的增益降低。轻压缩 2~6 dB；强压缩 8~14；若阈值极低再适度提升)。"
-            "\n6) Mix (0.00~1.00 并行压缩混合，保动态=0.5~0.8；激进致密=0.9~1.0；透明保原味=0.3~0.5)。"
-            "\n逻辑映射指南："
-            "\n- ‘ambient, atmospheric, post-rock, cinematic’：较温和阈值(>-30)，较低 Ratio(2~4)，中等较慢 Attack 以保瞬态，较长 Release，Mix 偏高并行保原声。"
-            "\n- ‘progressive_metal, djent, modern metal’：低阈值(-45~-30)，高 Ratio(6~10+)，极快 Attack，较快 Release 防止拖尾，较高 Makeup。"
-            "\n- ‘blues, vintage, expressive’：阈值中等(-28~-20)，Ratio 2~4，Attack 适中(0.10~0.25)，Release 中等自然，Makeup 适度，Mix 0.6~0.8。"
-            "\n- 若标签指向“dynamic, touch, expressive”为主，避免过度压缩。"
-            "\n- 若无法确定风格，使用 neutral 设定：Threshold -24, Ratio 3, Attack 0.08, Release 0.18, Makeup 4, Mix 0.7。"
-            "\n输出：只返回 JSON："
+            f"Based on style tags (if generated): {song_style} and original description: {chat_message}."
+            "Task: Generate compressor settings JSON for guitar or main bus (judge based on semantics)."
+            "\nParameter requirements:"
+            "\n1) Threshold (-128.00~0.00 dB, more aggressive=lower value; clear and dynamic preservation=higher -20~-10; heavy compression= -40~-25 or lower)."
+            "\n2) Ratio (1~100, gentle:1.5~3; normal control:3~6; high control/modern metal:6~12; limiter compression:>12)."
+            "\n3) Attack (0.00~1.00 ms, smaller value=faster. Preserve transient=slightly amplified ~0.10~0.30; metal high density=very fast <0.05; if creating breathing feeling can appropriately slow down >0.30)."
+            "\n4) Release (0.00~1.00 ms, simulating 'second decimal' concept, relatively longer than Attack; smooth natural=0.10~0.30; pumping feel=0.05~0.12; longer for continuous atmosphere 0.30~0.60)."
+            "\n5) Makeup (-128.00~64.00 dB, compensate gain reduction from compression. Light compression 2~6 dB; strong compression 8~14; if threshold very low, appropriately increase)."
+            "\n6) Mix (0.00~1.00 parallel compression mix, preserve dynamic=0.5~0.8; aggressive dense=0.9~1.0; transparent preserve original=0.3~0.5)."
+            "\nLogic mapping guide:"
+            "\n- 'ambient, atmospheric, post-rock, cinematic': relatively mild threshold(>-30), lower Ratio(2~4), medium slower Attack to preserve transient, longer Release, higher Mix parallel for original sound."
+            "\n- 'progressive_metal, djent, modern metal': low threshold(-45~-30), high Ratio(6~10+), very fast Attack, faster Release to prevent dragging, higher Makeup."
+            "\n- 'blues, vintage, expressive': medium threshold(-28~-20), Ratio 2~4, moderate Attack(0.10~0.25), medium natural Release, appropriate Makeup, Mix 0.6~0.8."
+            "\n- If tags mainly point to 'dynamic, touch, expressive', avoid excessive compression."
+            "\n- If style cannot be determined, use neutral setting: Threshold -24, Ratio 3, Attack 0.08, Release 0.18, Makeup 4, Mix 0.7."
+            "\nOutput: only return JSON:"
             '\n{"CompressorOn":{"Threshold":<float>,"Ratio":<float>,"Attack":<float>,"Release":<float>,"Makeup":<float>,"Mix":<float>}}'
-            "\n确保数值在范围内，保留 2~3 位小数，无额外文本。"
+            "\nEnsure values are within range, keep 2~3 decimal places, no extra text."
         )
     },
     {
         "name": "distortion",
         "example_with": '{"DriverOn":{"Distortion":0.70,"Volume":-18.4}}',
         "prompt_with": (
-            f"基于风格标签 {song_style} 与原始描述 {chat_message} ，生成失真器参数。"
-            "\n参数：Distortion 0.00~1.00 (驱动强度)，Volume -64.0~0.0 dB (输出补偿)。"
-            "\n风格映射："
-            "\n- ‘high gain metal / djent / modern shred’：Distortion 0.75~0.95；Volume 视链路适度负补偿(-24~-12)。"
-            "\n- ‘classic rock / blues rock’：Distortion 0.40~0.65；Volume -18~-6。"
-            "\n- ‘fusion / expressive mid-gain’：Distortion 0.45~0.60；Volume -12~-4。"
-            "\n- ‘ambient / clean emphasis’：Distortion 0.05~0.25；Volume -6~-2。"
-            "\n- 若后接过载器(出现 screamer / overdrive / boost 语义)则此处 Distortion 略收敛。"
-            "\n若信息不足使用中性：Distortion 0.55, Volume -12。"
-            '\n输出 JSON: {"DriverOn":{"Distortion":<float>,"Volume":<float>}}'
-            "\n只输出 JSON，数值合法，2~3 位小数。"
+            f"Based on style tags {song_style} and original description {chat_message}, generate distortion parameters."
+            "\nParameters: Distortion 0.00~1.00 (drive strength), Volume -64.0~0.0 dB (output compensation)."
+            "\nStyle mapping:"
+            "\n- 'high gain metal / djent / modern shred': Distortion 0.75~0.95; Volume moderately negative compensation based on chain (-24~-12)."
+            "\n- 'classic rock / blues rock': Distortion 0.40~0.65; Volume -18~-6。"
+            "\n- 'fusion / expressive mid-gain': Distortion 0.45~0.60; Volume -12~-4。"
+            "\n- 'ambient / clean emphasis': Distortion 0.05~0.25; Volume -6~-2。"
+            "\n- If followed by overdrive (screamer / overdrive / boost semantics), Distortion slightly converges here."
+            "\nIf insufficient information, use neutral: Distortion 0.55, Volume -12。"
+            '\nOutput JSON: {"DriverOn":{"Distortion":<float>,"Volume":<float>}}'
+            "\nOnly output JSON, valid values, 2~3 decimal places."
         )
     },
     {
         "name": "overload",
         "example_with": '{"ScreamerOn":{"Drive":0.82,"Tone":0.55,"Level":-18.3}}',
         "prompt_with": (
-            f"基于 {song_style} 与 {chat_message} 生成过载(Screamer类)参数。"
-            "\n参数范围：Drive 0.00~1.00；Tone 0.00~1.00（重点调中高频咬合度）；Level -64.00~0.00 dB。"
-            "\n风格映射："
-            "\n- 用作前级 tighten（金属、djent）：Drive 0.25~0.45，Tone 0.55~0.70，Level -18~-8。"
-            "\n- 主音中增亮 sustain（fusion / prog lead）：Drive 0.50~0.70，Tone 0.50~0.62，Level -14~-6。"
-            "\n- 复古/布鲁斯：Drive 0.55~0.80，Tone 0.40~0.55，Level -10~-4。"
-            "\n- 只需轻微 edge：Drive 0.20~0.35，Tone 0.45~0.55，Level -12~-6。"
-            "\n中性回退：Drive 0.60, Tone 0.52, Level -12。"
-            '\n输出 JSON: {"ScreamerOn":{"Drive":<float>,"Tone":<float>,"Level":<float>}}'
-            "\n仅 JSON，无解释。"
+            f"Based on {song_style} and {chat_message}, generate overload (Screamer type) parameters."
+            "\nParameter range: Drive 0.00~1.00; Tone 0.00~1.00 (focus on mid-high frequency bite); Level -64.00~0.00 dB。"
+            "\nStyle mapping:"
+            "\n- Used as preamp tighten (metal, djent): Drive 0.25~0.45, Tone 0.55~0.70, Level -18~-8。"
+            "\n- Lead boost sustain (fusion / prog lead): Drive 0.50~0.70, Tone 0.50~0.62, Level -14~-6。"
+            "\n- Vintage/Blues: Drive 0.55~0.80, Tone 0.40~0.55, Level -10~-4。"
+            "\n- Only slight edge: Drive 0.20~0.35, Tone 0.45~0.55, Level -12~-6。"
+            "\nNeutral fallback: Drive 0.60, Tone 0.52, Level -12。"
+            '\nOutput JSON: {"ScreamerOn":{"Drive":<float>,"Tone":<float>,"Level":<float>}}'
+            "\nJSON only, no explanation."
         )
     },
     {
         "name": "delay",
         "example_with": '{"DelayOn":{"Feedback":0.32,"Delay":380.0,"Mix":0.42}}',
         "prompt_with": (
-            f"基于 {song_style} 与 {chat_message} 生成延迟器参数。"
-            "\n参数：Feedback 0.00~1.00；Delay 1.00~400.00 ms；Mix 0.00~1.00。"
-            "\n风格映射："
-            "\n- ‘ambient / post-rock / cinematic’：Delay 300~400ms (1/2 或 dotted 1/4 感)，Feedback 0.45~0.70，Mix 0.35~0.55。"
-            "\n- ‘modern lead sustain’：Delay 280~360ms，Feedback 0.30~0.50，Mix 0.25~0.40。"
-            "\n- ‘tight rhythmic / prog metal’：Delay 90~160ms (slap / support)，Feedback 0.18~0.30，Mix 0.12~0.25。"
-            "\n- ‘blues/expressive subtle’：Delay 180~260ms，Feedback 0.22~0.38，Mix 0.15~0.28。"
-            "\n中性默认：Delay 320ms, Feedback 0.35, Mix 0.30。"
-            '\n输出 JSON: {"DelayOn":{"Feedback":<float>,"Delay":<float>,"Mix":<float>}}'
-            "\n数值 2~3 位小数，只输出 JSON。"
+            f"Based on {song_style} and {chat_message}, generate delay parameters."
+            "\nParameters: Feedback 0.00~1.00; Delay 1.00~400.00 ms; Mix 0.00~1.00。"
+            "\nStyle mapping:"
+            "\n- 'ambient / post-rock / cinematic': Delay 300~400ms (1/2 or dotted 1/4 feel), Feedback 0.45~0.70, Mix 0.35~0.55。"
+            "\n- 'modern lead sustain': Delay 280~360ms, Feedback 0.30~0.50, Mix 0.25~0.40。"
+            "\n- 'tight rhythmic / prog metal': Delay 90~160ms (slap / support), Feedback 0.18~0.30, Mix 0.12~0.25。"
+            "\n- 'blues/expressive subtle': Delay 180~260ms, Feedback 0.22~0.38, Mix 0.15~0.28。"
+            "\nNeutral default: Delay 320ms, Feedback 0.35, Mix 0.30。"
+            '\nOutput JSON: {"DelayOn":{"Feedback":<float>,"Delay":<float>,"Mix":<float>}}'
+            "\nValues 2~3 decimal places, JSON only."
         )
     },
     {
         "name": "reverb",
         "example_with": '{"ReverbOn":{"Size":0.40,"Damping":0.32,"Width":0.70,"Mix":0.36}}',
         "prompt_with": (
-            f"基于 {song_style} 与 {chat_message} 生成混响器参数。"
-            "\n参数范围：Size 0.00~1.00（空间尺度），Damping 0.00~1.00（高频吸收），Width 0.00~1.00（立体扩展），Mix 0.00~1.00。"
-            "\n风格映射："
-            "\n- ‘ambient / cinematic / atmospheric_post_rock’：Size 0.65~0.90，Damping 中等(0.40~0.60)，Width 0.70~0.95，Mix 0.40~0.60。"
-            "\n- ‘tight prog / metal lead’：Size 0.25~0.45，Damping 0.35~0.55，Width 0.55~0.75，Mix 0.18~0.32。"
-            "\n- ‘vintage blues / classic rock’：Size 0.30~0.55，Damping 0.45~0.70，Width 0.50~0.70，Mix 0.20~0.35。"
-            "\n- ‘fusion articulate’：Size 0.25~0.40，Damping 0.30~0.50，Width 0.55~0.75，Mix 0.15~0.28。"
-            "\n默认中性：Size 0.40, Damping 0.32, Width 0.70, Mix 0.30。"
-            '\n输出 JSON: {"ReverbOn":{"Size":<float>,"Damping":<float>,"Width":<float>,"Mix":<float>}}'
-            "\n只输出 JSON。"
+            f"Based on {song_style} and {chat_message}, generate reverb parameters."
+            "\nParameter range: Size 0.00~1.00 (space scale), Damping 0.00~1.00 (high frequency absorption), Width 0.00~1.00 (stereo expansion), Mix 0.00~1.00。"
+            "\nStyle mapping:"
+            "\n- 'ambient / cinematic / atmospheric_post_rock': Size 0.65~0.90, Damping medium(0.40~0.60), Width 0.70~0.95, Mix 0.40~0.60。"
+            "\n- 'tight prog / metal lead': Size 0.25~0.45, Damping 0.35~0.55, Width 0.55~0.75, Mix 0.18~0.32。"
+            "\n- 'vintage blues / classic rock': Size 0.30~0.55, Damping 0.45~0.70, Width 0.50~0.70, Mix 0.20~0.35。"
+            "\n- 'fusion articulate': Size 0.25~0.40, Damping 0.30~0.50, Width 0.55~0.75, Mix 0.15~0.28。"
+            "\nDefault neutral: Size 0.40, Damping 0.32, Width 0.70, Mix 0.30。"
+            '\nOutput JSON: {"ReverbOn":{"Size":<float>,"Damping":<float>,"Width":<float>,"Mix":<float>}}'
+            "\nJSON only."
         )
     },
     {
         "name": "chorus",
         "example_with": '{"ChorusOn":{"Delay":0.028,"Depth":0.30,"Frequency":0.55,"Width":0.032}}',
         "prompt_with": (
-            f"基于 {song_style} 与 {chat_message} 生成合唱(Chorus)参数。"
-            "\n参数范围：Delay 0.010~0.050；Depth 0.00~1.00；Frequency 0.05~2.00；Width 0.010~0.050。"
-            "\n风格映射："
-            "\n- ‘80s vibe / ambient shimmer’：Depth 0.45~0.70，Delay 0.028~0.040，Frequency 0.25~0.60，Width 0.030~0.045。"
-            "\n- ‘subtle thickening (modern lead)’：Depth 0.15~0.35，Delay 0.022~0.030，Frequency 0.35~0.85，Width 0.020~0.032。"
-            "\n- ‘clean melodic chorus pop’：Depth 0.35~0.55，Delay 0.030~0.042，Frequency 0.40~0.90，Width 0.028~0.040。"
-            "\n- ‘avoid modulation (dry preference)’：Depth <0.12，Mix 可由后端控制（此处不含 Mix 字段）。"
-            "\n默认：Delay 0.028，Depth 0.30，Frequency 0.55，Width 0.032。"
-            '\n输出 JSON: {"ChorusOn":{"Delay":<float>,"Depth":<float>,"Frequency":<float>,"Width":<float>}}'
-            "\n只输出 JSON。"
+            f"Based on {song_style} and {chat_message} generate Chorus parameters."
+            "\nParameter range: Delay 0.010~0.050; Depth 0.00~1.00; Frequency 0.05~2.00; Width 0.010~0.050."
+            "\nStyle mapping:"
+            "\n- '80s vibe / ambient shimmer': Depth 0.45~0.70, Delay 0.028~0.040, Frequency 0.25~0.60, Width 0.030~0.045."
+            "\n- 'subtle thickening (modern lead)': Depth 0.15~0.35, Delay 0.022~0.030, Frequency 0.35~0.85, Width 0.020~0.032."
+            "\n- 'clean melodic chorus pop': Depth 0.35~0.55, Delay 0.030~0.042, Frequency 0.40~0.90, Width 0.028~0.040."
+            "\n- 'avoid modulation (dry preference)': Depth <0.12, Mix can be controlled by backend (Mix field not included here)."
+            "\nDefault: Delay 0.028, Depth 0.30, Frequency 0.55, Width 0.032."
+            '\nOutput JSON: {"ChorusOn":{"Delay":<float>,"Depth":<float>,"Frequency":<float>,"Width":<float>}}'
+            "\nJSON only."
         )
     },
     {
         "name": "flanger",
         "example_with": '{"FlangerOn":{"Delay":0.012,"Depth":0.40,"Feedback":0.22,"Frequency":0.55,"Width":0.012}}',
         "prompt_with": (
-            f"基于 {song_style} 与 {chat_message} 生成镶边(Flanger)参数。"
-            "\n参数：Delay 0.00100~0.02000；Depth 0.00~1.00；Feedback 0.00~0.50；Frequency 0.05~2.00；Width 0.001~0.020。"
-            "\n风格映射："
-            "\n- ‘dramatic jet / classic flanger sweep’：Depth 0.55~0.85，Feedback 0.30~0.45，Delay 0.010~0.016。"
-            "\n- ‘subtle movement for ambient’：Depth 0.15~0.35，Feedback 0.08~0.20，Delay 0.006~0.012，Frequency 0.15~0.40。"
-            "\n- ‘rhythmic metallic texture’：Depth 0.35~0.55，Feedback 0.18~0.30，Frequency 0.50~0.90。"
-            "\n- ‘minimal coloring’：Depth 0.08~0.18，Feedback 0.05~0.12，Frequency 0.20~0.50。"
-            "\n默认：Delay 0.012, Depth 0.40, Feedback 0.22, Frequency 0.55, Width 0.012。"
-            '\n输出 JSON: {"FlangerOn":{"Delay":<float>,"Depth":<float>,"Feedback":<float>,"Frequency":<float>,"Width":<float>}}'
-            "\n只输出 JSON。"
+            f"Based on {song_style} and {chat_message} generate Flanger parameters."
+            "\nParameters: Delay 0.00100~0.02000; Depth 0.00~1.00; Feedback 0.00~0.50; Frequency 0.05~2.00; Width 0.001~0.020."
+            "\nStyle mapping:"
+            "\n- 'dramatic jet / classic flanger sweep': Depth 0.55~0.85, Feedback 0.30~0.45, Delay 0.010~0.016."
+            "\n- 'subtle movement for ambient': Depth 0.15~0.35, Feedback 0.08~0.20, Delay 0.006~0.012, Frequency 0.15~0.40."
+            "\n- 'rhythmic metallic texture': Depth 0.35~0.55, Feedback 0.18~0.30, Frequency 0.50~0.90."
+            "\n- 'minimal coloring': Depth 0.08~0.18, Feedback 0.05~0.12, Frequency 0.20~0.50."
+            "\nDefault: Delay 0.012, Depth 0.40, Feedback 0.22, Frequency 0.55, Width 0.012."
+            '\nOutput JSON: {"FlangerOn":{"Delay":<float>,"Depth":<float>,"Feedback":<float>,"Frequency":<float>,"Width":<float>}}'
+            "\nJSON only."
         )
     },
     {
         "name": "equalization",
         "example_with": '{"EqualiserOn":{"100hz":-1.5,"200hz":0.0,"400hz":0.5,"800hz":1.0,"1600hz":1.2,"3200hz":2.0,"6400hz":1.8,"Level":0.0}}',
         "prompt_with": (
-            f"基于 {song_style} 与 {chat_message} 生成均衡(EQ) 7 段近似示例（100/200/400/800/1600/3200/6400 Hz + Level）。"
-            "\n各频段范围：-15.00~15.00 dB。Level 为整体补偿（-15~15）。"
-            "\n风格映射："
-            "\n- ‘tight metal / djent’：100hz -4~-2（收紧低频），200hz -3~-1 控浑浊，400hz -2~0，800hz 0~+1，1600/3200hz +1~+3 增存在与攻击，6400hz +1~+4 清晰；Level 视需求微调。"
-            "\n- ‘blues / vintage rock’：100hz -1~+1，200hz 0~+1 温暖，400hz +0.5~+1.5（躯干），800hz -0.5~0.5，1600hz +0.5~+1.5，3200hz +1~+2，6400hz +0.5~+1.5。"
-            "\n- ‘ambient / atmospheric’：极少极端削增，更多轻度雕刻：100hz -2~0，200hz -1~+0.5，400hz 0~+0.5，800hz 0~+0.8，1600hz +0.5~+1.2，3200hz +1~+2.2，6400hz +1~+2.5。"
-            "\n- ‘fusion articulate’：低频轻微收紧，存在与高频适度提升。"
-            "\n若无法确定，输出中性微雕：全部 0。"
-            '\n输出 JSON: {"EqualiserOn":{"100hz":<float>,"200hz":<float>,"400hz":<float>,"800hz":<float>,"1600hz":<float>,"3200hz":<float>,"6400hz":<float>,"Level":<float>}}'
-            "\n只输出 JSON。"
+            f"Based on {song_style} and {chat_message} generate Equalizer (EQ) 7-band approximate example (100/200/400/800/1600/3200/6400 Hz + Level)."
+            "\nFrequency band ranges: -15.00~15.00 dB. Level is overall compensation (-15~15)."
+            "\nStyle mapping:"
+            "\n- 'tight metal / djent': 100hz -4~-2 (tighten low frequencies), 200hz -3~-1 control muddiness, 400hz -2~0, 800hz 0~+1, 1600/3200hz +1~+3 increase presence and attack, 6400hz +1~+4 clarity; Level fine-tune as needed."
+            "\n- 'blues / vintage rock': 100hz -1~+1, 200hz 0~+1 warmth, 400hz +0.5~+1.5 (body), 800hz -0.5~0.5, 1600hz +0.5~+1.5, 3200hz +1~+2, 6400hz +0.5~+1.5."
+            "\n- 'ambient / atmospheric': minimal extreme cuts/boosts, more mild sculpting: 100hz -2~0, 200hz -1~+0.5, 400hz 0~+0.5, 800hz 0~+0.8, 1600hz +0.5~+1.2, 3200hz +1~+2.2, 6400hz +1~+2.5."
+            "\n- 'fusion articulate': low frequencies slightly tightened, presence and high frequencies moderately boosted."
+            "\nIf uncertain, output neutral minimal sculpting: all 0."
+            '\nOutput JSON: {"EqualiserOn":{"100hz":<float>,"200hz":<float>,"400hz":<float>,"800hz":<float>,"1600hz":<float>,"3200hz":<float>,"6400hz":<float>,"Level":<float>}}'
+            "\nJSON only."
         )
     },
     {
         "name": "phase",
         "example_with": '{"PhaserOn":{"Depth":0.70,"Feedback":0.55,"Frequency":0.60,"Width":1200}}',
         "prompt_with": (
-            f"基于 {song_style} 与 {chat_message} 生成相位(Phaser)参数。"
-            "\n参数范围：Depth 0.00~1.00；Feedback 0.00~0.90；Frequency 0.05~2.00；Width 50~3000 (表示扫频跨度单位假设为 Hz 区间或内部刻度)。"
-            "\n风格映射："
-            "\n- ‘psychedelic / classic phase swirl’：Depth 0.60~0.85，Feedback 0.40~0.70，Frequency 0.30~0.70，Width 1200~2200。"
-            "\n- ‘subtle motion (modern clean / ambient)’：Depth 0.20~0.40，Feedback 0.15~0.35，Frequency 0.20~0.50，Width 800~1400。"
-            "\n- ‘pronounced modulation leads’：Depth 0.50~0.70，Feedback 0.30~0.55，Frequency 0.40~0.90，Width 1600~2400。"
-            "\n- ‘minimal coloring’：Depth 0.10~0.25，Feedback 0.05~0.15，Frequency 0.25~0.45，Width 600~1200。"
-            "\n默认：Depth 0.70, Feedback 0.55, Frequency 0.60, Width 1500。"
-            '\n输出 JSON: {"PhaserOn":{"Depth":<float>,"Feedback":<float>,"Frequency":<float>,"Width":<int>}}'
-            "\n只输出 JSON。"
+            f"Based on {song_style} and {chat_message} generate Phaser parameters."
+            "\nParameter range: Depth 0.00~1.00; Feedback 0.00~0.90; Frequency 0.05~2.00; Width 50~3000 (represents sweep span unit assumed to be Hz range or internal scale)."
+            "\nStyle mapping:"
+            "\n- 'psychedelic / classic phase swirl': Depth 0.60~0.85, Feedback 0.40~0.70, Frequency 0.30~0.70, Width 1200~2200."
+            "\n- 'subtle motion (modern clean / ambient)': Depth 0.20~0.40, Feedback 0.15~0.35, Frequency 0.20~0.50, Width 800~1400."
+            "\n- 'pronounced modulation leads': Depth 0.50~0.70, Feedback 0.30~0.55, Frequency 0.40~0.90, Width 1600~2400."
+            "\n- 'minimal coloring': Depth 0.10~0.25, Feedback 0.05~0.15, Frequency 0.25~0.45, Width 600~1200."
+            "\nDefault: Depth 0.70, Feedback 0.55, Frequency 0.60, Width 1500."
+            '\nOutput JSON: {"PhaserOn":{"Depth":<float>,"Feedback":<float>,"Frequency":<float>,"Width":<int>}}'
+            "\nJSON only."
         )
     }
 ]
@@ -610,9 +609,9 @@ effectors = [
 final_result = {}
 
 
-# 定义向量余弦相似度计算函数
+# Define vector cosine similarity calculation function
 def vector_cosine_similarity(vec1, vec2):
-    """计算两个向量的余弦相似度"""
+    """Calculate cosine similarity between two vectors"""
     dot_product = np.dot(vec1, vec2)
     norm_vec1 = np.linalg.norm(vec1)
     norm_vec2 = np.linalg.norm(vec2)
@@ -621,17 +620,17 @@ def vector_cosine_similarity(vec1, vec2):
     return dot_product / (norm_vec1 * norm_vec2)
 
 
-# 初始化三个参考数据源
-audio_vector_params = []  # audio_vector 表的参考参数
-preference_params = []  # music_responses 表中用户偏好参数
+# Initialize three reference data sources
+audio_vector_params = []  # Reference parameters from audio_vector table
+preference_params = []  # User preference parameters from music_responses table
 user_text_reference = {
     "style_tags": song_style,
     "description": guitar_features
-}  # 用户输入和文本分析结果
+}  # User input and text analysis results
 
-# 获取音频向量参考参数（无论记忆模块是否开启）
+# Get audio vector reference parameters (regardless of whether memory module is enabled)
 if file_path and file_path.strip() and vector is not None:
-    # 查询audio_vector表
+    # Query audio_vector table
     audio_cursor.execute("SELECT Parameters, Vector FROM audio_vector")
     audio_rows = audio_cursor.fetchall()
 
@@ -640,38 +639,38 @@ if file_path and file_path.strip() and vector is not None:
         audio_vector_str = audio_row[1]
 
         try:
-            # 计算音频向量相似度
+            # Calculate audio vector similarity
             db_vector = np.array([float(x.strip()) for x in audio_vector_str.split(',')])
             similarity = vector_cosine_similarity(vector, db_vector)
 
-            if similarity > 0.3:  # 相似度阈值
+            if similarity > 0.3:  # Similarity threshold
                 audio_vector_params.append(json.loads(audio_params))
-                print(f"音频向量相似度: {similarity:.4f}, 参数数量: {len(audio_vector_params)}")
+                print(f"Audio vector similarity: {similarity:.4f}, parameter count: {len(audio_vector_params)}")
         except (ValueError, TypeError) as e:
-            print(f"处理音频向量参数时出错: {e}")
+            print(f"Error processing audio vector parameters: {e}")
 
-# 如果记忆模块开启，获取用户偏好参考参数
+# If memory module is enabled, get user preference reference parameters
 if memoryEnabled == "true":
-    # 查询music_responses表
+    # Query music_responses table
     cursor.execute("SELECT SongName, Parameters, Preferences, Style, Feature FROM music_responses")
     preference_rows = cursor.fetchall()
 
-    print(f"查询到 {len(preference_rows)} 条用户偏好记录")
+    print(f"Found {len(preference_rows)} user preference records")
 
-    # 直接使用result2中的tags和description作为检索内容
+    # Use tags and description from result2 directly as search content
     target_tags = set(result2.get("tags", []))
     target_description = result2.get("description", [])
     
-    # 解析特征标签，处理结构化数据（如 guitar_solo: blues_rock_pentatonic, aggressive_bends...）
+    # Parse feature tags, handle structured data (e.g. guitar_solo: blues_rock_pentatonic, aggressive_bends...)
     parsed_features = []
     for feature in target_description:
         if isinstance(feature, str):
-            # 检查是否包含结构化数据（以分号分隔的部分）
+            # Check if contains structured data (parts separated by semicolons)
             if ";" in feature:
-                # 分割普通描述和结构化部分
+                # Split normal description and structured part
                 parts = feature.split(";", 1)
-                parsed_features.append(parts[0].strip())  # 添加描述部分
-                # 可以在这里进一步解析结构化数据
+                parsed_features.append(parts[0].strip())  # Add description part
+                # Can further parse structured data here
                 structured_part = parts[1].strip()
                 if structured_part:
                     parsed_features.append(structured_part)
@@ -686,19 +685,19 @@ if memoryEnabled == "true":
         style_str = pref_row[3]
         feature_str = pref_row[4]
 
-        print(f"处理记录: 歌曲={song_name}, 偏好={preference}")
+        print(f"Processing record: Song={song_name}, Preference={preference}")
 
-        # 检查歌曲名是否和当前用户输入相同，相同则跳过
+        # Check if song name is same as current user input, skip if same
         if song_name == chat_message:
-            print(f"跳过相同歌曲: {song_name}")
+            print(f"Skip same song: {song_name}")
             continue
 
         try:
             if param_str and param_str.strip():
                 param_data = json.loads(param_str)
-                print(f"解析参数: {type(param_data)} - {param_data}")
+                print(f"Parsed parameters: {type(param_data)} - {param_data}")
 
-                # 解析历史记录的风格标签和描述特征
+                # Parse style tags and description features from historical records
                 try:
                     hist_style = json.loads(style_str) if style_str else []
                     hist_features = json.loads(feature_str) if feature_str else []
@@ -706,26 +705,26 @@ if memoryEnabled == "true":
                     hist_style = []
                     hist_features = []
 
-                # 计算相似度
+                # Calculate similarity
                 tags_similarity = enhanced_tag_similarity(target_tags, hist_style) if target_tags and hist_style else 0.0
                 
-                # 改进的描述相似度计算：考虑结构化特征的匹配
+                # Improved description similarity calculation: consider matching of structured features
                 if target_description and hist_features:
                     desc_similarities = []
                     
-                    # 将目标描述转换为查找关键词
+                    # Convert target description to search keywords
                     target_keywords = []
                     if isinstance(target_description, str):
                         target_keywords.extend(target_description.lower().split())
                     else:
-                        # 如果是数组，每个元素可能是结构化数据
+                        # If array, each element might be structured data
                         for feature in target_description:
                             if isinstance(feature, str):
                                 if ";" in feature:
-                                    # 处理结构化数据
+                                    # Process structured data
                                     parts = feature.split(";", 1)
                                     target_keywords.extend(parts[0].lower().split())
-                                    # 添加结构化部分的关键词
+                                    # Add keywords from structured part
                                     if ":" in parts[1]:
                                         tech_name, tech_details = parts[1].split(":", 1)
                                         target_keywords.append(tech_name.strip())
@@ -733,12 +732,12 @@ if memoryEnabled == "true":
                                 else:
                                     target_keywords.extend(feature.lower().split())
                     
-                    # 对每个历史特征计算相似度
+                    # Calculate similarity for each historical feature
                     for hist_feature in hist_features:
                         if hist_feature.strip():
                             hist_keywords = []
                             if ";" in hist_feature:
-                                # 处理历史记录中的结构化数据
+                                # Process structured data in historical records
                                 parts = hist_feature.split(";", 1)
                                 hist_keywords.extend(parts[0].lower().split())
                                 if ":" in parts[1]:
@@ -748,7 +747,7 @@ if memoryEnabled == "true":
                             else:
                                 hist_keywords.extend(hist_feature.lower().split())
                             
-                            # 计算关键词交集相似度
+                            # Calculate keyword intersection similarity
                             common_keywords = set(target_keywords) & set(hist_keywords)
                             union_keywords = set(target_keywords) | set(hist_keywords)
                             
@@ -756,96 +755,96 @@ if memoryEnabled == "true":
                                 keyword_similarity = len(common_keywords) / len(union_keywords)
                                 desc_similarities.append(keyword_similarity)
                     
-                    # 取最大相似度作为描述相似度
+                    # Take maximum similarity as description similarity
                     desc_similarity = max(desc_similarities) if desc_similarities else 0.0
                     
-                    # 如果历史记录有多个描述句子，给予额外奖励
+                    # If historical records have multiple description sentences, give extra bonus
                     if len(hist_features) > 1:
-                        desc_similarity = min(desc_similarity * 1.1, 1.0)  # 最高不超过1.0
+                        desc_similarity = min(desc_similarity * 1.1, 1.0)  # Maximum not exceeding 1.0
                 else:
                     desc_similarity = 0.0
                 
-                # 加权总体相似度：标签相似度权重0.6，描述相似度权重0.4
+                # Weighted overall similarity: tag similarity weight 0.6, description similarity weight 0.4
                 overall_similarity = tags_similarity * 0.6 + desc_similarity * 0.4
                 
-                print(f"相似度计算 - 标签相似度: {tags_similarity:.4f}, 描述相似度: {desc_similarity:.4f}, 总相似度: {overall_similarity:.4f}")
+                print(f"Similarity calculation - Tag similarity: {tags_similarity:.4f}, Description similarity: {desc_similarity:.4f}, Total similarity: {overall_similarity:.4f}")
                 
-                # 只有当相似度大于0.15时才处理这个偏好记录
+                # Only process this preference record when similarity is greater than 0.15
                 if overall_similarity > 0.3:
-                    # 如果偏好为空，默认为accept
+                    # If preference is empty, default to accept
                     actual_preference = preference if preference else "accept"
 
                     if actual_preference == "accept":
-                        # accept参数优先级最高
+                        # accept parameters have highest priority
                         preference_params.insert(0, {
                             "type": "accept",
                             "parameters": param_data,
                             "similarity": overall_similarity
                         })
-                        print(f"添加accept参数到列表开头 (相似度: {overall_similarity:.4f})")
+                        print(f"Add accept parameters to list beginning (similarity: {overall_similarity:.4f})")
                     elif actual_preference == "edit":
-                        # edit参数次之，放在accept后面
+                        # edit parameters are second, placed after accept
                         if not any(p["type"] == "edit" for p in preference_params):
                             preference_params.append({
                                 "type": "edit",
                                 "parameters": param_data,
                                 "similarity": overall_similarity
                             })
-                            print(f"添加edit参数 (相似度: {overall_similarity:.4f})")
+                            print(f"Add edit parameters (similarity: {overall_similarity:.4f})")
                     elif actual_preference == "reject":
-                        # reject参数单独存储，用于避免
+                        # reject parameters are stored separately for avoidance
                         preference_params.append({
                             "type": "reject",
                             "parameters": param_data,
                             "similarity": overall_similarity
                         })
-                        print(f"添加reject参数 (相似度: {overall_similarity:.4f})")
+                        print(f"Add reject parameters (similarity: {overall_similarity:.4f})")
                 else:
-                    print(f"跳过记录，相似度不足: {overall_similarity:.4f}")
+                    print(f"Skip record, insufficient similarity: {overall_similarity:.4f}")
         except json.JSONDecodeError as e:
-            print(f"处理用户偏好参数时出错: {e}")
+            print(f"Error processing user preference parameters: {e}")
         except Exception as e:
-            print(f"处理记录时发生错误: {e}")
+            print(f"Error processing record: {e}")
 
-# 初始化偏好参数列表
-# similar_songs 和 resu 已被新的三参考系统替代，不再需要
+# Initialize preference parameter list
+# similar_songs and resu have been replaced by new three-reference system, no longer needed
 
-# 打印信息
-print("相似歌曲搜索功能已禁用，使用新的三参考系统")
-print(f"收集到的偏好参数: {len(preference_params)} 条")
-print(f"音频向量参数: {len(audio_vector_params)} 条")
+# Print information
+print("Similar song search function disabled, using new three-reference system")
+print(f"Collected preference parameters: {len(preference_params)} items")
+print(f"Audio vector parameters: {len(audio_vector_params)} items")
 
-# 无论记忆模块是否开启，文本分析结果始终包含在参考中
+# Text analysis results are always included in reference regardless of memory module
 user_text_ref = f"""
-用户文本分析结果:
-风格标签: {json.dumps(song_style, ensure_ascii=False)}
-描述特征: {json.dumps(guitar_features, ensure_ascii=False)}
-文本权重: {text_Weight if text_Weight else "0.5"}
+User text analysis results:
+Style tags: {json.dumps(song_style, ensure_ascii=False)}
+Description features: {json.dumps(guitar_features, ensure_ascii=False)}
+Text weight: {text_Weight if text_Weight else "0.5"}
 """
 
-# 创建系统提示模板，包含三个参考类型
+# Create system prompt template containing three reference types
 system_prompt_template = f"""
-你是音效参数专家。输入可能包含：
-- 歌曲名（若有）
-- 描述 / 情绪 / 场景
-- 风格标签 / 技巧 / 语义关键词
-文本：[{chat_message}]
-外部风格标签（可选）：{song_style}
+You are an audio effects parameter expert. Input may include:
+- Song name (if any)
+- Description / Emotion / Scenario
+- Style tags / Techniques / Semantic keywords
+Text: [{chat_message}]
+External style tags (optional): {song_style}
 
-参考数据：
-1. 文本分析参考（始终可用）:
+Reference data:
+1. Text analysis reference (always available):
    {user_text_ref}
-2. 音频向量参考（{"相似度>0.3时启用" if file_path and file_path.strip() and vector is not None else "未检测到音频文件"}）:
+2. Audio vector reference ({"enabled when similarity>0.3" if file_path and file_path.strip() and vector is not None else "no audio file detected"}):
    {json.dumps(audio_vector_params, ensure_ascii=False) if audio_vector_params else "[]"}
-3. 用户偏好参考（{"已启用" if memoryEnabled == "true" else "记忆模块未开启"}）:
+3. User preference reference ({"enabled" if memoryEnabled == "true" else "memory module not enabled"}):
    {json.dumps(preference_params, ensure_ascii=False) if preference_params else "[]"}
 
-权重设置：
-- 文本分析权重: {text_Weight if text_Weight else "0.5"}
-- 音频向量权重: {audio_Weight if audio_Weight else "0.3"}
-- 用户偏好权重: {preference_Weight if preference_Weight else "0.2"}
+Weight settings:
+- Text analysis weight: {text_Weight if text_Weight else "0.5"}
+- Audio vector weight: {audio_Weight if audio_Weight else "0.3"}
+- User preference weight: {preference_Weight if preference_Weight else "0.2"}
 
-任务：只输出 10 个音效模块启用与否的固定顺序 JSON（yes/no），无其它字符：
+Task: Only output 10 audio effects module enable/disable fixed order JSON (yes/no), no other characters:
 {{
   "overload": "yes|no",
   "distortion": "yes|no",
@@ -859,28 +858,28 @@ system_prompt_template = f"""
   "noise_gate": "yes|no"
 }}
 
-优先级顺序（高到低）：
-显式文本锁定 > 清洁强约束(acoustic|fingerstyle|unplugged|pure clean) > 参考硬触发(hard ref) > 参考普遍开启(prevalent ref) > 风格基线/标签推导 > 技巧/语义补强 > 低密度补全/回退
+Priority order (high to low):
+Explicit text lock > Clean strong constraint(acoustic|fingerstyle|unplugged|pure clean) > Reference hard trigger(hard ref) > Reference prevalent enable(prevalent ref) > Style baseline/tag inference > Technique/semantic enhancement > Low density completion/fallback
 
-流程：
-0) 标题直判锁定
-0.R1) 参考模块硬触发解析 (hard ref)
-0.R2) 参考模块普遍开启统计 (prevalent ref, >=60% 默认阈值，可调为 prevalence_threshold=0.60)
-0.1) 冲突纠偏 SC1~SC8
-0.2) 显式效果锁定 (locked_text)
-1) 描述与风格标签补全（含风格基线）
-2) 技巧 / 语义关键词补强
-3) 互斥 / 约束裁剪
-4) 噪声门判定
-6A) 基线 & 单一调制 / 低密度补全
-5) 回退（最小集合）
-6) 未决填充 no + 调制互斥终检（显式豁免 + locked_ref 优先）
+Process:
+0) Title direct judgment lock
+0.R1) Reference module hard trigger parsing (hard ref)
+0.R2) Reference module prevalent enable statistics (prevalent ref, >=60% default threshold, adjustable to prevalence_threshold=0.60)
+0.1) Conflict correction SC1~SC8
+0.2) Explicit effect lock (locked_text)
+1) Description and style tag completion (including style baseline)
+2) Technique / semantic keyword enhancement
+3) Mutual exclusion / constraint pruning
+4) Noise gate judgment
+6A) Baseline & single modulation / low density completion
+5) Fallback (minimum set)
+6) Pending fill no + modulation mutual exclusion final check (explicit exemption + locked_ref priority)
 
-=== 参考模块解析规则 ===
-参考输入中可能出现形如 XXXOn 的键。按下列映射与级别处理：
-模块->效果映射：
+=== Reference Module Parsing Rules ===
+Reference input may contain keys like XXXOn. Process according to following mapping and levels:
+Module->effect mapping:
   CompressorOn -> compression
-  DriverOn / DistortionOn / HighGainOn / PreampHighGainOn / FuzzOn -> distortion（DriverOn 有阈值）
+  DriverOn / DistortionOn / HighGainOn / PreampHighGainOn / FuzzOn -> distortion (DriverOn has threshold)
   ScreamerOn / OverdriveOn / BoostOn / ODOn -> overload
   DelayOn -> delay
   ReverbOn -> reverb
@@ -890,137 +889,137 @@ system_prompt_template = f"""
   EqualiserOn -> equalization
   NoiseGateOn / GateOn -> noise_gate
 
-0.R1 硬触发 (hard ref) 逻辑：
+0.R1 Hard trigger (hard ref) logic:
   - DriverOn:
-      若存在 Distortion/Gain/Drive 参数 >=0.40 -> distortion=yes (locked_ref)
-      若 0.20 <= 数值 <0.40 -> overload=yes (仅轻推动, soft_ref)，不直接触发 distortion
+      If Distortion/Gain/Drive parameter >=0.40 exists -> distortion=yes (locked_ref)
+      If 0.20 <= value <0.40 -> overload=yes (light push only, soft_ref), does not directly trigger distortion
   - DistortionOn / HighGainOn / PreampHighGainOn / FuzzOn -> distortion=yes (locked_ref)
-  - FuzzOn 始终视为失真硬触发，忽略 mid_gain 抑制
-  - ScreamerOn / OverdriveOn / BoostOn / ODOn -> overload=yes (soft_ref；若与硬失真同在，可并存)
-  - CompressorOn -> compression=yes (soft_ref；可被显式 no 或清洁强约束覆盖)
-  - ReverbOn: 若 Mix>0.02 -> reverb=yes (soft_ref 但强可信)；Mix<=0.02 -> weak_ref（后续可被裁剪）
-  - DelayOn: 若 Mix>0.05 且 Delay>0 -> delay=yes (soft_ref)；否则 weak_ref
-  - ChorusOn / PhaserOn / FlangerOn：加入调制候选；若多个 On，先记录，最终互斥处理
+  - FuzzOn always treated as distortion hard trigger, ignoring mid_gain suppression
+  - ScreamerOn / OverdriveOn / BoostOn / ODOn -> overload=yes (soft_ref; can coexist with hard distortion)
+  - CompressorOn -> compression=yes (soft_ref; can be overridden by explicit no or clean strong constraint)
+  - ReverbOn: If Mix>0.02 -> reverb=yes (soft_ref but highly credible); Mix<=0.02 -> weak_ref (can be pruned later)
+  - DelayOn: If Mix>0.05 and Delay>0 -> delay=yes (soft_ref); otherwise weak_ref
+  - ChorusOn / PhaserOn / FlangerOn: Add to modulation candidates; if multiple On, record first, handle mutual exclusion later
   - EqualiserOn -> equalization=yes (soft_ref)
-  - NoiseGateOn / GateOn -> noise_gate=yes (soft_ref；若最终失真链不足，可回退为 no)
-  - 同时存在 ScreamerOn + DriverOn 且 DriverOn Distortion>=0.40 -> overload=yes + distortion=yes
-  - mid_gain|crunch 不再否决 locked_ref 的 distortion
-  - 清洁强约束(acoustic|fingerstyle|unplugged|pure clean) 仍可覆盖失真相关：distortion=no overload=no noise_gate=no（除显式文本直接要求失真）
+  - NoiseGateOn / GateOn -> noise_gate=yes (soft_ref; can fallback to no if final distortion chain insufficient)
+  - Simultaneous ScreamerOn + DriverOn with DriverOn Distortion>=0.40 -> overload=yes + distortion=yes
+  - mid_gain|crunch no longer veto locked_ref distortion
+  - Clean strong constraint(acoustic|fingerstyle|unplugged|pure clean) can still override distortion related: distortion=no overload=no noise_gate=no (except explicit text directly requesting distortion)
 
-0.R2 普遍开启统计 (prevalent ref)：
-  对每一效果类别统计参考列表中对应"On"模块的开启比例：
-    prevalence = (该效果相关 On 模块出现次数) / (参考条目数量)
-  若 prevalence >= prevalence_threshold(默认0.60) 且该效果尚未被显式 / 清洁 / 硬触发明确为 no：
-    将该效果标记为 yes (ref_prevalent，soft_ref)
-  调制（chorus/phase/flanger）如多项同时达到普遍开启，后续仍按 chorus > phase > flanger 优先级单一保留（若无显式多锁）
-  对 delay/reverb 若普遍开启但多数实例 Mix 近 0，可降级为 weak_prevalent，可在后续裁剪
+0.R2 Prevalent enable statistics (prevalent ref):
+  For each effect category, calculate the enable ratio of corresponding "On" modules in reference list:
+    prevalence = (number of On modules related to this effect) / (number of reference entries)
+  If prevalence >= prevalence_threshold(default 0.60) and effect not explicitly set to no by explicit/clean/hard trigger:
+    Mark effect as yes (ref_prevalent, soft_ref)
+  Modulation (chorus/phase/flanger) if multiple reach prevalent enable, still keep single by chorus > phase > flanger priority (unless explicit multiple locks)
+  For delay/reverb if prevalent but most instances Mix near 0, can downgrade to weak_prevalent, can be pruned later
 
-=== 三个参考类型的特殊处理规则 ===
-1. 文本分析参考（权重: {text_Weight if text_Weight else "0.5"}）:
-   - 基于风格标签和描述特征进行风格推断
-   - 直接影响基础模块启用决策（如ambient->reverb+delay，metal->distortion）
-   - 作为参数生成的基础参考
+=== Special Processing Rules for Three Reference Types ===
+1. Text analysis reference (weight: {text_Weight if text_Weight else "0.5"}):
+   - Perform style inference based on style tags and description features
+   - Directly affect basic module enable decisions (e.g., ambient->reverb+delay, metal->distortion)
+   - Serve as basic reference for parameter generation
 
-2. 音频向量参考（权重: {audio_Weight if audio_Weight else "0.3"}）:
-   {"- 当相似度>0.3时启用，提供高质量标准参数参考" if audio_vector_params else "- 当前无可用音频向量参考"}
-   - 参数值经过验证和优化，适合当前音频风格
-   - 优先使用accept类型的参数数据
+2. Audio vector reference (weight: {audio_Weight if audio_Weight else "0.3"}):
+   {"- Enabled when similarity>0.3, providing high quality standard parameter reference" if audio_vector_params else "- No audio vector reference available"}
+   - Parameter values validated and optimized, suitable for current audio style
+   - Prioritize accept type parameter data
 
-3. 用户偏好参考（权重: {preference_Weight if preference_Weight else "0.2"}）:
-   - accept类型：高优先级，必须优先参考
-   - edit类型：中优先级，包含用户修改后的参数建议
-   - reject类型：低优先级，必须避免重复
-   - 综合参考时：{"有用户历史数据" if memoryEnabled == "true" and preference_params else "无用户历史数据"}
+3. User preference reference (weight: {preference_Weight if preference_Weight else "0.2"}):
+   - accept type: high priority, must be prioritized
+   - edit type: medium priority, contains user-modified parameter suggestions
+   - reject type: low priority, must avoid duplication
+   - When referencing: {"user history data available" if memoryEnabled == "true" and preference_params else "no user history data"}
 
-用户偏好数据说明：
-{json.dumps(preference_params, ensure_ascii=False) if preference_params else "无用户历史数据可用"}
+User preference data description:
+{json.dumps(preference_params, ensure_ascii=False) if preference_params else "no user history data available"}
 
-特殊规则：
-- 如果用户偏好中有accept类型参数，优先参考accept数据
-- 如果用户偏好中有reject类型参数，避免生成相同参数
-- 如果用户偏好中有edit类型参数，在accept基础上进行调整
+Special rules:
+- If user preferences contain accept type parameters, prioritize referencing accept data
+- If user preferences contain reject type parameters, avoid generating same parameters
+- If user preferences contain edit type parameters, adjust based on accept data
 
-显式效果锁定 (0.2)：
-  匹配："with a/an <effect> effect" "<effect> effect" "use <effect>" "<effect> sound/tone"
+Explicit effect lock (0.2):
+  Match: "with a/an <effect> effect" "<effect> effect" "use <effect>" "<effect> sound/tone"
   effect: overdrive/drive/boost(=overload), distortion, delay, reverb, compression/comp, chorus, flanger, phaser(=phase), eq/eqing/equalizer(=equalization), gate(=noise_gate)
-  -> 设 yes + locked_text；仅清洁/噪声明显纠偏可改。
+  -> Set yes + locked_text; only clean/noise obvious correction can change.
 
-风格 / 标签与语义：
-- metal/djent/thrash/death/core/grind/heavy (+ chug|palm mute|tight|high gain 可选) -> distortion=yes；若 boost/drive/overdrive/tight/chug -> overload=yes
-- mid_gain|mid-gain|crunch|classic_rock|blues|vintage|hard_rock -> overload=yes（轻） distortion=no（若无 locked_ref）
-- ambient|atmospheric|post-rock|shoegaze|cinematic -> reverb=yes delay=yes；dreamy|lush->chorus；psychedelic|spacey|swirl->phase
-- acoustic|fingerstyle|folk|unplugged -> reverb=yes compression=yes equalization=yes；distortion/overload/noise_gate=no
-- melodic|emotional|lyrical|sustain|solo|lead -> delay=yes；reverb=yes（若未）
+Style / tag and semantics:
+- metal/djent/thrash/death/core/grind/heavy (+ chug|palm mute|tight|high gain optional) -> distortion=yes; if boost/drive/overdrive/tight/chug -> overload=yes
+- mid_gain|mid-gain|crunch|classic_rock|blues|vintage|hard_rock -> overload=yes(light) distortion=no(if no locked_ref)
+- ambient|atmospheric|post-rock|shoegaze|cinematic -> reverb=yes delay=yes; dreamy|lush->chorus; psychedelic|spacey|swirl->phase
+- acoustic|fingerstyle|folk|unplugged -> reverb=yes compression=yes equalization=yes; distortion/overload/noise_gate=no
+- melodic|emotional|lyrical|sustain|solo|lead -> delay=yes; reverb=yes(if not set)
 - boost|overdrive|screamer|od -> overload=yes
 - fuzz|wall|massive|dense|saturated -> distortion=yes
 - lush|dreamy|shimmer|80s -> chorus=yes
-- psychedelic|spacey|swirl -> phase=yes（若 chorus 非显式锁定）
+- psychedelic|spacey|swirl -> phase=yes(if chorus not explicitly locked)
 - jet|swoosh|metallic -> flanger=yes
 - ambient|space|swell|pad|ethereal -> reverb+delay=yes
-- hiss|noise|gate|gating|unwanted noise 且 distortion=yes -> noise_gate=yes
+- hiss|noise|gate|gating|unwanted noise and distortion=yes -> noise_gate=yes
 - melodic_bassline -> compression=yes equalization=yes
-- clean_to_distorted -> 无高增益词：overload=yes（轻） distortion保持 no（若无 locked_ref）
+- clean_to_distorted -> no high gain words: overload=yes(light) distortion remains no(if no locked_ref)
 
-风格基线 (grunge | alternative_rock | clean_to_distorted | (rock 且无高增益词)):
-- distortion 未被高增益触发且非 locked_ref -> overload=yes compression=yes reverb=yes equalization=yes
-- melodic_bassline 额外确保 compression & equalization=yes
+Style baseline (grunge | alternative_rock | clean_to_distorted | (rock and no high gain words)):
+- distortion not triggered by high gain and not locked_ref -> overload=yes compression=yes reverb=yes equalization=yes
+- melodic_bassline additionally ensures compression & equalization=yes
 
-技巧补强与细化：
-- tapping/sweep/shred/fast/legato + 高增益语境 -> distortion=yes
-- chug/djent/palm mute/tight/percussive -> distortion=yes；若出现 drive/overdrive/boost -> overload=yes
+Technique enhancement and refinement:
+- tapping/sweep/shred/fast/legato + high gain context -> distortion=yes
+- chug/djent/palm mute/tight/percussive -> distortion=yes; if drive/overdrive/boost appears -> overload=yes
 - wall/massive/dense/saturated/fuzz -> distortion=yes
 - clean sparkle/glassy -> compression=yes
-- droning/drone -> reverb=yes；有旋律词且 delay 未设 -> delay=yes
-- 噪声词 (hiss/noise/gating...) + 失真链 -> noise_gate=yes
+- droning/drone -> reverb=yes; if melodic words and delay not set -> delay=yes
+- noise words (hiss/noise/gating...) + distortion chain -> noise_gate=yes
 
-互斥 / 约束：
-- 调制仅一：chorus > phase > flanger（显式锁定多保留；否则按优先级保留最高来源：locked_text > locked_ref > ref_prevalent > soft_ref > weak_ref）
-- distortion=no 且 overload=no -> noise_gate=no
-- distortion=yes 且 chug|djent|tight|palm mute|boost -> overload=yes & noise_gate=yes
-- acoustic|fingerstyle|unplugged|pure clean -> distortion/overload/noise_gate=no（即使 locked_ref，但显式文本要求失真可豁免）
-- mid_gain|crunch 且无高增益词 -> distortion=no（若非 locked_ref）
-- overload 不推导 distortion；轻推动不触发噪声门
+Mutual exclusion / constraints:
+- Modulation only one: chorus > phase > flanger (explicit lock multiple reserved; otherwise keep highest source by priority: locked_text > locked_ref > ref_prevalent > soft_ref > weak_ref)
+- distortion=no and overload=no -> noise_gate=no
+- distortion=yes and chug|djent|tight|palm mute|boost -> overload=yes & noise_gate=yes
+- acoustic|fingerstyle|unplugged|pure clean -> distortion/overload/noise_gate=no(even if locked_ref, but explicit text requesting distortion can be exempted)
+- mid_gain|crunch and no high gain words -> distortion=no(if not locked_ref)
+- overload does not derive distortion; light push does not trigger noise gate
 
-噪声门：
-noise_gate=yes 当：
-  distortion=yes 且 metal|djent|chug|tight|palm mute|thrash|death|core|high gain|heavy
-  或 hiss|noise|gate|gating|unwanted noise
-参数细化：
-  若 distortion 来源仅 DriverOn 且 Distortion<0.55 且无上述高增益/噪声词 -> noise_gate=no
+Noise gate:
+noise_gate=yes when:
+  distortion=yes and metal|djent|chug|tight|palm mute|thrash|death|core|high gain|heavy
+  or hiss|noise|gate|gating|unwanted noise
+Parameter refinement:
+  If distortion source only DriverOn and Distortion<0.55 and no above high gain/noise words -> noise_gate=no
 
-6A 单一调制 / 低密度补全：
-- 若仅 1 调制=yes 且未声明 dry：
-  equalization=yes；reverb=yes；compression=yes（若含 grunge|alternative_rock|rock|mid_tempo|melodic|melodic_bassline|clean_to_distorted）
-  overload=yes（若基线条件成立且 distortion=no）
-- 若最终 yes 数 <2 且非 dry -> 至少 equalization=yes
+6A Single modulation / low density completion:
+- If only 1 modulation=yes and not declared dry:
+  equalization=yes; reverb=yes; compression=yes(if contains grunge|alternative_rock|rock|mid_tempo|melodic|melodic_bassline|clean_to_distorted)
+  overload=yes(if baseline condition established and distortion=no)
+- If final yes count <2 and not dry -> at least equalization=yes
 
-回退：
-- 全部 no/未定 -> equalization=yes
-- lead/solo/melodic/emotional 且 delay 未设 -> delay=yes
-- ambient|space|atmospheric 且 reverb 未设 -> reverb=yes
-- 仍 <2 yes 且非 dry -> equalization=yes
+Fallback:
+- All no/undecided -> equalization=yes
+- lead/solo/melodic/emotional and delay not set -> delay=yes
+- ambient|space|atmospheric and reverb not set -> reverb=yes
+- Still <2 yes and not dry -> equalization=yes
 
-终检：
-- 未定->no
-- 调制互斥（显式豁免 + locked_ref 优先）
-- locked_ref 的 distortion 不被 mid_gain/crunch 否决
-- distortion=no 且 overload=no -> noise_gate=no
-- 若 distortion=yes 但来源 locked_ref 且(DriverOn Distortion 0.40~0.55) 且无高增益/噪声语义 -> noise_gate=no
-- 禁止额外文本
+Final check:
+- Undecided->no
+- Modulation mutual exclusion (explicit exemption + locked_ref priority)
+- locked_ref distortion not vetoed by mid_gain/crunch
+- distortion=no and overload=no -> noise_gate=no
+- If distortion=yes but source locked_ref and(DriverOn Distortion 0.40~0.55) and no high gain/noise semantics -> noise_gate=no
+- Prohibit extra text
 
-附加：
-- 显式指令优先
-- 情绪词不触发增益或噪声门
-- clean_to_distorted 默认轻推动
-- 单一调制不孤岛：需 EQ+Reverb（+Compression 视风格）
-- 参考硬触发优先于普遍开启；普遍开启为 soft_ref 可被更高优先级覆盖
-- 普遍开启统计：prevalence >=0.60（可调），不足阈值不强制
-- weak_ref（Mix≈0 / 参数近零）可在互斥或终检阶段被移除
+Additional:
+- Explicit instructions priority
+- Emotion words do not trigger gain or noise gate
+- clean_to_distorted defaults to light push
+- Single modulation not isolated: needs EQ+Reverb(+Compression depending on style)
+- Reference hard trigger priority over prevalent enable; prevalent enable is soft_ref can be overridden by higher priority
+- Prevalent enable statistics: prevalence >=0.60(adjustable), below threshold not forced
+- weak_ref(Mix≈0 / parameters near zero) can be removed in mutual exclusion or final check stage
 - ScreamerOn + DriverOn (Distortion>=0.40) -> overload=yes + distortion=yes
-- FuzzOn 永远视为 distortion=yes（硬触发）
-- 不因单纯 prevalent equalization 而否定 explicit no（若显式要求 no，可保持 no）
+- FuzzOn always treated as distortion=yes(hard trigger)
+- Do not deny explicit no due to prevalent equalization alone(if explicitly requested no, can keep no)
 
-输出：仅输出 JSON（键顺序固定）：
+Output: Only output JSON (key order fixed):
 {{
   "overload": "yes|no",
   "distortion": "yes|no",
@@ -1035,93 +1034,93 @@ noise_gate=yes 当：
 }}
 """
 
-# 使用更新后的系统提示模板
+# Use updated system prompt template
 print(f"system_prompt_template:{system_prompt_template}")
 system_prompt = system_prompt_template
 user_prompt1 = chat_message
 
-# 保存系统消息
+# Save system message
 system_message = {"role": "system", "content": system_prompt}
 conversation_history.append(system_message)
-# 保存用户消息
+# Save user message
 user_message = {"role": "user", "content": user_prompt1}
 conversation_history.append(user_message)
-# 发送请求
+# Send request
 response1 = client.chat.completions.create(
     model="deepseek-chat",
     messages=[system_message, user_message],
     stream=False
 )
-# 保存助手回复
+# Save assistant reply
 assistant_message = {
     "role": "assistant",
     "content": response1.choices[0].message.content
 }
 conversation_history.append(assistant_message)
 
-# 获取 response1 响应数据并转换为 JSON
+# Get response1 response data and convert to JSON
 response_content1 = response1.choices[0].message.content
-# 提取有效的JSON部分
+# Extract valid JSON part
 start_index = response_content1.find("{")
 end_index = response_content1.rfind("}") + 1
 if start_index != -1 and end_index != -1:
     cleaned_content1 = response_content1[start_index:end_index]
 else:
-    print("Error: 未找到有效的JSON内容")
+    print("Error: No valid JSON content found")
     sys.exit(1)
 
 try:
     result1 = json.loads(cleaned_content1)
     print(json.dumps(result1, ensure_ascii=False, indent=2))
 except json.JSONDecodeError:
-    print(f"Error: 无效的JSON响应: {cleaned_content1}")
+    print(f"Error: Invalid JSON response: {cleaned_content1}")
     sys.exit(1)
 
-# 使用 for 循环处理不同的音效模块
+# Use for loop to process different audio effect modules
 for effector in effectors:
     effector_name = effector["name"]
     if result1.get(effector_name) == "yes":
-        # 构建包含音频向量参考参数的系统提示（无论记忆是否开启）
-        audio_ref_info = f"音频向量参考参数: {json.dumps(audio_vector_params, ensure_ascii=False) if audio_vector_params else '[]'}"
+        # Build system prompt containing audio vector reference parameters (regardless of memory)
+        audio_ref_info = f"Audio vector reference parameters: {json.dumps(audio_vector_params, ensure_ascii=False) if audio_vector_params else '[]'}"
 
-        if memoryEnabled == "true":  # 简化条件检查
+        if memoryEnabled == "true":  # Simplified condition check
             system_prompt = f"""
-你是一位专业音效调整师。目标：针对当前单一音效模块，基于相似歌曲参考参数 {audio_vector_params} 与用户偏好，输出该模块的 JSON 参数。示例格式（仅参考结构，不参考数值）：{effector["example_with"]}
+You are a professional audio effects adjuster. Goal: For the current single audio effect module, based on similar song reference parameters {audio_vector_params} and user preferences, output the module's JSON parameters. Example format (reference structure only, not values): {effector["example_with"]}
 
-严格输出要求：
-1. 只输出一个 JSON 对象，禁止添加说明文字 / 额外字段 / 前后缀。
-2. 若判定模块需要启用：键名使用示例中的 *On 形式（如 CompressorOn、DelayOn）。若判定关闭：使用 *Off（如 CompressorOff）并赋空对象 {{}}。
-3. 不要直接照搬示例数值；也不要逐字复刻 {audio_vector_params} 中单条参数值。必须在参考基础上做小幅调整。
-4. 只输出与该模块相关的键，禁止额外模块或多余层级。
+Strict output requirements:
+1. Only output one JSON object, prohibit adding explanatory text / extra fields / prefixes/suffixes.
+2. If module needs to be enabled: use *On form from example (e.g. CompressorOn, DelayOn). If disabled: use *Off (e.g. CompressorOff) and assign empty object {{}}.
+3. Do not directly copy example values; nor verbatim copy single parameter values from {audio_vector_params}. Must make small adjustments based on reference.
+4. Only output keys related to this module, prohibit extra modules or redundant levels.
 
-参考数据（用户偏好参数，多条 JSON 片段或数组形式）：{preference_params}
+Reference data (user preference parameters, multiple JSON fragments or array form): {preference_params}
 {audio_ref_info}
 
-解析规则：
-- 识别该模块的 On/Off：出现 <ModuleName>On 视为开启；<ModuleName>Off 视为关闭。
-- 模块名称与本次处理对象由外部上下文 effector 决定，不需你猜测其它模块。
-- 若参考中出现多个版本（如 CompressorOn 与 CompressorOff 混杂），统计：On_count 与 Off_count。
-  - On_count > Off_count → 判定开启
-  - Off_count > On_count → 判定关闭
-  - 平票或均未出现 → 进入"启发式判定"
+Parsing rules:
+- Identify module On/Off: <ModuleName>On considered enabled; <ModuleName>Off considered disabled.
+- Module name and processing object determined by external context effector, no need to guess other modules.
+- If multiple versions appear in reference (e.g. CompressorOn and CompressorOff mixed), count: On_count and Off_count.
+  - On_count > Off_count → Judge as enabled
+  - Off_count > On_count → Judge as disabled
+  - Tie or neither appears → Enter "heuristic judgment"
 
-启发式判定（仅在平票或无信息时适用）：
-- 若模块属于常规基础链路（例如均衡、压缩、轻度空间处理）且该风格常见 → 可开启
-- 若模块属于调制（chorus/phaser/flanger）且参考无迹象 → 默认关闭
-- 若无明确风格或信息不足 → 默认关闭（除非是 EQ 等基础模块）
+Heuristic judgment (applicable only when tied or no information):
+- If module belongs to conventional basic chain (e.g. equalization, compression, light spatial processing) and common in this style → Can be enabled
+- If module is modulation (chorus/phaser/flanger) and no indication in reference → Default to disabled
+- If no clear style or insufficient information → Default to disabled (unless basic module like EQ)
 
-参数生成逻辑（仅当判定开启）：
-1. 参考所有 On 样本该模块的参数值集合（来自{audio_vector_params}），计算每个参数的基准值（默认使用中位数；若无法解析则使用第一条 On 样本）。
-2. 基于基准值生成新值：保持"合理、接近、不过度漂移"：
-   - 0~1 归一化参数：偏移幅度 ±(0.03~0.10)，裁剪到 [0,1]
-   - 时间参数（ms、宽度等）：±5%~12%（若原值极小 <1，可加一个最小微调 0.001~0.01）
-   - dB 参数：±(5%~15%) 或 ±(1~3 dB) 取更小；阈值类（极负数）可在 ±(2~6 dB)
-   - 比率（Ratio）：若 <10 → ±(0.2~0.8)；若 ≥10 → ±(0.5~2.0)，不低于 1
-   - 延迟时间 Delay：保持在 1.00~400.00 范围内
-   - 仅整数参数（如某些 Width）可四舍五入
-3. 确保不与基准值完全相同；若随机漂移后仍相同则再做一次微小增减 (最小步进 0.01 或 1 单位)。
-4. 保持参数间逻辑一致（如 Attack 不应远大于 Release 若语义不符；若无规则忽略）。
-5. 若{audio_vector_params}没有任何 On 样本但启发式判定开启 → 使用该模块的中性默认：
+Parameter generation logic (only when judged enabled):
+1. Reference all On samples' parameter value sets for this module (from {audio_vector_params}), calculate baseline value for each parameter (default use median; if cannot parse use first On sample).
+2. Generate new value based on baseline: maintain "reasonable, close, not excessive drift":
+   - 0~1 normalized parameters: offset ±(0.03~0.10), clamp to [0,1]
+   - Time parameters (ms, width, etc.): ±5%~12% (if original value very small <1, can add minimum adjustment 0.001~0.01)
+   - dB parameters: ±(5%~15%) or ±(1~3 dB) take smaller; thresholdtype (very negative) can ±(2~6 dB)
+   - Ratio: If <10 → ±(0.2~0.8); If ≥10 → ±(0.5~2.0), not below 1
+   - Delay time Delay: Keep within 1.00~400.00 range
+   - Integer parameters only (like some Width) can be rounded
+3. Ensure not exactly same as baseline; if still same after random drift, make another micro adjustment (minimum step 0.01 or 1 unit).
+4. Maintain logical consistency between parameters (e.g. Attack should not be much larger than Release if semantically inconsistent; ignore if no rule).
+5. If {audio_vector_params} has no On samples but heuristic judgment enabled → Use module's neutral default:
    - Compressor: Threshold=-24, Ratio=3, Attack=0.010~0.050, Release=0.120~0.250, Makeup=4, Mix=0.70
    - Distortion/Driver: Distortion=0.55, Volume=-12
    - Overdrive/Screamer: Drive=0.55, Tone=0.52, Level=-12
@@ -1130,48 +1129,48 @@ for effector in effectors:
    - Chorus: Delay=0.028, Depth=0.30, Frequency=0.60, Width=0.030
    - Flanger: Delay=0.012, Depth=0.40, Feedback=0.22, Frequency=0.55, Width=0.012
    - Phaser: Depth=0.60, Feedback=0.40, Frequency=0.60, Width=1500
-   - EQ: 全频段=0（Level=0）
-   - NoiseGate（若适用）：Threshold=-50~ -60, Release=0.10~0.25 （仅示例，若模块定义不同可忽略）
+   - EQ: All bands=0 (Level=0)
+   - NoiseGate (if applicable): Threshold=-50~ -60, Release=0.10~0.25 (example only, can ignore if module definition differs)
 
-关闭状态：
-- 输出 {{"<ModuleName>Off": {{}}}} 不包含参数键。
-- 不输出任何与参数取值相关的提示。
+Disabled state:
+- Output {{"<ModuleName>Off": {{}}}} without parameter keys.
+- Do not output any parameter value related hints.
 
-输出格式：
-- 只允许一个最外层键（On 或 Off）
-- 所有数值型保持数字类型（不要加引号）；字符串参数原样即可
-- 保留 2~3 位小数（整数参数可为 int）
+Output format:
+- Only allow one outermost key (On or Off)
+- All numeric types remain numbers (no quotes); string parameters as-is
+- Keep 2~3 decimal places (integer parameters can be int)
 
-禁止事项：
-- 不得输出说明文字、理由、注释
-- 不得包含除该模块键以外的任何顶层键
-- 不得输出 null / None / NaN / Infinity
-- 不得使用与示例完全一样的参数集（数值需有差异）
+Prohibited items:
+- Must not output explanatory text, reasons, comments
+- Must not include any top-level keys other than this module's key
+- Must not output null / None / NaN / Infinity
+- Must not use exactly same parameter set as example (values need differences)
 
-现在请根据上述规则输出该模块最终 JSON。
+Now please output this module's final JSON according to above rules.
 """
         else:
             system_prompt = f"""
-你是一位专业音效调整师。基于音频向量参考参数 {audio_ref_info} 和内部通用经验输出该模块的 JSON。示例结构（仅参考格式，不参考数值）：{effector["example_with"]}
+You are a professional audio effects adjuster. Based on audio vector reference parameters {audio_ref_info} and internal general experience, output the module's JSON. Example structure (reference format only, not values): {effector["example_with"]}
 
-判定：
-- 若该模块为基础核心（均衡、压缩、主音延迟、主音混响、必要增益级） → 默认开启
-- 若为调制/特效（chorus, flanger, phaser）且无风格上下文 → 默认关闭
-- 若为高增益相关（distortion/overdrive）且无上下文 → 默认关闭
-- 可选策略：如模块名包含 "Equaliser" 则一定开启；"Compressor" 视为可开启；"Delay""Reverb" 可中性轻度开启以提供空间；其余关闭
+Judgment:
+- If module is basic core (equalization, compression, main delay, main reverb, necessary gain stage) → Default enabled
+- If modulation/effects (chorus, flanger, phaser) and no style context → Default disabled
+- If high gain related (distortion/overdrive) and no context → Default disabled
+- Optional strategy: if module name contains "Equaliser" then definitely enabled; "Compressor" considered enableable; "Delay"/"Reverb" can be neutrally lightly enabled to provide space; others disabled
 
-参考数据：{audio_ref_info}
+Reference data: {audio_ref_info}
 
-参数生成逻辑：
-1. 参考所有 On 样本该模块的参数值集合（来自{audio_vector_params}），计算每个参数的基准值（默认使用中位数；若无法解析则使用中性默认）。
-2. 基于基准值生成新值：保持"合理、接近、不过度漂移"：
-   - 0~1 归一化参数：偏移幅度 ±(0.03~0.10)，裁剪到 [0,1]
-   - 时间参数（ms、宽度等）：±5%~12%（若原值极小 <1，可加一个最小微调 0.001~0.01）
-   - dB 参数：±(5%~15%) 或 ±(1~3 dB) 取更小；阈值类（极负数）可在 ±(2~6 dB)
-   - 比率（Ratio）：若 <10 → ±(0.2~0.8)；若 ≥10 → ±(0.5~2.0)，不低于 1
-   - 延迟时间 Delay：保持在 1.00~400.00 范围内
-   - 仅整数参数（如某些 Width）可四舍五入
-3. 若{audio_vector_params}没有任何 On 样本 → 使用该模块的中性默认：
+Parameter generation logic:
+1. Reference all On samples' parameter value sets for this module (from {audio_vector_params}), calculate baseline value for each parameter (default use median; if cannot parse use neutral default).
+2. Generate new value based on baseline: maintain "reasonable, close, not excessive drift":
+   - 0~1 normalized parameters: offset ±(0.03~0.10), clamp to [0,1]
+   - Time parameters (ms, width, etc.): ±5%~12% (if original value very small <1, can add minimum adjustment 0.001~0.01)
+   - dB parameters: ±(5%~15%) or ±(1~3 dB) take smaller; thresholdtype (very negative) can ±(2~6 dB)
+   - Ratio: If <10 → ±(0.2~0.8); If ≥10 → ±(0.5~2.0), not below 1
+   - Delay time Delay: Keep within 1.00~400.00 range
+   - Integer parameters only (like some Width) can be rounded
+3. If {audio_vector_params} has no On samples → Use module's neutral default:
    - Compressor: Threshold=-24, Ratio=3, Attack=0.010~0.050, Release=0.120~0.250, Makeup=4, Mix=0.70
    - Distortion/Driver: Distortion=0.55, Volume=-12
    - Overdrive/Screamer: Drive=0.55, Tone=0.52, Level=-12
@@ -1180,48 +1179,48 @@ for effector in effectors:
    - Chorus: Delay=0.028, Depth=0.30, Frequency=0.60, Width=0.030
    - Flanger: Delay=0.012, Depth=0.40, Feedback=0.22, Frequency=0.55, Width=0.012
    - Phaser: Depth=0.60, Feedback=0.40, Frequency=0.60, Width=1500
-   - EQ: 全频段=0（Level=0）
+   - EQ: All bands=0 (Level=0)
 
-输出要求：
-1. 只输出 JSON，一个顶层键（On 或 Off），禁止添加任何说明文字或额外字段。
-2. 数值参数保持数字类型，不添加引号。
-3. 参数范围符合模块要求（如 Delay 时间 1.00~400.00）。
-4. 禁止输出 null、None、NaN 或 Infinity。
-5. 若判定为关闭，则输出如 {{"CompressorOff": {{}}}}。
+Output requirements:
+1. Only output JSON, one top-level key (On or Off), prohibit adding any explanatory text or extra fields.
+2. Numeric parameters remain numeric type, no quotes.
+3. Parameter range meets module requirements (e.g. Delay time 1.00~400.00).
+4. Prohibit outputting null, None, NaN or Infinity.
+5. If judged disabled, output like {{"CompressorOff": {{}}}}.
 
-现在请根据上述规则输出该模块 JSON。
+Now please output this module's JSON according to above rules.
 """
         print(f"system_prompt:{system_prompt}")
         user_prompt = effector["prompt_with"] + effector["example_with"]
-        # 保存系统消息
+        # Save system message
         system_message = {"role": "system", "content": system_prompt}
         conversation_history.append(system_message)
-        # 保存用户消息
+        # Save user message
         user_message = {"role": "user", "content": user_prompt}
         conversation_history.append(user_message)
-        # 发送请求
+        # Send request
         response = client.chat.completions.create(
             model="deepseek-chat",
             messages=[system_message, user_message],
             stream=False
         )
-        # 保存助手回复
+        # Save assistant reply
         assistant_message = {
             "role": "assistant",
             "content": response.choices[0].message.content
         }
         conversation_history.append(assistant_message)
 
-        # 获取响应数据并转换为 JSON
+        # Get response data and convert to JSON
         response_content = response.choices[0].message.content
-        # 去除前后的代码块标记和换行
+        # Remove code block markers and newlines from front and back
         cleaned_content = response_content.replace("```json", "").replace("```", "").strip()
         try:
             result = json.loads(cleaned_content)
             print(json.dumps(result, ensure_ascii=False, indent=2))
             final_result.update(result)
         except json.JSONDecodeError:
-            print(f"Error: 无效的JSON响应: {cleaned_content}")
+            print(f"Error: Invalid JSON response: {cleaned_content}")
             sys.exit(1)
     elif result1.get(effector_name) == "no":
         if effector_name == "compression":
@@ -1246,19 +1245,19 @@ for effector in effectors:
         elif effector_name == "phase":
             final_result["PhaserOff"] = {"Depth": "0.00", "Feedback": "0.00", "Frequency": "0.05", "Width": "50"}
 
-# 将最终结果转换为字符串
+# Convert final result to string
 result_str = json.dumps(final_result, ensure_ascii=False)
-# 打印相关信息
-print(f"输入的歌曲名称: {chat_message}")
-print(f"对应的风格和特点:{result2_str}")
-print(f"对应的参数:{result_str}")
+# Print related information
+print(f"Input song name: {chat_message}")
+print(f"Corresponding style and characteristics: {result2_str}")
+print(f"Corresponding parameters: {result_str}")
 print("-" * 50)
-# 将列表转换为JSON字符串
+# Convert list to JSON string
 song_style_str = json.dumps(song_style, ensure_ascii=False)
 guitar_features_str = json.dumps(guitar_features, ensure_ascii=False)
 
-print(f"完整的对话历史：{conversation_history}")
-# 系统提示
+print(f"Complete conversation history: {conversation_history}")
+# System prompt
 system_prompt3 = f'''
 You are a professional intelligent music effects assistant with extensive knowledge in music production and audio processing. Your role is to:
 
@@ -1315,32 +1314,32 @@ Provide a comprehensive analysis of the music style preferences and effects para
 Your response must start with "Parameter generation complete!\n" followed by a well-structured, professional analysis that demonstrates deep music production expertise.
 '''
 
-# 保存系统消息
+# Save system message
 system_message = {"role": "system", "content": system_prompt3}
-# 保存用户消息
+# Save user message
 user_message = {"role": "user", "content": user_prompt3}
-# 发送请求
+# Send request
 response3 = client.chat.completions.create(
     model="deepseek-chat",
     messages=[system_message, user_message],
     stream=False
 )
 response3_content = response3.choices[0].message.content
-print(f"清理后的响应：{response3_content}")
+print(f"Cleaned response: {response3_content}")
 
-# 先将向量转换为字符串格式（与查询代码对应）
+# First convert vector to string format (corresponding to query code)
 vector_str = ','.join(map(str, vector)) if vector is not None else ''
 
-# 数据合法性检查
+# Data validity check
 valid = True
 error_msg = []
 
-# 检查歌曲名是否为空
+# Check if song name is empty
 if not chat_message or chat_message.strip() == '':
     valid = False
-    error_msg.append("歌曲名不能为空")
+    error_msg.append("Song name cannot be empty")
 
-# 检查风格和特征字段是否为有效JSON
+# Check if style and feature fields are valid JSON
 try:
     if song_style_str:
         json.loads(song_style_str)
@@ -1348,36 +1347,36 @@ try:
         json.loads(guitar_features_str)
 except json.JSONDecodeError as e:
     valid = False
-    error_msg.append(f"风格或特征字段JSON格式错误: {str(e)}")
+    error_msg.append(f"Style or feature field JSON format error: {str(e)}")
 
-# 检查向量格式（如果存在）
+# Check vector format (if exists)
 if vector_str:
     try:
-        # 验证能否还原为浮点数列表
+        # Verify if can be restored to float list
         [float(x) for x in vector_str.split(',')]
     except ValueError:
         valid = False
-        error_msg.append("音频向量包含非数字值")
+        error_msg.append("Audio vector contains non-numeric values")
 
 if not valid:
-    print(f"数据验证失败: {'; '.join(error_msg)}")
+    print(f"Data validation failed: {'; '.join(error_msg)}")
     sys.exit(1)
 
-# 将风格结果字符串写入文件
+# Write style result string to file
 safe_write_file("result1.txt", song_style_str)
 
-# 将特征结果字符串写入文件
+# Write feature result string to file
 safe_write_file("result2.txt", guitar_features_str)
 
-# 将参数结果字符串写入文件
+# Write parameter result string to file
 safe_write_file("result.txt", result_str)
 
-# 将参数结果字符串写入文件
+# Write analysis result string to file
 safe_write_file("result3.txt", response3_content)
 
-# 关闭数据库连接
+# Close database connection
 conn.close()
 audio_conn.close()
 
-# 新增：等待用户输入后再关闭窗口
-#input("程序执行完毕，按回车键关闭窗口...")
+# New: Wait for user input before closing window
+#input("Program execution completed, press Enter to close window...")

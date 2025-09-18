@@ -32,19 +32,19 @@ public:
 		mGroupComponentPtr.reset(new juce::GroupComponent("tuner", "Tuner"));
 		addAndMakeVisible(*mGroupComponentPtr);
 
-		// 设置组件边框和文本颜色 - 深蓝色与白色背景形成对比
+		
 		mGroupComponentPtr->setColour(juce::GroupComponent::outlineColourId, juce::Colours::black);
 		mGroupComponentPtr->setColour(juce::GroupComponent::textColourId, juce::Colours::black);
 
 		mPitchLabel = std::make_unique<juce::Label>("Pitch", "Pitch");
-		// 设置标签颜色 - 深色文本在白色背景上更易读
+		
 		mPitchLabel->setColour(juce::Label::textColourId, juce::Colour(20, 20, 20));
 		mPitchLabel->setJustificationType(juce::Justification::centred);
 		mPitchLabel->setFont(juce::Font(18.0f, juce::Font::bold));
 		addAndMakeVisible(*mPitchLabel);
 
 		mRemainderLabel = std::make_unique<juce::Label>("Remainder", "Remainder");
-		// 设置标签颜色 - 深色文本在白色背景上更易读
+		
 		mRemainderLabel->setColour(juce::Label::textColourId, juce::Colour(20, 20, 20));
 		mRemainderLabel->setJustificationType(juce::Justification::centred);
 		mRemainderLabel->setFont(juce::Font(18.0f, juce::Font::bold));
@@ -57,7 +57,7 @@ public:
 		mToggleButtonAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
 			processorRef.getAudioProcessorValueTreeState(), toggleOnParameterId, *mToggleButtonPtr);
 
-		// 设置开关按钮颜色
+		
 		mToggleButtonPtr->setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
 		mToggleButtonPtr->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
 		mToggleButtonPtr->setColour(juce::ToggleButton::textColourId, juce::Colours::black);

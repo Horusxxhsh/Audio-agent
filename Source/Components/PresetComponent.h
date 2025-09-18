@@ -9,17 +9,17 @@
 #include <juce_core/juce_core.h>
 #include "DelayComponent.h"
 
-// Windows 特定头文件
+
 #ifdef _WIN32
 #include <windows.h>
-#undef min  // 避免与 std::min 冲突
-#undef max  // 避免与 std::max 冲突
+#undef min  
+#undef max  
 #endif
 
 class PresetComponent : public juce::Component, private juce::Thread, juce::Button::Listener, juce::ComboBox::Listener
 {
 public:
-    // 线程参数结构体
+    
     struct SqlThreadParam
     {
         juce::String paramString;
@@ -42,7 +42,7 @@ public:
         }
     };
 
-      // 构造函数
+      
     PresetComponent(PluginAudioProcessor& processor, PluginPresetManager& pm, juce::UndoManager& um)
         : audioProcessor(processor), presetManager(pm), undoManager(um), juce::Thread("SQL Thread")
     {
@@ -68,10 +68,10 @@ public:
         loadPresetList();
     }
 
-    // 析构函数
+    
     ~PresetComponent()
     {
-        stopThread(1000); // 确保线程停止
+        stopThread(1000); 
         undoButton.removeListener(this);
         redoButton.removeListener(this);
         saveButton.removeListener(this);
@@ -112,7 +112,7 @@ public:
 
         try
         {
-            // 获取 Python 解释器和脚本路径
+            
             juce::File pythonInterpreterFile;
             juce::File pythonScriptFile;
 
@@ -152,7 +152,7 @@ public:
             const juce::String pythonInterpreterPath = pythonInterpreterFile.getFullPathName();
             const juce::String pythonScriptPath = pythonScriptFile.getFullPathName();
 
-            // 构建完整的命令行
+            
             std::string command = "\"" + pythonInterpreterPath.toStdString() + "\" \"" + pythonScriptPath.toStdString() + "\"";
             command += " \"" + sqlThreadParam->paramString.toStdString() + "\"";
             command += " \"" + sqlThreadParam->userMessage.toStdString() + "\"";
@@ -169,11 +169,11 @@ public:
             STARTUPINFOA si = { sizeof(si) };
             PROCESS_INFORMATION pi = { 0 };
 
-            // 设置启动信息，隐藏窗口
+            
             si.dwFlags = STARTF_USESHOWWINDOW;
             si.wShowWindow = SW_HIDE;
 
-            // 创建进程
+            
             if (!CreateProcessA(
                 NULL,
                 const_cast<LPSTR>(command.c_str()),
@@ -191,8 +191,8 @@ public:
                 return;
             }
 
-            // 等待进程完成
-            DWORD waitResult = WaitForSingleObject(pi.hProcess, 300000); // 300秒超时
+            
+            DWORD waitResult = WaitForSingleObject(pi.hProcess, 300000); 
 
             if (waitResult == WAIT_TIMEOUT) {
                 juce::Logger::writeToLog("Python process timed out, terminating...");
@@ -203,7 +203,7 @@ public:
                 juce::Logger::writeToLog("Wait failed with error: " + juce::String(error));
             }
 
-            // 获取进程退出码
+            
             DWORD exitCode;
             if (GetExitCodeProcess(pi.hProcess, &exitCode)) {
                 int returnCode = static_cast<int>(exitCode);
@@ -229,7 +229,7 @@ public:
             CloseHandle(pi.hThread);
 
 #else
-            // 非 Windows 系统使用 system() 调用
+            
             int returnCode = std::system(command.c_str());
             juce::Logger::writeToLog("SQL script executed with return code: " + juce::String(returnCode));
 
@@ -257,13 +257,13 @@ public:
 
         juce::Logger::writeToLog("SQL thread finished");
 
-        // 在主线程中调用回调方法更新UI
+        
         juce::MessageManager::callAsync([this]() {
             sqlScriptCompleted();
         });
     }
 
-    // 公共方法用于启动异步线程
+    
     void startSqlScriptAsync(const juce::String& paramString, 
                            const juce::String& userMessage,
                            const juce::String& currentPresetName,
@@ -276,34 +276,34 @@ public:
         if (isSqlScriptRunning)
         {
             juce::Logger::writeToLog("Warning: SQL script is already running, cancelling previous request");
-            // 如果已经在运行，先停止当前线程
-            stopThread(1000); // 等待1秒让线程停止
+            
+            stopThread(1000); 
             sqlThreadParam.reset();
         }
 
-        // 重置执行状态
+        
         sqlScriptSuccess = false;
 
-        // 创建线程参数
+        
         sqlThreadParam = std::make_unique<SqlThreadParam>(
             paramString, userMessage, currentPresetName, memoryEnabled,
             audioPath, textWeight, audioWeight, preferenceWeight
         );
 
         isSqlScriptRunning = true;
-        startThread(); // 启动新线程执行Python脚本
+        startThread(); 
     }
     
-    // 回调方法用于在主线程中更新UI
+    
     void sqlScriptCompleted()
     {
         isSqlScriptRunning = false;
         sqlThreadParam.reset();
         
-        // 更新预设列表
+        
         loadPresetList();
         
-        // 根据执行结果显示相应的弹窗
+        
         if (sqlScriptSuccess) {
             // Success dialog - green check icon
             juce::AlertWindow::showMessageBoxAsync(
@@ -324,7 +324,7 @@ public:
             juce::Logger::writeToLog("SQL script failed");
         }
         
-        // 重置执行状态
+        
         sqlScriptSuccess = false;
     }
 
@@ -395,7 +395,7 @@ private:
                 return;
             }
 
-            // 收集所有效果器的开关状态
+            
             const auto index1 = presetManager.getParameterValue("pre_compressor_on");
             const auto index2 = presetManager.getParameterValue("tube_screamer_on");
             const auto index3 = presetManager.getParameterValue("mouse_drive_on");
@@ -406,18 +406,18 @@ private:
             const auto index8 = presetManager.getParameterValue("phaser_on");
             const auto index9 = presetManager.getParameterValue("pre_eq_on");
 
-            // 构建参数字符串，以开关状态开始
+            
             std::string paramString = std::to_string(index1) + "," + std::to_string(index2) + ","
                 + std::to_string(index3) + "," + std::to_string(index4) + ","
                 + std::to_string(index5) + "," + std::to_string(index6) + ","
                 + std::to_string(index7) + "," + std::to_string(index8) + ","
                 + std::to_string(index9);
 
-            // 用于跟踪已添加的参数数量
-            int paramCount = 9; // 初始为9个开关状态参数
+            
+            int paramCount = 9; 
 
-            // 根据开关状态添加对应效果器的参数
-            //1 - Compressor
+            
+            
             if (index1 == true) {
                 const auto comp1 = presetManager.getParameterValue("pre_comp_thresh");
                 juce::Logger::writeToLog("pre_comp_thresh:" + juce::String(comp1));
@@ -444,7 +444,7 @@ private:
                 paramCount += 6;
             }
 
-            //2 - Tube Screamer
+            
             if (index2 == true) {
                 const auto screamer1 = presetManager.getParameterValue("tube_screamer_drive");
                 const auto screamer2 = presetManager.getParameterValue("tube_screamer_level");
@@ -462,7 +462,7 @@ private:
                 paramCount += 3;
             }
 
-            //3 - Mouse Drive
+            
             if (index3 == true) {
                 const auto drive1 = presetManager.getParameterValue("mouse_drive_distortion");
                 const auto drive2 = presetManager.getParameterValue("mouse_drive_volume");
@@ -476,7 +476,7 @@ private:
                 paramCount += 2;
             }
 
-            //4 - Delay
+            
             if (index4 == true) {
                 const auto delay1 = presetManager.getParameterValue("delay_feedback");
                 const auto delay2 = presetManager.getParameterValue("delay_left_millisecond");
@@ -494,7 +494,7 @@ private:
                 paramCount += 3;
             }
 
-            //5 - Room
+            
             if (index5 == true) {
                 const auto room1 = presetManager.getParameterValue("room_size");
                 const auto room2 = presetManager.getParameterValue("room_damping");
@@ -514,7 +514,7 @@ private:
                 paramCount += 4;
             }
 
-            //6 - Chorus
+            
             if (index6 == true) {
                 const auto chorus1 = presetManager.getParameterValue("chorus_delay");
                 const auto chorus2 = presetManager.getParameterValue("chorus_depth");
@@ -534,7 +534,7 @@ private:
                 paramCount += 4;
             }
 
-            //7 - Flanger
+            
             if (index7 == true) {
                 const auto flanger1 = presetManager.getParameterValue("flanger_delay");
                 const auto flanger2 = presetManager.getParameterValue("flanger_depth");
@@ -612,11 +612,11 @@ private:
 
             juce::Logger::writeToLog("paramCount:" + juce::String(paramCount));
 
-            // 添加参数总数作为最后一个元素
+            
             paramString += "," + std::to_string(paramCount);
             juce::Logger::writeToLog("paramString:" + juce::String(paramString));
 
-            // 启动异步线程执行Python脚本
+            
             startSqlScriptAsync(
                 juce::String(paramString),
                 juce::String(userMessage),
@@ -675,10 +675,10 @@ private:
     juce::ComboBox presetList;
     std::unique_ptr<juce::FileChooser> fileChooser;
     
-    // 异步线程相关成员
+    
     std::unique_ptr<SqlThreadParam> sqlThreadParam;
     bool isSqlScriptRunning = false;
-    bool sqlScriptSuccess = false; // 跟踪脚本执行状态
+    bool sqlScriptSuccess = false; 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PresetComponent)
 };

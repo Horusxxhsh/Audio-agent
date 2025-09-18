@@ -50,7 +50,7 @@ public:
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     void reset() override;
 
-    void resetParametersToDefault(); // 重置参数的方法
+    void resetParametersToDefault(); 
 
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
@@ -217,7 +217,7 @@ private:
     bool mIsBypassOn = false;
 
     void loadImpulseResponseFromState();
-    std::unordered_map<std::string, float> parameterInitialValues; // 存储参数初始值的映射
+    std::unordered_map<std::string, float> parameterInitialValues; 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginAudioProcessor)
 };

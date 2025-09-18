@@ -39,7 +39,7 @@ public:
 		mGroupComponentPtr.reset(new juce::GroupComponent(title, title));
 		addAndMakeVisible(mGroupComponentPtr.get());
 
-		// 设置组件边框和文本颜色 - 深红色/棕色与绿色形成对比
+		
 		mGroupComponentPtr->setColour(juce::GroupComponent::outlineColourId, juce::Colours::black);
 		mGroupComponentPtr->setColour(juce::GroupComponent::textColourId, juce::Colours::black);
 
@@ -49,7 +49,7 @@ public:
 			sliderPtr->setTextValueSuffix(setting.suffix);
 			sliderPtr->setScrollWheelEnabled(false);
 
-			// 设置滑块颜色 - 使用深色和高对比度颜色
+			
 			sliderPtr->setColour(juce::Slider::thumbColourId, juce::Colour(220, 80, 80));
 			sliderPtr->setColour(juce::Slider::rotarySliderFillColourId, juce::Colour(180, 60, 60));
 			sliderPtr->setColour(juce::Slider::rotarySliderOutlineColourId, juce::Colour(50, 50, 50));
@@ -64,7 +64,7 @@ public:
 			labelPtr->setText(setting.title, juce::dontSendNotification);
 			labelPtr->attachToComponent(sliderPtr.get(), false);
 
-			// 设置标签颜色 - 白色文本在绿色背景上更易读
+			
 			labelPtr->setColour(juce::Label::textColourId, juce::Colours::black);
 			labelPtr->setJustificationType(juce::Justification::centred);
 
@@ -76,12 +76,12 @@ public:
 			mAttachmentPtrs.push_back(std::move(attachmentPtr));
 		}
 
-		// Toggle Button
+		
 		mToggleButtonPtr = std::make_unique<juce::ToggleButton>();
 		mToggleButtonAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
 			apvts, toggleOnParameterId, *mToggleButtonPtr);
 
-		// 设置开关按钮颜色
+		
 		mToggleButtonPtr->setColour(juce::ToggleButton::tickColourId, juce::Colour(220, 80, 80));
 		mToggleButtonPtr->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
 		mToggleButtonPtr->setColour(juce::ToggleButton::textColourId, juce::Colours::black);
@@ -94,10 +94,10 @@ public:
 			mAdditionalToggleButtonAttachmentPtr = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
 				apvts, additionalToggleParameterId, *mAdditionalToggleButtonPtr);
 
-			// 设置额外开关按钮颜色
+			
 			mAdditionalToggleButtonPtr->setColour(juce::ToggleButton::textColourId, juce::Colours::black);
 			mAdditionalToggleButtonPtr->setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
-			// 设置按钮框（边框）的颜色为黑色
+			
 			mAdditionalToggleButtonPtr->setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
 
 			addAndMakeVisible(mAdditionalToggleButtonPtr.get());

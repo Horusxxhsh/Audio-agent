@@ -19,8 +19,7 @@
 
 #include <JuceHeader.h>
 
-// 如果后续需要对外暴露主题切换接口，可在此添加 enum ThemeVariant { Light, Dark, ... } 等
-// 目前主题色集中在 PluginLookAndFeel.cpp 内部的 UITheme 命名空间中。
+
 
 class PluginLookAndFeel : public juce::LookAndFeel_V4
 {
@@ -28,7 +27,7 @@ public:
     PluginLookAndFeel();
     ~PluginLookAndFeel() override;
 
-    // 旋钮（圆形滑块）绘制
+ 
     void drawRotarySlider(juce::Graphics&,
         int x, int y, int width, int height,
         float sliderPosProportional,
@@ -36,34 +35,33 @@ public:
         const float rotaryEndAngle,
         juce::Slider&) override;
 
-    // 按钮背景
+
     void drawButtonBackground(juce::Graphics& g,
         juce::Button& button,
         const juce::Colour& backgroundColour,
         bool isMouseOverButton,
         bool isButtonDown) override;
 
-    // 按钮文字
+
     void drawButtonText(juce::Graphics& g,
         juce::TextButton& button,
         bool isMouseOverButton,
         bool isButtonDown) override;
 
-    // 为滑块创建文本框
+
     juce::Label* createSliderTextBox(juce::Slider& slider) override;
 
-    // ToggleButton（复选/开关）
+  
     void drawToggleButton(juce::Graphics& g,
         juce::ToggleButton& button,
         bool isMouseOverButton,
         bool isButtonDown) override;
 
-    // PopupMenu 分节标题
+  
     void drawPopupMenuSectionHeader(juce::Graphics& g,
         const juce::Rectangle<int>& area,
         const juce::String& sectionName) override;
    
     int getTabButtonBestWidth(juce::TabBarButton& button, int tabDepth) override;
     void positionComboBoxText(juce::ComboBox& box, juce::Label& label) override;
-    // 如需：可在此添加 setThemeVariant(ThemeVariant v) 等接口
 };

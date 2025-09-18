@@ -16,7 +16,7 @@ import numpy as np
 
 
 def parameters_update(parameters):
-    # 当 first_47[0] == 1.0 时，将 "CompressorOff" 替换为 "CompressorOn"
+    # When first_47[0] == 1.0, replace "CompressorOff" with "CompressorOn"
     if first_47[0] == 1.0 and 'CompressorOff' in parameters:
         compressor_settings = parameters.pop('CompressorOff')
         parameters['CompressorOn'] = compressor_settings
@@ -31,7 +31,7 @@ def parameters_update(parameters):
         parameters['CompressorOff']['Makeup'] = -12.00
         parameters['CompressorOff']['Mix'] = 0.00
 
-    # 当 first_47[1] == 1.0 时，将 "ScreamerOff" 替换为 "ScreamerOn"
+    # When first_47[1] == 1.0, replace "ScreamerOff" with "ScreamerOn"
     if first_47[1] == 1.0 and 'ScreamerOff' in parameters:
         compressor_settings = parameters.pop('ScreamerOff')
         parameters['ScreamerOn'] = compressor_settings
@@ -43,7 +43,7 @@ def parameters_update(parameters):
         parameters['ScreamerOff']['Tone'] = 0.00
         parameters['ScreamerOff']['Level'] = -64.0000000
 
-    # 当 first_47[2] == 1.0 时，将 "DriverOff" 替换为 "DriverOn"
+    # When first_47[2] == 1.0, replace "DriverOff" with "DriverOn"
     if first_47[2] == 1.0 and 'DriverOff' in parameters:
         compressor_settings = parameters.pop('DriverOff')
         parameters['DriverOn'] = compressor_settings
@@ -54,7 +54,7 @@ def parameters_update(parameters):
         parameters['DriverOff']['Distortion'] = 0.00
         parameters['DriverOff']['Volume'] = -64.0
 
-        # 当 first_47[3] == 1.0 时，将 "DelayOff" 替换为 "DelayOn"
+        # When first_47[3] == 1.0, replace "DelayOff" with "DelayOn"
     if first_47[3] == 1.0 and 'DelayOff' in parameters:
         compressor_settings = parameters.pop('DelayOff')
         parameters['DelayOn'] = compressor_settings
@@ -66,7 +66,7 @@ def parameters_update(parameters):
         parameters['DelayOff']['Delay'] = 1.00
         parameters['DelayOff']['Mix'] = 0.00
 
-        # 当 first_47[4] == 1.0 时，将 "ReverbOff" 替换为 "ReverbOn"
+        # When first_47[4] == 1.0, replace "ReverbOff" with "ReverbOn"
     if first_47[4] == 1.0 and 'ReverbOff' in parameters:
         compressor_settings = parameters.pop('ReverbOff')
         parameters['ReverbOn'] = compressor_settings
@@ -79,7 +79,7 @@ def parameters_update(parameters):
         parameters['ReverbOff']['Width'] = 0.00
         parameters['ReverbOff']['Mix'] = 0.00
 
-        # 当 first_47[5] == 1.0 时，将 "ChorusOff" 替换为 "ChorusOn"
+        # When first_47[5] == 1.0, replace "ChorusOff" with "ChorusOn"
     if first_47[5] == 1.0 and 'ChorusOff' in parameters:
         compressor_settings = parameters.pop('ChorusOff')
         parameters['ChorusOn'] = compressor_settings
@@ -92,7 +92,7 @@ def parameters_update(parameters):
         parameters['ChorusOff']['Frequency'] = 0.05
         parameters['ChorusOff']['Width'] = 0.010
 
-        # 当 first_47[6] == 1.0 时，将 "FlangerOff" 替换为 "FlangerOn"
+        # When first_47[6] == 1.0, replace "FlangerOff" with "FlangerOn"
     if first_47[6] == 1.0 and 'FlangerOff' in parameters:
         compressor_settings = parameters.pop('FlangerOff')
         parameters['FlangerOn'] = compressor_settings
@@ -106,7 +106,7 @@ def parameters_update(parameters):
         parameters['FlangerOff']['Frequency'] = 0.05
         parameters['FlangerOff']['Width'] = 0.001
 
-    # 当 first_47[7] == 1.0 时，将 "PhaserOff" 替换为 "PhaserOn"
+    # When first_47[7] == 1.0, replace "PhaserOff" with "PhaserOn"
     if first_47[7] == 1.0 and 'PhaserOff' in parameters:
         compressor_settings = parameters.pop('PhaserOff')
         parameters['PhaserOn'] = compressor_settings
@@ -119,7 +119,7 @@ def parameters_update(parameters):
         parameters['PhaserOff']['Frequency'] = -64.0000000
         parameters['PhaserOff']['Width'] = -64.0000000
 
-    # 当 first_47[8] == 1.0 时，将 "EqualiserOff" 替换为 "EqualiserOn"
+    # When first_47[8] == 1.0, replace "EqualiserOff" with "EqualiserOn"
     if first_47[8] == 1.0 and 'EqualiserOff' in parameters:
         compressor_settings = parameters.pop('EqualiserOff')
         parameters['EqualiserOn'] = compressor_settings
@@ -136,27 +136,27 @@ def parameters_update(parameters):
         parameters['EqualiserOff']['6400hz'] = 0.00
         parameters['EqualiserOff']['Level'] = 0.00
 
-        # 更新数据库中的参数值
+        # Update parameter values in database
     if first_47[0] == 1.0:
         if 'CompressorOn' in parameters:
 
-            # 将 first_47[9] 转换为 Threshold 范围的值
+            # Convert first_47[9] to Threshold range value
             first_47[9] = float(first_47[9])
             threshold = -128 + (0 - (-128)) * first_47[9]
             parameters['CompressorOn']['Threshold'] = threshold
 
-            # 获取 Ratio 值
+            # Get Ratio value
             first_47[11] = float(first_47[11])
             ratio = get_ratio(first_47[11])
             if ratio is not None:
                 parameters['CompressorOn']['Ratio'] = ratio
             else:
-                print(f"未找到 first_47[11] = {first_47[11]} 对应的 Ratio 值")
+                print(f"No corresponding Ratio value found for first_47[11] = {first_47[11]}")
 
             parameters['CompressorOn']['Attack'] = first_47[10]
             parameters['CompressorOn']['Release'] = first_47[12]
 
-            # 将 first_47[13] 转换为 Makeup 范围的值
+            # Convert first_47[13] to Makeup range value
             first_47[13] = float(first_47[13])
             makeup = -128 + (64 - (-128)) * first_47[13]
             parameters['CompressorOn']['Makeup'] = makeup
@@ -166,7 +166,7 @@ def parameters_update(parameters):
     if first_47[2] == 1.0:
         if 'DriverOn' in parameters:
             parameters['DriverOn']['Distortion'] = first_47[18]
-            # 将 first_47[19] 转换为 Volume 范围的值
+            # Convert first_47[19] to Volume range value
             first_47[19] = float(first_47[19])
             volume = -64 + (0 - (-64)) * first_47[19]
             parameters['DriverOn']['Volume'] = volume
@@ -175,7 +175,7 @@ def parameters_update(parameters):
         if 'ScreamerOn' in parameters:
             parameters['ScreamerOn']['Drive'] = first_47[15]
             parameters['ScreamerOn']['Tone'] = first_47[17]
-            # 将 first_47[16] 转换为 Volume 范围的值
+            # Convert first_47[16] to Volume range value
             first_47[16] = float(first_47[16])
             volume = -64 + (0 - (-64)) * first_47[16]
             parameters['ScreamerOn']['Level'] = volume
@@ -198,85 +198,85 @@ def parameters_update(parameters):
     if first_47[8] == 1.0:
         if 'EqualiserOn' in parameters:
             if len(first_47) > 46:
-                # 将 first_47[40] 转换为 Frequency 范围的值
+                # Convert first_47[40] to Frequency range value
                 first_47[40] = float(first_47[40])
                 fz = -15.00 + (15.00 - (-15.00)) * first_47[40]
                 parameters['EqualiserOn']['100hz'] = fz
 
-                # 将 first_47[41] 转换为 Frequency 范围的值
+                # Convert first_47[41] to Frequency range value
                 first_47[41] = float(first_47[41])
                 fz = -15.00 + (15.00 - (-15.00)) * first_47[41]
                 parameters['EqualiserOn']['200hz'] = fz
 
-                # 将 first_47[42] 转换为 Frequency 范围的值
+                # Convert first_47[42] to Frequency range value
                 first_47[42] = float(first_47[42])
                 fz = -15.00 + (15.00 - (-15.00)) * first_47[42]
                 parameters['EqualiserOn']['400hz'] = fz
 
-                # 将 first_47[43] 转换为 Frequency 范围的值
+                # Convert first_47[43] to Frequency range value
                 first_47[43] = float(first_47[43])
                 fz = -15.00 + (15.00 - (-15.00)) * first_47[43]
                 parameters['EqualiserOn']['800hz'] = fz
 
-                # 将 first_47[44] 转换为 Frequency 范围的值
+                # Convert first_47[44] to Frequency range value
                 first_47[44] = float(first_47[44])
                 fz = -15.00 + (15.00 - (-15.00)) * first_47[44]
                 parameters['EqualiserOn']['1600hz'] = fz
 
-                # 将 first_47[45] 转换为 Frequency 范围的值
+                # Convert first_47[45] to Frequency range value
                 first_47[45] = float(first_47[45])
                 fz = -15.00 + (15.00 - (-15.00)) * first_47[45]
                 parameters['EqualiserOn']['3200hz'] = fz
 
-                # 将 first_47[46] 转换为 Frequency 范围的值
+                # Convert first_47[46] to Frequency range value
                 first_47[46] = float(first_47[46])
                 fz = -15.00 + (15.00 - (-15.00)) * first_47[46]
                 parameters['EqualiserOn']['6400hz'] = fz
             if len(first_47) > 47:
-                # 将 first_47[47] 转换为 Frequency 范围的值
+                # Convert first_47[47] to Frequency range value
                 first_47[47] = float(first_47[47])
                 fz = -15.00 + (15.00 - (-15.00)) * first_47[47]
                 parameters['EqualiserOn']['Level'] = fz
 
     if first_47[5] == 1.0:
         if 'ChorusOn' in parameters:
-            # 将 first_47[27] 转换为 Depth 范围的值
+            # Convert first_47[27] to Depth range value
             first_47[27] = float(first_47[27])
             depth = 0.010 + (0.050 - 0.010) * first_47[27]
             parameters['ChorusOn']['Delay'] = depth
 
             parameters['ChorusOn']['Depth'] = first_47[28]
 
-            # 将 first_47[29] 转换为 Frequency 范围的值
+            # Convert first_47[29] to Frequency range value
             first_47[29] = float(first_47[29])
             frequency = 0.05 + (2.00 - 0.05) * first_47[29]
             parameters['ChorusOn']['Frequency'] = frequency
 
-            # 将 first_47[30] 转换为 Width 范围的值
+            # Convert first_47[30] to Width range value
             first_47[30] = float(first_47[30])
             width = 0.010 + (0.050 - 0.010) * first_47[30]
             parameters['ChorusOn']['Width'] = width
 
     if first_47[6] == 1.0:
         if 'FlangerOn' in parameters:
-            # 将 first_47[31] 转换为 Delay 范围的值
+            # Convert first_47[31] to Delay range value
             first_47[31] = float(first_47[31])
             delay = 0.00100 + (0.02000 - 0.00100) * first_47[31]
             parameters['FlangerOn']['Delay'] = delay
 
             parameters['FlangerOn']['Depth'] = first_47[32]
 
-            # 将 first_47[33] 转换为 Feedback 范围的值
+            # Convert first_47[33] to Feedback range value
             first_47[33] = float(first_47[33])
             feedback = 0.00 + (0.50 - 0.00) * first_47[33]
             parameters['FlangerOn']['Feedback'] = feedback
 
-            # 将 first_47[34] 转换为 Frequency 范围的值
+            # Convert first_47[34] to Frequency range value
             first_47[34] = float(first_47[34])
             frequency = 0.05 + (2.00 - 0.05) * first_47[34]
             parameters['FlangerOn']['Frequency'] = frequency
 
-            # 将 first_47[35] 转换为 Width 范围的值
+            # Convert first_47[35] to Width range value
             first_47[35] = float(first_47[35])
             width = 0.001 + (0.020 - 0.001) * first_47[35]
             parameters['FlangerOn']['Width'] = width
@@ -285,17 +285,17 @@ def parameters_update(parameters):
         if 'PhaserOn' in parameters:
             parameters['PhaserOn']['Depth'] = first_47[36]
 
-            # 将 first_47[37] 转换为 Feedback 范围的值
+            # Convert first_47[37] to Feedback range value
             first_47[37] = float(first_47[37])
             feedback = 0.00 + (0.09 - 0.00) * first_47[37]
             parameters['PhaserOn']['Feedback'] = feedback
 
-            # 将 first_47[38] 转换为 Frequency 范围的值
+            # Convert first_47[38] to Frequency range value
             first_47[38] = float(first_47[38])
             frequency = 0.00 + (2.00 - 0.00) * first_47[38]
             parameters['PhaserOn']['Frequency'] = frequency
 
-            # 将 first_47[39] 转换为 Width 范围的值
+            # Convert first_47[39] to Width range value
             first_47[39] = float(first_47[39])
             width = 50 + (3000 - 50) * first_47[39]
             parameters['PhaserOn']['Width'] = width
@@ -304,9 +304,9 @@ def parameters_update(parameters):
 
 
 
-# 1. 定义参数映射（复用现有映射）
+# 1. Define parameter mapping (reuse existing mapping)
 param_mapping = {
-    # 开关控制映射
+    # Switch control mapping
     "CompressorOn": ("pre_compressor_on", 1),
     "CompressorOff": ("pre_compressor_on", 0),
     "ScreamerOn": ("tube_screamer_on", 1),
@@ -326,7 +326,7 @@ param_mapping = {
     "EqualiserOn": ("pre_eq_on", 1),
     "EqualiserOff": ("pre_eq_on", 0),
 
-    # 参数值映射
+    # Parameter value mapping
     "CompressorOn.Threshold": "pre_comp_thresh",
     "CompressorOn.Ratio": "pre_comp_ratio",
     "CompressorOn.Attack": "pre_comp_attack",
@@ -407,7 +407,7 @@ param_mapping = {
     "EqualiserOff.Level": "pre_eq_level_gain"
 }
 
-# 定义 MemoryNote 类
+# Define MemoryNote class
 class MemoryNote:
     def __init__(self, id, songName, style, feature, parameter, preference):
         self.id = id
@@ -423,31 +423,31 @@ class MemoryNote:
 
 
 
-# 定义Jaccard相似度函数
+# Define Jaccard similarity function
 def jaccard_similarity(set1, set2):
     intersection = len(set1.intersection(set2))
     union = len(set1.union(set2))
     return intersection / union if union != 0 else 0
 
-# 改进的标签相似度计算函数，考虑标签的语义相似度和权重
+# Enhanced tag similarity calculation function considering semantic similarity and weights
 def enhanced_tag_similarity(target_tags, hist_tags):
-    """增强的标签相似度计算，考虑语义相似度和权重"""
+    """Enhanced tag similarity calculation considering semantic similarity and weights"""
     if not target_tags or not hist_tags:
         return 0.0
     
-    # 计算基础Jaccard相似度
+    # Calculate base Jaccard similarity
     base_similarity = jaccard_similarity(set(target_tags), set(hist_tags))
     
-    # 计算精确匹配数量
+    # Calculate exact match count
     exact_matches = len(set(target_tags).intersection(set(hist_tags)))
     
-    # 计算语义相似度（基于标签的前缀/后缀匹配）
+    # Calculate semantic similarity (based on prefix/suffix matching of tags)
     semantic_matches = 0
     for target_tag in target_tags:
         for hist_tag in hist_tags:
-            # 如果标签有共同前缀或后缀
+            # If tags have common prefix or suffix
             if target_tag == hist_tag:
-                semantic_matches += 1  # 精确匹配已经计过，这里不再重复
+                semantic_matches += 1  # Exact match already counted, no duplication here
             elif (target_tag.replace('_rock', '') == hist_tag.replace('_rock', '')) or \
                  (target_tag.replace('_metal', '') == hist_tag.replace('_metal', '')) or \
                  (target_tag.replace('_rhythm', '') == hist_tag.replace('_rhythm', '')) or \
@@ -458,15 +458,15 @@ def enhanced_tag_similarity(target_tags, hist_tags):
                  (target_tag.replace('_influenced', '') == hist_tag.replace('_influenced_solos', '')) or \
                  (target_tag == hist_tag.replace('_solos', '')) or \
                  (hist_tag == target_tag.replace('_solos', '')):
-                semantic_matches += 0.5  # 部分语义相似
+                semantic_matches += 0.5  # Partial semantic similarity
     
-    # 综合计算：基础相似度占70%，语义匹配占30%
+    # Comprehensive calculation: base similarity accounts for 70%, semantic matching for 30%
     enhanced_sim = base_similarity * 0.7 + (semantic_matches / max(len(target_tags), len(hist_tags))) * 0.3
     
     return enhanced_sim
 
 
-# 定义文本相似度函数
+# Define text similarity function
 def text_similarity(text1, text2):
     if not text1 or not text2:
         return 0.0
@@ -475,17 +475,17 @@ def text_similarity(text1, text2):
     return cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
 
 def parse_structured_features(feature_array):
-    """解析结构化特征数组，提取所有关键词"""
+    """Parse structured feature array to extract all keywords"""
     all_keywords = []
     if isinstance(feature_array, list):
         for feature in feature_array:
             if isinstance(feature, str):
-                # 检查是否包含结构化数据（以分号分隔的部分）
+                # Check if contains structured data (semicolon-separated parts)
                 if ";" in feature:
-                    # 分割普通描述和结构化部分
+                    # Split regular description and structured part
                     parts = feature.split(";", 1)
                     all_keywords.extend(parts[0].lower().split())
-                    # 添加结构化部分的关键词
+                    # Add keywords from structured part
                     if ":" in parts[1]:
                         tech_name, tech_details = parts[1].split(":", 1)
                         all_keywords.append(tech_name.strip())
@@ -493,7 +493,7 @@ def parse_structured_features(feature_array):
                 else:
                     all_keywords.extend(feature.lower().split())
     elif isinstance(feature_array, str):
-        # 处理字符串格式的情况
+        # Handle string format case
         if ";" in feature_array:
             parts = feature_array.split(";", 1)
             all_keywords.extend(parts[0].lower().split())
@@ -504,57 +504,57 @@ def parse_structured_features(feature_array):
         else:
             all_keywords.extend(feature_array.lower().split())
     
-    return list(set(all_keywords))  # 去重
+    return list(set(all_keywords))  # Remove duplicates
 
 
-# 更新预设文件
+# Update preset file
 def update_preset_in_file(file_path, params_dict):
     try:
         tree = ET.parse(file_path)
         root = tree.getroot()
 
-        # 更新参数
+        # Update parameters
         for param in root.findall('PARAM'):
             param_id = param.get('id')
             if param_id in params_dict:
                 param.set('value', str(params_dict[param_id]))
 
-        # 保存更新后的内容
+        # Save updated content
         tree.write(file_path, encoding='utf-8', xml_declaration=True)
-        print(f"预设文件 {file_path} 已更新")
+        print(f"Preset file {file_path} updated successfully")
         return True
     except Exception as e:
-        print(f"更新预设文件出错: {e}")
+        print(f"Error updating preset file: {e}")
         return False
 
 
 def safe_open_file(relative_path, absolute_dir=None):
-    """尝试打开文件，如果相对路径失败则尝试使用环境变量指定的路径"""
+    """Try to open file, if relative path fails try using environment variable specified path"""
 
-    # 如果没有提供绝对路径，尝试从环境变量获取
+    # If absolute path not provided, try to get from environment variable
     if absolute_dir is None:
         absolute_dir = os.environ.get('DOCUMENTS_DIR')
-        # 如果环境变量也不存在，使用默认值
+        # If environment variable also doesn't exist, use default value
         if not absolute_dir:
-            print("警告: 环境变量 DOCUMENTS_DIR 未设置，使用当前目录")
-            absolute_dir = os.getcwd()  # 使用当前工作目录作为备选
+            print("Warning: Environment variable DOCUMENTS_DIR not set, using current directory")
+            absolute_dir = os.getcwd()  # Use current working directory as alternative
 
     try:
-        # 首先尝试相对路径
+        # First try relative path
         with open(relative_path, 'r', encoding='utf-8') as file:
             content = file.read()
-            print(f"成功从相对路径打开文件: {relative_path}")
+            print(f"Successfully opened file from relative path: {relative_path}")
             return content
     except FileNotFoundError:
         try:
-            # 如果相对路径失败，尝试环境变量指定的路径
+            # If relative path fails, try environment variable specified path
             absolute_path = os.path.join(absolute_dir, relative_path)
             with open(absolute_path, 'r', encoding='utf-8') as file:
                 content = file.read()
-                print(f"成功从环境变量指定路径打开文件: {absolute_path}")
+                print(f"Successfully opened file from environment variable specified path: {absolute_path}")
                 return content
         except FileNotFoundError:
-            print(f"无法打开文件 {relative_path}，相对路径和环境变量路径都失败")
+            print(f"Cannot open file {relative_path}, both relative and environment variable paths failed")
             return ""
 
 def get_ratio(value):
@@ -574,42 +574,42 @@ def get_ratio(value):
 
 
 def update_parameters_to_database(parameters):
-    # 只有记忆系统开启才会执行这部分代码
+    # Only execute this code when memory system is enabled
     if memoryEnabled == "true":
-        # 首先查询数据库中是否有与当前user_message匹配的记录
+        # First query database for records matching current user_message
         cursor.execute("SELECT SongName, Style, Feature, Parameters, Preferences FROM music_responses WHERE SongName = ?", (user_message,))
         matched_row = cursor.fetchone()
         
         if matched_row:
-            # 如果找到匹配记录，使用数据库中的数据
+            # If matching record found, use data from database
             song_name = matched_row[0]
             style_str = matched_row[1]
             feature_str = matched_row[2]
             parameter_str = matched_row[3]
             preferences_str = matched_row[4]
             
-            print(f"从数据库获取匹配记录: {song_name}")
-            print(f"数据库style_str: {style_str}")
-            print(f"数据库feature_str: {feature_str}")
+            print(f"Retrieved matching record from database: {song_name}")
+            print(f"Database style_str: {style_str}")
+            print(f"Database feature_str: {feature_str}")
         else:
-            # 如果没有匹配记录，回退到result1.txt和result2.txt文件
+            # If no matching record, fallback to result1.txt and result2.txt files
             song_name = user_message
             style_str = result1_str
             feature_str = result2_str
             parameter_str = result_str
             preferences_str = 'edit'
             
-            print(f"未找到数据库匹配记录，使用result文件: {song_name}")
+            print(f"No matching database record found, using result files: {song_name}")
             print(f"result1_str: {style_str}")
             print(f"result2_str: {feature_str}")
         
-        # 从数据库中获取所有歌曲信息并计算相似度,得到similar_songs和memory_notes
+        # Get all song info from database and calculate similarity, getting similar_songs and memory_notes
         cursor.execute("SELECT SongName, Style, Feature, Parameters, Preferences FROM music_responses")
         rows = cursor.fetchall()
         similar_songs = []
-        memory_notes = []  # 存储 MemoryNote 实例的列表
+        memory_notes = []  # List storing MemoryNote instances
         
-        # 从结果中排除当前处理的记录
+        # Exclude current record from results
         db_rows = [row for row in rows if row[0] != user_message]
 
         for index, row in enumerate(db_rows, start=1):
@@ -617,7 +617,7 @@ def update_parameters_to_database(parameters):
             style_str = row[1]
             feature_str = row[2]
             parameter_str = row[3]
-            preferences_str = row[4]  # 偏好字段，暂未使用
+            preferences_str = row[4]  # Preference field, not used yet
             if song_name != user_message:
                 try:
                     print(f"R song_name: {song_name}")
@@ -628,31 +628,31 @@ def update_parameters_to_database(parameters):
                     style = json.loads(style_str)
                     feature = json.loads(feature_str)
 
-                    # 计算标签相似度
+                    # Calculate tag similarity
                     tags = set(style)
                     tag_similarity = enhanced_tag_similarity(list(result1_set), list(tags))
                     
-                    # 改进的描述相似度计算：考虑结构化特征的匹配
-                    # 使用从数据库或文件获取的feature_str
+                    # Improved description similarity calculation: considering structured feature matching
+                    # Use feature_str from database or file
                     target_features_str = feature_str
                     if target_features_str and feature:
-                        # 解析目标特征（从数据库或文件读取的字符串可能是JSON数组或字符串）
+                        # Parse target features (string from database/file may be JSON array or string)
                         try:
                             target_features = json.loads(target_features_str)
                         except json.JSONDecodeError:
                             target_features = target_features_str
                         
-                        # 使用新的解析函数提取所有关键词
+                        # Use new parsing function to extract all keywords
                         target_keywords = parse_structured_features(target_features)
                         desc_similarities = []
                         
-                        # 对每个历史特征计算相似度
+                        # Calculate similarity for each historical feature
                         for hist_feature in feature:
                             if hist_feature.strip():
-                                # 解析历史特征
+                                # Parse historical feature
                                 hist_keywords = parse_structured_features(hist_feature)
                                 
-                                # 计算关键词交集相似度
+                                # Calculate keyword intersection similarity
                                 common_keywords = set(target_keywords) & set(hist_keywords)
                                 union_keywords = set(target_keywords) | set(hist_keywords)
                                 
@@ -660,40 +660,40 @@ def update_parameters_to_database(parameters):
                                     keyword_similarity = len(common_keywords) / len(union_keywords)
                                     desc_similarities.append(keyword_similarity)
                         
-                        # 取最大相似度作为描述相似度
+                        # Take maximum similarity as description similarity
                         desc_similarity = max(desc_similarities) if desc_similarities else 0.0
                         
-                        # 如果历史记录有多个描述句子，给予额外奖励
+                        # Give extra reward if historical record has multiple description sentences
                         if len(feature) > 1:
-                            desc_similarity = min(desc_similarity * 1.1, 1.0)  # 最高不超过1.0
+                            desc_similarity = min(desc_similarity * 1.1, 1.0)  # Maximum not exceeding 1.0
                     else:
                         desc_similarity = 0.0
                     
-                    # 加权总体相似度：标签相似度权重0.6，描述相似度权重0.4
+                    # Weighted overall similarity: tag similarity weight 0.6, description similarity weight 0.4
                     similarity = tag_similarity * 0.6 + desc_similarity * 0.4
                     print(f"similarity:{similarity}")
                     if similarity > 0.11:
                         similar_songs.append((song_name, similarity, style_str, feature_str, parameter_str))
-                        # 存储检索到的歌曲的信息
-                        # 限制memory_notes最大长度为3
+                        # Store retrieved song info
+                        # Limit memory_notes maximum length to 3
                         if len(memory_notes) < 3:
                             note = MemoryNote(index, song_name, style, feature, parameter_str, preferences_str)
                             memory_notes.append(note)
                         else:
-                            # 已达到最大长度，可根据需要选择是否跳出循环
-                            break  # 如果想只保留前3个符合条件的，可以加上break
+                            # Reached maximum length, can choose whether to break loop as needed
+                            break  # If want to keep only first 3 qualifying, can add break
 
                 except json.JSONDecodeError:
-                    print(f"Error: 无效的JSON响应: {style_str}")
-        # 打印 MemoryNote 实例的信息
+                    print(f"Error: Invalid JSON response: {style_str}")
+        # Print MemoryNote instance information
         for note in memory_notes:
             print(f"note:{note}")
 
-        # 记忆更新
+        # Memory update
         song_name = user_message
         sqlParameters = json.dumps(parameters, ensure_ascii=False, indent=2)
         print(f"sqlParameters:{sqlParameters}")
-        # 格式化 system_prompt3
+        # Format system_prompt3
         memory_notes_str = "\n".join([str(note) for note in memory_notes])
         system_prompt3 = f'''
                                         You are an AI memory evolution agent responsible for managing and evolving a knowledge base.
@@ -714,15 +714,27 @@ def update_parameters_to_database(parameters):
                                         2. What specific actions should be taken (strengthen, update_neighbor)?
                                            2.1 If choose to strengthen the connection, which memory should it be connected to? Can you give the updated tags of this memory?
                                            2.2 If choose to update_neighbor, you must update the parameters of these memories based on the following rules:
-                                                   - **CRITICAL MODULE STATE RULE - ABSOLUTE REQUIREMENT**: For ALL audio effectors (Driver, Phaser, Equaliser, Flanger, Chorus, Reverb, Delay, Screamer, Compressor):
-                                                     * IF CURRENT MEMORY HAS "DRIVEROFF" -> ALL NEIGHBORS MUST HAVE "DRIVEROFF" (Distortion: 0.0, Volume: -64.0)
-                                                     * IF CURRENT MEMORY HAS "PHASEROFF" -> ALL NEIGHBORS MUST HAVE "PHASEROFF" (Depth: 0.0, Feedback: 0.0, Frequency: -64.0, Width: -64.0)
-                                                     * IF CURRENT MEMORY HAS "CHORUSOFF" -> ALL NEIGHBORS MUST HAVE "CHORUSOFF" (Depth: 0.0, Frequency: 0.05, Width: 0.01)
-                                                     * IF CURRENT MEMORY HAS "FLANGEROFF" -> ALL NEIGHBORS MUST HAVE "FLANGEROFF" (Depth: 0.0, Feedback: 0.0, Frequency: 0.05, Width: 0.001)
-                                                     * IF CURRENT MEMORY HAS "DELAYOFF" -> ALL NEIGHBORS MUST HAVE "DELAYOFF" (Feedback: 0.0, Delay: 1.0, Mix: 0.0)
-                                                     * IF CURRENT MEMORY HAS "MODULEON" -> SET NEIGHBOR'S MODULE TO "MODULEON" BUT WITH DIFFERENT PARAMETER VALUES (DO NOT COPY EXACT VALUES FROM CURRENT MEMORY)
+                                                   - **CRITICAL MODULE STATE RULE - ABSOLUTE REQUIREMENT**: For ALL audio effectors (Compressor, Driver, Screamer, Delay, Reverb, Chorus, Flanger, Equaliser, Phaser):
+                                                     * IF CURRENT MEMORY HAS "DriverOff" -> ALL NEIGHBORS MUST HAVE "DriverOff" (Distortion: 0.0, Volume: -64.0)
+                                                     * IF CURRENT MEMORY HAS "ScreamerOff" -> ALL NEIGHBORS MUST HAVE "ScreamerOff" (Drive: 0.0, Tone: 0.0,Level: -64.0)
+                                                     * IF CURRENT MEMORY HAS "ReverbOff" -> ALL NEIGHBORS MUST HAVE "ReverbOff" (Size: 0.0, Damping: 0.0, Mix: 0.0, Width: 0.0)
+                                                     * IF CURRENT MEMORY HAS "PhaserOff" -> ALL NEIGHBORS MUST HAVE "PhaserOff" (Depth: 0.0, Feedback: 0.0, Frequency: -64.0, Width: -64.0)
+                                                     * IF CURRENT MEMORY HAS "ChorusOff" -> ALL NEIGHBORS MUST HAVE "ChorusOff" (Depth: 0.0, Frequency: 0.05, Width: 0.01)
+                                                     * IF CURRENT MEMORY HAS "FlangerOff" -> ALL NEIGHBORS MUST HAVE "FlangerOff" (Depth: 0.0, Feedback: 0.0, Frequency: 0.05, Width: 0.001)
+                                                     * IF CURRENT MEMORY HAS "DelayOff" -> ALL NEIGHBORS MUST HAVE "DelayOff" (Feedback: 0.0, Delay: 1.0, Mix: 0.0)
+                                                     * IF CURRENT MEMORY HAS "CompressorOff" -> ALL NEIGHBORS MUST HAVE "CompressorOff" (Threshold: -128.0, Ratio: 1, Attack: 0.0, Release: 0.0, Makeup: -128.0, Mix: 0.0)
+                                                     * IF CURRENT MEMORY HAS "EqualiserOff" -> ALL NEIGHBORS MUST HAVE "EqualiserOff" (100hz: 0.0, 200hz: 0.0, 400hz: 0.0, 800hz: 0.0, 1600hz: 0.0, 3200hz: 0.0, 6400hz: 0.0, Level: 0.0)
+                                                     * IF CURRENT MEMORY HAS "DriverOn" -> ALL NEIGHBORS MUST HAVE "DriverOn" (Distortion: DIFFERENT from current, Volume: DIFFERENT from current)
+                                                     * IF CURRENT MEMORY HAS "PhaserOn" -> ALL NEIGHBORS MUST HAVE "PhaserOn" (Depth: DIFFERENT from current, Feedback: DIFFERENT from current, Frequency: DIFFERENT from current, Width: DIFFERENT from current)
+                                                     * IF CURRENT MEMORY HAS "ChorusOn" -> ALL NEIGHBORS MUST HAVE "ChorusOn" (Delay: DIFFERENT from current, Depth: DIFFERENT from current, Frequency: DIFFERENT from current, Width: DIFFERENT from current)
+                                                     * IF CURRENT MEMORY HAS "FlangerOn" -> ALL NEIGHBORS MUST HAVE "FlangerOn" (Delay: DIFFERENT from current,Depth: DIFFERENT from current, Feedback: DIFFERENT from current, Frequency: DIFFERENT from current, Width: DIFFERENT from current)
+                                                     * IF CURRENT MEMORY HAS "DelayOn" -> ALL NEIGHBORS MUST HAVE "DelayOn" (Feedback: DIFFERENT from current, Delay: DIFFERENT from current, Mix: DIFFERENT from current)
+                                                     * IF CURRENT MEMORY HAS "ReverbOn" -> ALL NEIGHBORS MUST HAVE "ReverbOn" (Size: DIFFERENT from current, Damping: DIFFERENT from current, Width: DIFFERENT from current, Mix: DIFFERENT from current)
+                                                     * IF CURRENT MEMORY HAS "ScreamerOn" -> ALL NEIGHBORS MUST HAVE "ScreamerOn" (Drive: DIFFERENT from current, Tone: DIFFERENT from current, Level: DIFFERENT from current)
+                                                     * IF CURRENT MEMORY HAS "CompressorOn" -> ALL NEIGHBORS MUST HAVE "CompressorOn" (Threshold: DIFFERENT from current, Ratio: DIFFERENT from current, Attack: DIFFERENT from current, Release: DIFFERENT from current, Makeup: DIFFERENT from current, Mix: DIFFERENT from current)
+                                                     * IF CURRENT MEMORY HAS "EqualiserOn" -> ALL NEIGHBORS MUST HAVE "EqualiserOn" (100hz: DIFFERENT from current, 200hz: DIFFERENT from current, 400hz: DIFFERENT from current, 800hz: DIFFERENT from current, 1600hz: DIFFERENT from current, 3200hz: DIFFERENT from current, 6400hz: DIFFERENT from current, Level: DIFFERENT from current)
                                                      * THIS RULE OVERRIDES ALL OTHER PARAMETER ADJUSTMENT RULES
-                                                     * DO NOT IGNORE "MODULEOFF" STATES IN CURRENT MEMORY
+                                                     * DO NOT IGNORE "MODULEON" OR "MODULEOFF" STATES IN CURRENT MEMORY
                                                    - For audio effectors that are "On", create parameter values that are:
                                                    * DIFFERENT from current memory (e.g., if current has Drive: 0.72, neighbor should have 0.65 or 0.80, etc.)
                                                    * NOT identical between adjacent memories (each neighbor should have unique values)
@@ -747,8 +759,8 @@ def update_parameters_to_database(parameters):
                                             "actions": ["strengthen", "update_neighbor"],
                                             "suggested_connections": ["neighbor_memory_ids"],
                                             "new_parameter_neighborhood": [
-                                                {{"parameters_1": "对应第一首歌曲的参数"}},
-                                                {{"parameters_n": "对应第n首歌曲的参数"}}
+                                                {{"parameters_1": "corresponding to first song's parameters"}},
+                                                {{"parameters_n": "corresponding to nth song's parameters"}}
                                             ]
                                         }}
                                         '''
@@ -766,135 +778,135 @@ def update_parameters_to_database(parameters):
             stream=False
         )
 
-        # 获取 response3 响应数据并转换为 JSON
+        # Get response3 response data and convert to JSON
         response_content3 = response3.choices[0].message.content
-        # 去除前后的代码块标记和换行
+        # Remove code block markers and newlines from beginning and end
         cleaned_content3 = response_content3.replace("```json", "").replace("```", "").strip()
         try:
             result3 = json.loads(cleaned_content3)
             result3_str = json.dumps(result3, ensure_ascii=False)
-            # 获取是否更新记忆
+            # Get whether to update memory
             should_evolve = result3.get("should_evolve", [])
-            # 获取动作
+            # Get actions
             actions = result3.get("actions", [])
-            # 获取连接建议
+            # Get connection suggestions
             suggested_connections = result3.get("suggested_connections", [])
-            # 获取邻居的新参数
+            # Get neighbor's new parameters
             new_parameter_neighborhood = result3.get("new_parameter_neighborhood", [])
 
-            # 打印信息
-            print(f"记忆更新模型响应: {result3_str}")
+            # Print information
+            print(f"Memory update model response: {result3_str}")
             print(f"user_message:{user_message}")
 
-            # 在获取 OpenAI 响应并解析 JSON 之后添加以下代码
+            # Add the following code after getting OpenAI response and parsing JSON
             if 'new_parameter_neighborhood' in result3:
                 new_params_list = result3['new_parameter_neighborhood']
                 total_updates = 0
 
-                # 假设使用第一个邻居的参数来更新预设文件
+                # Assume using first neighbor's parameters to update preset file
                 if new_params_list:
                     for index, neighbor_params in enumerate(new_params_list):
                         print(f"new_params_list:{neighbor_params}")
-                        # 转换参数格式以匹配Excel预设文件
+                        # Convert parameter format to match Excel preset file
                         excel_params = {}
 
-                        # 示例：根据邻居参数更新预设文件中的参数
-                        # 注意：需要根据实际参数映射关系调整
-                        # （此处复用param_mapping，与新记忆处理逻辑一致）
+                        # Example: Update preset file parameters based on neighbor parameters
+                        # Note: Need to adjust according to actual parameter mapping relationship
+                        # (Reuse param_mapping here, consistent with new memory processing logic)
 
-                        # 1. 优先处理顶层开关状态（如 CompressorOff）
+                        # 1. Priority processing top-level switch states (e.g., CompressorOff)
                         for key in neighbor_params:
                             if key in param_mapping:
-                                # 若为开关状态（映射值为元组），提取参数名和值
+                                # If switch state (mapping value is tuple), extract parameter name and value
                                 if isinstance(param_mapping[key], tuple):
                                     param_id, param_value = param_mapping[key]
                                     excel_params[param_id] = param_value
-                                    print(f"处理开关状态: {key} -> {param_id} = {param_value}")  # 日志跟踪
+                                    print(f"Processing switch state: {key} -> {param_id} = {param_value}")  # Log tracking
 
-                        # 2. 处理嵌套参数（如 CompressorOn.Threshold 等）
+                        # 2. Process nested parameters (e.g., CompressorOn.Threshold etc.)
                         for key, value in neighbor_params.items():
                             if isinstance(value, dict):
-                                # 处理嵌套字典（如 DriverOn.Distortion）
+                                # Process nested dictionary (e.g., DriverOn.Distortion)
                                 for sub_key, sub_value in value.items():
                                     full_key = f"{key}.{sub_key}"
                                     if full_key in param_mapping:
                                         param_id = param_mapping[full_key]
                                         excel_params[param_id] = sub_value
                             else:
-                                # 处理非嵌套的参数值（若有）
+                                # Process non-nested parameter values (if any)
                                 if key in param_mapping and not isinstance(param_mapping[key], tuple):
                                     param_id = param_mapping[key]
                                     excel_params[param_id] = value
 
-                        # 打印生成的 excel_params，验证 pre_compressor_on 是否为 0
-                        print(f"生成的预设参数: {excel_params.get('pre_compressor_on')}")
-                        # 预设文件路径
+                        # Print generated excel_params, verify pre_compressor_on is 0
+                        print(f"Generated preset parameters: {excel_params.get('pre_compressor_on')}")
+                        # Preset file path
                         if index < len(similar_songs):
                             song_name = similar_songs[index][0]
                             preset_file_path = fr"C:\Users\Public\Documents\Supertonal DSP\HCAP\{song_name}.preset"
                             try:
-                                # 更新预设文件
+                                # Update preset file
                                 if update_preset_in_file(preset_file_path, excel_params):
-                                    print(f"预设文件 {song_name}.preset 更新成功")
+                                    print(f"Preset file {song_name}.preset updated successfully")
                                 else:
-                                    print(f"预设文件 {song_name}.preset 更新失败，继续执行后续代码")
+                                    print(f"Preset file {song_name}.preset update failed, continue executing subsequent code")
                             except FileNotFoundError:
-                                print(f"预设文件路径 {preset_file_path} 不存在，继续执行后续代码")
+                                print(f"Preset file path {preset_file_path} does not exist, continue executing subsequent code")
                             except Exception as e:
-                                print(f"更新预设文件时出现未知错误: {e}，继续执行后续代码")
+                                print(f"Unknown error updating preset file: {e}, continue executing subsequent code")
 
-                # 遍历所有相似歌曲
+                # Iterate through all similar songs
                 for i, (song_name, similarity, _, _, _) in enumerate(similar_songs):
-                    # 检查是否有对应的新参数
+                    # Check if corresponding new parameters exist
                     if i < len(new_params_list):
                         new_params = new_params_list[i]
                         try:
-                            # 将参数转换为 JSON 字符串
+                            # Convert parameters to JSON string
                             new_params_str = json.dumps(new_params, ensure_ascii=False)
                             cursor.execute(
                                 "UPDATE music_responses SET Parameters =? WHERE SongName =?",
                                 (new_params_str, song_name))
                             conn.commit()
-                            print(f"成功更新 '{song_name}' 的参数 (相似度: {similarity:.4f})")
+                            print(f"Successfully updated '{song_name}' parameters (similarity: {similarity:.4f})")
                             total_updates += 1
                         except Exception as e:
-                            print(f"更新 '{song_name}' 参数时出错: {e}")
+                            print(f"Error updating '{song_name}' parameters: {e}")
                             conn.rollback()
 
-                print(f"总共更新了 {total_updates} 首歌曲的参数")
+                print(f"Total updated {total_updates} songs parameters")
 
                 if total_updates < len(similar_songs):
-                    print(f"注意: 有 {len(similar_songs) - total_updates} 首歌曲没有对应的新参数")
+                    print(f"Note: {len(similar_songs) - total_updates} songs have no corresponding new parameters")
             else:
-                print("未找到 new_parameter_neighborhood 数据，无法更新参数")
+                print("No new_parameter_neighborhood data found, cannot update parameters")
         except json.JSONDecodeError:
-            print(f"Error: 无效的JSON响应: {cleaned_content3}")
+            print(f"Error: Invalid JSON response: {cleaned_content3}")
             sys.exit(1)
     else:
-        print(f"记忆系统关闭")
+        print(f"Memory system disabled")
 
 
 
-# 读取 result1.txt 文件
+# Read result1.txt file
 result1_str = safe_open_file("result1.txt")
-# 将字符串转换为集合
+# Convert string to set
 result1_set = set(result1_str.split(',')) if result1_str else set()
 
-# 读取 result2.txt 文件
+# Read result2.txt file
 result2_str = safe_open_file("result2.txt")
 
-# 读取 result.txt 文件
+# Read result.txt file
 result_str = safe_open_file("result.txt")
 
-#连接数据库
+# Connect to database
 db_dir = os.environ.get('SUPERTONAL_DIR')
 if not os.path.exists(db_dir):
-    os.makedirs(db_dir)  # 创建目录（如果不存在）
+    os.makedirs(db_dir)  # Create directory (if it doesn't exist)
 db_path = os.path.join(db_dir, "music_info.db")
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
-# 获取index的值
+# Get index value
 if len(sys.argv) > 0:
     if platform.system() == "Windows":
         chat_message = sys.argv[1]
@@ -911,29 +923,29 @@ else:
     user_message = sys.argv[2].encode('cp936').decode('utf-8', errors='replace')
     currentPresetName = sys.argv[3].encode('cp936').decode('utf-8', errors='replace')
     memoryEnabled = sys.argv[4]
- # 添加判断：如果user_message为空，则用currentPresetName代替
-if not user_message.strip():  # 处理空字符串或仅含空白字符的情况
+ # Add judgment: if user_message is empty, use currentPresetName instead
+if not user_message.strip():  # Handle empty string or whitespace-only case
     user_message = currentPresetName
-print(f"chat_message: {chat_message}")  # 获取命令行中c++程序传入的第一个参数)
-print(f"User message: {user_message}")  # 获取命令行中c++程序传入的第二个参数
+print(f"chat_message: {chat_message}")  # Get first parameter passed from c++ program)
+print(f"User message: {user_message}")  # Get second parameter passed from c++ program
 print(f"currentPresetName: {currentPresetName}")
 print(f"memoryEnabled: {memoryEnabled}")
 
 parts = chat_message.split(',')
 if len(parts) < 48:
-    print("命令行参数分割后列表长度不足 48，请检查输入。")
+    print("Command line parameter split list length less than 48, please check input.")
 else:
     first_47 = parts[:48]
-    # 将 first_47[0] 到 first_47[8] 转换为浮点数
+    # Convert first_47[0] to first_47[8] to float
     for i in range(9):
         first_47[i] = float(first_47[i])
 
-    # 查询匹配的记录
+    # Query matching records
     cursor.execute(
         "SELECT SongName, Parameters FROM music_responses WHERE SongName =?",
         (user_message,))
     row = cursor.fetchone()
-    # 如果没有匹配的记录，则添加新数据
+    # If no matching record, add new data
     if row is None:
         parameters = json.loads(result_str)
         parameters = parameters_update(parameters)
@@ -946,8 +958,8 @@ else:
         """, (user_message, result_str, 'edit', result1_str, result2_str))
         conn.commit()
         update_parameters_to_database(parameters)
-        #input("已新增记录，按回车键关闭窗口...")
-    # 如果有匹配的记录，则更新数据
+        #input("New record added, press Enter to close window...")
+    # If there is matching record, update data
     else:
         song_name = row[0]
         parameters = json.loads(row[1])
@@ -955,30 +967,30 @@ else:
 
         parameters = parameters_update(parameters)
 
-        # 将更新后的参数转换为字符串
+        # Convert updated parameters to string
         updated_parameters_str = json.dumps(parameters, ensure_ascii=False)
 
-        # 更新数据库中的记录
+        # Update record in database
         cursor.execute("UPDATE music_responses SET Parameters =?, Preferences =? WHERE SongName =?",
                        (updated_parameters_str, "edit", song_name))
         conn.commit()
-        # 打印更新后的信息
+        # Print updated information
         print(f"Update SongName: {song_name}")
         print(f"Update Parameters: {parameters}")
         print("-" * 50)
 
-        # ---------------------- 新增：更新新记忆（当前song）的预设文件 ----------------------
+        # ---------------------- Added: Update new memory (current song) preset file ----------------------
 
-        # 2. 将新记忆的parameters转换为预设文件格式
+        # 2. Convert new memory parameters to preset file format
         new_memory_excel_params = {}
-        # 处理顶层开关状态
+        # Process top-level switch states
         for key in parameters:
             if key in param_mapping and isinstance(param_mapping[key], tuple):
                 param_id, param_value = param_mapping[key]
                 new_memory_excel_params[param_id] = param_value
-                print(f"新记忆开关状态处理: {key} -> {param_id} = {param_value}")
+                print(f"New memory switch state processing: {key} -> {param_id} = {param_value}")
 
-        # 处理嵌套参数
+        # Process nested parameters
         for key, value in parameters.items():
             if isinstance(value, dict):
                 for sub_key, sub_value in value.items():
@@ -991,22 +1003,22 @@ else:
                     param_id = param_mapping[key]
                     new_memory_excel_params[param_id] = value
 
-        # 3. 定义新记忆的预设文件路径
+        # 3. Define new memory preset file path
         new_memory_preset_path = fr"C:\Users\Public\Documents\Supertonal DSP\HCAP\{song_name}.preset"
-        # 4. 更新新记忆的预设文件
+        # 4. Update new memory preset file
         try:
             if update_preset_in_file(new_memory_preset_path, new_memory_excel_params):
-                print(f"新记忆 '{song_name}' 的预设文件更新成功")
+                print(f"New memory '{song_name}' preset file updated successfully")
             else:
-                print(f"新记忆 '{song_name}' 的预设文件更新失败")
+                print(f"New memory '{song_name}' preset file update failed")
         except FileNotFoundError:
-            print(f"新记忆预设文件路径不存在: {new_memory_preset_path}")
+            print(f"New memory preset file path does not exist: {new_memory_preset_path}")
         except Exception as e:
-            print(f"更新新记忆预设文件时出错: {e}")
-        # ---------------------- 新增结束 ----------------------
+            print(f"Error updating new memory preset file: {e}")
+        # ---------------------- Added end ----------------------
 
     update_parameters_to_database(parameters)
 
 conn.close()
 
-#input("程序执行完毕，按回车键关闭窗口...")
+#input("Program execution completed, press Enter to close window...")

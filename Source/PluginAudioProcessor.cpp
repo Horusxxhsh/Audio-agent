@@ -1292,8 +1292,7 @@ void PluginAudioProcessor::resetParametersToDefault()
 			parameterInitialValues["pre_eq_3200_gain"] = e_32;
 			parameterInitialValues["pre_eq_6400_gain"] = e_64;
 			parameterInitialValues["pre_eq_level_gain"] = e_Level;
-			//parameterInitialValues["noise_gate_threshold"] = p_NoiseGateThreshold;
-			// 从 parameterInitialValues 获取初始值
+			
 			
 			if (parameterInitialValues.find(parameterId) != parameterInitialValues.end())
 			{
@@ -1304,32 +1303,6 @@ void PluginAudioProcessor::resetParametersToDefault()
 	}
 }
 
-
-
-//void PluginAudioProcessor::resetToDefaults()
-//{
-//	// 1. 开始批量撤销操作
-//	undoManager.beginNewTransaction();
-//
-//	// 2. 遍历所有参数并设置默认值
-//	for (auto& param : *apvts)
-//	{
-//		if (!param->isAutomatable()) continue; // 跳过不可自动化参数
-//
-//		param->beginChangeGesture();
-//		param->setValueNotifyingHost(param->getDefaultValue()); // 设置默认值
-//		param->endChangeGesture();
-//	}
-//
-//	// 3. 清理DSP状态（示例：重置延迟线）
-//	delayLine->clear();
-//
-//	// 4. 触发UI更新（APVTS自动通知UI）
-//	// 无需额外代码，参数值变化会自动同步到UI
-//
-//	// 5. 结束撤销事务
-//	undoManager.endNewTransaction();
-//}
 
 
 
