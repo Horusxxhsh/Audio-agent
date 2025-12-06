@@ -1,0 +1,116 @@
+\documentclass[journal]{IEEEtran}
+
+% Package Imports
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs} % For professional tables
+\usepackage{hyperref} % For hyperlinks
+\usepackage{cleveref} % For smart referencing
+\usepackage{multirow} % For complex tables
+\usepackage{subcaption} % For subfigures
+
+% Path to figures
+\graphicspath{{./figures/}}
+
+% Title and Author
+\title{Audio-Agent: Bridging the Semantic Gap in Neural Audio Effects via Multi-Modal Retrieval-Augmented Generation}
+
+\author{
+    \IEEEauthorblockN{Author Name 1, Author Name 2, and Author Name 3}
+    \thanks{This work was supported by...}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+The democratization of digital audio workstations (DAWs) has equipped musicians with profound creative capabilities, yet the complexity of modern signal processing tools often creates a significant ``semantic gap'' between a user's artistic intent and the requisite technical parameters. While recent generative AI models can synthesize audio directly from text, they typically produce non-editable waveforms, failing to integrate into professional, parametric workflows. In this paper, we propose \textbf{Audio-Agent}, a neuro-symbolic framework that bridges this gap by leveraging Large Language Models (LLMs) to infer control parameters for rigorous, physics-based Digital Signal Processing (DSP) chains. To mitigate the hallucination issues inherent in mapping natural language to continuous parameter spaces, we introduce a novel \textbf{Dual-Modal Retrieval-Augmented Generation (RAG)} mechanism. This system grounds parameter inference in both semantic style descriptions and acoustic feature embeddings extracted via Wav2Vec2. Furthermore, we design an \textbf{Adaptive Memory Loop} that facilitates online learning from user interactions (Accept/Edit/Reject), allowing the system to dynamically align with individual aesthetic preferences over time. Extensive objective experiments and subjective listening tests demonstrate that Audio-Agent achieves superior semantic relevance and parameter editability compared to baseline methods, offering a transparent, interactive, and personalized paradigm for intelligent music production.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Neuro-Symbolic AI, Retrieval-Augmented Generation, Intelligent Music Production, Audio Effects, Large Language Models, Human-Computer Interaction.
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:introduction}
+\IEEEPARstart{T}{he} evolution of digital audio processing has fundamentally transformed music production, empowering artists with an unprecedented array of creative tools. From dynamic range compression to spectral equalization, modern Digital Audio Workstations (DAWs) offer granular control over every facet of sound. However, this power comes at the cost of cognitive load. A single effects chain for a guitar tone may involve dozens of continuous parameters—thresholds, ratios, Q-factors, and decay times—interacting in non-linear ways. This complexity creates a persistent \textit{Semantic Gap} \cite{stables2014semantic}: musicians think and communicate in perceptual descriptors (e.g., ``punchy,'' ``atmospheric,'' ``warm''), while their tools demand low-level technical specifications.
+
+\subsection{The Challenge of Parameter Intuition}
+Bridging this gap has been a long-standing goal of Intelligent Music Production (IMP). Traditional approaches often rely on audio content analysis to automate mixing tasks, such as fader balancing or EQ matching. While effective for technical corrections, these systems often lack the flexibility to handle creative, style-driven timbre design. 
+
+Recent advancements in generative AI, such as AudioLDM \cite{liu2023audioldm} and MusicLM \cite{agostinelli2023musiclm}, have demonstrated remarkable capabilities in text-to-audio synthesis. However, these ``black-box'' models typically generate raw waveforms directly. This poses a critical limitation for professional workflows: the output is finalized and non-editable. A producer cannot tweak the ``attack time'' of a generated snare nor adjust the ``drive'' of a synthesized guitar riff. Consequently, despite their novelty, these tools remain isolated from the standard parametric workflow of modern production.
+
+\subsection{Neuro-Symbolic Control and Hallucination}
+To combine the semantic understanding of Large Language Models (LLMs) with the precision of classic DSP, a \textit{Neuro-Symbolic} approach—where an LLM acts as an agent to control symbolic DSP parameters—emerges as a promising solution. However, applying naive LLMs to this task reveals a ``hallucination'' problem in the parameter space. Without grounding, an LLM might infer plausible-looking but sonically incoherent settings (e.g., a compressor with a Ratio of 1:1 and a Threshold of 0dB, effectively doing nothing, despite a prompt asking for ``heavy compression''). Furthermore, generic LLMs lack specific knowledge of user-defined presets or niche musical sub-genres (e.g., ``Shoegaze'' or ``Djent'').
+
+\subsection{Contributions}
+In this paper, we address these challenges with \textbf{Audio-Agent}, a system that integrates a Local LLM with a real-time C++ DSP engine. Our key contributions are:
+
+\begin{enumerate}
+    \item \textbf{Neuro-Symbolic Architecture}: We propose a hybrid framework where an LLM agent interprets user intent to control a standard, high-fidelity DSP chain, ensuring that all outputs are fully improved and editable within standard DAWs.
+    \item \textbf{Dual-Modal RAG}: We introduce a retrieval mechanism that queries both a textual knowledge base (for semantic styles) and an audio embedding space (using Wav2Vec2 \cite{baevski2020wav2vec} for acoustic similarity). This grounds the LLM's generation in concrete, retrieved examples, significantly reducing parameter hallucination.
+    \item \textbf{Adaptive Preference Learning}: We develop a feedback-driven memory system. By analyzing user actions (Accept, Edit, Reject), the system updates its retrieval weights online, allowing Audio-Agent to evolve and personalize its mapping logic to the user's specific taste.
+\end{enumerate}
+
+The remainder of this paper is organized as follows: Section \ref{sec:related_work} reviews related work in IMP and neural audio. Section \ref{sec:problem_formulation} formalizes the parameter inference problem. Section \ref{sec:methodology} details the Audio-Agent architecture and algorithms. Section \ref{sec:experiments} presents our experimental evaluation, and Section \ref{sec:conclusion} concludes.
+
+\section{Related Work}
+\label{sec:related_work}
+
+\subsection{Intelligent Music Production}
+% Contrast with traditional automated mixing
+
+\subsection{Neural Audio Synthesis}
+% Contrast with DDSP, MusicLM
+
+\subsection{LLM-based Control Systems}
+% Discuss agents in other domains
+
+\section{Problem Formulation}
+\label{sec:problem_formulation}
+Let $f(\mathbf{x}, \theta)$ denote the audio effect chain...
+% TODO: Mathematical definition from Storyline 3
+
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{System Architecture}
+\label{ssec:architecture}
+% Overview of C++ Client and Python Agent
+
+\subsection{Dual-Modal Retrieval-Augmented Generation}
+\label{ssec:rag}
+% Details of Music Knowledge and Parameter Presets in ChromaDB
+
+\subsection{Adaptive Preference Learning}
+\label{ssec:memory}
+% Details of the feedback loop
+
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Setup}
+% Dataset, Baselines
+
+\subsection{Objective Evaluation}
+% Parameter Consistency, Retrieval Accuracy
+
+\subsection{Subjective Evaluation}
+% MOS Test results
+
+\subsection{Ablation Study}
+% Impact of RAG and Memory modules
+
+\section{Conclusion}
+\label{sec:conclusion}
+In this paper, we presented Audio-Agent...
+
+\bibliographystyle{IEEEtran}
+\bibliography{reference}
+
+\end{document}
