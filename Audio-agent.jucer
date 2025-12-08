@@ -29,6 +29,7 @@
             file="Assets/WorkSans-Regular.ttf"/>
     </GROUP>
     <GROUP id="{051B3464-46EA-0C7D-826E-4111001F4D4C}" name="Source">
+      <FILE id="KQVuh4" name="test_rag.py" compile="0" resource="1" file="Source/test_rag.py"/>
       <FILE id="VwjGtt" name="rag_integration.py" compile="0" resource="1"
             file="Source/rag_integration.py"/>
       <FILE id="QB4TFe" name="rag_system.py" compile="0" resource="1" file="Source/rag_system.py"/>
