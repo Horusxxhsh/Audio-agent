@@ -4,8 +4,8 @@ import os
 
 # Paths to databases (Relative to this script)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MUSIC_DB_PATH = os.path.join(BASE_DIR, '..', 'music_info.db')
-AUDIO_DB_PATH = os.path.join(BASE_DIR, '..', 'audio_info.db')
+MUSIC_DB_PATH = os.path.join(BASE_DIR, '..', '..', 'music_info.db')
+AUDIO_DB_PATH = os.path.join(BASE_DIR, '..', '..', 'audio_info.db')
 
 def load_and_merge_data():
     """

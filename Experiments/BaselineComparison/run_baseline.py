@@ -1,6 +1,12 @@
 import json
 import os
 import random
+import sys
+
+# Add common directory to sys.path
+common_dir = os.path.join(os.path.dirname(__file__), '..', 'common')
+sys.path.append(common_dir)
+
 from dataset_loader import load_and_merge_data
 from baselines import BaselineA, BaselineB
 from rag_system_sim import DualModalRAG

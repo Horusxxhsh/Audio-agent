@@ -370,5 +370,6 @@ wrap-sign-cmds.md
 **/*.DS_Store
 /build-ios/
 # Experiments output
-Experiments/debug_params.txt
-Experiments/results.json
+Experiments/common/debug_params.txt
+Experiments/BaselineComparison/results.json
+Experiments/AblationStudies/results_ablation.json
