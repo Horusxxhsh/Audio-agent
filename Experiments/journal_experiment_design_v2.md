@@ -41,6 +41,19 @@
 | **B3** | **Audio-Vector RAG** | 声学向量 (Wav2Vec2 Mean) | 声学内容匹配 | 代表传统音频检索 (MusicCaps等) |
 | **Ours** | **Texture-RAG** | **Text + TRR (Gram Matrix)** | **语义 + 纹理共振** | **本文提出的最终方案** |
 
+### 2.3 核心方法详解: Texture Resonance Retrieval (TRR)
+**为何均值向量失效？**
+传统的音频检索 (如 MusicCaps, CLAP) 通常对时间维度进行**均值池化 (Mean Pooling)**，即 $V = \frac{1}{T} \sum_{t=1}^{T} f(t)$。这种操作会抹平时间上的动态变化，导致一段“平稳的正弦波”和一段“快速调制的方波”在均值特征上极其相似。这对“音色/纹理”的区分是致命的。
+
+**TRR 的解决方案 (Gram Matrix)**:
+受图像风格迁移 (Style Transfer) 的启发，我们提出计算特征通道之间的**二阶相关性 (Second-order Correlation)**，即 **Gram Matrix**。
+
+1.  **特征提取**: 输入音频 $A$，通过 Wav2Vec 2.0 提取中间层特征 $F \in \mathbb{R}^{C \times T}$ ($C$=通道数, $T$=时间步)。
+2.  **纹理编码**: 计算 Gram 矩阵 $G = F \cdot F^T \in \mathbb{R}^{C \times C}$。
+    *   $G_{ij}$ 代表第 $i$ 个特征通道和第 $j$ 个特征通道的共激活程度。
+    *   **关键点**: 该矩阵的大小只与通道数有关，与时间 $T$ 无关（Time-Invariant），因此它是纯粹的“风格/纹理”描述符。
+3.  **检索**: 将 $G$ 展平为向量，使用余弦相似度进行检索。
+
 ---
 
 ## 3. 实验设计 (Detailed Experiments)

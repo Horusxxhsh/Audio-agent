@@ -107,7 +107,11 @@ def main():
         "B3_VectorRAG": [],
         "Ours_TextureRAG": [],
         "Ablation_Noise_TextOnly": [],
-        "Ablation_Noise_Ours": []
+        "Ablation_Noise_Ours": [],
+        # New Metrics
+        "Ours_Cosine": [],
+        "Ours_Accuracy": [],
+        "Ours_Recall": []
     }
 
     # ==========================================
@@ -178,9 +182,16 @@ def main():
         
         pred_ours = agent.generate(text_prompt, context_items=final_ctx[:5], mode="rag_cot")
         dist_ours = evaluator.compute_parameter_distance(pred_ours, gt_params)
-        results["Ours_TextureRAG"].append(dist_ours)
+        cos_ours = evaluator.compute_cosine_similarity(pred_ours, gt_params)
+        acc_ours = evaluator.compute_accuracy_tolerance(pred_ours, gt_params, tolerance=0.1)
+        rec_ours = evaluator.compute_parameter_recall(pred_ours, gt_params, threshold=0.1)
         
-        print(f"  -> Distances | B1: {dist_b1:.2f} | B2: {dist_b2:.2f} | B3: {dist_b3:.2f} | Ours: {dist_ours:.2f}")
+        results["Ours_TextureRAG"].append(dist_ours)
+        results["Ours_Cosine"].append(cos_ours)
+        results["Ours_Accuracy"].append(acc_ours)
+        results["Ours_Recall"].append(rec_ours)
+        
+        print(f"  -> Distances | B1: {dist_b1:.2f} | B2: {dist_b2:.2f} | B3: {dist_b3:.2f} | Ours: {dist_ours:.2f} (Cos={cos_ours:.2f}, Acc={acc_ours:.2f}, Rec={rec_ours:.2f})")
 
     # ==========================================
     # RQ3: Robustness (Ablation under Noise)
@@ -231,6 +242,11 @@ def main():
     print(f"  B2 (Text-RAG)   : {statistics.mean(results['B2_TextRAG']):.4f}")
     print(f"  B3 (Vector-RAG) : {statistics.mean(results['B3_VectorRAG']):.4f}")
     print(f"  Ours (Texture)  : {statistics.mean(results['Ours_TextureRAG']):.4f}")
+    
+    print("\nAdditional Metrics for Ours:")
+    print(f"  Cosine Similarity : {statistics.mean(results['Ours_Cosine']):.4f} (Direction)")
+    print(f"  Param Accuracy    : {statistics.mean(results['Ours_Accuracy']):.4f} (Tolerance=0.1)")
+    print(f"  Active Recall     : {statistics.mean(results['Ours_Recall']):.4f} (Non-zero match)")
     
     print("\nRQ3: Robustness under Vague Text")
     print(f"  Text-Only RAG   : {statistics.mean(results['Ablation_Noise_TextOnly']):.4f}")
