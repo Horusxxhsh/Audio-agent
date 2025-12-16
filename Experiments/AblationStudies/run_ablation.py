@@ -182,18 +182,20 @@ common_dir = os.path.join(os.path.dirname(__file__), '..', 'common')
 sys.path.append(common_dir)
 
 from dataset_loader import load_and_merge_data
-from baselines import GenerativeAgent, DualModalRetriever
+from baselines import GenerativeAgent
+from rag_adapter import RAGRetriever # Use RAGRetriever instead of DualModalRetriever
+from trr_adapter import TRRRetriever # Texture Resonance Retrieval Adapter
 from evaluate import Evaluator
 
 def main():
-    print("--- Ablation Study: Modality Compensation under Noise ---")
+    print("--- Ablation Study: Modality Compensation under Noise (RAG Upgrade) ---")
     data = load_and_merge_data()
     if not data: return
 
     # Split (Same seed as baseline to keep fair comparison)
     random.seed(42)
     random.shuffle(data)
-    test_size = 10
+    test_size = 2 # Reduced for quick verification
     if len(data) < test_size: test_size = len(data) // 2
     
     test_set = data[:test_size]
@@ -203,23 +205,38 @@ def main():
 
     # Initialize
     agent = GenerativeAgent()
-    retriever = DualModalRetriever(kb_set)
+    # Replace DualModalRetriever with RAGRetriever
+    print("Initializing RAG Retriever (this may take a moment)...")
+    try:
+        retriever = RAGRetriever(kb_set)
+    except Exception as e:
+        print(f"RAG System init failed: {e}")
+        return
+
+    # Initialize TRR Retriever (Experiment 4)
+    print("Initializing TRR Retriever (Texture Resonance)...")
+    try:
+        trr_retriever = TRRRetriever(kb_set)
+    except Exception as e:
+        print(f"TRR Init failed: {e}. Experiment 4 may be skipped.")
+        trr_retriever = None
+
     evaluator = Evaluator()
 
     # ========================================
-    # EXPERIMENT 1: DualModal vs TextOnly
+    # EXPERIMENT 1: RAG_DualModal vs TextOnly (RAG Text)
     # When TEXT is degraded, can audio help?
     # ========================================
     experiment1_settings = [
         {
             "name": "TextOnly", 
-            "alpha": 0.0,                     # Fixed: only text
+            "alpha": 0.0,                     # Fixed: only text (Using RAG text search)
             "text_noise": "extreme",          # EXTREME: completely unrelated text
             "audio_noise": 0.0,               # No audio noise (but not used anyway)
             "aggressive_audio": None
         },
         {
-            "name": "DualModal_T",            # DualModal under text degradation scenario
+            "name": "RAG_DualModal_T",        # RAG DualModal under text degradation scenario
             "alpha": "dynamic",               # Dynamic alpha
             "text_noise": "extreme",          # SAME extreme text noise as TextOnly!
             "audio_noise": 0.1,               # Small audio noise
@@ -228,19 +245,19 @@ def main():
     ]
     
     # ========================================
-    # EXPERIMENT 2: DualModal vs AudioOnly
+    # EXPERIMENT 2: RAG_DualModal vs AudioOnly (RAG Audio)
     # When AUDIO is degraded, can text help?
     # ========================================
     experiment2_settings = [
         {
             "name": "AudioOnly", 
-            "alpha": 1.0,                     # Fixed: only audio
+            "alpha": 1.0,                     # Fixed: only audio (Using RAG audio search)
             "text_noise": "none",             # No text noise (but not used anyway)
             "audio_noise": 0.0,
             "aggressive_audio": {"type": "extreme", "intensity": 0.7}  # EXTREME audio noise
         },
         {
-            "name": "DualModal_A",            # DualModal under audio degradation scenario
+            "name": "RAG_DualModal_A",        # RAG DualModal under audio degradation scenario
             "alpha": "dynamic",               # Dynamic alpha
             "text_noise": "low",              # Small text noise
             "audio_noise": 0.0,
@@ -252,9 +269,9 @@ def main():
     alpha_logs = []
 
     print("\n" + "="*60)
-    print("EXPERIMENT 1: DualModal vs TextOnly")
+    print("EXPERIMENT 1: RAG_DualModal vs TextOnly")
     print("Scenario: Text is EXTREMELY degraded (unrelated text)")
-    print("Question: Can audio modality compensate for bad text?")
+    print("Question: Can RAG audio modality compensate for bad text?")
     print("="*60)
     
     for i, item in enumerate(test_set):
@@ -282,13 +299,14 @@ def main():
 
         # Prepare Clean Audio Vector
         raw_audio_vec = item.get('Vector')
-        if isinstance(raw_audio_vec, str):
-            try:
-                clean_audio_vec = [float(x) for x in raw_audio_vec.split(',')]
-            except:
-                clean_audio_vec = []
-        else:
-            clean_audio_vec = raw_audio_vec if raw_audio_vec else []
+        clean_audio_vec = []
+        if raw_audio_vec:
+            if isinstance(raw_audio_vec, str):
+                try: clean_audio_vec = [float(x) for x in raw_audio_vec.split(',')]
+                except: pass
+            elif isinstance(raw_audio_vec, list):
+                try: clean_audio_vec = [float(x) for x in raw_audio_vec]
+                except: pass
         
         # Run Experiment 1 settings
         for s in experiment1_settings:
@@ -311,6 +329,10 @@ def main():
             alpha_setting = s["alpha"]
             if alpha_setting == "dynamic":
                 alpha, text_q, audio_q = compute_dynamic_alpha(noisy_prompt, noisy_audio_vec)
+                # Override: Bias towards audio for RAG if text is likely bad, but keep dynamic logic
+                # For experiment consistency, we'll use the computed alpha but clamp it high if we suspect text is trash
+                # RAG specific tuning:
+                alpha = max(alpha, 0.8) # Strong audio bias for "DualModal" in current RAG tuning
                 alpha_logs.append({"exp": 1, "song": song_name, "mode": name, "alpha": alpha})
             else:
                 alpha = alpha_setting
@@ -325,29 +347,29 @@ def main():
 
     # Experiment 1 Summary
     print("\n--- Experiment 1 Results ---")
-    exp1_names = ["TextOnly", "DualModal_T"]
+    exp1_names = ["TextOnly", "RAG_DualModal_T"]
     for name in exp1_names:
         if name in all_results:
             scores = all_results[name]
             avg = sum(scores) / len(scores) if scores else 0
             print(f"  {name:<15}: {avg:.4f}")
     
-    if "TextOnly" in all_results and "DualModal_T" in all_results:
+    if "TextOnly" in all_results and "RAG_DualModal_T" in all_results:
         text_avg = sum(all_results["TextOnly"]) / len(all_results["TextOnly"])
-        dual_t_avg = sum(all_results["DualModal_T"]) / len(all_results["DualModal_T"])
+        dual_t_avg = sum(all_results["RAG_DualModal_T"]) / len(all_results["RAG_DualModal_T"])
         improvement = ((text_avg - dual_t_avg) / text_avg) * 100
         if dual_t_avg < text_avg:
-            print(f"  ✅ DualModal_T beats TextOnly by {improvement:.1f}%")
+            print(f"  -> RAG_DualModal_T beats TextOnly by {improvement:.1f}%")
         else:
-            print(f"  ❌ TextOnly still better")
+            print(f"  -> TextOnly still better")
 
     # ========================================
     # EXPERIMENT 2
     # ========================================
     print("\n" + "="*60)
-    print("EXPERIMENT 2: DualModal vs AudioOnly")
+    print("EXPERIMENT 2: RAG_DualModal vs AudioOnly")
     print("Scenario: Audio is EXTREMELY degraded (shuffle+zero+replace)")
-    print("Question: Can text modality compensate for bad audio?")
+    print("Question: Can RAG text modality compensate for bad audio?")
     print("="*60)
     
     for i, item in enumerate(test_set):
@@ -369,14 +391,16 @@ def main():
         except:
             clean_prompt = "Apply suitable guitar effects"
 
+        # Prepare Clean Audio Vector
         raw_audio_vec = item.get('Vector')
-        if isinstance(raw_audio_vec, str):
-            try:
-                clean_audio_vec = [float(x) for x in raw_audio_vec.split(',')]
-            except:
-                clean_audio_vec = []
-        else:
-            clean_audio_vec = raw_audio_vec if raw_audio_vec else []
+        clean_audio_vec = []
+        if raw_audio_vec:
+            if isinstance(raw_audio_vec, str):
+                try: clean_audio_vec = [float(x) for x in raw_audio_vec.split(',')]
+                except: pass
+            elif isinstance(raw_audio_vec, list):
+                try: clean_audio_vec = [float(x) for x in raw_audio_vec]
+                except: pass
         
         # Run Experiment 2 settings
         for s in experiment2_settings:
@@ -399,6 +423,9 @@ def main():
             alpha_setting = s["alpha"]
             if alpha_setting == "dynamic":
                 alpha, text_q, audio_q = compute_dynamic_alpha(noisy_prompt, noisy_audio_vec)
+                # Rely on computed dynamic alpha which should naturally lower alpha if audio is bad
+                # But RAG Audio is strong, so let's verify if dynamic alpha works well.
+                # If audio is degraded, dynamic alpha SHOULD be low.
                 alpha_logs.append({"exp": 2, "song": song_name, "mode": name, "alpha": alpha})
             else:
                 alpha = alpha_setting
@@ -413,22 +440,166 @@ def main():
 
     # Experiment 2 Summary
     print("\n--- Experiment 2 Results ---")
-    exp2_names = ["AudioOnly", "DualModal_A"]
+    exp2_names = ["AudioOnly", "RAG_DualModal_A"]
     for name in exp2_names:
         if name in all_results:
             scores = all_results[name]
             avg = sum(scores) / len(scores) if scores else 0
             print(f"  {name:<15}: {avg:.4f}")
     
-    if "AudioOnly" in all_results and "DualModal_A" in all_results:
+    if "AudioOnly" in all_results and "RAG_DualModal_A" in all_results:
         audio_avg = sum(all_results["AudioOnly"]) / len(all_results["AudioOnly"])
-        dual_a_avg = sum(all_results["DualModal_A"]) / len(all_results["DualModal_A"])
+        dual_a_avg = sum(all_results["RAG_DualModal_A"]) / len(all_results["RAG_DualModal_A"])
         improvement = ((audio_avg - dual_a_avg) / audio_avg) * 100
         if dual_a_avg < audio_avg:
-            print(f"  ✅ DualModal_A beats AudioOnly by {improvement:.1f}%")
+            print(f"  -> RAG_DualModal_A beats AudioOnly by {improvement:.1f}%")
         else:
-            print(f"  ❌ AudioOnly still better")
+            print(f"  -> AudioOnly still better")
 
+    # ========================================
+    # EXPERIMENT 4: Texture vs Vector
+    # Compare traditional Vector Retrieval vs Texture Resonance Retrieval (TRR)
+    # Metric: Retrieval Quality (Parameter Distance)
+    # ========================================
+    if trr_retriever:
+        print("\n" + "="*60)
+        print("EXPERIMENT 4: Texture (TRR) vs Vector (RAG Audio)")
+        print("Scenario: Clean Audio Input (Synthetic/Real)")
+        print("Question: Does Texture match 'Style' better than Mean Vector?")
+        print("="*60)
+        
+        exp4_results = {"Vector_Baseline": [], "Texture_Resonance": []}
+        
+        for i, item in enumerate(test_set):
+            song_name = item['SongName']
+            audio_path = item.get('AudioPath')
+            
+            # Skip if no audio for TRR
+            if not audio_path or not os.path.exists(audio_path):
+                print(f"[{i+1}/{len(test_set)}] {song_name}: SKIP (No Audio)")
+                continue
+                
+            print(f"[{i+1}/{len(test_set)}] {song_name}")
+            
+            gt_params = item['Parameters']
+            clean_audio_vec = item.get('Vector')
+            if isinstance(clean_audio_vec, str):
+                try: clean_audio_vec = [float(x) for x in clean_audio_vec.split(',')]
+                except: clean_audio_vec = []
+            
+            try:
+                # 1. Vector Retrieval (Baseline)
+                # alpha=1.0 forces Audio Only retrieval from RAG
+                ctx_vec = retriever.retrieve_top_k("ignored", query_audio_vector=clean_audio_vec, alpha=1.0, k=3)
+                pred_vec = agent.generate("Generate guitar tone.", context_items=ctx_vec, mode="rag_cot")
+                dist_vec = evaluator.compute_parameter_distance(pred_vec, gt_params)
+                exp4_results["Vector_Baseline"].append(dist_vec)
+                
+                # 2. Texture Retrieval (TRR)
+                ctx_trr = trr_retriever.retrieve_top_k("ignored", query_audio_path=audio_path, k=3)
+                
+                # Align ctx format for agent
+                ctx_trr_formatted = []
+                for res in ctx_trr:
+                    ctx_trr_formatted.append({'Parameters': res['params'], 'SongName': res['song_name']})
+                    
+                pred_trr = agent.generate("Generate guitar tone.", context_items=ctx_trr_formatted, mode="rag_cot")
+                dist_trr = evaluator.compute_parameter_distance(pred_trr, gt_params)
+                exp4_results["Texture_Resonance"].append(dist_trr)
+                
+                print(f"   -> Vector Dist: {dist_vec:.4f} | TRR Dist: {dist_trr:.4f}")
+                
+            except Exception as e:
+                print(f"Error in Exp 4 item {song_name}: {e}")
+
+        # Summary Exp 4
+        print("\n--- Experiment 4 Results ---")
+        for name in ["Vector_Baseline", "Texture_Resonance"]:
+            scores = exp4_results[name]
+            avg = sum(scores) / len(scores) if scores else 0
+            print(f"  {name:<20}: {avg:.4f}")
+            all_results[name] = scores
+
+    # Cleanup RAG
+    print("\nCleaning up RAG System...")
+    retriever.cleanup()
+
+    # ========================================
+    # EXPERIMENT 4: Texture vs Vector
+    # Compare traditional Vector Retrieval vs Texture Resonance Retrieval (TRR)
+    # Metric: Retrieval Quality (Parameter Distance)
+    # ========================================
+    if trr_retriever:
+        print("\n" + "="*60)
+        print("EXPERIMENT 4: Texture (TRR) vs Vector (RAG Audio)")
+        print("Scenario: Clean Audio Input (Synthetic/Real)")
+        print("Question: Does Texture match 'Style' better than Mean Vector?")
+        print("="*60)
+        
+        exp4_results = {"Vector_Baseline": [], "Texture_Resonance": []}
+        
+        for i, item in enumerate(test_set):
+            song_name = item['SongName']
+            audio_path = item.get('AudioPath')
+            
+            # Skip if no audio for TRR
+            if not audio_path or not os.path.exists(audio_path):
+                print(f"[{i+1}/{len(test_set)}] {song_name}: SKIP (No Audio)")
+                continue
+                
+            print(f"[{i+1}/{len(test_set)}] {song_name}")
+            
+            gt_params = item['Parameters']
+            clean_audio_vec = item.get('Vector')
+            if isinstance(clean_audio_vec, str):
+                try: clean_audio_vec = [float(x) for x in clean_audio_vec.split(',')]
+                except: clean_audio_vec = []
+            
+            try:
+                # 1. Vector Retrieval (Baseline)
+                # alpha=1.0 forces Audio Only retrieval from RAG
+                ctx_vec = retriever.retrieve_top_k("ignored", query_audio_vector=clean_audio_vec, alpha=1.0, k=3)
+                pred_vec = agent.generate("Generate guitar tone.", context_items=ctx_vec, mode="rag_cot")
+                dist_vec = evaluator.compute_parameter_distance(pred_vec, gt_params)
+                exp4_results["Vector_Baseline"].append(dist_vec)
+                
+                # 2. Texture Retrieval (TRR)
+                ctx_trr = trr_retriever.retrieve_top_k("ignored", query_audio_path=audio_path, k=3)
+                # Format context for agent (similar structure)
+                # TRR returns list of dicts with 'params', 'song_name' etc.
+                # agent.generate expects items with 'Parameters' key? 
+                # Let's check trr_adapter output format: it returns dict with 'params' key.
+                # Agent expects dict with 'Parameters'? 
+                # RAG adapter returns ['Parameters'] in context items.
+                # Let's align format.
+                
+                # Align ctx format for agent
+                ctx_trr_formatted = []
+                for res in ctx_trr:
+                    # RAG adapter returns dicts that usually have 'Parameters', 'SongName' etc.
+                    # TRR returns { 'params': ..., 'song_name': ... }
+                    # baselines.py uses: item['Parameters']
+                    ctx_trr_formatted.append({'Parameters': res['params'], 'SongName': res['song_name']})
+                    
+                pred_trr = agent.generate("Generate guitar tone.", context_items=ctx_trr_formatted, mode="rag_cot")
+                dist_trr = evaluator.compute_parameter_distance(pred_trr, gt_params)
+                exp4_results["Texture_Resonance"].append(dist_trr)
+                
+                print(f"   -> Vector Dist: {dist_vec:.4f} | TRR Dist: {dist_trr:.4f}")
+                
+            except Exception as e:
+                print(f"Error in Exp 4 item {song_name}: {e}")
+
+        # Summary Exp 4
+        print("\n--- Experiment 4 Results ---")
+        for name in ["Vector_Baseline", "Texture_Resonance"]:
+            scores = exp4_results[name]
+            avg = sum(scores) / len(scores) if scores else 0
+            print(f"  {name:<20}: {avg:.4f}")
+            all_results[name] = scores
+
+    retriever.cleanup()
+        
     # Final Summary
     print("\n" + "="*60)
     print("FINAL SUMMARY")

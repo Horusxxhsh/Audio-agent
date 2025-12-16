@@ -53,20 +53,41 @@ class AudioRAGSystem:
         self.music_collection = self._get_or_create_collection("music_knowledge")
         self.parameter_collection = self._get_or_create_collection("parameter_presets")
         
+        # Audio collection for storing raw audio vectors
+        # Note: We use a simple collection where we provide embeddings directly
+        try:
+            self.audio_collection = self.chroma_client.get_or_create_collection(
+                name="audio_knowledge",
+                metadata={"hnsw:space": "cosine"}
+            )
+            print(f"Collection 'audio_knowledge' ready")
+        except Exception as e:
+            print(f"Error initializing audio_knowledge: {e}")
+            self.audio_collection = None
+        
         print(f"RAG System initialized. Vector DB: {persist_directory}")
     
     def _get_or_create_collection(self, name: str):
         """获取或创建集合"""
         try:
-            collection = self.chroma_client.get_collection(name)
-            print(f"Collection '{name}' loaded with {collection.count()} documents")
-        except:
-            collection = self.chroma_client.create_collection(
-                name=name,
-                metadata={"hnsw:space": "cosine"}
-            )
-            print(f"Collection '{name}' created")
-        return collection
+            # Use a standard, high-quality local embedding model compatible with DeepSeek (local execution)
+            ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
+            
+            try:
+                collection = self.chroma_client.get_collection(name=name, embedding_function=ef)
+                print(f"Collection '{name}' loaded with {collection.count()} documents")
+            except:
+                collection = self.chroma_client.create_collection(
+                    name=name,
+                    embedding_function=ef,
+                    metadata={"hnsw:space": "cosine"}
+                )
+                print(f"Collection '{name}' created")
+            return collection
+        except Exception as e:
+            print(f"Error initializing collection {name} with SentenceTransformer: {e}")
+            # Fallback to default
+            return self.chroma_client.get_or_create_collection(name=name)
     
     def _generate_embedding(self, text: str) -> List[float]:
         """
@@ -176,7 +197,8 @@ class AudioRAGSystem:
                             parameters: Dict[str, Any],
                             style_tags: List[str],
                             description: str,
-                            user_rating: Optional[str] = None):
+                            user_rating: Optional[str] = None,
+                            audio_vector: Optional[List[float]] = None):
         """
         添加参数预设到向量数据库
         
@@ -186,6 +208,7 @@ class AudioRAGSystem:
             style_tags: 风格标签
             description: 描述
             user_rating: 用户评价（accept/edit/reject）
+            audio_vector: Optional audio feature vector (from dataset or inference)
         """
         # 构建文档内容
         doc_text = f"Preset: {preset_name}\n"
@@ -205,63 +228,166 @@ class AudioRAGSystem:
             "user_rating": user_rating or "neutral"
         }
         
-        # 添加到集合
+        # 1. 存入 Parameter Collection (Text-based)
         try:
             self.parameter_collection.add(
                 documents=[doc_text],
                 ids=[doc_id],
                 metadatas=[doc_metadata]
             )
-            print(f"Added parameter preset: {preset_name}")
+            print(f"Added parameter preset (Text): {preset_name}")
         except Exception as e:
-            # 如果已存在则更新
             try:
                 self.parameter_collection.update(
                     ids=[doc_id],
                     documents=[doc_text],
                     metadatas=[doc_metadata]
                 )
-                print(f"Updated parameter preset: {preset_name}")
+                print(f"Updated parameter preset (Text): {preset_name}")
             except Exception as e2:
-                print(f"Error adding parameter preset: {e2}")
+                print(f"Error adding parameter preset (Text): {e2}")
+
+        # 2. 存入 Audio Collection (Audio-based)
+        if audio_vector is not None and self.audio_collection is not None:
+            try:
+                # Use the SAME ID and Metadata so we can link them back
+                self.audio_collection.add(
+                    ids=[doc_id],
+                    embeddings=[audio_vector],
+                    metadatas=[doc_metadata],
+                    documents=[doc_text] # Keeping text as doc is fine, but we'll search by vector
+                )
+                print(f"Added parameter preset (Audio): {preset_name}")
+            except Exception as e:
+                try:
+                    self.audio_collection.update(
+                        ids=[doc_id],
+                        embeddings=[audio_vector],
+                        metadatas=[doc_metadata],
+                        documents=[doc_text]
+                    )
+                    print(f"Updated parameter preset (Audio): {preset_name}")
+                except Exception as e2:
+                    print(f"Error adding parameter preset (Audio): {e2}")
     
     def retrieve_similar_knowledge(self, 
                                    query: str,
                                    n_results: int = 5,
-                                   collection_type: str = "music") -> List[Dict[str, Any]]:
+                                   collection_type: str = "music",
+                                   audio_query_vector: Optional[List[float]] = None,
+                                   weight_audio: float = 0.5) -> List[Dict[str, Any]]:
         """
-        检索相似的知识
+        检索相似的知识 (支持加权融合排序 Weighted Fusion Ranking)
         
         Args:
             query: 查询文本
             n_results: 返回结果数量
             collection_type: 集合类型（"music" 或 "parameter"）
+            audio_query_vector: Optional audio embedding vector
+            weight_audio: Audio score weight (0.0 to 1.0). Text weight is (1-weight_audio).
             
         Returns:
             相似文档列表
         """
-        collection = self.music_collection if collection_type == "music" else self.parameter_collection
+        target_collection = self.music_collection if collection_type == "music" else self.parameter_collection
         
+        # 1. Fetch Candidates
+        text_results = []
+        audio_results = []
+        
+        # Text Query
         try:
-            results = collection.query(
-                query_texts=[query],
-                n_results=n_results
-            )
-            
-            # 格式化结果
-            formatted_results = []
-            if results['documents'] and len(results['documents']) > 0:
-                for i in range(len(results['documents'][0])):
-                    formatted_results.append({
-                        'document': results['documents'][0][i],
-                        'metadata': results['metadatas'][0][i] if results['metadatas'] else {},
-                        'distance': results['distances'][0][i] if results['distances'] else None
-                    })
-            
-            return formatted_results
+            if query and len(query.strip()) > 0:
+                raw_text_res = target_collection.query(
+                    query_texts=[query],
+                    n_results=n_results * 2 # Fetch more for re-ranking
+                )
+                if raw_text_res['documents']:
+                    for i in range(len(raw_text_res['documents'][0])):
+                        dist = raw_text_res['distances'][0][i] if raw_text_res['distances'] else 1.0
+                        # Convert Cosine Distance to Similarity (approx)
+                        # Chroma Cosine Distance is 0..2 (1 - cos). Sim = 1 - Dist.
+                        # Note: Sometimes Chroma returns Squared L2 if not configured. Assuming Cosine here as set in init.
+                        sim = max(0.0, 1.0 - dist)
+                        
+                        item = {
+                            'document': raw_text_res['documents'][0][i],
+                            'metadata': raw_text_res['metadatas'][0][i],
+                            'id': raw_text_res['ids'][0][i],
+                            'score': sim
+                        }
+                        text_results.append(item)
         except Exception as e:
-            print(f"Retrieval error: {e}")
-            return []
+            print(f"Text retrieval error: {e}")
+
+        # Audio Query
+        if audio_query_vector is not None and collection_type == "parameter" and self.audio_collection is not None:
+            try:
+                raw_audio_res = self.audio_collection.query(
+                    query_embeddings=[audio_query_vector],
+                    n_results=n_results * 2
+                )
+                if raw_audio_res['documents']:
+                    for i in range(len(raw_audio_res['documents'][0])):
+                        dist = raw_audio_res['distances'][0][i] if raw_audio_res['distances'] else 1.0
+                        sim = max(0.0, 1.0 - dist)
+                        item = {
+                            'document': raw_audio_res['documents'][0][i], # Might be same text
+                            'metadata': raw_audio_res['metadatas'][0][i],
+                            'id': raw_audio_res['ids'][0][i],
+                            'score': sim
+                        }
+                        audio_results.append(item)
+            except Exception as e:
+                print(f"Audio retrieval error: {e}")
+                
+        # 2. Fusion (Rank Aggregation)
+        # Create a map of all unique IDs
+        unique_items = {}
+        
+        # Process Audio Results
+        for item in audio_results:
+            uid = item['id']
+            unique_items[uid] = {
+                'item': item,
+                'audio_score': item['score'],
+                'text_score': 0.0 # Default if not found in text results
+            }
+            
+        # Process Text Results (Update or Add)
+        for item in text_results:
+            uid = item['id']
+            if uid in unique_items:
+                unique_items[uid]['text_score'] = item['score']
+            else:
+                unique_items[uid] = {
+                    'item': item,
+                    'audio_score': 0.0,
+                    'text_score': item['score']
+                }
+                
+        # Calculate Final Weighted Score
+        final_candidates = []
+        for uid, data in unique_items.items():
+            # Weighted Sum
+            final_score = (data['audio_score'] * weight_audio) + (data['text_score'] * (1.0 - weight_audio))
+            
+            candidate = data['item'].copy()
+            candidate['distance'] = 1.0 - final_score # Convert back to 'distance' format for compatibility
+            candidate['fusion_score'] = final_score
+            candidate['source_modality'] = 'hybrid'
+            final_candidates.append(candidate)
+            
+        # 3. Sort and Return Top K
+        final_candidates.sort(key=lambda x: x['fusion_score'], reverse=True)
+        
+        # DEBUG
+        print(f"DEBUG: Fusion - AudioRes: {len(audio_results)}, TextRes: {len(text_results)}")
+        if final_candidates:
+             top = final_candidates[0]
+             print(f"DEBUG: Top Candidate: Score={top['fusion_score']:.4f} (Audio={top.get('audio_score',-1):.2f}, Text={top.get('text_score',-1):.2f}), Modality={top.get('source_modality')}")
+             
+        return final_candidates[:n_results]
     
     def generate_with_rag(self,
                          user_query: str,
@@ -336,31 +462,71 @@ Please provide a detailed and accurate answer based on the context above."""
     def recommend_parameters(self,
                             style_tags: List[str],
                             user_description: str,
-                            n_recommendations: int = 3) -> List[Dict[str, Any]]:
+                            n_recommendations: int = 3,
+                            audio_query_vector: Optional[List[float]] = None) -> List[Dict[str, Any]]:
         """
-        基于 RAG 推荐参数
+        基于 RAG 推荐参数 (支持文本和音频混合检索)
         
         Args:
             style_tags: 风格标签
             user_description: 用户描述
             n_recommendations: 推荐数量
+            audio_query_vector: Optional audio feature vector
             
         Returns:
             推荐的参数列表
         """
-        # 构建查询
-        query = f"{user_description} {' '.join(style_tags)}"
+        all_results = []
         
-        # 检索相似参数预设
-        similar_presets = self.retrieve_similar_knowledge(
+        # 1. Audio Retrieval (High Priority)
+        if audio_query_vector is not None:
+            audio_results = self.retrieve_similar_knowledge(
+                query="", # Ignored when vector provided
+                n_results=n_recommendations,
+                collection_type="parameter",
+                audio_query_vector=audio_query_vector
+            )
+            all_results.extend(audio_results)
+            
+        # 2. Text Retrieval
+        # 构建文本查询
+        query = f"{user_description} {' '.join(style_tags)}"
+        text_results = self.retrieve_similar_knowledge(
             query,
             n_results=n_recommendations,
             collection_type="parameter"
         )
+        all_results.extend(text_results)
+        
+        # 3. Merge and Deduplicate
+        unique_presets = {}
+        for res in all_results:
+            try:
+                metadata = res.get('metadata', {})
+                preset_name = metadata.get('preset_name', 'Unknown')
+                
+                # If already exists, keep the one with lower distance (better match)
+                # Note: distances might not be directly comparable between modalities, 
+                # but generally lower is better. We might prioritize audio source.
+                current_distance = res.get('distance', 1.0)
+                
+                if preset_name not in unique_presets:
+                    unique_presets[preset_name] = res
+                else:
+                    existing = unique_presets[preset_name]
+                    if current_distance < existing.get('distance', 1.0):
+                         unique_presets[preset_name] = res
+            except:
+                continue
+        
+        # Convert back to list and sort by distance
+        final_results = list(unique_presets.values())
+        final_results.sort(key=lambda x: x.get('distance', 1.0))
+        final_results = final_results[:n_recommendations]
         
         # 解析并返回参数
         recommendations = []
-        for preset in similar_presets:
+        for preset in final_results:
             try:
                 metadata = preset.get('metadata', {})
                 parameters = json.loads(metadata.get('parameters', '{}'))
@@ -369,7 +535,8 @@ Please provide a detailed and accurate answer based on the context above."""
                     'parameters': parameters,
                     'style_tags': json.loads(metadata.get('style_tags', '[]')),
                     'similarity': 1 - preset.get('distance', 1.0),
-                    'user_rating': metadata.get('user_rating', 'neutral')
+                    'user_rating': metadata.get('user_rating', 'neutral'),
+                    'source_modality': preset.get('source_modality', 'unknown')
                 })
             except Exception as e:
                 print(f"Error parsing preset: {e}")

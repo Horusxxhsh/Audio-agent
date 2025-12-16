@@ -88,6 +88,33 @@ def load_and_merge_data():
         })
 
     print(f"Merged {len(merged_dataset)} records.")
+    
+    # Optional: Resolve Local Audio Paths
+    # Prioritize Synthetic Data for TRR Experiment
+    base_audio_dir = os.path.join(BASE_DIR, '..', '..', 'Data', 'Audio_Synthetic') 
+    
+    if os.path.exists(base_audio_dir):
+        print(f"Scanning for audio files in {base_audio_dir}...")
+        for item in merged_dataset:
+            song_name = item['SongName']
+            # Sanitize filename to match generator logic
+            safe_name = "".join([c for c in song_name if c.isalpha() or c.isdigit() or c in (' ', '-', '_')]).strip()
+            
+            candidates = [
+                os.path.join(base_audio_dir, f"{safe_name}.wav"),
+                os.path.join(base_audio_dir, f"{song_name}.wav"),
+            ]
+            for c in candidates:
+                if os.path.exists(c):
+                    item['AudioPath'] = c
+                    break
+            if 'AudioPath' not in item:
+                item['AudioPath'] = None
+    else:
+        # Just initialize key
+        for item in merged_dataset:
+            item['AudioPath'] = None
+
     return merged_dataset
 
 if __name__ == "__main__":

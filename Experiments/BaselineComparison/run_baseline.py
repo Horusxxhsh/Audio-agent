@@ -8,23 +8,17 @@ common_dir = os.path.join(os.path.dirname(__file__), '..', 'common')
 sys.path.append(common_dir)
 
 from dataset_loader import load_and_merge_data
-from baselines import BaselineA, BaselineB
-from rag_system_sim import DualModalRAG
+from baselines import GenerativeAgent, TextRetriever, DualModalRetriever
 from evaluate import Evaluator
 
 def main():
     print("--- 1. Loading Data ---")
     data = load_and_merge_data()
-    
-    # Debug: Check if data loaded
     if not data:
-        print("No data found. Checking separate counts...")
-        # We can re-run pieces of loader logic here or rely on loader's print
-        print("Exiting.")
+        print("No data found. Exiting.")
         return
 
-    # Split Data (Simple 80/20 or Leave-One-Out)
-    # Since we have ~50 items, let's just pick 10 random items as 'Test', rest as 'KB'
+    # Split Data
     random.seed(42)
     random.shuffle(data)
     test_size = 10
@@ -36,16 +30,15 @@ def main():
     
     print(f"Split: {len(test_set)} Test, {len(kb_set)} KnowledgeBase")
 
-    print("\n--- 2. Initializing Models ---")
-    baseline_a = BaselineA()
-    baseline_b = BaselineB(kb_set) # Text RAG
-    rag_ours = DualModalRAG(kb_set) # Dual Modal
-    
+    print("\n--- 2. Initializing Generative Agent & Retrievers ---")
+    agent = GenerativeAgent()
+    text_retriever = TextRetriever(kb_set)
+    dual_retriever = DualModalRetriever(kb_set)
     evaluator = Evaluator()
     
     results = []
 
-    print("\n--- 3. Running Evaluation ---")
+    print("\n--- 3. Running Generative Evaluation (3 Modes) ---")
     for i, item in enumerate(test_set):
         song_name = item['SongName']
         print(f"[{i+1}/{len(test_set)}] Processing: {song_name}")
@@ -53,58 +46,56 @@ def main():
         gt_params = item['Parameters']
         
         # Prepare Inputs
-        # Text Prompt: combined Style + Feature
         style_list = item.get('Style', [])
         feature_list = item.get('Feature', [])
-        # Ensure lists
-        if isinstance(style_list, str): style_list = [style_list]
-        if isinstance(feature_list, str): feature_list = [feature_list]
+        prompt_text = " ".join(style_list + feature_list) # simple string concat
         
-        prompt_text = " ".join(style_list + feature_list)
-        
-        # Audio Vector (for Ours): item['Vector']
-        audio_vec = item['Vector']
+        audio_vec = item.get('Vector') # Raw vector from DB (list of floats usually)
+        # dataset_loader might return it as string or list, ensure list for retriever
         if isinstance(audio_vec, str):
-             audio_vec = [float(x) for x in audio_vec.split(',')]
+             try:
+                 audio_vec = [float(x) for x in audio_vec.split(',')]
+             except:
+                 audio_vec = []
 
-        # 1. Baseline A (Zero-shot Sim)
-        pred_a = baseline_a.generate(prompt_text, training_data=kb_set)
-        
-        # 2. Baseline B (Text RAG)
-        pred_b = baseline_b.retrieve(prompt_text)
-        
-        # 3. Audio-Agent (Ours) - Dual Modal
-        # Weight alpha=0.5
-        pred_ours = rag_ours.retrieve(prompt_text, query_audio_vector=audio_vec, alpha=0.5)
+        # Mode A: Zero-shot (Baseline A)
+        print("   > Mode A: Zero-shot Generation...")
+        pred_a = agent.generate(prompt_text, mode="zero_shot")
+
+        # Mode B: Text RAG (Baseline B)
+        print("   > Mode B: Text RAG Generation...")
+        ctx_text = text_retriever.retrieve_top_k(prompt_text, k=3)
+        pred_b = agent.generate(prompt_text, context_items=ctx_text, mode="rag")
+
+        # Mode C: Dual RAG (Ours)
+        print("   > Mode C: Dual RAG Generation (Ours)...")
+        ctx_dual = dual_retriever.retrieve_top_k(prompt_text, query_audio_vector=audio_vec, alpha=0.5, k=3)
+        pred_c = agent.generate(prompt_text, context_items=ctx_dual, mode="rag_cot")
 
         # Compute Metrics
         d_a = evaluator.compute_parameter_distance(pred_a, gt_params)
         d_b = evaluator.compute_parameter_distance(pred_b, gt_params)
-        d_ours = evaluator.compute_parameter_distance(pred_ours, gt_params)
+        d_c = evaluator.compute_parameter_distance(pred_c, gt_params)
 
         results.append({
             "SongName": song_name,
-            "BaselineA_Dist": d_a,
-            "BaselineB_Dist": d_b,
-            "Ours_Dist": d_ours
+            "BaselineA_ZeroShot_Dist": d_a,
+            "BaselineB_TextRAG_Dist": d_b,
+            "Ours_DualRAG_Dist": d_c
         })
 
     # Summary
     print("\n--- 4. Results Summary ---")
     if results:
-        avg_a = sum(r['BaselineA_Dist'] for r in results) / len(results)
-        avg_b = sum(r['BaselineB_Dist'] for r in results) / len(results)
-        avg_ours = sum(r['Ours_Dist'] for r in results) / len(results)
+        avg_a = sum(r['BaselineA_ZeroShot_Dist'] for r in results) / len(results)
+        avg_b = sum(r['BaselineB_TextRAG_Dist'] for r in results) / len(results)
+        avg_c = sum(r['Ours_DualRAG_Dist'] for r in results) / len(results)
         
         print(f"Average Parameter Distance (Lower is Better):")
-        print(f"Baseline A (Random/Zero-shot): {avg_a:.4f}")
-        print(f"Baseline B (Text RAG):         {avg_b:.4f}")
-        print(f"Audio-Agent (Dual-Modal):      {avg_ours:.4f}")
+        print(f"Baseline A (Zero-shot): {avg_a:.4f}")
+        print(f"Baseline B (Text RAG):  {avg_b:.4f}")
+        print(f"Ours (Dual RAG):        {avg_c:.4f}")
         
-        if avg_ours < avg_b:
-            print("\nSUCCESS: Audio-Agent outperformed Text-Only RAG!")
-        else:
-            print("\nNote: Audio-Agent performance similar or worse than B. (Expected with simulated/perfect data)")
     else:
         print("No results generated.")
 
