@@ -373,3 +373,8 @@ wrap-sign-cmds.md
 Experiments/common/debug_params.txt
 Experiments/BaselineComparison/results.json
 Experiments/AblationStudies/results_ablation.json
+
+# Local debug files
+debug_log.txt
+results_journal.txt
+test_rag_db/
