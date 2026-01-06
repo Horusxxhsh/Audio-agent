@@ -1,0 +1,245 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{stables2014semantic}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:introduction}{{1}{1}{Introduction}{section.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}The Creativity--Complexity Paradox in Modern Audio Production}{1}{subsection.1.1}\protected@file@percent }
+\citation{liu2023audioldm}
+\citation{agostinelli2023musiclm}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Parameter range violations in zero-shot LLM generation. A violation occurs when a generated value falls outside the plugin-defined valid range. Results based on 50 test queries across three common parameter types.}}{2}{table.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:hallucination}{{1}{2}{Parameter range violations in zero-shot LLM generation. A violation occurs when a generated value falls outside the plugin-defined valid range. Results based on 50 test queries across three common parameter types}{table.caption.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}The Challenge of Parameter Intuition}{2}{subsection.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Neuro-Symbolic Control and Hallucination}{2}{subsection.1.3}\protected@file@percent }
+\citation{stables2014semantic}
+\citation{schedl2014survey}
+\citation{martinez2020deep,steinmetz2022automix,moliner2025megami}
+\citation{peladeau2024blind}
+\citation{liu2024ddspSFX}
+\citation{deemanat2025latent}
+\citation{benetos2024stito}
+\citation{doh2025llm2fx,doh2025llm2fxtools,clemens2025mixassist}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{3}{section.2}\protected@file@percent }
+\newlabel{sec:related_work}{{2}{3}{Related Work}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Intelligent Music Production}{3}{subsection.2.1}\protected@file@percent }
+\citation{liu2023audioldm,liu2024audioldm2,agostinelli2023musiclm,vyas2023audiobox}
+\citation{huang2022makeanaudio}
+\citation{wang2023audiolcm}
+\citation{liang2024instruction}
+\citation{engel2020ddsp}
+\citation{baevski2020wav2vec}
+\citation{lewis2020rag}
+\citation{yasunaga2023retrieval,liu2025hmrag}
+\citation{zayats2024mmkb}
+\citation{jin2024mrag}
+\citation{jin2024multimodal}
+\citation{schick2023toolformer,yao2023react,sun2024toolgen}
+\citation{elizalde2023clap}
+\citation{chen2024reclap}
+\citation{niizumi2024m2dclap}
+\citation{wu2024fewshot}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Comparison of waveform-level and parameter-level approaches in neural audio workflows. Each paradigm offers complementary strengths for different production contexts.}}{4}{table.caption.2}\protected@file@percent }
+\newlabel{tab:param_waveform_duality}{{2}{4}{Comparison of waveform-level and parameter-level approaches in neural audio workflows. Each paradigm offers complementary strengths for different production contexts}{table.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Neural Audio Synthesis}{4}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}LLM Agents and Retrieval-Augmented Generation}{4}{subsection.2.3}\protected@file@percent }
+\citation{gatys2015style}
+\citation{stylianou2015audio}
+\citation{mcwec2023texture}
+\citation{verzotto2022representations}
+\citation{weck2023wikimute}
+\citation{srivatsan2024retrieval}
+\citation{gonzales2024rag}
+\citation{stables2014semantic}
+\citation{engel2020ddsp}
+\citation{doh2025llm2fx}
+\citation{liu2023audioldm}
+\citation{liu2025hmrag}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Positioning Against Prior Work}}{5}{table.caption.3}\protected@file@percent }
+\newlabel{tab:positioning}{{3}{5}{Positioning Against Prior Work}{table.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Audio Texture and Semantic Audio Retrieval}{5}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Problem Formulation}{5}{section.3}\protected@file@percent }
+\newlabel{sec:problem_formulation}{{3}{5}{Problem Formulation}{section.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Methodology}{6}{section.4}\protected@file@percent }
+\newlabel{sec:methodology}{{4}{6}{Methodology}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}System Architecture}{6}{subsection.4.1}\protected@file@percent }
+\newlabel{ssec:architecture}{{4.1}{6}{System Architecture}{subsection.4.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces System architecture showing the C++ DSP client, Python RAG agent, and bidirectional communication flow.}}{6}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:architecture}{{1}{6}{System architecture showing the C++ DSP client, Python RAG agent, and bidirectional communication flow}{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.1}C++ Client (JUCE DSP Engine)}{6}{subsubsection.4.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.2}Python Agent (RAG and Reasoning Engine)}{6}{subsubsection.4.1.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces C++ client detailed architecture. The JUCE-based DSP engine uses a dual-threaded design: a high-priority real-time thread for audio processing and a background thread for parameter updates, communicating via lock-free queues to ensure glitch-free audio.}}{7}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:cpp_architecture}{{2}{7}{C++ client detailed architecture. The JUCE-based DSP engine uses a dual-threaded design: a high-priority real-time thread for audio processing and a background thread for parameter updates, communicating via lock-free queues to ensure glitch-free audio}{figure.caption.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Python agent detailed architecture. The agent orchestrates dual-modal retrieval from text and audio knowledge bases, fuses results with uncertainty-aware weighting, and uses LLM reasoning with constraint validation to generate valid DSP parameters.}}{7}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:python_architecture}{{3}{7}{Python agent detailed architecture. The agent orchestrates dual-modal retrieval from text and audio knowledge bases, fuses results with uncertainty-aware weighting, and uses LLM reasoning with constraint validation to generate valid DSP parameters}{figure.caption.6}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.1.3}Communication Protocol}{7}{subsubsection.4.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Parameter Update Message.}{7}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Acknowledgment and Error Handling.}{7}{section*.9}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Data flow and control flow in Audio-Agent. The system processes user queries through parallel text and audio retrieval pathways, fuses results, generates parameters via LLM reasoning, validates constraints, and delivers parameters to the real-time DSP engine for audio processing.}}{8}{figure.caption.7}\protected@file@percent }
+\newlabel{fig:data_control_flow}{{4}{8}{Data flow and control flow in Audio-Agent. The system processes user queries through parallel text and audio retrieval pathways, fuses results, generates parameters via LLM reasoning, validates constraints, and delivers parameters to the real-time DSP engine for audio processing}{figure.caption.7}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Text Knowledge Base Construction}}{8}{algorithm.1}\protected@file@percent }
+\newlabel{alg:text_kb}{{1}{8}{Text Knowledge Base Construction}{algorithm.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Latency and Throughput.}{8}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Dual-Modal Retrieval-Augmented Generation}{8}{subsection.4.2}\protected@file@percent }
+\newlabel{ssec:rag}{{4.2}{8}{Dual-Modal Retrieval-Augmented Generation}{subsection.4.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}Knowledge Base Construction}{8}{subsubsection.4.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}Why Second-Order Statistics?}{8}{subsubsection.4.2.2}\protected@file@percent }
+\citation{gatys2015style}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Audio Knowledge Base Construction}}{9}{algorithm.2}\protected@file@percent }
+\newlabel{alg:audio_kb}{{2}{9}{Audio Knowledge Base Construction}{algorithm.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{A Concrete Contrast.}{9}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.3}The Texture Hypothesis}{9}{subsubsection.4.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.4}Texture Resonance Retrieval (TRR)}{9}{subsubsection.4.2.4}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Complete Texture Resonance Retrieval (TRR) Algorithm}}{10}{algorithm.3}\protected@file@percent }
+\newlabel{alg:trr_complete}{{3}{10}{Complete Texture Resonance Retrieval (TRR) Algorithm}{algorithm.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Texture Resonance feature extraction pipeline. The process transforms audio input through Wav2Vec2 feature extraction, Gram matrix computation to capture second-order statistics, and spectral normalization for scale invariance.}}{10}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:trr_pipeline}{{5}{10}{Texture Resonance feature extraction pipeline. The process transforms audio input through Wav2Vec2 feature extraction, Gram matrix computation to capture second-order statistics, and spectral normalization for scale invariance}{figure.caption.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Gram matrix computation captures second-order statistics. The matrix $\mathbf  {G} = \frac  {1}{T}\mathbf  {H}\mathbf  {H}^\top $ encodes channel-to-channel correlations, where $\mathbf  {G}_{ij}$ measures how features $i$ and $j$ co-activate across time.}}{11}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:gram_computation}{{6}{11}{Gram matrix computation captures second-order statistics. The matrix $\mathbf {G} = \frac {1}{T}\mathbf {H}\mathbf {H}^\top $ encodes channel-to-channel correlations, where $\mathbf {G}_{ij}$ measures how features $i$ and $j$ co-activate across time}{figure.caption.13}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.5}Theoretical Analysis of Texture Resonance Retrieval}{11}{subsubsection.4.2.5}\protected@file@percent }
+\newlabel{sssec:trr_theory}{{4.2.5}{11}{Theoretical Analysis of Texture Resonance Retrieval}{subsubsection.4.2.5}{}}
+\@writefile{toc}{\contentsline {paragraph}{Time-Invariance Property.}{11}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Scale-Invariance Property.}{11}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Connection to Parameter Space.}{11}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.6}Hybrid Retrieval Algorithm}{11}{subsubsection.4.2.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Comparison of mean pooling vs. Texture Resonance Retrieval. While mean pooling captures first-order statistics (average channel activations), TRR captures second-order statistics (channel co-activation patterns), enabling discrimination of textures with similar average content but different structural properties.}}{12}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:trr_vs_mean}{{7}{12}{Comparison of mean pooling vs. Texture Resonance Retrieval. While mean pooling captures first-order statistics (average channel activations), TRR captures second-order statistics (channel co-activation patterns), enabling discrimination of textures with similar average content but different structural properties}{figure.caption.17}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Dual-Modal Hybrid Retrieval with Uncertainty-Aware Fusion}}{12}{algorithm.4}\protected@file@percent }
+\newlabel{alg:dual_retrieval}{{4}{12}{Dual-Modal Hybrid Retrieval with Uncertainty-Aware Fusion}{algorithm.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.7}Theoretical Analysis of Dual-Modal Fusion}{12}{subsubsection.4.2.7}\protected@file@percent }
+\newlabel{sssec:fusion_theory}{{4.2.7}{12}{Theoretical Analysis of Dual-Modal Fusion}{subsubsection.4.2.7}{}}
+\@writefile{toc}{\contentsline {paragraph}{Uncertainty Estimation via Entropy.}{12}{section*.20}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Dual-modal retrieval pipeline with uncertainty-aware fusion. The system retrieves candidates from both text and audio knowledge bases, estimates retrieval uncertainty for each modality, and fuses results using dynamic weights that down-weight unreliable modalities.}}{13}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:dual_modal_retrieval}{{8}{13}{Dual-modal retrieval pipeline with uncertainty-aware fusion. The system retrieves candidates from both text and audio knowledge bases, estimates retrieval uncertainty for each modality, and fuses results using dynamic weights that down-weight unreliable modalities}{figure.caption.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Uncertainty-aware modality fusion mechanism. Retrieval uncertainty is estimated from similarity distributions using entropy, then mapped to fusion weights via exponential decay. This allows the system to automatically down-weight unreliable modalities (e.g., vague text prompts) and rely more on confident modalities.}}{13}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:modality_fusion}{{9}{13}{Uncertainty-aware modality fusion mechanism. Retrieval uncertainty is estimated from similarity distributions using entropy, then mapped to fusion weights via exponential decay. This allows the system to automatically down-weight unreliable modalities (e.g., vague text prompts) and rely more on confident modalities}{figure.caption.19}{}}
+\@writefile{toc}{\contentsline {paragraph}{Adaptive Weight Computation.}{13}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Robustness to Missing Modalities.}{13}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Robustness to Degraded Inputs.}{13}{section*.23}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Adaptive Preference Learning}{13}{subsection.4.3}\protected@file@percent }
+\newlabel{ssec:memory}{{4.3}{13}{Adaptive Preference Learning}{subsection.4.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Parameter Space Constraints and Generation}{14}{subsection.4.4}\protected@file@percent }
+\newlabel{ssec:param_constraints}{{4.4}{14}{Parameter Space Constraints and Generation}{subsection.4.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.1}Constraint Formalization}{14}{subsubsection.4.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Types of Constraints.}{14}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.2}Parameter Generation with Constraint Satisfaction}{14}{subsubsection.4.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Constraint satisfaction mechanism. The system validates generated parameters against range and dependency constraints, repairs violations through clipping and reference-guided interpolation, and falls back to retrieved references if repair fails.}}{14}{figure.caption.25}\protected@file@percent }
+\newlabel{fig:constraint_satisfaction}{{10}{14}{Constraint satisfaction mechanism. The system validates generated parameters against range and dependency constraints, repairs violations through clipping and reference-guided interpolation, and falls back to retrieved references if repair fails}{figure.caption.25}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Parameter space mapping from retrieval to generation. Retrieved presets define a neighborhood in parameter space that guides LLM generation. Constraint satisfaction ensures the output remains within the valid parameter space $\Theta $ while preserving proximity to retrieved references.}}{14}{figure.caption.26}\protected@file@percent }
+\newlabel{fig:param_space_mapping}{{11}{14}{Parameter space mapping from retrieval to generation. Retrieved presets define a neighborhood in parameter space that guides LLM generation. Constraint satisfaction ensures the output remains within the valid parameter space $\Theta $ while preserving proximity to retrieved references}{figure.caption.26}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.3}Theoretical Guarantees}{14}{subsubsection.4.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Constraint Satisfaction Guarantee.}{14}{section*.27}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces Constrained Parameter Generation}}{15}{algorithm.5}\protected@file@percent }
+\newlabel{alg:param_generation}{{5}{15}{Constrained Parameter Generation}{algorithm.5}{}}
+\@writefile{toc}{\contentsline {paragraph}{Proximity Preservation.}{15}{section*.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Complete Inference Pipeline}{15}{subsection.4.5}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {6}{\ignorespaces Constraint Repair via Nearest Valid Projection}}{16}{algorithm.6}\protected@file@percent }
+\newlabel{alg:constraint_repair}{{6}{16}{Constraint Repair via Nearest Valid Projection}{algorithm.6}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {7}{\ignorespaces Audio-Agent Parameter Inference}}{16}{algorithm.7}\protected@file@percent }
+\newlabel{alg:inference}{{7}{16}{Audio-Agent Parameter Inference}{algorithm.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Experiments}{16}{section.5}\protected@file@percent }
+\newlabel{sec:experiments}{{5}{16}{Experiments}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Experimental Setup}{16}{subsection.5.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Experimental setup pipeline. The figure shows the construction of the evaluation dataset from parameter and audio databases, and the evaluation pipeline used for comparative analysis.}}{16}{figure.caption.29}\protected@file@percent }
+\newlabel{fig:experimental_setup}{{12}{16}{Experimental setup pipeline. The figure shows the construction of the evaluation dataset from parameter and audio databases, and the evaluation pipeline used for comparative analysis}{figure.caption.29}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Experimental Hyperparameters}}{17}{table.caption.30}\protected@file@percent }
+\newlabel{tab:hyperparameters}{{4}{17}{Experimental Hyperparameters}{table.caption.30}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Main Results on 50 Guitar Tone Samples}}{17}{table.caption.31}\protected@file@percent }
+\newlabel{tab:main_results}{{5}{17}{Main Results on 50 Guitar Tone Samples}{table.caption.31}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}RQ1: Overall Effectiveness}{17}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Why Does Text-Only Perform So Poorly?}{17}{subsubsection.5.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Where Does TRR Help?}{17}{subsubsection.5.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Metrics}{17}{subsection.5.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Evaluation metrics computation. The figure illustrates how each metric is computed from predicted and ground-truth parameter vectors.}}{18}{figure.caption.32}\protected@file@percent }
+\newlabel{fig:metric_computation}{{13}{18}{Evaluation metrics computation. The figure illustrates how each metric is computed from predicted and ground-truth parameter vectors}{figure.caption.32}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}RQ2: Texture Validity and Mechanism}{18}{subsection.5.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Case Study: Texture Resonance vs. Vector Baseline (Lower is Better)}}{18}{table.caption.33}\protected@file@percent }
+\newlabel{tab:exp4}{{6}{18}{Case Study: Texture Resonance vs. Vector Baseline (Lower is Better)}{table.caption.33}{}}
+\@writefile{toc}{\contentsline {paragraph}{Interpretation.}{18}{section*.34}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.1}Case Study: ``Stadium Rock'' Retrieval Granularity}{18}{subsubsection.5.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Ground truth.}{18}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Retrieval.}{18}{section*.36}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Prediction.}{18}{section*.37}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Feature--Parameter Alignment (Spearman $\rho $; higher is better)}}{19}{table.caption.38}\protected@file@percent }
+\newlabel{tab:feature_param_corr}{{7}{19}{Feature--Parameter Alignment (Spearman $\rho $; higher is better)}{table.caption.38}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Robustness Under Vague Text}}{19}{table.caption.39}\protected@file@percent }
+\newlabel{tab:robustness}{{8}{19}{Robustness Under Vague Text}{table.caption.39}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.2}Feature--Parameter Alignment}{19}{subsubsection.5.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Ablation Study}{19}{subsection.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Perceptual Listening Test (Planned)}{19}{subsection.5.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}RQ3: Robustness Under Degraded Inputs}{19}{subsection.5.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Interpretation.}{20}{section*.40}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{20}{section.6}\protected@file@percent }
+\newlabel{sec:discussion}{{6}{20}{Discussion}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Broader Implications}{20}{subsection.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Revisiting the Texture Hypothesis}{20}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Ethical Considerations}{20}{subsection.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{21}{section.7}\protected@file@percent }
+\newlabel{sec:conclusion}{{7}{21}{Conclusion}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Immediate Next Steps}{21}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Roadmap}{21}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Additional Algorithm Details}{21}{appendix.A}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Complete TRR Algorithm}{21}{subsection.A.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Complete Dual-Modal Retrieval Algorithm}{21}{subsection.A.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {B}Experimental Parameters}{21}{appendix.B}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {C}Additional Experimental Results}{21}{appendix.C}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {C.1}Per-Parameter Analysis}{21}{subsection.C.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {C.2}Ablation Study Results}{21}{subsection.C.2}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {8}{\ignorespaces Complete Texture Resonance Retrieval Algorithm}}{22}{algorithm.8}\protected@file@percent }
+\newlabel{alg:trr_complete_appendix}{{8}{22}{Complete Texture Resonance Retrieval Algorithm}{algorithm.8}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Complete Hyperparameters List}}{22}{table.caption.42}\protected@file@percent }
+\newlabel{tab:hyperparameters_appendix}{{9}{22}{Complete Hyperparameters List}{table.caption.42}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {D}Implementation Details}{22}{appendix.D}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {D.1}WebSocket Communication Protocol}{22}{subsection.D.1}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {9}{\ignorespaces Complete Dual-Modal Retrieval with Uncertainty-Aware Fusion}}{23}{algorithm.9}\protected@file@percent }
+\newlabel{alg:dual_retrieval_appendix}{{9}{23}{Complete Dual-Modal Retrieval with Uncertainty-Aware Fusion}{algorithm.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Per-parameter error analysis (L2 distance)}}{23}{table.caption.43}\protected@file@percent }
+\newlabel{tab:per_param_analysis}{{10}{23}{Per-parameter error analysis (L2 distance)}{table.caption.43}{}}
+\bibdata{reference}
+\bibcite{agostinelli2023musiclm}{{1}{2023}{{Agostinelli et~al.}}{{Agostinelli, Denk, Borsos, Engel, Verzetti, Caillon, Huang, Jansen, Roberts, Tagliasacchi, et~al.}}}
+\bibcite{baevski2020wav2vec}{{2}{2020}{{Baevski et~al.}}{{Baevski, Zhou, Mohamed, and Auli}}}
+\bibcite{benetos2024stito}{{3}{2024}{{Benetos et~al.}}{{}}}
+\bibcite{chen2024reclap}{{4}{2024}{{Chen et~al.}}{{}}}
+\bibcite{clemens2025mixassist}{{5}{2025}{{Clemens \& Marasovi{\'c}}}{{Clemens and Marasovi{\'c}}}}
+\bibcite{deemanat2025latent}{{6}{2025}{{Dees et~al.}}{{}}}
+\bibcite{doh2025llm2fx}{{7}{2025{a}}{{Doh et~al.}}{{Doh, Koo, Mart{\'i}nez-Ram{\'i}rez, Choi, Liao, Wu, Nam, and Mitsufuji}}}
+\bibcite{doh2025llm2fxtools}{{8}{2025{b}}{{Doh et~al.}}{{Doh, Koo, Mart{\'i}nez-Ram{\'i}rez, Choi, Liao, Wu, Nam, and Mitsufuji}}}
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Ablation study results (Parameter Distance)}}{24}{table.caption.44}\protected@file@percent }
+\newlabel{tab:ablation}{{11}{24}{Ablation study results (Parameter Distance)}{table.caption.44}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {D.2}Performance Optimization}{24}{subsection.D.2}\protected@file@percent }
+\bibcite{elizalde2023clap}{{9}{2023}{{Elizalde et~al.}}{{Elizalde, Deshmukh, Al~Ismail, and Wang}}}
+\bibcite{engel2020ddsp}{{10}{2020}{{Engel et~al.}}{{Engel, Hantrakul, Gu, and Roberts}}}
+\bibcite{gatys2015style}{{11}{2015}{{Gatys et~al.}}{{Gatys, Ecker, and Bethge}}}
+\bibcite{gonzales2024rag}{{12}{2024}{{Gonzales et~al.}}{{}}}
+\bibcite{huang2022makeanaudio}{{13}{2023}{{Huang et~al.}}{{}}}
+\bibcite{jin2024mrag}{{14}{2025}{{Jin et~al.}}{{}}}
+\bibcite{jin2024multimodal}{{15}{2024}{{Jin et~al.}}{{}}}
+\bibcite{lewis2020rag}{{16}{2020}{{Lewis et~al.}}{{Lewis, Perez, Piktus, Petroni, Karpukhin, Goyal, K{\"u}ttler, Lewis, Yih, Rockt{\"a}schel, et~al.}}}
+\bibcite{liang2024instruction}{{17}{2024}{{Liang et~al.}}{{}}}
+\bibcite{liu2023audioldm}{{18}{2023}{{Liu et~al.}}{{Liu, Chen, Yuan, Mei, Liu, Mandic, Wang, and Plumbley}}}
+\bibcite{liu2024audioldm2}{{19}{2024{a}}{{Liu et~al.}}{{Liu, Yuan, Liu, Mei, Kong, Tian, Wang, Wang, Wang, and Plumbley}}}
+\bibcite{liu2025hmrag}{{20}{2025}{{Liu et~al.}}{{Liu, Liu, Yao, Liu, Meng, Wang, and Ma}}}
+\bibcite{liu2024ddspSFX}{{21}{2024{b}}{{Liu et~al.}}{{}}}
+\bibcite{martinez2020deep}{{22}{2020}{{Mart{\'i}nez~Ram{\'i}rez \& Reiss}}{{Mart{\'i}nez~Ram{\'i}rez and Reiss}}}
+\bibcite{mcwec2023texture}{{23}{2023}{{McWec et~al.}}{{}}}
+\bibcite{moliner2025megami}{{24}{2025}{{Moliner et~al.}}{{Moliner, Mart{\'i}nez-Ram{\'i}rez, Koo, Liao, Cheuk, Serr{\`a}, V{\"a}lim{\"a}ki, and Mitsufuji}}}
+\bibcite{niizumi2024m2dclap}{{25}{2024}{{Niizumi et~al.}}{{}}}
+\bibcite{peladeau2024blind}{{26}{2024}{{Peladeau et~al.}}{{}}}
+\bibcite{schedl2014survey}{{27}{2014}{{Schedl et~al.}}{{}}}
+\bibcite{schick2023toolformer}{{28}{2023}{{Schick et~al.}}{{Schick, Dwivedi-Yu, Dess{\`\i }, Raileanu, Lomeli, Zettlemoyer, Cancedda, and Scialom}}}
+\bibcite{srivatsan2024retrieval}{{29}{2024}{{Srivatsan et~al.}}{{}}}
+\bibcite{stables2014semantic}{{30}{2014}{{Stables et~al.}}{{Stables, Enderby, De~Man, Fazekas, and Reiss}}}
+\bibcite{steinmetz2022automix}{{31}{2022}{{Steinmetz et~al.}}{{Steinmetz, Bryan, and Reiss}}}
+\bibcite{stylianou2015audio}{{32}{2015}{{Stylianou et~al.}}{{Stylianou, Kappler, and Tzanetakis}}}
+\bibcite{sun2024toolgen}{{33}{2024}{{Sun et~al.}}{{}}}
+\bibcite{verzotto2022representations}{{34}{2022}{{Verzotto et~al.}}{{}}}
+\bibcite{vyas2023audiobox}{{35}{2023}{{Vyas et~al.}}{{Vyas, Shi, Le, Tjandra, Wu, Guo, Zhang, Zhang, Adkins, Ngan, et~al.}}}
+\bibcite{wang2023audiolcm}{{36}{2024}{{Wang et~al.}}{{}}}
+\bibcite{weck2023wikimute}{{37}{2023}{{Weck et~al.}}{{}}}
+\bibcite{wu2024fewshot}{{38}{2024}{{Wu et~al.}}{{}}}
+\bibcite{yao2023react}{{39}{2023}{{Yao et~al.}}{{Yao, Zhao, Yu, Du, Shafran, Narasimhan, and Cao}}}
+\bibcite{yasunaga2023retrieval}{{40}{2023}{{Yasunaga et~al.}}{{Yasunaga, Aghajanyan, Shi, James, Leskovec, Liang, Lewis, Zettlemoyer, and Yih}}}
+\bibcite{zayats2024mmkb}{{41}{2024}{{Zayats et~al.}}{{}}}
+\bibstyle{iclr2025_conference}
+\gdef \@abspage@last{26}

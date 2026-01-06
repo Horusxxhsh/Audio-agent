@@ -1,0 +1,213 @@
+\begin{thebibliography}{41}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Agostinelli et~al.(2023)Agostinelli, Denk, Borsos, Engel, Verzetti, Caillon, Huang, Jansen, Roberts, Tagliasacchi, et~al.]{agostinelli2023musiclm}
+Andrea Agostinelli, Timo~I Denk, Zal{\'a}n Borsos, Jesse Engel, Mauro Verzetti, Antoine Caillon, Qingqing Huang, Aren Jansen, Adam Roberts, Marco Tagliasacchi, et~al.
+\newblock Musiclm: Generating music from text.
+\newblock \emph{arXiv preprint arXiv:2301.11325}, 2023.
+
+\bibitem[Baevski et~al.(2020)Baevski, Zhou, Mohamed, and Auli]{baevski2020wav2vec}
+Alexei Baevski, Henry Zhou, Abdelrahman Mohamed, and Michael Auli.
+\newblock wav2vec 2.0: A framework for self-supervised learning of speech representations.
+\newblock In \emph{Advances in Neural Information Processing Systems (NeurIPS)}, volume~33, pp.\  12449--12460, 2020.
+
+\bibitem[Benetos et~al.(2024)]{benetos2024stito}
+Emmanouil Benetos et~al.
+\newblock St-ito: Controlling audio effects for style transfer with inference-time optimization.
+\newblock \emph{arXiv preprint arXiv:2410.21233}, 2024.
+
+\bibitem[Chen et~al.(2024)]{chen2024reclap}
+K.~Chen et~al.
+\newblock Reclap: Improving zero shot audio classification by describing sounds.
+\newblock \emph{arXiv preprint arXiv:2409.09213}, 2024.
+
+\bibitem[Clemens \& Marasovi{\'c}(2025)Clemens and Marasovi{\'c}]{clemens2025mixassist}
+Michael Clemens and Ana Marasovi{\'c}.
+\newblock Mixassist: An audio-language dataset for co-creative ai assistance in music mixing.
+\newblock In \emph{Conference on Language Modeling (COLM)}, 2025.
+
+\bibitem[Dees et~al.(2025)]{deemanat2025latent}
+A.~Dees et~al.
+\newblock Generative latent spaces for neural audio synthesis.
+\newblock 2025.
+
+\bibitem[Doh et~al.(2025{\natexlab{a}})Doh, Koo, Mart{\'i}nez-Ram{\'i}rez, Choi, Liao, Wu, Nam, and Mitsufuji]{doh2025llm2fx}
+Seungheon Doh, Junghyun Koo, Marco~A Mart{\'i}nez-Ram{\'i}rez, Woosung Choi, Wei-Hsiang Liao, Qiyu Wu, Juhan Nam, and Yuki Mitsufuji.
+\newblock Can large language models predict audio effects parameters from natural language?
+\newblock \emph{arXiv preprint arXiv:2505.20770}, 2025{\natexlab{a}}.
+
+\bibitem[Doh et~al.(2025{\natexlab{b}})Doh, Koo, Mart{\'i}nez-Ram{\'i}rez, Choi, Liao, Wu, Nam, and Mitsufuji]{doh2025llm2fxtools}
+Seungheon Doh, Junghyun Koo, Marco~A Mart{\'i}nez-Ram{\'i}rez, Woosung Choi, Wei-Hsiang Liao, Qiyu Wu, Juhan Nam, and Yuki Mitsufuji.
+\newblock Llm2fx-tools: Tool calling for music post-production.
+\newblock \emph{arXiv preprint arXiv:2512.01559}, 2025{\natexlab{b}}.
+
+\bibitem[Elizalde et~al.(2023)Elizalde, Deshmukh, Al~Ismail, and Wang]{elizalde2023clap}
+B.~Elizalde, S.~Deshmukh, M.~Al~Ismail, and H.~Wang.
+\newblock Clap: Learning audio concepts from natural language supervision.
+\newblock 2023.
+
+\bibitem[Engel et~al.(2020)Engel, Hantrakul, Gu, and Roberts]{engel2020ddsp}
+Jesse Engel, Lamtharn Hantrakul, Chenjie Gu, and Adam Roberts.
+\newblock Ddsp: Differentiable digital signal processing.
+\newblock In \emph{International Conference on Learning Representations (ICLR)}, 2020.
+
+\bibitem[Gatys et~al.(2015)Gatys, Ecker, and Bethge]{gatys2015style}
+Leon~A Gatys, Alexander~S Ecker, and Matthias Bethge.
+\newblock A neural algorithm of artistic style.
+\newblock \emph{arXiv preprint arXiv:1508.06576}, 2015.
+
+\bibitem[Gonzales et~al.(2024)]{gonzales2024rag}
+R.~Gonzales et~al.
+\newblock A retrieval augmented approach for text-to-music generation.
+\newblock In \emph{NLP4MuSA Workshop}, 2024.
+
+\bibitem[Huang et~al.(2023)]{huang2022makeanaudio}
+Q.~Huang et~al.
+\newblock Make-an-audio: Text-to-audio generation with prompt enhancement.
+\newblock \emph{arXiv preprint arXiv:2308.11752}, 2023.
+
+\bibitem[Jin et~al.(2025)]{jin2024mrag}
+H.~Jin et~al.
+\newblock Multimodal retrieval augmented generation framework for visually-rich document understanding.
+\newblock \emph{Springer Nature Applied Sciences}, 2025.
+
+\bibitem[Jin et~al.(2024)]{jin2024multimodal}
+Y.~Jin et~al.
+\newblock Multimodal retrieval-augmented generation for instruction manual understanding.
+\newblock In \emph{Stanford CS231N Class Projects}, 2024.
+
+\bibitem[Lewis et~al.(2020)Lewis, Perez, Piktus, Petroni, Karpukhin, Goyal, K{\"u}ttler, Lewis, Yih, Rockt{\"a}schel, et~al.]{lewis2020rag}
+Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich K{\"u}ttler, Mike Lewis, Wen-tau Yih, Tim Rockt{\"a}schel, et~al.
+\newblock Retrieval-augmented generation for knowledge-intensive nlp tasks.
+\newblock \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 33:\penalty0 9459--9474, 2020.
+
+\bibitem[Liang et~al.(2024)]{liang2024instruction}
+B.~Liang et~al.
+\newblock Text-to-audio generation using instruction-guided latent diffusion.
+\newblock \emph{arXiv preprint arXiv:2404.09956}, 2024.
+
+\bibitem[Liu et~al.(2023)Liu, Chen, Yuan, Mei, Liu, Mandic, Wang, and Plumbley]{liu2023audioldm}
+Haohe Liu, Zehua Chen, Yi~Yuan, Xinhao Mei, Xubo Liu, Danilo Mandic, Wenwu Wang, and Mark~D Plumbley.
+\newblock Audioldm: Text-to-audio generation with latent diffusion models.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, 2023.
+
+\bibitem[Liu et~al.(2024{\natexlab{a}})Liu, Yuan, Liu, Mei, Kong, Tian, Wang, Wang, Wang, and Plumbley]{liu2024audioldm2}
+Haohe Liu, Yi~Yuan, Xubo Liu, Xinhao Mei, Qiuqiang Kong, Qiao Tian, Yuping Wang, Wenwu Wang, Yuxuan Wang, and Mark~D Plumbley.
+\newblock Audioldm 2: Learning holistic audio generation with self-supervised pretraining.
+\newblock \emph{IEEE/ACM Transactions on Audio, Speech, and Language Processing}, 32:\penalty0 2871--2883, 2024{\natexlab{a}}.
+
+\bibitem[Liu et~al.(2025)Liu, Liu, Yao, Liu, Meng, Wang, and Ma]{liu2025hmrag}
+Pei Liu, Xin Liu, Ruoyu Yao, Junming Liu, Siyuan Meng, Ding Wang, and Jun Ma.
+\newblock Hm-rag: Hierarchical multi-agent multimodal retrieval augmented generation.
+\newblock In \emph{ACM International Conference on Multimedia}, 2025.
+
+\bibitem[Liu et~al.(2024{\natexlab{b}})]{liu2024ddspSFX}
+Y.~Liu et~al.
+\newblock Ddsp-sfx: Acoustically-guided sound effects generation with ddsp.
+\newblock 2024{\natexlab{b}}.
+
+\bibitem[Mart{\'i}nez~Ram{\'i}rez \& Reiss(2020)Mart{\'i}nez~Ram{\'i}rez and Reiss]{martinez2020deep}
+Marco~A Mart{\'i}nez~Ram{\'i}rez and Joshua~D Reiss.
+\newblock Deep learning for automatic mixing.
+\newblock In \emph{Audio Engineering Society Convention}, 2020.
+
+\bibitem[McWec et~al.(2023)]{mcwec2023texture}
+McWec et~al.
+\newblock Trends in audio texture analysis, synthesis, and applications.
+\newblock \emph{ResearchGate}, 2023.
+
+\bibitem[Moliner et~al.(2025)Moliner, Mart{\'i}nez-Ram{\'i}rez, Koo, Liao, Cheuk, Serr{\`a}, V{\"a}lim{\"a}ki, and Mitsufuji]{moliner2025megami}
+Eloi Moliner, Marco~A Mart{\'i}nez-Ram{\'i}rez, Junghyun Koo, Wei-Hsiang Liao, Kin~Wai Cheuk, Joan Serr{\`a}, Vesa V{\"a}lim{\"a}ki, and Yuki Mitsufuji.
+\newblock Automatic music mixing using a generative model of effect embeddings.
+\newblock \emph{arXiv preprint arXiv:2511.08040}, 2025.
+
+\bibitem[Niizumi et~al.(2024)]{niizumi2024m2dclap}
+D.~Niizumi et~al.
+\newblock M2d-clap: Masked modeling duo meets clap for learning general-purpose audio-language representations.
+\newblock 2024.
+
+\bibitem[Peladeau et~al.(2024)]{peladeau2024blind}
+C.~Peladeau et~al.
+\newblock Blind estimation of audio effects using an auto-encoder architecture.
+\newblock \emph{arXiv preprint arXiv:2310.11781}, 2024.
+
+\bibitem[Schedl et~al.(2014)]{schedl2014survey}
+M.~Schedl et~al.
+\newblock Music information retrieval: Recent developments and future challenges.
+\newblock \emph{Foundations and Trends in Information Retrieval}, 8\penalty0 (2-3):\penalty0 127--261, 2014.
+
+\bibitem[Schick et~al.(2023)Schick, Dwivedi-Yu, Dess{\`\i}, Raileanu, Lomeli, Zettlemoyer, Cancedda, and Scialom]{schick2023toolformer}
+Timo Schick, Jane Dwivedi-Yu, Roberto Dess{\`\i}, Roberta Raileanu, Maria Lomeli, Luke Zettlemoyer, Nicola Cancedda, and Thomas Scialom.
+\newblock Toolformer: Language models can teach themselves to use tools.
+\newblock \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 2023.
+
+\bibitem[Srivatsan et~al.(2024)]{srivatsan2024retrieval}
+N.~Srivatsan et~al.
+\newblock Retrieval guided music captioning via multimodal prefixes.
+\newblock In \emph{International Joint Conference on Artificial Intelligence (IJCAI)}, 2024.
+
+\bibitem[Stables et~al.(2014)Stables, Enderby, De~Man, Fazekas, and Reiss]{stables2014semantic}
+Ryan Stables, Sean Enderby, Brecht De~Man, Gy{\"o}rgy Fazekas, and Joshua~D Reiss.
+\newblock Safe: A system for the extraction and retrieval of semantic audio descriptors.
+\newblock In \emph{Proceedings of the AES 53rd International Conference on Semantic Audio}, 2014.
+
+\bibitem[Steinmetz et~al.(2022)Steinmetz, Bryan, and Reiss]{steinmetz2022automix}
+Christian~J Steinmetz, Nicholas~J Bryan, and Joshua~D Reiss.
+\newblock Automatic multitrack mixing with a differentiable mixing console of neural audio effects.
+\newblock In \emph{IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 2022.
+
+\bibitem[Stylianou et~al.(2015)Stylianou, Kappler, and Tzanetakis]{stylianou2015audio}
+Yannis Stylianou, Georg Kappler, and George Tzanetakis.
+\newblock Audio style transfer.
+\newblock In \emph{IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 2015.
+
+\bibitem[Sun et~al.(2024)]{sun2024toolgen}
+Renxi Sun et~al.
+\newblock Toolgen: Unified tool retrieval and calling via generation.
+\newblock \emph{arXiv preprint arXiv:2410.03439}, 2024.
+
+\bibitem[Verzotto et~al.(2022)]{verzotto2022representations}
+Lavinia Verzotto et~al.
+\newblock Audio representations for deep learning in sound synthesis.
+\newblock \emph{arXiv preprint arXiv:2201.02490}, 2022.
+
+\bibitem[Vyas et~al.(2023)Vyas, Shi, Le, Tjandra, Wu, Guo, Zhang, Zhang, Adkins, Ngan, et~al.]{vyas2023audiobox}
+Apoorv Vyas, Bowen Shi, Matthew Le, Andros Tjandra, Yi-Chiao Wu, Baishan Guo, Jiemin Zhang, Xinyue Zhang, Robert Adkins, William Ngan, et~al.
+\newblock Audiobox: Unified audio generation with natural language prompts.
+\newblock \emph{arXiv preprint arXiv:2312.15821}, 2023.
+
+\bibitem[Wang et~al.(2024)]{wang2023audiolcm}
+S.~Wang et~al.
+\newblock Audiolcm: Efficient and high-quality text-to-audio generation via latent consistency models.
+\newblock 2024.
+
+\bibitem[Weck et~al.(2023)]{weck2023wikimute}
+B.~Weck et~al.
+\newblock Wikimute: A web-sourced dataset of semantic descriptions of music.
+\newblock \emph{arXiv preprint arXiv:2312.09207}, 2023.
+
+\bibitem[Wu et~al.(2024)]{wu2024fewshot}
+Y.~Wu et~al.
+\newblock Few-shot prompt learning for audio language models.
+\newblock 2024.
+
+\bibitem[Yao et~al.(2023)Yao, Zhao, Yu, Du, Shafran, Narasimhan, and Cao]{yao2023react}
+Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, and Yuan Cao.
+\newblock React: Synergizing reasoning and acting in language models.
+\newblock In \emph{International Conference on Learning Representations (ICLR)}, 2023.
+
+\bibitem[Yasunaga et~al.(2023)Yasunaga, Aghajanyan, Shi, James, Leskovec, Liang, Lewis, Zettlemoyer, and Yih]{yasunaga2023retrieval}
+Michihiro Yasunaga, Armen Aghajanyan, Weijia Shi, Richard James, Jure Leskovec, Percy Liang, Mike Lewis, Luke Zettlemoyer, and Wen-tau Yih.
+\newblock Retrieval-augmented multimodal language modeling.
+\newblock \emph{arXiv preprint arXiv:2211.12561}, 2023.
+
+\bibitem[Zayats et~al.(2024)]{zayats2024mmkb}
+H.~Zayats et~al.
+\newblock Mmkb-rag: A multi-modal knowledge-based retrieval-augmented generation system.
+\newblock \emph{arXiv preprint arXiv:2504.10074}, 2024.
+
+\end{thebibliography}

@@ -970,85 +970,85 @@ We thank the anonymous reviewers for their valuable feedback.
 \subsection{Complete TRR Algorithm}
 
 \begin{algorithm}[t]
-	\caption{Complete Texture Resonance Retrieval Algorithm}
-	\label{alg:trr_complete_appendix}
-	\begin{algorithmic}
-		\REQUIRE Audio sample $a$, sample rate $sr=16000$, Wav2Vec2 model $\mathcal{W}$
-		\ENSURE TRR embedding $\mathbf{G}_{\text{norm}} \in \mathbb{R}^{C \times C}$ where $C=768$
+\caption{Complete Texture Resonance Retrieval Algorithm}
+\label{alg:trr_complete_appendix}
+\begin{algorithmic}
+\REQUIRE Audio sample $a$, sample rate $sr=16000$, Wav2Vec2 model $\mathcal{W}$
+\ENSURE TRR embedding $\mathbf{G}_{\text{norm}} \in \mathbb{R}^{C \times C}$ where $C=768$
 
-		\STATE \textbf{// Step 1: Audio Preprocessing}
-		\STATE Resample $a$ to 16kHz if needed
-		\STATE Normalize amplitude: $a \leftarrow a / \max(|a|)$
-		\STATE Ensure minimum length: $T_{\text{audio}} \geq 1$ second
+\STATE \textbf{// Step 1: Audio Preprocessing}
+\STATE Resample $a$ to 16kHz if needed
+\STATE Normalize amplitude: $a \leftarrow a / \max(|a|)$
+\STATE Ensure minimum length: $T_{\text{audio}} \geq 1$ second
 
-		\STATE \textbf{// Step 2: Feature Extraction}
-		\STATE Extract frame-level features from layer 9 of Wav2Vec2:
-		\STATE $\mathbf{H} \leftarrow \mathcal{W}_{\text{layer 9}}(a) \in \mathbb{R}^{C \times T}$
-		\STATE \textit{where $C=768$ is feature dimension, $T$ is number of time frames}
+\STATE \textbf{// Step 2: Feature Extraction}
+\STATE Extract frame-level features from layer 9 of Wav2Vec2:
+\STATE $\mathbf{H} \leftarrow \mathcal{W}_{\text{layer 9}}(a) \in \mathbb{R}^{C \times T}$
+\STATE \textit{where $C=768$ is feature dimension, $T$ is number of time frames}
 
-		\STATE \textbf{// Step 3: Gram Matrix Computation}
-		\STATE Compute second-order statistics:
-		\STATE $\mathbf{G} \leftarrow \frac{1}{T} \mathbf{H}\mathbf{H}^\top \in \mathbb{R}^{C \times C}$
-		\STATE \textit{$\mathbf{G}_{ij}$ captures correlation between channels $i$ and $j$}
+\STATE \textbf{// Step 3: Gram Matrix Computation}
+\STATE Compute second-order statistics:
+\STATE $\mathbf{G} \leftarrow \frac{1}{T} \mathbf{H}\mathbf{H}^\top \in \mathbb{R}^{C \times C}$
+\STATE \textit{$\mathbf{G}_{ij}$ captures correlation between channels $i$ and $j$}
 
-		\STATE \textbf{// Step 4: Spectral Normalization}
-		\STATE Compute Frobenius norm: $\sigma \leftarrow \|\mathbf{G}\|_F = \sqrt{\sum_{i,j} \mathbf{G}_{ij}^2}$
-		\STATE Normalize for scale invariance: $\mathbf{G}_{\text{norm}} \leftarrow \mathbf{G} / \sigma$
+\STATE \textbf{// Step 4: Spectral Normalization}
+\STATE Compute Frobenius norm: $\sigma \leftarrow \|\mathbf{G}\|_F = \sqrt{\sum_{i,j} \mathbf{G}_{ij}^2}$
+\STATE Normalize for scale invariance: $\mathbf{G}_{\text{norm}} \leftarrow \mathbf{G} / \sigma$
 
-		\RETURN $\mathbf{G}_{\text{norm}}$
+\RETURN $\mathbf{G}_{\text{norm}}$
 
-		\STATE
-		\STATE \textbf{Complexity Analysis:}
-		\STATE \textit{Time}: $\mathcal{O}(T \cdot C)$ for feature extraction, $\mathcal{O}(C^2 \cdot T)$ for Gram matrix
-		\STATE \textit{Space}: $\mathcal{O}(C \cdot T)$ for features, $\mathcal{O}(C^2)$ for Gram matrix
-		\STATE \textit{Total}: $\mathcal{O}(C^2 \cdot T)$ time, $\mathcal{O}(C^2)$ space when features are not cached
-	\end{algorithmic}
+\STATE
+\STATE \textbf{Complexity Analysis:}
+\STATE \textit{Time}: $\mathcal{O}(T \cdot C)$ for feature extraction, $\mathcal{O}(C^2 \cdot T)$ for Gram matrix
+\STATE \textit{Space}: $\mathcal{O}(C \cdot T)$ for features, $\mathcal{O}(C^2)$ for Gram matrix
+\STATE \textit{Total}: $\mathcal{O}(C^2 \cdot T)$ time, $\mathcal{O}(C^2)$ space when features are not cached
+\end{algorithmic}
 \end{algorithm}
 
 \subsection{Complete Dual-Modal Retrieval Algorithm}
 
 \begin{algorithm}[t]
-	\caption{Complete Dual-Modal Retrieval with Uncertainty-Aware Fusion}
-	\label{alg:dual_retrieval_appendix}
-	\begin{algorithmic}
-		\REQUIRE Query $q = (T_{\text{desc}}, A_{\text{ref}})$, knowledge bases $\mathcal{K}_{\text{text}}, \mathcal{K}_{\text{audio}}$, top-K value $K$
-		\ENSURE Fused top-K retrieval results $\mathcal{R}$
+\caption{Complete Dual-Modal Retrieval with Uncertainty-Aware Fusion}
+\label{alg:dual_retrieval_appendix}
+\begin{algorithmic}
+\REQUIRE Query $q = (T_{\text{desc}}, A_{\text{ref}})$, knowledge bases $\mathcal{K}_{\text{text}}, \mathcal{K}_{\text{audio}}$, top-K value $K$
+\ENSURE Fused top-K retrieval results $\mathcal{R}$
 
-		\STATE \textbf{// Step 1: Text Retrieval}
-		\STATE Encode text query: $\mathbf{e}_{\text{text}} = \text{SBERT}(T_{\text{desc}})$
-		\STATE Retrieve top-$K$ candidates: $\mathcal{R}_{\text{text}} = \text{TopK}(\mathcal{K}_{\text{text}}, \mathbf{e}_{\text{text}})$
-		\STATE Compute text uncertainty: $u_{\text{text}} = \text{Entropy}(\text{Similarities}(\mathcal{R}_{\text{text}}))$
+\STATE \textbf{// Step 1: Text Retrieval}
+\STATE Encode text query: $\mathbf{e}_{\text{text}} = \text{SBERT}(T_{\text{desc}})$
+\STATE Retrieve top-$K$ candidates: $\mathcal{R}_{\text{text}} = \text{TopK}(\mathcal{K}_{\text{text}}, \mathbf{e}_{\text{text}})$
+\STATE Compute text uncertainty: $u_{\text{text}} = \text{Entropy}(\text{Similarities}(\mathcal{R}_{\text{text}}))$
 
-		\STATE \textbf{// Step 2: Audio Retrieval (if reference available)}
-		\IF{$A_{\text{ref}}$ is provided}
-		\STATE Extract audio features: $\mathbf{h} = \text{Wav2Vec2}(A_{\text{ref}})$
-		\STATE Compute TRR encoding: $\mathbf{G} = \text{TRR}(\mathbf{h})$
-		\STATE Retrieve top-$K$ candidates: $\mathcal{R}_{\text{audio}} = \text{TopK}(\mathcal{K}_{\text{audio}}, \mathbf{G})$
-		\STATE Compute audio uncertainty: $u_{\text{audio}} = \text{Entropy}(\text{Similarities}(\mathcal{R}_{\text{audio}}))$
-		\ELSE
-		\STATE $\mathcal{R}_{\text{audio}} = \emptyset$, $u_{\text{audio}} = \infty$
-		\ENDIF
+\STATE \textbf{// Step 2: Audio Retrieval (if reference available)}
+\IF{$A_{\text{ref}}$ is provided}
+    \STATE Extract audio features: $\mathbf{h} = \text{Wav2Vec2}(A_{\text{ref}})$
+    \STATE Compute TRR encoding: $\mathbf{G} = \text{TRR}(\mathbf{h})$
+    \STATE Retrieve top-$K$ candidates: $\mathcal{R}_{\text{audio}} = \text{TopK}(\mathcal{K}_{\text{audio}}, \mathbf{G})$
+    \STATE Compute audio uncertainty: $u_{\text{audio}} = \text{Entropy}(\text{Similarities}(\mathcal{R}_{\text{audio}}))$
+\ELSE
+    \STATE $\mathcal{R}_{\text{audio}} = \emptyset$, $u_{\text{audio}} = \infty$
+\ENDIF
 
-		\STATE \textbf{// Step 3: Uncertainty-Aware Weight Computation}
-		\STATE Compute modality weights:
-		\STATE $w_{\text{text}} = \exp(-\beta \cdot u_{\text{text}})$
-		\STATE $w_{\text{audio}} = \exp(-\beta \cdot u_{\text{audio}})$ \textit{where $\beta$ is temperature parameter}
-		\STATE Normalize: $w_{\text{text}} \leftarrow \frac{w_{\text{text}}}{w_{\text{text}} + w_{\text{audio}}}$
-		\STATE Normalize: $w_{\text{audio}} \leftarrow \frac{w_{\text{audio}}}{w_{\text{text}} + w_{\text{audio}}}$
+\STATE \textbf{// Step 3: Uncertainty-Aware Weight Computation}
+\STATE Compute modality weights:
+\STATE $w_{\text{text}} = \exp(-\beta \cdot u_{\text{text}})$
+\STATE $w_{\text{audio}} = \exp(-\beta \cdot u_{\text{audio}})$ \textit{where $\beta$ is temperature parameter}
+\STATE Normalize: $w_{\text{text}} \leftarrow \frac{w_{\text{text}}}{w_{\text{text}} + w_{\text{audio}}}$
+\STATE Normalize: $w_{\text{audio}} \leftarrow \frac{w_{\text{audio}}}{w_{\text{text}} + w_{\text{audio}}}$
 
-		\STATE \textbf{// Step 4: Fusion via Weighted Score Combination}
-		\STATE Initialize fused candidates: $\mathcal{C} = \mathcal{R}_{\text{text}} \cup \mathcal{R}_{\text{audio}}$
-		\FORALL{candidate $c \in \mathcal{C}$}
-		\STATE $s_{\text{text}}(c) = \text{Similarity}(c, T_{\text{desc}})$ if $c \in \mathcal{R}_{\text{text}}$ else 0
-		\STATE $s_{\text{audio}}(c) = \text{Similarity}(c, A_{\text{ref}})$ if $c \in \mathcal{R}_{\text{audio}}$ else 0
-		\STATE $s_{\text{fused}}(c) = w_{\text{text}} \cdot s_{\text{text}}(c) + w_{\text{audio}} \cdot s_{\text{audio}}(c)$
-		\ENDFOR
+\STATE \textbf{// Step 4: Fusion via Weighted Score Combination}
+\STATE Initialize fused candidates: $\mathcal{C} = \mathcal{R}_{\text{text}} \cup \mathcal{R}_{\text{audio}}$
+\FORALL{candidate $c \in \mathcal{C}$}
+    \STATE $s_{\text{text}}(c) = \text{Similarity}(c, T_{\text{desc}})$ if $c \in \mathcal{R}_{\text{text}}$ else 0
+    \STATE $s_{\text{audio}}(c) = \text{Similarity}(c, A_{\text{ref}})$ if $c \in \mathcal{R}_{\text{audio}}$ else 0
+    \STATE $s_{\text{fused}}(c) = w_{\text{text}} \cdot s_{\text{text}}(c) + w_{\text{audio}} \cdot s_{\text{audio}}(c)$
+\ENDFOR
 
-		\STATE \textbf{// Step 5: Rank and Return Top-K}
-		\STATE Sort $\mathcal{C}$ by $s_{\text{fused}}$ in descending order
-		\STATE $\mathcal{R} \leftarrow$ Top-K candidates from sorted $\mathcal{C}$
-		\RETURN $\mathcal{R}$
-	\end{algorithmic}
+\STATE \textbf{// Step 5: Rank and Return Top-K}
+\STATE Sort $\mathcal{C}$ by $s_{\text{fused}}$ in descending order
+\STATE $\mathcal{R} \leftarrow$ Top-K candidates from sorted $\mathcal{C}$
+\RETURN $\mathcal{R}$
+\end{algorithmic}
 \end{algorithm}
 
 \section{Experimental Parameters}
@@ -1056,38 +1056,38 @@ We thank the anonymous reviewers for their valuable feedback.
 Table \ref{tab:hyperparameters_appendix} lists all hyperparameters used in our experiments.
 
 \begin{table}[h]
-	\centering
-	\caption{Complete Hyperparameters List}
-	\label{tab:hyperparameters_appendix}
-	\small
-	\begin{tabular}{llc}
-		\toprule
-		\textbf{Parameter}    & \textbf{Value}         & \textbf{Description}              \\
-		\midrule
-		\multicolumn{3}{l}{\textbf{Audio Preprocessing}}                                   \\
-		Sample rate           & 16 kHz                 & Audio preprocessing sample rate   \\
-		Window size           & 25 ms                  & STFT window size                  \\
-		Hop size              & 10 ms                  & STFT hop size                     \\
-		\midrule
-		\multicolumn{3}{l}{\textbf{Feature Extraction}}                                    \\
-		Wav2Vec2 model        & facebook/wav2vec2-base & Pretrained model                  \\
-		Wav2Vec2 layer        & 9                      & Feature extraction layer          \\
-		Feature dimension     & 768                    & Wav2Vec2 feature dimension        \\
-		TRR dimension         & $768 \times 768$       & Gram matrix size                  \\
-		\midrule
-		\multicolumn{3}{l}{\textbf{Retrieval}}                                             \\
-		Text embedding        & SBERT-base             & Text encoder model                \\
-		Top-K                 & 5                      & Number of retrieved candidates    \\
-		Fusion weight $\beta$ & 1.0                    & Uncertainty temperature parameter \\
-		Similarity metric     & Cosine                 & Embedding similarity measure      \\
-		\midrule
-		\multicolumn{3}{l}{\textbf{Parameter Generation}}                                  \\
-		LLM model             & GPT-3.5-turbo          & Language model                    \\
-		Max tokens            & 1024                   & Maximum output tokens             \\
-		Temperature           & 0.7                    & Sampling temperature              \\
-		Top-p                 & 0.9                    & Nucleus sampling parameter        \\
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Complete Hyperparameters List}
+\label{tab:hyperparameters_appendix}
+\small
+\begin{tabular}{llc}
+\toprule
+\textbf{Parameter} & \textbf{Value} & \textbf{Description} \\
+\midrule
+\multicolumn{3}{l}{\textbf{Audio Preprocessing}} \\
+Sample rate & 16 kHz & Audio preprocessing sample rate \\
+Window size & 25 ms & STFT window size \\
+Hop size & 10 ms & STFT hop size \\
+\midrule
+\multicolumn{3}{l}{\textbf{Feature Extraction}} \\
+Wav2Vec2 model & facebook/wav2vec2-base & Pretrained model \\
+Wav2Vec2 layer & 9 & Feature extraction layer \\
+Feature dimension & 768 & Wav2Vec2 feature dimension \\
+TRR dimension & $768 \times 768$ & Gram matrix size \\
+\midrule
+\multicolumn{3}{l}{\textbf{Retrieval}} \\
+Text embedding & SBERT-base & Text encoder model \\
+Top-K & 5 & Number of retrieved candidates \\
+Fusion weight $\beta$ & 1.0 & Uncertainty temperature parameter \\
+Similarity metric & Cosine & Embedding similarity measure \\
+\midrule
+\multicolumn{3}{l}{\textbf{Parameter Generation}} \\
+LLM model & GPT-3.5-turbo & Language model \\
+Max tokens & 1024 & Maximum output tokens \\
+Temperature & 0.7 & Sampling temperature \\
+Top-p & 0.9 & Nucleus sampling parameter \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \section{Additional Experimental Results}
@@ -1097,22 +1097,22 @@ Table \ref{tab:hyperparameters_appendix} lists all hyperparameters used in our e
 Table \ref{tab:per_param_analysis} shows the performance breakdown by parameter type.
 
 \begin{table}[h]
-	\centering
-	\caption{Per-parameter error analysis (L2 distance)}
-	\label{tab:per_param_analysis}
-	\small
-	\begin{tabular}{lcc}
-		\toprule
-		\textbf{Parameter Type} & \textbf{Vector-RAG} & \textbf{Audio-Agent (Ours)} \\
-		\midrule
-		Gain/Volume             & 8.23                & \textbf{6.45}               \\
-		EQ Low/Mid/High         & 12.34               & \textbf{9.87}               \\
-		Compression Ratio       & 1.45                & \textbf{0.98}               \\
-		Compression Threshold   & 5.67                & \textbf{3.21}               \\
-		Distortion Drive        & 15.23               & \textbf{11.45}              \\
-		Time-based Effects      & 18.90               & \textbf{14.23}              \\
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Per-parameter error analysis (L2 distance)}
+\label{tab:per_param_analysis}
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Parameter Type} & \textbf{Vector-RAG} & \textbf{Audio-Agent (Ours)} \\
+\midrule
+Gain/Volume & 8.23 & \textbf{6.45} \\
+EQ Low/Mid/High & 12.34 & \textbf{9.87} \\
+Compression Ratio & 1.45 & \textbf{0.98} \\
+Compression Threshold & 5.67 & \textbf{3.21} \\
+Distortion Drive & 15.23 & \textbf{11.45} \\
+Time-based Effects & 18.90 & \textbf{14.23} \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \subsection{Ablation Study Results}
@@ -1120,22 +1120,22 @@ Table \ref{tab:per_param_analysis} shows the performance breakdown by parameter 
 Table \ref{tab:ablation} shows the results of our ablation study.
 
 \begin{table}[h]
-	\centering
-	\caption{Ablation study results (Parameter Distance)}
-	\label{tab:ablation}
-	\small
-	\begin{tabular}{lcc}
-		\toprule
-		\textbf{Configuration}   & \textbf{Error} & \textbf{Notes}            \\
-		\midrule
-		Full Audio-Agent         & \textbf{21.86} & All components            \\
-		- Text modality          & 23.45          & Audio-only retrieval      \\
-		- Audio modality         & 35.67          & Text-only retrieval       \\
-		- TRR (use mean pooling) & 24.89          & Standard vector retrieval \\
-		- Uncertainty weighting  & 22.34          & Fixed 50/50 weights       \\
-		- Constraint repair      & 23.12          & No constraint enforcement \\
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Ablation study results (Parameter Distance)}
+\label{tab:ablation}
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Configuration} & \textbf{Error} & \textbf{Notes} \\
+\midrule
+Full Audio-Agent & \textbf{21.86} & All components \\
+- Text modality & 23.45 & Audio-only retrieval \\
+- Audio modality & 35.67 & Text-only retrieval \\
+- TRR (use mean pooling) & 24.89 & Standard vector retrieval \\
+- Uncertainty weighting & 22.34 & Fixed 50/50 weights \\
+- Constraint repair & 23.12 & No constraint enforcement \\
+\bottomrule
+\end{tabular}
 \end{table}
 
 \section{Implementation Details}
