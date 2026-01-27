@@ -49,7 +49,6 @@ After a successful response, click the reset button to transfer parameters with 
    - librosa
    - transformers
    - networkx
-   - audiocraft
 
 ## Environment Variable Configuration:
 1. Add the following four items to your system environment variables:
