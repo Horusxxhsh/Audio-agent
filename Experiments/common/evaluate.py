@@ -159,6 +159,90 @@ class Evaluator:
             
         return tp / (tp + fn)
 
+    def compute_constraint_violation(self, pred_params, gt_params):
+        """
+        Invalid Rate = (Hallucinated Keys + Out-of-bounds Values) / Total Parameters
+
+        参数对比说明：
+        - 只比较 Parameters 中的数据
+        - Hallucinated Keys: 预测中有但GT中没有的参数键
+        - Out-of-bounds Values: 超出[0,1]范围的参数值
+        """
+        v1_dict = self._flatten_params(pred_params)
+        v2_dict = self._flatten_params(gt_params)
+
+        violations = 0
+        total = 0
+
+        for k, v in v1_dict.items():
+            total += 1
+            # 1. Hallucination Check: 预测的键必须在GT中存在
+            if k not in v2_dict:
+                violations += 1
+                continue
+
+            # 2. Bound Check: 参数值应该在[0, 1]范围内（加小容忍度）
+            if abs(v) > 1.05:  # tolerance
+                violations += 1
+
+        if total == 0: return 0.0
+        return violations / total
+
+    def compute_style_consistency(self, pred_tags, gt_tags):
+        """
+        Jaccard Similarity of style tags.
+        Input should be lists of strings locally, but here we simulate it via parameter patterns if tags missing.
+        Assumption: If tags are passed directly.
+        """
+        s1 = set(pred_tags) if pred_tags else set()
+        s2 = set(gt_tags) if gt_tags else set()
+
+        if not s1 and not s2: return 1.0 # Both empty = match
+        if not s1 or not s2: return 0.0
+
+        intersection = len(s1 & s2)
+        union = len(s1 | s2)
+        return intersection / union
+
+    def compute_module_consistency(self, pred_params, gt_params, active_threshold=0.05):
+        """
+        Module Consistency Score (音色模块一致性).
+        衡量哪些效果器模块（如 Compressor, Delay, Reverb）被启用。
+
+        判断逻辑：单纯看参数键名是否以"On"结尾
+        - CompressorOn → Compressor开启
+        - DriverOff → Driver关闭
+
+        返回 Jaccard 相似度：|A ∩ B| / |A ∪ B|
+        其中 A 是预测启用的模块集合，B 是GT启用的模块集合
+
+        值范围：[0, 1]，1.0 表示完全一致
+        """
+        def get_active_modules(params):
+            """获取所有启用的模块名称（只看键名是否以On结尾）"""
+            active = set()
+            for key in params.keys():
+                if key.endswith('On'):
+                    # 提取模块名（去掉On后缀）
+                    module_name = key[:-2]  # 如 "CompressorOn" → "Compressor"
+                    active.add(module_name)
+            return active
+
+        pred_modules = get_active_modules(pred_params)
+        gt_modules = get_active_modules(gt_params)
+
+        # Jaccard 相似度
+        if not pred_modules and not gt_modules:
+            return 1.0  # 两者都没有启用模块，认为一致
+
+        intersection = len(pred_modules & gt_modules)
+        union = len(pred_modules | gt_modules)
+
+        if union == 0:
+            return 1.0
+
+        return intersection / union
+
 if __name__ == "__main__":
     ev = Evaluator()
     p1 = {"a": 10, "b": {"c": 5}}

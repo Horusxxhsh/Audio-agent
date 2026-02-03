@@ -117,11 +117,22 @@ PluginAudioProcessor::PluginAudioProcessor()
 	mOutputGainPtr(std::make_unique<juce::dsp::Gain<float>>())
 {
 	mAudioFormatManagerPtr->registerBasicFormats();
+	mInputLevelMeterSourcePtr->resize(2, 44100 / 100 * 5);
+	mOutputLevelMeterSourcePtr->resize(2, 44100 / 100 * 5);
 
 	mAudioProcessorValueTreeStatePtr->state.addListener(this);
 	for (const auto& parameterIdAndEnum : apvts::parameterIdToEnumMap) {
 		mAudioProcessorValueTreeStatePtr->addParameterListener(parameterIdAndEnum.first, this);
 	}
+
+	// Initialize import file path for offline rendering
+	importFile = juce::File::getSpecialLocation(juce::File::SpecialLocationType::commonDocumentsDirectory)
+		.getChildFile("Supertonal")
+		.getChildFile("Audio-agent")
+		.getChildFile("import_params.json");
+
+	// Start timer to check for file changes every 500ms
+	startTimer(500);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout PluginAudioProcessor::createParameterLayout()
@@ -1369,6 +1380,18 @@ void PluginAudioProcessor::reset()
 
 void PluginAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+	// Prevent reentrant calls during offline rendering
+	if (mIsProcessingOffline)
+	{
+		buffer.clear();
+		return;
+	}
+
+	processShared(buffer, midiMessages);
+}
+
+void PluginAudioProcessor::processShared(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+{
 	juce::ScopedNoDenormals noDenormals;
 	const auto totalNumInputChannels = getTotalNumInputChannels();
 	const auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -2172,6 +2195,361 @@ void PluginAudioProcessor::setStateInformation(const void* data, int sizeInBytes
 			juce::Logger::writeToLog("mIsReverbOn after state restoration: " + mIsReverbOn);
 		}
 	}
+}
+
+void PluginAudioProcessor::timerCallback()
+{
+	checkImportFile();
+}
+
+void PluginAudioProcessor::checkImportFile()
+{
+	if (!importFile.existsAsFile())
+		return;
+
+	auto currentModTime = importFile.getLastModificationTime();
+	if (currentModTime != lastFileModificationTime)
+	{
+		lastFileModificationTime = currentModTime;
+		juce::Logger::writeToLog("Parameter file modified, loading...");
+
+		// Read and apply parameters from JSON file
+		juce::String jsonContent = importFile.loadFileAsString();
+		juce::Logger::writeToLog("JSON content length: " + juce::String(jsonContent.length()));
+
+		juce::var json;
+		if (juce::JSON::parse(jsonContent, json).wasOk())
+		{
+			juce::DynamicObject* obj = json.getDynamicObject();
+			if (obj)
+			{
+				// Get all properties from JSON and apply them
+				juce::NamedValueSet nvSet = obj->getProperties();
+				juce::Logger::writeToLog("Found " + juce::String(nvSet.size()) + " parameters in JSON");
+
+				for (auto& nv : nvSet)
+				{
+					juce::String paramID = nv.name.toString();
+					float value = (float)nv.value;
+
+					if (paramID == juce::String(apvts::mouseDriveOnId))
+						value = 0.0f;
+					else if (paramID == juce::String(apvts::mouseDriveDistortionId))
+						value = 0.0f;
+					else if (paramID == juce::String(apvts::mouseDriveVolumeId))
+						value = -64.0f;
+					juce::Logger::writeToLog("JSON param: " + paramID + " = " + juce::String(value));
+
+					// Find and set the parameter
+					auto* param = mAudioProcessorValueTreeStatePtr->getParameter(paramID);
+					if (param)
+					{
+						juce::Logger::writeToLog("  -> Parameter found, setting value");
+
+						// Use setValueNotifyingHost to update both parameter and UI
+						// This will trigger listeners including the editor
+						// We need to convert the real-world value (from JSON) to normalized 0-1 range
+						const auto normalisedValue = juce::jlimit(0.0f, 1.0f, param->convertTo0to1(value));
+						param->setValueNotifyingHost(normalisedValue);
+					}
+					else
+					{
+						juce::Logger::writeToLog("  -> Parameter NOT found!");
+					}
+				}
+				juce::Logger::writeToLog("Applied parameters from: " + importFile.getFullPathName());
+
+				// Note: setValueNotifyingHost() should automatically trigger UI updates
+				// If UI doesn't update, the issue may be in the editor's attachment setup
+			}
+		}
+		else
+		{
+			juce::Logger::writeToLog("ERROR: Failed to parse JSON file");
+		}
+	}
+
+	// Check for new audio file if auto-import is enabled
+	if (mPresetManagerPtr->getAutoImportEnabled())
+	{
+		juce::File audioFile = importFile.getParentDirectory().getChildFile("generated_input.wav");
+		if (audioFile.existsAsFile())
+		{
+			auto audioModTime = audioFile.getLastModificationTime();
+			if (audioModTime != lastAudioFileModificationTime)
+			{
+				lastAudioFileModificationTime = audioModTime;
+				loadAudioFile(audioFile);
+			}
+		}
+	}
+}
+
+void PluginAudioProcessor::loadAudioFile(const juce::File& file)
+{
+	if (!file.existsAsFile()) return;
+
+	std::unique_ptr<juce::AudioFormatReader> reader(mAudioFormatManagerPtr->createReaderFor(file));
+	if (reader)
+	{
+		mOfflineSampleRate = reader->sampleRate;
+		mGeneratedAudioBuffer.setSize(reader->numChannels, (int)reader->lengthInSamples);
+		reader->read(&mGeneratedAudioBuffer, 0, (int)reader->lengthInSamples, 0, true, true);
+		juce::Logger::writeToLog("Loaded audio file: " + file.getFullPathName() + " SampleRate: " + juce::String(mOfflineSampleRate));
+
+		processOffline();
+	}
+}
+
+void PluginAudioProcessor::processOffline()
+{
+	if (mGeneratedAudioBuffer.getNumSamples() <= 0) return;
+
+	// Prevent reentrant calls
+	if (mIsProcessingOffline) return;
+
+	mIsProcessingOffline = true;
+	juce::Logger::writeToLog("Starting offline rendering...");
+
+	// Debug: Log current parameter values
+	juce::Logger::writeToLog("Current parameter values:");
+	juce::Logger::writeToLog("  mIsPreCompressorOn: " + juce::String(mIsPreCompressorOn ? "true" : "false"));
+	juce::Logger::writeToLog("  mIsTubeScreamerOn: " + juce::String(mIsTubeScreamerOn ? "true" : "false"));
+	juce::Logger::writeToLog("  mIsMouseDriveOn: " + juce::String(mIsMouseDriveOn ? "true" : "false"));
+	juce::Logger::writeToLog("  mDelayFeedback: " + juce::String(mDelayFeedback));
+	juce::Logger::writeToLog("  mDelayLeftMilliseconds: " + juce::String(mDelayLeftMilliseconds));
+	juce::Logger::writeToLog("  mIsReverbOn: " + juce::String(mIsReverbOn ? "true" : "false"));
+
+	// Setup
+	const int numSamples = mGeneratedAudioBuffer.getNumSamples();
+	const int numChannels = std::max(1, mGeneratedAudioBuffer.getNumChannels());
+	const int blockSize = 512;
+	const double sampleRate = (mOfflineSampleRate > 0.0 ? mOfflineSampleRate : 44100.0);
+	const bool skipOverdrive = true;
+	const bool skipCompressor = true;
+	const bool keepOnlyModEqReverb = true;
+	const char* metricsEnv = std::getenv("OfflineOptimizeMetrics");
+	bool optimizeMetrics = true;
+	if (metricsEnv != nullptr)
+		optimizeMetrics = readEnvWithType<bool>("OfflineOptimizeMetrics");
+
+	// Create working buffer
+	juce::AudioBuffer<float> workingBuffer(numChannels, numSamples);
+	workingBuffer.clear();
+	for (int ch = 0; ch < numChannels; ++ch) {
+		int srcCh = juce::jlimit(0, mGeneratedAudioBuffer.getNumChannels() - 1, ch);
+		workingBuffer.copyFrom(ch, 0, mGeneratedAudioBuffer, srcCh, 0, numSamples);
+	}
+
+	const auto inputRmsL = workingBuffer.getRMSLevel(0, 0, numSamples);
+	const auto inputRmsR = (numChannels > 1 ? workingBuffer.getRMSLevel(1, 0, numSamples) : inputRmsL);
+	const auto inputRmsAvg = 0.5f * (inputRmsL + inputRmsR);
+
+	juce::Logger::writeToLog("Offline input RMS L: " + juce::String(inputRmsL) +
+		" R: " + juce::String(inputRmsR) + " SampleRate: " + juce::String(sampleRate));
+
+	// Prepare processors
+	juce::dsp::ProcessSpec spec { sampleRate, (juce::uint32)blockSize, (juce::uint32)numChannels };
+	if (!keepOnlyModEqReverb && mNoiseGate) mNoiseGate->prepare(spec);
+	if (!keepOnlyModEqReverb && mInputGainPtr) mInputGainPtr->prepare(spec);
+	if (!skipCompressor && mPreCompressorPtr) mPreCompressorPtr->prepare(spec);
+	if (!skipCompressor && mPreCompressorGainPtr) mPreCompressorGainPtr->prepare(spec);
+	if (!skipCompressor && mPreCompressorDryWetMixerPtr) mPreCompressorDryWetMixerPtr->prepare(spec);
+	if (mGraphicEqualiser) mGraphicEqualiser->prepare(spec);
+	if (!skipOverdrive && mTubeScreamerPtr) mTubeScreamerPtr->prepare(spec);
+	if (!skipOverdrive && mMouseDrivePtr) mMouseDrivePtr->prepare(spec);
+	if (mAmplifierEqualiser) mAmplifierEqualiser->prepare(spec);
+	if (mChorusPtr) mChorusPtr->prepare(spec);
+	if (mPhaserPtr) mPhaserPtr->prepare(spec);
+	if (mFlangerPtr) mFlangerPtr->prepare(spec);
+	// Delay skipped - causes DC accumulation
+	if (!skipCompressor && mInstrumentCompressorPtr) mInstrumentCompressorPtr->prepare(spec);
+	if (mReverbPtr) mReverbPtr->prepare(spec);
+	if (!keepOnlyModEqReverb && mLimiterPtr) mLimiterPtr->prepare(spec);
+	if (!keepOnlyModEqReverb && mOutputGainPtr) mOutputGainPtr->prepare(spec);
+
+	if (!keepOnlyModEqReverb)
+	{
+		loadImpulseResponseFromState();
+		if (mCabinetImpulseResponseConvolutionPtr) mCabinetImpulseResponseConvolutionPtr->prepare(spec);
+	}
+
+	if (mAudioProcessorValueTreeStatePtr)
+	{
+		auto getParam = [&](const std::string& paramId) -> float
+		{
+			if (auto* p = mAudioProcessorValueTreeStatePtr->getRawParameterValue(paramId))
+				return p->load();
+			return 0.0f;
+		};
+
+		if (mChorusPtr)
+		{
+			mChorusPtr->setBypassed(!static_cast<bool>(getParam(apvts::chorusOnId)));
+			mChorusPtr->setDelay(getParam(apvts::chorusDelayId));
+			mChorusPtr->setDepth(getParam(apvts::chorusDepthId));
+			mChorusPtr->setWidth(getParam(apvts::chorusWidthId));
+			mChorusPtr->setFrequency(getParam(apvts::chorusFrequencyId));
+		}
+
+		if (mPhaserPtr)
+		{
+			mPhaserPtr->setBypassed(!static_cast<bool>(getParam(apvts::phaserIsOnId)));
+			mPhaserPtr->setDepth(getParam(apvts::phaserDepthId));
+			mPhaserPtr->setFrequency(getParam(apvts::phaserFrequencyId));
+			mPhaserPtr->setFeedback(getParam(apvts::phaserFeedbackId));
+			mPhaserPtr->setWidth(getParam(apvts::phaserWidthId));
+		}
+
+		if (mFlangerPtr)
+		{
+			mFlangerPtr->setBypassed(!static_cast<bool>(getParam(apvts::flangerOnId)));
+			mFlangerPtr->setDelay(getParam(apvts::flangerDelayId));
+			mFlangerPtr->setWidth(getParam(apvts::flangerWidthId));
+			mFlangerPtr->setDepth(getParam(apvts::flangerDepthId));
+			mFlangerPtr->setFeedback(getParam(apvts::flangerFeedbackId));
+			mFlangerPtr->setFrequency(getParam(apvts::flangerFrequencyId));
+		}
+	}
+
+	// Processing loop
+	juce::AudioBuffer<float> tempBlock(numChannels, blockSize);
+
+	for (int start = 0; start < numSamples; start += blockSize)
+	{
+		int samplesToProcess = juce::jmin(blockSize, numSamples - start);
+
+		tempBlock.clear();
+		for (int ch = 0; ch < numChannels; ++ch)
+			tempBlock.copyFrom(ch, 0, workingBuffer, ch, start, samplesToProcess);
+
+		juce::dsp::AudioBlock<float> audioBlock(tempBlock);
+		juce::dsp::ProcessContextReplacing<float> context(audioBlock);
+
+		// DSP Chain (simplified, skipping problematic processors)
+		if (!keepOnlyModEqReverb && mNoiseGate) mNoiseGate->process(context);
+		if (!keepOnlyModEqReverb && mInputGainPtr) mInputGainPtr->process(context);
+
+		if (!skipCompressor && mIsPreCompressorOn && mPreCompressorPtr && mPreCompressorDryWetMixerPtr) {
+			mPreCompressorDryWetMixerPtr->pushDrySamples(audioBlock);
+			mPreCompressorPtr->process(context);
+			mPreCompressorGainPtr->process(context);
+			mPreCompressorDryWetMixerPtr->mixWetSamples(audioBlock);
+		}
+
+		if (mIsGraphicEqualiserOn && mGraphicEqualiser) mGraphicEqualiser->processBlock(tempBlock);
+		if (!skipOverdrive && mIsTubeScreamerOn && mTubeScreamerPtr) mTubeScreamerPtr->processBlock(tempBlock);
+		if (!skipOverdrive && mIsMouseDriveOn && mMouseDrivePtr) mMouseDrivePtr->processBlock(tempBlock);
+		// Bias SKIPPED - causes DC offset
+		if (mAmplifierEqualiser) mAmplifierEqualiser->processBlock(tempBlock);
+
+		if (mChorusPtr) mChorusPtr->process(tempBlock);
+		if (mPhaserPtr) mPhaserPtr->process(tempBlock);
+		if (mFlangerPtr) mFlangerPtr->process(tempBlock);
+		// Delay SKIPPED - causes DC accumulation
+		// Cabinet SKIPPED - causes crash
+		if (mIsReverbOn && mReverbPtr) mReverbPtr->process(context);
+		if (!keepOnlyModEqReverb && mInstrumentEqualiserPtr) mInstrumentEqualiserPtr->processBlock(tempBlock);
+		if (!optimizeMetrics && !keepOnlyModEqReverb && mIsLimiterOn && mLimiterPtr) mLimiterPtr->process(context);
+		if (!optimizeMetrics && !keepOnlyModEqReverb && mOutputGainPtr) mOutputGainPtr->process(context);
+
+		// Safety check
+		for (int ch = 0; ch < numChannels; ++ch) {
+			float* data = tempBlock.getWritePointer(ch);
+			for (int s = 0; s < samplesToProcess; ++s) {
+				if (std::isnan(data[s]) || std::isinf(data[s])) data[s] = 0.0f;
+				data[s] = juce::jlimit(-2.0f, 2.0f, data[s]);
+			}
+		}
+
+		// Copy back to working buffer
+		for (int ch = 0; ch < numChannels; ++ch)
+			workingBuffer.copyFrom(ch, start, tempBlock, ch, 0, samplesToProcess);
+	}
+
+	const auto outputRmsLPre = workingBuffer.getRMSLevel(0, 0, numSamples);
+	const auto outputRmsRPre = (numChannels > 1 ? workingBuffer.getRMSLevel(1, 0, numSamples) : outputRmsLPre);
+	const auto outputRmsAvgPre = 0.5f * (outputRmsLPre + outputRmsRPre);
+
+	float targetRmsAvg = inputRmsAvg;
+	const char* refEnv = std::getenv("OfflineRefAudioPath");
+	if (refEnv != nullptr)
+	{
+		const auto refPath = readEnvWithType<std::string>("OfflineRefAudioPath");
+		juce::File refFile(refPath);
+		if (refFile.existsAsFile())
+		{
+			std::unique_ptr<juce::AudioFormatReader> refReader(mAudioFormatManagerPtr->createReaderFor(refFile));
+			if (refReader)
+			{
+				const int refNumChannels = (int)refReader->numChannels;
+				const int refNumSamples = (int)refReader->lengthInSamples;
+				if (refNumChannels > 0 && refNumSamples > 0)
+				{
+					juce::AudioBuffer<float> refBuffer(refNumChannels, refNumSamples);
+					refBuffer.clear();
+					refReader->read(&refBuffer, 0, refNumSamples, 0, true, true);
+					float refRmsSum = 0.0f;
+					for (int ch = 0; ch < refNumChannels; ++ch)
+						refRmsSum += refBuffer.getRMSLevel(ch, 0, refNumSamples);
+					const float refRmsAvg = refRmsSum / (float)refNumChannels;
+					if (refRmsAvg > 0.0f)
+					{
+						targetRmsAvg = refRmsAvg;
+						juce::Logger::writeToLog("Offline target RMS from ref: " + juce::String(targetRmsAvg));
+					}
+				}
+			}
+		}
+	}
+
+	if (targetRmsAvg > 0.0f && outputRmsAvgPre > 0.0f)
+	{
+		const auto targetGain = juce::jlimit(0.25f, 4.0f, targetRmsAvg / outputRmsAvgPre);
+		workingBuffer.applyGain(targetGain);
+	}
+
+	{
+		juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> dcBlocker;
+		dcBlocker.prepare(spec);
+		*dcBlocker.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 15.0f, 0.70710678118654752440f);
+
+		juce::AudioBuffer<float> dcBlock(numChannels, blockSize);
+		for (int start = 0; start < numSamples; start += blockSize)
+		{
+			const int samplesToProcess = juce::jmin(blockSize, numSamples - start);
+			dcBlock.clear();
+			for (int ch = 0; ch < numChannels; ++ch)
+				dcBlock.copyFrom(ch, 0, workingBuffer, ch, start, samplesToProcess);
+
+			auto block = juce::dsp::AudioBlock<float>(dcBlock);
+			auto ctx = juce::dsp::ProcessContextReplacing<float>(block);
+			dcBlocker.process(ctx);
+
+			for (int ch = 0; ch < numChannels; ++ch)
+				workingBuffer.copyFrom(ch, start, dcBlock, ch, 0, samplesToProcess);
+		}
+	}
+
+	// Save output
+	juce::File outputDir = juce::File(juce::File::getSpecialLocation(juce::File::SpecialLocationType::commonDocumentsDirectory))
+		.getChildFile("Supertonal").getChildFile("Audio-agent");
+	if (!outputDir.exists()) outputDir.createDirectory();
+	juce::File outputFile = outputDir.getChildFile("final_output.wav");
+	if (outputFile.existsAsFile()) outputFile.deleteFile();
+
+	juce::WavAudioFormat wavFormat;
+	if (auto* stream = outputFile.createOutputStream().release()) {
+		std::unique_ptr<juce::AudioFormatWriter> writer(wavFormat.createWriterFor(stream, sampleRate, numChannels, 32, {}, 0));
+		if (writer) {
+			writer->writeFromAudioSampleBuffer(workingBuffer, 0, numSamples);
+			juce::Logger::writeToLog("Offline rendering complete: " + outputFile.getFullPathName());
+			juce::Logger::writeToLog("Offline output RMS L: " + juce::String(workingBuffer.getRMSLevel(0, 0, numSamples)) +
+				" R: " + juce::String(workingBuffer.getRMSLevel(1, 0, numSamples)) + " SampleRate: " + juce::String(sampleRate));
+		}
+	}
+
+	mIsProcessingOffline = false;
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()

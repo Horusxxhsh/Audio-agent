@@ -36,7 +36,12 @@ public:
 	float getParameterValue(const juce::String& parameterID) const;
 	juce::StringArray getAllPresets() const;
 	juce::String getCurrentPreset() const;
+    
+    void setAutoImportEnabled(bool enabled);
+    bool getAutoImportEnabled() const;
+
 private:
+    bool isAutoImportEnabled = false;
 	void valueTreeRedirected(juce::ValueTree& treeWhichHasBeenChanged) override;
 
 	juce::AudioProcessorValueTreeState& valueTreeState;

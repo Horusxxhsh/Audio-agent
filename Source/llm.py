@@ -15,9 +15,120 @@ import librosa
 from transformers import Wav2Vec2Processor, Wav2Vec2Model
 import numpy as np
 import tempfile
+import time
+import scipy.io.wavfile
 
+# --- Local MusicGen Configuration (using transformers library) ---
+USE_LOCAL_MUSICGEN = True
+MUSICGEN_MODEL_NAME = "facebook/musicgen-small"  # Options: small, medium, large
+MUSICGEN_DURATION = 8  # seconds (max_new_tokens = duration * 50)
 
-# Define a function to safely write files
+# Lazy-loaded model references
+_musicgen_model = None
+_musicgen_processor = None
+
+def get_local_musicgen_model():
+    """Load MusicGen model using transformers library (better Windows compatibility)"""
+    global _musicgen_model, _musicgen_processor
+    if _musicgen_model is None:
+        try:
+            from transformers import AutoProcessor, MusicgenForConditionalGeneration
+            print(f"Loading local MusicGen model: {MUSICGEN_MODEL_NAME}...")
+            _musicgen_processor = AutoProcessor.from_pretrained(MUSICGEN_MODEL_NAME)
+            _musicgen_model = MusicgenForConditionalGeneration.from_pretrained(MUSICGEN_MODEL_NAME)
+            
+            # Move to GPU if available
+            if torch.cuda.is_available():
+                _musicgen_model = _musicgen_model.to("cuda")
+                print("MusicGen model loaded on GPU.")
+            else:
+                print("MusicGen model loaded on CPU (slower).")
+        except ImportError as e:
+            print(f"ERROR: transformers library issue: {e}")
+            print("Run: pip install transformers scipy")
+            return None, None
+        except Exception as e:
+            print(f"ERROR loading MusicGen model: {e}")
+            return None, None
+    return _musicgen_model, _musicgen_processor
+
+def generate_audio_local(prompt, output_path):
+    """Generate audio using local MusicGen model via transformers"""
+    model, processor = get_local_musicgen_model()
+    if model is None or processor is None:
+        print("ERROR: Model or processor is None, cannot generate audio.")
+        return False
+    
+    try:
+        print(f"Generating audio for prompt: {prompt}")
+        
+        # Prepare inputs
+        inputs = processor(
+            text=[prompt],
+            padding=True,
+            return_tensors="pt",
+        )
+        
+        # Move to same device as model
+        if torch.cuda.is_available():
+            inputs = {k: v.to("cuda") for k, v in inputs.items()}
+        
+        # Generate audio (duration * 50 tokens per second)
+        max_new_tokens = MUSICGEN_DURATION * 50
+        print(f"Generating {MUSICGEN_DURATION} seconds of audio...")
+        audio_values = model.generate(**inputs, max_new_tokens=max_new_tokens)
+        
+        # Get sampling rate from model config
+        sampling_rate = model.config.audio_encoder.sampling_rate
+        print(f"Sampling rate: {sampling_rate}")
+        
+        # Convert to numpy - take first batch, first channel
+        audio_data = audio_values[0, 0].cpu().numpy()
+        print(f"Audio shape: {audio_data.shape}, dtype: {audio_data.dtype}")
+        
+        # Normalize to float32 range [-1, 1] for scipy
+        audio_data = audio_data.astype(np.float32)
+        max_val = np.abs(audio_data).max()
+        if max_val > 0:
+            audio_data = audio_data / max_val * 0.95  # Normalize with some headroom
+        
+        # Ensure output directory exists
+        output_dir = os.path.dirname(output_path)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+            print(f"Created directory: {output_dir}")
+        
+        # Save using scipy
+        scipy.io.wavfile.write(output_path, rate=int(sampling_rate), data=audio_data)
+        
+        if os.path.exists(output_path):
+            print(f"Audio saved successfully to: {output_path}")
+            print(f"File size: {os.path.getsize(output_path)} bytes")
+        else:
+            print("ERROR: File was not created!")
+            
+        return True
+    except Exception as e:
+        print(f"Error generating audio: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+def safe_write_binary_file(filename, content):
+    try:
+        with open(filename, 'wb') as f:
+            f.write(content)
+            print(f"Audio file saved to current directory: {os.path.abspath(filename)}")
+    except (IOError, PermissionError):
+        try:
+            docs_dir = os.environ.get('DOCUMENTS_DIR')
+            if docs_dir:
+                full_path = os.path.join(docs_dir, filename)
+                with open(full_path, 'wb') as f:
+                    f.write(content)
+                print(f"Audio file saved to documents directory: {full_path}")
+        except Exception as e:
+            print(f"Failed to save audio file: {e}")
 def safe_write_file(filename, content):
     try:
         # First try to write in current directory
@@ -154,7 +265,7 @@ CREATE TABLE IF NOT EXISTS audio_vector (
 ''')
 audio_conn.commit()
 
-client = OpenAI(api_key="sk-1b73586fde854a329ec187dc371f53ef", base_url="https://api.deepseek.com")
+client = OpenAI(api_key="sk-0705951d960041ed96c607ab69724d0d", base_url="https://api.deepseek.com")
 
 import platform
 
@@ -1374,9 +1485,202 @@ safe_write_file("result.txt", result_str)
 # Write analysis result string to file
 safe_write_file("result3.txt", response3_content)
 
+# --------------------------------------------------------------------------------
+# Added: Generate import_params.json for Plugin Auto-Import
+# --------------------------------------------------------------------------------
+
+try:
+    print("Starting generation of import_params.json...")
+    
+    # 1. Define Parameter Mapping (Moved inside try block for safety)
+    param_mapping = {
+        # Switch control mapping
+        "CompressorOn": ("pre_compressor_on", 1.0),
+        "CompressorOff": ("pre_compressor_on", 0.0),
+        "ScreamerOn": ("tube_screamer_on", 1.0),
+        "ScreamerOff": ("tube_screamer_on", 0.0),
+        "DriverOn": ("mouse_drive_on", 1.0),
+        "DriverOff": ("mouse_drive_on", 0.0),
+        "DelayOn": ("delay_on", 1.0),
+        "DelayOff": ("delay_on", 0.0),
+        "ReverbOn": ("room_on", 1.0),
+        "ReverbOff": ("room_on", 0.0),
+        "ChorusOn": ("chorus_on", 1.0),
+        "ChorusOff": ("chorus_on", 0.0),
+        "FlangerOn": ("flanger_on", 1.0),
+        "FlangerOff": ("flanger_on", 0.0),
+        "PhaserOn": ("phaser_on", 1.0),
+        "PhaserOff": ("phaser_on", 0.0),
+        "EqualiserOn": ("pre_eq_on", 1.0),
+        "EqualiserOff": ("pre_eq_on", 0.0),
+        "NoiseGateOn": ("noise_gate_on", 1.0), 
+        "NoiseGateOff": ("noise_gate_on", 0.0),
+
+        # Parameter value mapping
+        "CompressorOn.Threshold": "pre_comp_thresh",
+        "CompressorOn.Ratio": "pre_comp_ratio",
+        "CompressorOn.Attack": "pre_comp_attack",
+        "CompressorOn.Release": "pre_comp_release",
+        "CompressorOn.Mix": "pre_comp_blend",
+        "CompressorOn.Makeup": "pre_comp_gain",
+        "CompressorOff.Threshold": "pre_comp_thresh",
+        "CompressorOff.Ratio": "pre_comp_ratio",
+        "CompressorOff.Attack": "pre_comp_attack",
+        "CompressorOff.Release": "pre_comp_release",
+        "CompressorOff.Mix": "pre_comp_blend",
+        "CompressorOff.Makeup": "pre_comp_gain",
+        
+        "ScreamerOn.Drive": "tube_screamer_drive",
+        "ScreamerOn.Tone": "tube_screamer_tone",
+        "ScreamerOn.Level": "tube_screamer_level",
+        "ScreamerOff.Drive": "tube_screamer_drive",
+        "ScreamerOff.Tone": "tube_screamer_tone",
+        "ScreamerOff.Level": "tube_screamer_level",
+        
+        "DriverOn.Distortion": "mouse_drive_distortion",
+        "DriverOn.Volume": "mouse_drive_volume",
+        "DriverOff.Distortion": "mouse_drive_distortion",
+        "DriverOff.Volume": "mouse_drive_volume",
+        
+        "DelayOn.Feedback": "delay_feedback",
+        "DelayOn.Delay": "delay_left_millisecond",
+        "DelayOn.Mix": "delay_mix",
+        "DelayOff.Feedback": "delay_feedback",
+        "DelayOff.Delay": "delay_left_millisecond",
+        "DelayOff.Mix": "delay_mix",
+        
+        "ReverbOn.Size": "room_size",
+        "ReverbOn.Damping": "room_damping",
+        "ReverbOn.Width": "room_width",
+        "ReverbOn.Mix": "room_mix",
+        "ReverbOff.Size": "room_size",
+        "ReverbOff.Damping": "room_damping",
+        "ReverbOff.Width": "room_width",
+        "ReverbOff.Mix": "room_mix",
+        
+        "ChorusOn.Delay": "chorus_delay",
+        "ChorusOn.Depth": "chorus_depth",
+        "ChorusOn.Frequency": "chorus_frequency",
+        "ChorusOn.Width": "chorus_width",
+        "ChorusOff.Delay": "chorus_delay",
+        "ChorusOff.Depth": "chorus_depth",
+        "ChorusOff.Frequency": "chorus_frequency",
+        "ChorusOff.Width": "chorus_width",
+        
+        "FlangerOn.Delay": "flanger_delay",
+        "FlangerOn.Depth": "flanger_depth",
+        "FlangerOn.Feedback": "flanger_feedback",
+        "FlangerOn.Frequency": "flanger_frequency",
+        "FlangerOn.Width": "flanger_width",
+        "FlangerOff.Delay": "flanger_delay",
+        "FlangerOff.Depth": "flanger_depth",
+        "FlangerOff.Feedback": "flanger_feedback",
+        "FlangerOff.Frequency": "flanger_frequency",
+        "FlangerOff.Width": "flanger_width",
+        
+        "PhaserOn.Depth": "phaser_depth",
+        "PhaserOn.Feedback": "phaser_feedback",
+        "PhaserOn.Frequency": "phaser_frequency",
+        "PhaserOn.Width": "phaser_width",
+        "PhaserOff.Depth": "phaser_depth",
+        "PhaserOff.Feedback": "phaser_feedback",
+        "PhaserOff.Frequency": "phaser_frequency",
+        "PhaserOff.Width": "phaser_width",
+        
+        "EqualiserOn.100hz": "pre_eq_100_gain",
+        "EqualiserOn.200hz": "pre_eq_200_gain",
+        "EqualiserOn.400hz": "pre_eq_400_gain",
+        "EqualiserOn.800hz": "pre_eq_800_gain",
+        "EqualiserOn.1600hz": "pre_eq_1600_gain",
+        "EqualiserOn.3200hz": "pre_eq_3200_gain",
+        "EqualiserOn.6400hz": "pre_eq_6400_gain",
+        "EqualiserOn.Level": "pre_eq_level_gain",
+        "EqualiserOff.100hz": "pre_eq_100_gain",
+        "EqualiserOff.200hz": "pre_eq_200_gain",
+        "EqualiserOff.400hz": "pre_eq_400_gain",
+        "EqualiserOff.800hz": "pre_eq_800_gain",
+        "EqualiserOff.1600hz": "pre_eq_1600_gain",
+        "EqualiserOff.3200hz": "pre_eq_3200_gain",
+        "EqualiserOff.6400hz": "pre_eq_6400_gain",
+        "EqualiserOff.Level": "pre_eq_level_gain"
+    }
+
+    mapped_params = {}
+    
+    # Process final_result
+    # Check if final_result exists and is not empty
+    if 'final_result' not in globals() and 'final_result' not in locals():
+        print("Warning: final_result variable not found. Initializing empty.")
+        final_result = {}
+
+    for key, value in final_result.items():
+        # 1. Process top-level keys
+        if key in param_mapping:
+            if isinstance(param_mapping[key], tuple):
+                p_id, p_val = param_mapping[key]
+                mapped_params[p_id] = p_val
+        
+        # 2. Process nested parameters
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                full_key = f"{key}.{sub_key}"
+                if full_key in param_mapping:
+                    param_id = param_mapping[full_key]
+                    try:
+                        final_val = float(sub_value)
+                    except (ValueError, TypeError):
+                        final_val = sub_value
+                    mapped_params[param_id] = final_val
+
+    # Write to import_params.json
+    # Safer path resolution
+    public_dir = os.environ.get('PUBLIC', os.environ.get('SystemDrive', 'C:') + '\\Users\\Public')
+    common_docs = os.path.join(public_dir, 'Documents')
+    import_dir = os.path.join(common_docs, "Supertonal", "Audio-agent")
+    
+    if not os.path.exists(import_dir):
+        os.makedirs(import_dir)
+        
+    import_file_path = os.path.join(import_dir, "import_params.json")
+    
+    print(f"Writing to: {import_file_path}")
+    with open(import_file_path, 'w', encoding='utf-8') as f:
+        json.dump(mapped_params, f, ensure_ascii=False, indent=4)
+        
+    print(f"Successfully wrote mapped parameters to {import_file_path}")
+
+    # --- MusicGen Integration ---
+    if chat_message:
+        musicgen_prompt = str                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           (chat_message)
+        musicgen_prompt = f"{musicgen_prompt}, electric guitar solo, lead guitar melody, expressive solo, no strumming, no chords"
+        print(f"MusicGen final prompt: {musicgen_prompt}")
+        
+        audio_filename = "generated_input.wav"
+        audio_full_path = os.path.join(import_dir, audio_filename)
+        
+        # Use local MusicGen generation
+        success = generate_audio_local(musicgen_prompt, audio_full_path)
+        if success:
+            print(f"Generated audio saved to: {audio_full_path}")
+        else:
+            print("MusicGen generation failed.")
+    else:
+        print("Skipping MusicGen: No user input available.")
+    # ----------------------------
+
+except Exception as e:
+    print(f"Error processing parameters for import: {e}")
+    # Don't fail the whole script for this optional step, but print trace
+    import traceback
+    traceback.print_exc()
+
+# --------------------------------------------------------------------------------
+# End Added Code
+# --------------------------------------------------------------------------------
+
 # Close database connection
 conn.close()
 audio_conn.close()
 
 # New: Wait for user input before closing window
-#input("Program execution completed, press Enter to close window...")
+input("程序执行完成，按回车键关闭窗口...")

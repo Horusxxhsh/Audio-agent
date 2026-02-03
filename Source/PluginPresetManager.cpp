@@ -155,3 +155,13 @@ void PluginPresetManager::valueTreeRedirected(juce::ValueTree& treeWhichHasBeenC
 {
 	currentPreset.referTo(treeWhichHasBeenChanged.getPropertyAsValue(presetNameProperty, nullptr));
 }
+
+void PluginPresetManager::setAutoImportEnabled(bool enabled)
+{
+    isAutoImportEnabled = enabled;
+}
+
+bool PluginPresetManager::getAutoImportEnabled() const
+{
+    return isAutoImportEnabled;
+}

@@ -132,7 +132,9 @@
 - **B3**：Audio-vector RAG（mean pooling 的音频向量检索）。
 - **Ours**：TRR + dual-modal + dynamic fusion（你们最终方法）。
 
-强烈建议额外加入 1–2 个“更难反驳”的基线（顶刊更稳）：
+强烈建议额外加入 1–2 个“更难反驳”的基线（顶刊更
+
+稳）：
 
 - **更强音频嵌入检索**：如 CLAP / PaSST / PANNs（作为 audio 检索替代 mean pooling 的强对照）。
 - **黑盒参数搜索**：CMA-ES / Bayesian Optimization 在 \(\theta\) 空间最小化音频特征距离（这是“物理匹配上界/对照”，能堵住“你们只是检索更好”质疑）。
@@ -167,13 +169,16 @@
 
 ### 5.5 消融（每条贡献都要“可关掉”）
 
+
 - w/o TRR（用 mean pooling）
 - w/o dynamic fusion（固定 \(\alpha\)）
 - w/o audio modality / w/o text modality
 - w/o memory（如果记忆算贡献）
 - 约束策略消融（hard clamp vs repair vs none）
 
-### 5.6 鲁棒性与边界条件（建议单独小节）
+### 5.6 鲁棒性与边界条件（建议单独
+
+### 小节）
 
 建议至少 3 种退化：
 
@@ -318,4 +323,3 @@
 - `Experiments/journal_experiment_design_v2.md`：实验设计（含 TRR、动态融合等）
 - `Experiments/journal_results_analysis.md`：结果分析草案（后续需补统计与听测）
 - `Source/RAG_README.md`：RAG 系统说明（可作为方法实现对齐参考）
-

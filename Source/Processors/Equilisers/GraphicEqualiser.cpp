@@ -6,14 +6,6 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #include "GraphicEqualiser.h"
@@ -25,7 +17,7 @@ GraphicEqualiser::GraphicEqualiser()
         if (filterIndex < 6)
         {
             *mFilters[filterIndex].state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-                mCurrentSampleRate,
+                44100.0f,
                 sFrequencies[filterIndex],
                 sQualities[filterIndex],
                 1.0f);
@@ -33,7 +25,7 @@ GraphicEqualiser::GraphicEqualiser()
         else
         {
             *mFilters[filterIndex].state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(
-                mCurrentSampleRate,
+                44100.0f,
                 sFrequencies[filterIndex],
                 sQualities[filterIndex],
                 1.0f);
@@ -41,6 +33,32 @@ GraphicEqualiser::GraphicEqualiser()
     } 
     
     mLevelGain.setGainDecibels(0.0f);
+}
+
+void GraphicEqualiser::updateFilter(int index)
+{
+    if (mCurrentSampleRate <= 0) return;
+
+    if (index < 6)
+    {
+        *mFilters[index].state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+            mCurrentSampleRate, sFrequencies[index], sQualities[index], juce::Decibels::decibelsToGain(mGains[index]));
+    }
+    else if (index == 6)
+    {
+        *mFilters[index].state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(
+            mCurrentSampleRate, sFrequencies[index], sQualities[index], juce::Decibels::decibelsToGain(mGains[index]));
+    }
+    else if (index == 7)
+    {
+        mLevelGain.setGainDecibels(mGains[7]);
+    }
+}
+
+void GraphicEqualiser::updateAllFilters()
+{
+    for (int i = 0; i < 8; ++i)
+        this->updateFilter(i);
 }
 
 void GraphicEqualiser::prepare(juce::dsp::ProcessSpec& spec)
@@ -53,6 +71,8 @@ void GraphicEqualiser::prepare(juce::dsp::ProcessSpec& spec)
     }
 
     mLevelGain.prepare(spec);
+
+    this->updateAllFilters();
 }
 
 void GraphicEqualiser::processBlock(juce::AudioBuffer<float>& buffer)
@@ -80,25 +100,9 @@ void GraphicEqualiser::reset()
 
 void GraphicEqualiser::setGainDecibelsAtIndex(float newGainDecibels, int index)
 {
-
-    if (index < 6)
+    if (index >= 0 && index < 8)
     {
-        *mFilters[index].state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-            mCurrentSampleRate,
-            sFrequencies[index],
-            sQualities[index],
-            juce::Decibels::decibelsToGain(newGainDecibels));
-    }
-    else if (index == 6)
-    {
-        *mFilters[index].state = *juce::dsp::IIR::Coefficients<float>::makeHighShelf(
-            mCurrentSampleRate,
-            sFrequencies[index],
-            sQualities[index],
-            juce::Decibels::decibelsToGain(newGainDecibels));
-    }
-    else
-    {
-        mLevelGain.setGainDecibels(newGainDecibels);
+        mGains[index] = newGainDecibels;
+        this->updateFilter(index);
     }
 }

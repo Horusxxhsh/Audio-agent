@@ -25,7 +25,7 @@ def integrate_rag_with_existing_system(
     song_style: list,
     guitar_features: list,
     memoryEnabled: str,
-    api_key: str = "sk-1b73586fde854a329ec187dc371f53ef"
+    api_key: str = "sk-0705951d960041ed96c607ab69724d0d"
 ):
     """
     将 RAG 系统集成到现有的推理流程中

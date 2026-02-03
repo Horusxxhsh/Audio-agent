@@ -6,14 +6,6 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>
  */
 
 #include "InstrumentEqualiser.h"
@@ -21,12 +13,43 @@
 InstrumentEqualiser::InstrumentEqualiser()
 {
     // Initialize the filters with default values
-    *mFilters[0].state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(mCurrentSampleRate, sHighPassFrequencyNormalisableRange.start);
+    *mFilters[0].state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(44100.0f, sHighPassFrequencyNormalisableRange.start);
     for (int i = 1; i <= 4; ++i)
     {
-        *mFilters[i].state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(mCurrentSampleRate, getDefaultValueForIndex(i), sQualityNormalisableRange.start, 1.0f);
+        *mFilters[i].state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(44100.0f, getDefaultValueForIndex(i), sQualityNormalisableRange.start, 1.0f);
     }
-    *mFilters[5].state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(mCurrentSampleRate, sLowPassFrequencyNormalisableRange.start);
+    *mFilters[5].state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(44100.0f, sLowPassFrequencyNormalisableRange.start);
+}
+
+void InstrumentEqualiser::updateFilter(int index)
+{
+    if (mCurrentSampleRate <= 0) return;
+    
+    auto& filter = mFilters[index];
+    const auto frequency = mFrequencies[index];
+    const auto quality = mQualities[index];
+    const auto gain = mDecibelGains[index];
+
+    if (index == 0)
+    {
+        *filter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(mCurrentSampleRate, frequency, quality);
+    }
+    else if (index == 5)
+    {
+        *filter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(mCurrentSampleRate, frequency, quality);
+    }
+    else 
+    {
+        *filter.state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
+            mCurrentSampleRate, 
+            frequency, quality, juce::Decibels::decibelsToGain(gain));
+    }
+}
+
+void InstrumentEqualiser::updateAllFilters()
+{
+    for (int i = 0; i < 6; ++i)
+        this->updateFilter(i);
 }
 
 void InstrumentEqualiser::prepare(juce::dsp::ProcessSpec& spec)
@@ -36,6 +59,7 @@ void InstrumentEqualiser::prepare(juce::dsp::ProcessSpec& spec)
     {
         filter.prepare(spec);
     }
+    this->updateAllFilters();
 }
 
 void InstrumentEqualiser::processBlock(juce::AudioBuffer<float>& buffer)
@@ -62,84 +86,39 @@ void InstrumentEqualiser::reset()
 
 void InstrumentEqualiser::setOnAtIndex(bool newValue, int index)
 {
-    if (index >= 0 && index < mBypasses.size())
+    if (index >= 0 && index < 6)
     {
-        mBypasses[index] = !newValue; // a bypass is a "not on"
+        mBypasses[index] = !newValue;
     }
 }
 
 void InstrumentEqualiser::setFrequencyAtIndex(float newValue, int index)
 {
-    if (index >= 0 && index < mFilters.size() && newValue != 0.0)
+    if (index >= 0 && index < 6)
     {
         mFrequencies[index] = newValue;
-        auto& filter = mFilters[index];
-        const auto quality = mQualities[index];
-        const auto gain = mDecibelGains[index];
-
-        if (index == 0)
-        {
-            *filter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(mCurrentSampleRate, newValue, quality);
-        }
-        else if (index == 5)
-        {
-            *filter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(mCurrentSampleRate, newValue, quality);
-        }
-        else 
-        {
-            *filter.state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(
-                mCurrentSampleRate, 
-                newValue, quality, juce::Decibels::decibelsToGain(gain));
-        }
+        this->updateFilter(index);
     }
 }
 
 void InstrumentEqualiser::setGainAtIndex(float newValue, int index)
 {
-    if (index >= 0 && index < mFilters.size())
+    if (index >= 0 && index < 6)
     {
         mDecibelGains[index] = newValue;
-        auto& filter = mFilters[index];
-        const auto frequency = mFrequencies[index];
-        const auto quality = mQualities[index];
-
-        if (index == 0 || index == 5)
-        {
-            // For high-pass and low-pass filters, gain doesn't affect the shape of the filter, so we don't do anything here.
-            // If you want to apply gain, consider adding a separate gain stage after the filter.
-        }
-        else
-        {
-            *filter.state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(mCurrentSampleRate, frequency, quality, juce::Decibels::decibelsToGain(newValue));
-        }
+        this->updateFilter(index);
     }
 }
 
 void InstrumentEqualiser::setQualityAtIndex(float newValue, int index)
 {
-    if (index >= 0 && index < mFilters.size() && newValue != 0.0)
+    if (index >= 0 && index < 6)
     {
         mQualities[index] = newValue;
-        auto& filter = mFilters[index];
-        const auto frequency = mFrequencies[index];
-        const auto gain = mDecibelGains[index];
-
-        if (index == 0)
-        {
-            *filter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(mCurrentSampleRate, frequency, newValue);
-        }
-        else if (index == 5)
-        {
-            *filter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(mCurrentSampleRate, frequency, newValue);
-        }
-        else
-        {
-            *filter.state = *juce::dsp::IIR::Coefficients<float>::makePeakFilter(mCurrentSampleRate, frequency, newValue, juce::Decibels::decibelsToGain(gain));
-        }
+        this->updateFilter(index);
     }
 }
 
-// Helper function to get default values for frequencies based on the filter index
 float InstrumentEqualiser::getDefaultValueForIndex(int index)
 {
     switch (index)
@@ -148,11 +127,10 @@ float InstrumentEqualiser::getDefaultValueForIndex(int index)
     case 2: return InstrumentEqualiser::sLowMidPeakFrequencyDefaultValue;
     case 3: return InstrumentEqualiser::sHighMidPeakFrequencyDefaultValue;
     case 4: return InstrumentEqualiser::sHighPeakFrequencyDefaultValue;
-    default: return 0.0f; // This shouldn't happen
+    default: return 0.0f;
     }
 }
 
-// Helper function to get the corresponding frequency range based on the filter index
 const juce::NormalisableRange<float>& InstrumentEqualiser::getFrequencyNormalisableRangeForIndex(int index)
 {
     switch (index)
@@ -163,6 +141,6 @@ const juce::NormalisableRange<float>& InstrumentEqualiser::getFrequencyNormalisa
     case 3: return sHighMidPeakFrequencyNormalisableRange;
     case 4: return sHighPeakFrequencyNormalisableRange;
     case 5: return sLowPassFrequencyNormalisableRange;
-    default: return sHighPassFrequencyNormalisableRange; // This shouldn't happen
+    default: return sHighPassFrequencyNormalisableRange;
     }
 }

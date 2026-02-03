@@ -248,25 +248,35 @@ class AudioRAGSystem:
                 print(f"Error adding parameter preset (Text): {e2}")
 
         # 2. 存入 Audio Collection (Audio-based)
+        # FIX: Only add to audio_collection if vector has meaningful content
+        # Empty vectors (len=0) will cause ChromaDB to return unreliable results
         if audio_vector is not None and self.audio_collection is not None:
             try:
-                # Use the SAME ID and Metadata so we can link them back
-                self.audio_collection.add(
-                    ids=[doc_id],
-                    embeddings=[audio_vector],
-                    metadatas=[doc_metadata],
-                    documents=[doc_text] # Keeping text as doc is fine, but we'll search by vector
-                )
-                print(f"Added parameter preset (Audio): {preset_name}")
-            except Exception as e:
-                try:
-                    self.audio_collection.update(
+                # Check if vector has content
+                if len(audio_vector) > 0:
+                    # Use the SAME ID and Metadata so we can link them back
+                    self.audio_collection.add(
                         ids=[doc_id],
                         embeddings=[audio_vector],
                         metadatas=[doc_metadata],
-                        documents=[doc_text]
+                        documents=[doc_text] # Keeping text as doc is fine, but we'll search by vector
                     )
-                    print(f"Updated parameter preset (Audio): {preset_name}")
+                    print(f"Added parameter preset (Audio): {preset_name}")
+                else:
+                    # Skip audio indexing for empty vectors
+                    # These samples will still be in parameter_collection (text-only)
+                    # And can be retrieved by TRR which has its own index
+                    pass
+            except Exception as e:
+                try:
+                    if len(audio_vector) > 0:
+                        self.audio_collection.update(
+                            ids=[doc_id],
+                            embeddings=[audio_vector],
+                            metadatas=[doc_metadata],
+                            documents=[doc_text]
+                        )
+                        print(f"Updated parameter preset (Audio): {preset_name}")
                 except Exception as e2:
                     print(f"Error adding parameter preset (Audio): {e2}")
     

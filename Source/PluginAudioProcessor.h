@@ -36,7 +36,10 @@
 #include "Processors/Modulators/Flanger.h"
 #include "Utilities/GinAudioFifo.h"
 
-class PluginAudioProcessor : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener, juce::ValueTree::Listener
+class PluginAudioProcessor : public juce::AudioProcessor,
+                              juce::AudioProcessorValueTreeState::Listener,
+                              juce::ValueTree::Listener,
+                              private juce::Timer
 {
 public:
     PluginAudioProcessor();
@@ -72,6 +75,10 @@ public:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     void parameterChanged(const juce::String& parameterID, float newValue) override;
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
+
+    void timerCallback() override;
+    void loadAudioFile(const juce::File& file);
+    void processOffline();
 
     foleys::LevelMeterSource& getInputMeterSource()
     {
@@ -217,7 +224,19 @@ private:
     bool mIsBypassOn = false;
 
     void loadImpulseResponseFromState();
-    std::unordered_map<std::string, float> parameterInitialValues; 
+    std::unordered_map<std::string, float> parameterInitialValues;
+
+    juce::AudioBuffer<float> mGeneratedAudioBuffer;
+
+    juce::File importFile;
+    juce::Time lastFileModificationTime;
+    juce::Time lastAudioFileModificationTime;
+
+    void checkImportFile();
+    void processShared(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages);
+
+    bool mIsProcessingOffline = false;  // Prevent reentrant calls to processOffline
+    double mOfflineSampleRate = 44100.0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginAudioProcessor)
 };

@@ -583,6 +583,20 @@ ChatComponent::ChatComponent(PluginPresetManager& pm)
     textWeightLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     preferenceWeightLabel.setColour(juce::Label::textColourId, juce::Colours::black);
     audioWeightLabel.setColour(juce::Label::textColourId, juce::Colours::black);
+
+    addAndMakeVisible(autoImportButton);
+    autoImportButton.setClickingTogglesState(true);
+    autoImportButton.setColour(juce::ToggleButton::tickColourId, juce::Colours::darkgrey);
+    autoImportButton.setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::lightgrey);
+    
+    // Set initial state from presetManager
+    autoImportButton.setToggleState(presetManager.getAutoImportEnabled(), juce::dontSendNotification);
+
+    autoImportButton.onClick = [this]()
+    {
+        presetManager.setAutoImportEnabled(autoImportButton.getToggleState());
+        juce::Logger::writeToLog("Auto-Import toggled: " + juce::String(autoImportButton.getToggleState() ? "On" : "Off"));
+    };
 }
 
 void ChatComponent::resized()
@@ -591,6 +605,7 @@ void ChatComponent::resized()
 
     auto topButtonArea = area.removeFromTop(30);
     memoryToggleButton.setBounds(topButtonArea.removeFromRight(100).reduced(2));
+    autoImportButton.setBounds(topButtonArea.removeFromLeft(100).reduced(2));
 
     auto weightsArea = area.removeFromTop(30);
 
@@ -1038,7 +1053,7 @@ void ChatComponent::run() {
     STARTUPINFOA si = { sizeof(si) };
     PROCESS_INFORMATION pi = { 0 };
     
-    if (!CreateProcessA(NULL, const_cast<LPSTR>(utf8Command.c_str()), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
+    if (!CreateProcessA(NULL, const_cast<LPSTR>(utf8Command.c_str()), NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi)) {   //CREATE_NO_WINDOW
         DWORD error = GetLastError();
         std::cerr << "CreateProcess failed with error: " << error << std::endl;
         updateStatus("Failed to execute Python script");

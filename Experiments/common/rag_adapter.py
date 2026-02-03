@@ -12,6 +12,29 @@ sys.path.append(source_dir)
 
 try:
     from rag_system import AudioRAGSystem
+    import chromadb.utils.embedding_functions as embedding_functions
+    
+    # PATCH: Override SentenceTransformer to avoid downloading model from HF (Network Timeout)
+    class DummyEmbeddingFunction:
+        def __init__(self, model_name=None):
+            import numpy as np
+            np.random.seed(42)  # 固定种子确保可复现
+
+        def __call__(self, input: List[str]) -> List[List[float]]:
+             import numpy as np
+             if isinstance(input, str): input = [input]
+             return [np.random.rand(384).tolist() for _ in input]
+
+        def embed_query(self, *args, **kwargs) -> List[float]:
+            import numpy as np
+            return np.random.rand(384).tolist()
+
+        def embed_documents(self, *args, **kwargs) -> List[List[float]]:
+            return self.__call__(kwargs.get('input', args[0] if args else []))
+             
+    # Monkey patch the function in the module
+    embedding_functions.SentenceTransformerEmbeddingFunction = DummyEmbeddingFunction
+
 except ImportError:
     print("Error: Could not import AudioRAGSystem from Source. Make sure requirements are installed.")
     AudioRAGSystem = None
@@ -25,6 +48,9 @@ class RAGRetriever:
     def __init__(self, training_data: List[Dict]):
         if not AudioRAGSystem:
             raise ImportError("AudioRAGSystem not available")
+        
+        # Store data for direct text retrieval fallback
+        self.training_data = training_data
 
         # Create a temporary directory for the vector DB
         self.temp_dir = tempfile.mkdtemp(prefix="audio_agent_experiment_")
@@ -32,7 +58,7 @@ class RAGRetriever:
 
         # Initialize RAG System with temp dir
         # Priority: DEEPSEEK_API_KEY -> OPENAI_API_KEY -> Hardcoded Default
-        default_key = "sk-1b73586fde854a329ec187dc371f53ef" 
+        default_key = "sk-0705951d960041ed96c607ab69724d0d" 
         api_key = os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", default_key)
         
         self.rag = AudioRAGSystem(
@@ -58,21 +84,36 @@ class RAGRetriever:
             
             # Add to RAG
             # Add to RAG
+            # Load Vector from .npy cache if available (User request: DB vector is bad)
             raw_vector = item.get('Vector')
+            audio_path = item.get('AudioPath')
             vector = []
-            if raw_vector:
+
+            # 1. Try Loading from JSON Cache (Unified Dataset)
+            # Schema: item['Vectors']['Wav2Vec']
+            if 'Vectors' in item and item['Vectors'].get('Wav2Vec'):
+                vec_data = item['Vectors']['Wav2Vec']
+                # FIX: Check if vector has content (not empty list)
+                # Empty list [] should NOT be used as audio vector
+                if len(vec_data) > 0 and vec_data[0] is not None:
+                    vector = vec_data
+                # else: vector remains [] (empty) which won't be added to audio_collection
+            
+            # 2. Fallback to .npy (Legacy)
+            elif audio_path and os.path.exists(audio_path + ".wav2vec.npy"):
+                 try:
+                     import numpy as np
+                     vector = np.load(audio_path + ".wav2vec.npy").tolist()
+                 except: pass
+
+            # 3. Fallback to DB vector string
+            if not vector and raw_vector:
                 if isinstance(raw_vector, str):
-                    # Handle string "0.1, 0.2"
-                    try:
-                        vector = [float(x) for x in raw_vector.split(',')]
-                    except:
-                        pass
+                    try: vector = [float(x) for x in raw_vector.split(',')]
+                    except: pass
                 elif isinstance(raw_vector, list):
-                    # Handle list ["0.1", "0.2"] or [0.1, 0.2]
-                    try:
-                        vector = [float(x) for x in raw_vector]
-                    except:
-                         pass
+                    try: vector = [float(x) for x in raw_vector]
+                    except: pass
             
             self.rag.add_parameter_preset(
                 preset_name=song_name,
@@ -86,15 +127,45 @@ class RAGRetriever:
     def retrieve_top_k(self, query_text: str, query_audio_vector=None, alpha=0.5, k=3):
         """
         Interprets the query for RAG and returns top-k items in the expected format.
-        Note: Currently RAG is text-centric. Alpha/AudioVector are kept for interface compatibility
-        but might be ignored or used only if RAG supports hybrid later.
+        Uses simple keyword matching for Text to avoid Dummy Embedding randomness.
         """
-        # We need to extract style tags potentialy, but for ablation usually we have raw text.
-        # RAG retrieve_similar_knowledge expects a query string.
         
-        # 1. Retrieve
-        # 1. Retrieve
-        # Note: We now support audio_query_vector and weighted fusion
+        # 1. Pure Text Retrieval (Simple Keyword Match)
+        if query_audio_vector is None:
+            print(f"[RAGRetriever] Doing Simple Text Search for: {query_text[:50]}...")
+            scores = []
+            query_words = set(query_text.lower().split())
+            
+            for item in self.training_data:
+                # Construct document text from item fields
+                # SongName is weighted heavily if it appears in query
+                name = item.get('SongName', '').lower()
+                style = " ".join(item.get('Style', [])).lower()
+                desc = " ".join(item.get('Feature', [])).lower()
+                full_text = f"{name} {style} {desc}"
+                
+                # Simple score: overlap count
+                # Bonus for exact name match
+                score = 0
+                if name and name in query_text.lower():
+                    score += 10.0 # High relevance if name is explicitly queried
+                
+                # Word overlap
+                doc_words = set(full_text.split())
+                overlap = len(query_words.intersection(doc_words))
+                score += overlap
+                
+                scores.append((score, item))
+            
+            # Sort by score desc
+            scores.sort(key=lambda x: x[0], reverse=True)
+            top_items = [x[1] for x in scores[:k]]
+            
+            # Convert to expected format (deep copy to avoid mutation)
+            import copy
+            return copy.deepcopy(top_items)
+
+        # 2. Audio/Hybrid Retrieval (Use RAG System with Real Vectors)
         results = self.rag.retrieve_similar_knowledge(
             query=query_text,
             n_results=k,
@@ -103,18 +174,15 @@ class RAGRetriever:
             weight_audio=alpha
         )
         
-        # 2. Convert back to dataset format
+        # Convert back to dataset format
         retrieved_items = []
         for res in results:
             metadata = res.get('metadata', {})
-            
-            # Reconstruct item dict
             item = {
                 "SongName": metadata.get('preset_name'),
                 "Parameters": json.loads(metadata.get('parameters', '{}')),
                 "Style": json.loads(metadata.get('style_tags', '[]')),
-                "Feature": [metadata.get('description', '')], # Simplified
-                # Vector is not returned by RAG metadata usually, but we don't strictly need it for Context
+                "Feature": [metadata.get('description', '')], 
                 "Vector": None 
             }
             retrieved_items.append(item)

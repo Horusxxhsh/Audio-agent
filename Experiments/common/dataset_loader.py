@@ -9,6 +9,19 @@ AUDIO_DB_PATH = os.path.join(BASE_DIR, '..', '..', 'audio_info.db')
 
 def load_and_merge_data():
     """
+    Loads data. 
+    OPTIMIZED: Prefers 'dataset_full_vectors.json' if available.
+    Otherwise merges from DBs.
+    """
+    # 1. Try JSON First
+    json_path = os.path.join(os.path.dirname(__file__), '..', '..', 'Experiments', 'dataset_full_vectors.json')
+    if os.path.exists(json_path):
+        print(f"Loading data from optimized JSON: {json_path}")
+        with open(json_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+
+    # 2. Fallback to DB Merge
+    """
     Loads data from music_info.db and audio_info.db.
     Fallback strategy: Merge by INDEX (Offset 11) because exact parameter matching failed.
     Assumes Music[0] corresponds to Audio[11] (first new imported record).

@@ -68,11 +68,15 @@ class SourcePurifier:
 class TextureEncoder:
     """
     Stage 2 & 3 & 4: Feature Extraction, Texture Encoding (Gram Matrix), and Optimization.
+
+    P2 IMPROVEMENTS:
+    - Reduced projection dimension from 64 to 32 for better generalization
+    - Multi-layer Gram fusion from layers 4, 5, 6
     """
-    def __init__(self, device=None, project_dim=64):
+    def __init__(self, device=None, project_dim=32):
         self.device = device if device else torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.project_dim = project_dim
-        
+        self.project_dim = project_dim  # P2: 降低维度防止过拟合
+
         # Load Wav2Vec2 Model
         if Wav2Vec2Model:
             print("Loading Wav2Vec2 model...")
@@ -80,9 +84,9 @@ class TextureEncoder:
             self.model.eval()
         else:
             self.model = None
-            
+
         # Random Projection Layer (Frozen)
-        # Projects 768 dim features to smaller dim (e.g., 64) before Gram calculation
+        # P2: 优化后的投影维度（32 -> 32*32=1024维特征，更适合小数据集）
         self.projector = nn.Linear(768, self.project_dim).to(self.device)
         for param in self.projector.parameters():
             param.requires_grad = False
@@ -90,23 +94,23 @@ class TextureEncoder:
     def load_and_preprocess(self, audio_path: str) -> Optional[torch.Tensor]:
         """Loads audio, resamples to 16k, and normalizes."""
         try:
-            # Force soundfile backend if possible, or try-catch
+            # Prioritize direct soundfile load to avoid TorchCodec issues
             try:
-                waveform, sample_rate = torchaudio.load(audio_path, backend="soundfile")
-            except:
+                import soundfile as sf
+                data, sample_rate = sf.read(audio_path)
+                waveform = torch.from_numpy(data).float()
+                if waveform.dim() == 1:
+                    waveform = waveform.unsqueeze(0) # [1, T]
+                else:
+                    waveform = waveform.t() # [C, T]
+            except Exception as e_sf:
+                # Fallback to torchaudio if soundfile fails
+                print(f"Direct soundfile load failed: {e_sf}, trying torchaudio...")
                 try:
-                    # Fallback: direct soundfile load
-                    import soundfile as sf
-                    data, sample_rate = sf.read(audio_path)
-                    waveform = torch.from_numpy(data).float()
-                    if waveform.dim() == 1:
-                        waveform = waveform.unsqueeze(0) # [1, T]
-                    else:
-                        waveform = waveform.t() # [C, T]
-                except Exception as e_sf:
-                    print(f"Fallback load failed: {e_sf}")
-                    # Try default load last
                     waveform, sample_rate = torchaudio.load(audio_path)
+                except Exception as e_ta:
+                    print(f"Torchaudio load also failed: {e_ta}")
+                    return None
             
             # Resample to 16kHz
             if sample_rate != 16000:
@@ -151,42 +155,51 @@ class TextureEncoder:
         """
         # Features: [1, Time, Dim] -> [Time, Dim]
         feats = features.squeeze(0)
-        
+
         n_time = feats.shape[0]
-        
+
         # Projection (Optimization)
-        # [Time, 768] -> [Time, 64]
+        # [Time, 768] -> [Time, project_dim]
         projected = self.projector(feats)
-        
+
         # Gram Matrix: (F.T @ F) / N
-        # [64, Time] @ [Time, 64] -> [64, 64]
+        # [project_dim, Time] @ [Time, project_dim] -> [project_dim, project_dim]
         gram = torch.matmul(projected.T, projected)
         gram = gram / n_time
-        
+
         return gram
 
     def get_embedding(self, audio_path: str) -> Union[np.ndarray, None]:
         """
-        Full pipeline: Audio -> Features -> Projection -> Gram -> Flatten -> Norm
+        P2 IMPROVED: Full pipeline with multi-layer Gram fusion.
+        Audio -> Features -> Multi-layer Projection -> Gram Fusion -> Flatten -> Norm
         """
         # 1. Preprocess
         waveform = self.load_and_preprocess(audio_path)
         if waveform is None: return None
-        
-        # 2. Extract Base Features
-        # Using Layer 5 as recommended for Timbre
-        raw_features = self.extract_features(waveform, layer_idx=5)
-        
-        # 3. Compute Texture Encoding (Gram Matrix)
-        gram_matrix = self.compute_gram_matrix(raw_features)
-        
+
+        # 2. P2: Multi-layer Feature Extraction (Layers 4, 5, 6)
+        # 这些层在中层语义特征和纹理特征之间取得平衡
+        layer_indices = [4, 5, 6]
+        gram_matrices = []
+
+        for layer_idx in layer_indices:
+            raw_features = self.extract_features(waveform, layer_idx=layer_idx)
+            gram_matrix = self.compute_gram_matrix(raw_features)
+            gram_matrices.append(gram_matrix)
+
+        # 3. P2: 融合多个层的Gram Matrix（平均池化）
+        # 每个Gram Matrix形状: [project_dim, project_dim]
+        fused_gram = torch.stack(gram_matrices).mean(dim=0)
+
         # 4. Flatten and Normalize
-        # Flatten: [64, 64] -> [4096]
-        embedding_vec = gram_matrix.flatten()
-        
+        # Flatten: [project_dim, project_dim] -> [project_dim^2]
+        # 对于project_dim=32: [32, 32] -> [1024]
+        embedding_vec = fused_gram.flatten()
+
         # L2 Normalize
         embedding_vec = torch.nn.functional.normalize(embedding_vec, p=2, dim=0)
-        
+
         return embedding_vec.cpu().numpy()
 
 def similarity_score(vec_a: np.ndarray, vec_b: np.ndarray) -> float:

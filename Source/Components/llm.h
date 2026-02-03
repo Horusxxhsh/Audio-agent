@@ -5,7 +5,6 @@
 
 
 static const juce::String COZE_API_KEY = "pat_qYqWeCHQq2kXBWHJukeL8mOYyyRI9gdDa8a4ENXQiQjXqb3DNOYs3RbgN54gD4vE"; 
-static const juce::String API_ENDPOINT = "https://api.coze.cn/v3/chat"; 
 static const juce::String RESULT_ENDPOINT = "https://api.coze.cn/v3/chat/result"; 
 
 
@@ -158,6 +157,8 @@ private:
     void callAsync(const juce::String& response);
     void updateAudioWeightVisibility();
     void adjustWeightsForAudio(bool includeAudio);
+
+    juce::ToggleButton autoImportButton{ "Auto-Import" };
 };
 
 
