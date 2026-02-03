@@ -378,4 +378,5 @@ Experiments/AblationStudies/results_ablation.json
 debug_log.txt
 results_journal.txt
 test_rag_db/
+vector_db/
 Experiments/dataset_full_vectors.json
