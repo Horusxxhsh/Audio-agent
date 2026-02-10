@@ -32,7 +32,8 @@
 % Reference to three sections.
 \def\secrefs#1#2#3{sections \ref{#1}, \ref{#2} and \ref{#3}}
 % Reference to an equation, lower-case.
-\def\eqref#1{equation~\ref{#1}}
+% NOTE: Do not override amsmath's \eqref. Use \myeqref if you want "equation~\ref{...}" style references.
+\def\myeqref#1{equation~\ref{#1}}
 % Reference to an equation, upper case
 \def\Eqref#1{Equation~\ref{#1}}
 % A raw reference to an equation---avoid using if possible
@@ -105,7 +106,7 @@
 \def\rvf{{\mathbf{f}}}
 \def\rvg{{\mathbf{g}}}
 \def\rvh{{\mathbf{h}}}
-\def\rvu{{\mathbf{i}}}
+\def\rvi{{\mathbf{i}}}
 \def\rvj{{\mathbf{j}}}
 \def\rvk{{\mathbf{k}}}
 \def\rvl{{\mathbf{l}}}
