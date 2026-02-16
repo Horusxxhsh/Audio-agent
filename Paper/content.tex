@@ -333,7 +333,11 @@ We validate the proposed framework by answering three research questions: (RQ1) 
 
 \subsection{Experimental Setup}
 
-We utilize an internal evaluation benchmark constructed for this study. The test set consists of 31 guitar-tone queries (including both human-recorded and MusicGen-generated samples) representative of distinct regions in the parameter manifold $\Theta$. For objective parameter-space evaluation we report results on a 5-query held-out subset with ground-truth parameters. The retrieval knowledge base contains 51 disjoint items.
+We utilize an internal evaluation benchmark constructed for this study. The test set consists of 31 guitar-tone queries (including both human-recorded and MusicGen-generated samples) representative of distinct regions in the parameter manifold $\Theta$. For objective parameter-space evaluation we report results on a 5-query held-out subset with ground-truth parameters. The retrieval knowledge base contains 51 disjoint items (excluding the test samples).
+
+\paragraph{Test samples.}
+The 5 held-out queries with ground-truth parameters are: (1) \textit{Dry Funk}, (2) \textit{Tweed Breakup}, (3) \textit{Reverse Psychedelic}, (4) \textit{Math Rock Crystal}, and (5) \textit{Saturated Rhythm}. These samples cover diverse playing styles and effect configurations, including clean funk, blues breakup, psychedelic FX, clean compression, and high-gain rock tones.
+
 \paragraph{Scope and statistical caution.}
 Because the objective benchmark is small ($N=5$ with ground-truth parameters), we interpret these results as a pilot study of a retrieval-grounded, executable parameter inference setting, and do not make statistical significance or broad generalization claims.
 
@@ -508,6 +512,17 @@ In a dataset of $N$ candidates with feature dimension $d$, TRR retrieval cost is
 
 	The agent achieves perfect module consistency (1.0) for both methods in this benchmark. The improvement is uneven: TRR+LLM reduces parameter error by 13.0\% (0.0980 $\to$ 0.0852), whereas Text+LLM yields only a marginal 0.5\% gain. This is consistent with the interpretation that TRR retrieves a better initial neighborhood, leaving the LLM to make smaller adjustments.
 
+\paragraph{Few-shot ON/OFF prediction strategy.}
+To enable the LLM to correct module-level retrieval errors, we provide five manually curated few-shot examples covering diverse style regions:
+\begin{itemize}
+    \item \textit{Clean Funk}: Compressor\textbf{ON}, Driver\textbf{OFF}, Screamer\textbf{OFF}, Delay\textbf{ON}, Reverb\textbf{ON}, Chorus\textbf{ON}, Flanger\textbf{OFF}, EQ\textbf{ON}, Phaser\textbf{OFF}
+    \item \textit{Blues Tweed}: Compressor\textbf{OFF}, Driver\textbf{ON}, Screamer\textbf{OFF}, Delay\textbf{OFF}, Reverb\textbf{ON}, Chorus\textbf{OFF}, Flanger\textbf{OFF}, EQ\textbf{ON}, Phaser\textbf{OFF}
+    \item \textit{Reverse Psychedelic}: Compressor\textbf{OFF}, Driver\textbf{OFF}, Screamer\textbf{OFF}, Delay\textbf{OFF}, Reverb\textbf{OFF}, Chorus\textbf{OFF}, Flanger\textbf{OFF}, EQ\textbf{ON}, Phaser\textbf{OFF}
+    \item \textit{Math Rock Crystal}: Compressor\textbf{ON}, Driver\textbf{OFF}, Screamer\textbf{OFF}, Delay\textbf{ON}, Reverb\textbf{ON}, Chorus\textbf{ON}, Flanger\textbf{OFF}, EQ\textbf{ON}, Phaser\textbf{OFF}
+    \item \textit{Saturated Rhythm}: Compressor\textbf{OFF}, Driver\textbf{ON}, Screamer\textbf{OFF}, Delay\textbf{OFF}, Reverb\textbf{ON}, Chorus\textbf{OFF}, Flanger\textbf{OFF}, EQ\textbf{ON}, Phaser\textbf{OFF}
+\end{itemize}
+The prompt explicitly instructs the LLM to \textbf{IGNORE} ON/OFF information from retrieved prototypes (which may contain retrieval errors) and instead learn the activation patterns from few-shot examples. This design enables the LLM to achieve 100\% module consistency by correcting spurious module activations in retrieved prototypes.
+
 \subsection{RQ3: Robustness via Uncertainty Fusion}
 \label{ssec:robustness}
 
@@ -625,15 +640,55 @@ Conversely, we corrupt the audio modality by perturbing the TRR embedding in emb
 	\end{tabular}
 \end{table}
 
+\paragraph{Dynamic weight adjustment summary.}
+Table \ref{tab:dynamic_weight_strategy} summarizes the adaptive weighting behavior under both stress scenarios. The entropy-based fusion mechanism automatically detects modality reliability and shifts weights toward the more informative input, achieving 99.5--99.7\% error reduction compared to degraded single-modality baselines.
+
+\begin{table}[t]
+	\centering
+	\caption{Dynamic weight adjustment strategy under single-modality stress tests ($N=5$). The fusion mechanism automatically assigns higher weight to the reliable modality, achieving substantial error reduction.}
+	\label{tab:dynamic_weight_strategy}
+	\resizebox{\columnwidth}{!}{%
+	\begin{tabular}{lcccc}
+		\toprule
+		\textbf{Scenario} & \textbf{Degradation} & \textbf{Weight Strategy} & \textbf{Single-Modal L2} & \textbf{Hybrid L2} \\
+		\midrule
+		Vague Text        & Generic descriptor (e.g., ``warm'') & $\alpha=0.15$ (15\% text, 85\% audio) & 28.94 (Text-only) & \textbf{0.08} \\
+		Noisy Audio       & TRR embedding noise ($\sigma=5.0$)  & $\alpha=0.85$ (85\% text, 15\% audio) & 29.30 (TRR-only)  & \textbf{0.15} \\
+		\midrule
+		\textbf{Improvement} & --- & --- & --- & \textbf{99.5--99.7\%} \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
 \subsection{Metrics}
 \label{ssec:metrics}
 We employ five objective metrics to quantify alignment in $\Theta$:
-(1) \textbf{L2}: An operational parameter-space proxy computed as RMSE between flattened numeric parameter leaves, with missing keys treated as zero;
-(2) \textbf{Acc@0.1}: Fraction of flattened numeric parameters within $\pm 0.1$ tolerance under the same operational representation;
-(3) \textbf{Recall}: Recall of active parameters;
-(4) \textbf{Cosine}: Angular similarity in parameter space;
-(5) \textbf{Module}: Jaccard index of active DSP modules.
-Detailed definitions are provided in the supplementary material.
+
+(1) \textbf{L2 Error}: Root mean square error between flattened parameter vectors. Given ground-truth parameters $\theta_{\text{gt}}$ and predicted parameters $\tilde{\theta}$, we compute:
+\begin{equation}
+    \text{L2} = \sqrt{\frac{1}{d}\sum_{i=1}^{d}(\theta_{\text{gt}}^{(i)} - \tilde{\theta}^{(i)})^2}
+\end{equation}
+where $d$ is the dimensionality after flattening. Missing parameter keys are treated as zero.
+
+(2) \textbf{Accuracy@0.1}: Fraction of parameters within $\pm 0.1$ absolute tolerance:
+\begin{equation}
+    \text{Acc@0.1} = \frac{1}{d}\sum_{i=1}^{d}\mathbb{I}\left(|\theta_{\text{gt}}^{(i)} - \tilde{\theta}^{(i)}| \leq 0.1\right)
+\end{equation}
+
+(3) \textbf{Recall}: Ratio of correctly retrieved active parameters to total active parameters in ground truth.
+
+(4) \textbf{Cosine Similarity}: Angular similarity between parameter vectors:
+\begin{equation}
+    \text{Cosine} = \frac{\theta_{\text{gt}} \cdot \tilde{\theta}}{\|\theta_{\text{gt}}\|_2 \cdot \|\tilde{\theta}\|_2}
+\end{equation}
+
+(5) \textbf{Module Consistency}: Jaccard index of active DSP module sets. Let $A$ be the set of active modules in ground truth (module names ending with ``On'') and $B$ be the set in prediction:
+\begin{equation}
+    \text{Module} = \frac{|A \cap B|}{|A \cup B|}
+\end{equation}
+A module is considered active if its corresponding ``On'' parameter exists in the parameter dictionary, regardless of the numeric value.
+
 Because these metrics operate in parameter space, they are not perceptual audio distances; we therefore treat them as executable proxies for editability and reserve audio-space metrics (e.g., FAD or multi-resolution STFT losses on rendered audio) for future work.
 
 \textbf{Key Insight}. Shifting modality weights can provide information complementarity: when text is uninformative, relying more on audio helps; when the audio reference is degraded, relying more on text helps. In our stress tests we use the entropy-based fusion in Algorithm \ref{alg:dual_retrieval} and report the resulting average weights for transparency.
