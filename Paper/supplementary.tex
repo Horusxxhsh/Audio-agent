@@ -1,0 +1,196 @@
+\documentclass{article}
+
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+
+\title{Supplementary Material for Audio-Agent}
+\author{Anonymous Authors}
+\date{}
+
+\begin{document}
+\maketitle
+
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\setcounter{section}{0}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+
+\section{Objective Metric Definitions and Protocol Notes}
+
+This supplementary material uses the same operational objective metrics defined in the main paper. Briefly, \textbf{Param. Dist.} is computed as RMSE between flattened numeric parameter leaves (missing keys treated as zero), \textbf{Acc@0.1} is the fraction of flattened numeric parameters within $\pm 0.1$, \textbf{Recall} measures recall over active parameters, \textbf{Cosine} is cosine similarity in the same flattened space, and \textbf{Module} is the Jaccard index over active DSP modules.
+Because these metrics are computed in parameter space, absolute values can depend on the parameter encoding and experimental setting; we therefore interpret improvements \emph{within} each table under the stated protocol and avoid comparing magnitudes across tables.
+
+\section{Direct Retrieval Method Comparison}
+
+Table~\ref{tab:retrieval_methods_direct} reports a direct retrieval comparison that includes a \textbf{Pure LLM} baseline (no retrieval). The evaluation uses top-1 retrieval, and reports five operational parameter-space metrics: Param. Dist. (RMSE), Acc@0.1, Recall, Cosine similarity, and Module (Jaccard over active modules).
+
+\begin{table}[h]
+	\centering
+	\caption{Direct retrieval comparison. Lower is better for Param. Dist.; higher is better for the other metrics. Comparisons are within-table under the stated protocol.}
+	\label{tab:retrieval_methods_direct}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Method} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
+		\midrule
+		TRR (Ours) & \textbf{0.3028} & \textbf{0.7145} & \textbf{0.6833} & \textbf{0.8399} & 0.9586 \\
+		Wav2Vec-RAG & 0.3679 & 0.6354 & 0.5589 & 0.7189 & 0.8919 \\
+		Text-RAG & 0.4560 & 0.6950 & 0.6266 & 0.7250 & 0.8478 \\
+		FeatureNN-RAG & 1.7211 & 0.6735 & 0.6453 & 0.7550 & \textbf{0.9613} \\
+		Pure LLM (no retrieval) & 13.3575 & 0.4379 & 0.2113 & 0.3736 & 0.6995 \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\section{LLM-Enhanced Retrieval (Few-shot Module Correction)}
+
+Table~\ref{tab:retrieval_methods_llm} reports a four-way comparison between retrieval-only and retrieval+LLM variants on a core subset. The LLM is prompted with 5 manually specified few-shot examples and is instructed to \textbf{ignore} retrieval-provided module hints, predicting only the ON/OFF pattern; parameters are then copied from the retrieved reference conditioned on the predicted ON/OFF pattern.
+
+\begin{table}[h]
+	\centering
+	\caption{LLM-enhanced retrieval comparison.}
+	\label{tab:retrieval_methods_llm}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Method} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
+		\midrule
+		TRR (retrieval only) & 0.4104 & 0.7381 & \textbf{0.7101} & 0.7430 & 0.7833 \\
+		Text (retrieval only) & 0.4396 & 0.6645 & 0.5717 & 0.6425 & 0.6833 \\
+		TRR + LLM & \textbf{0.2631} & \textbf{0.8156} & \textbf{0.7101} & \textbf{0.8115} & \textbf{1.0000} \\
+		Text + LLM & 0.2769 & 0.7180 & 0.6178 & 0.7821 & \textbf{1.0000} \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\section{Robustness Stress Tests}
+
+We report two extreme stress-test settings where one modality is intentionally degraded. We use $\alpha$ to denote the \textbf{text} weight in the hybrid retriever (thus $1-\alpha$ is the audio weight). Metrics are the same as in Table~\ref{tab:retrieval_methods_direct}.
+
+\begin{table}[h]
+	\centering
+	\caption{Text-vague stress test.}
+	\label{tab:stress_text_vague}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Method} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
+		\midrule
+		Text + LLM & 29.28 & 0.62 & 0.43 & 0.51 & \textbf{1.00} \\
+		Hybrid ($\alpha=0.15$) + LLM & \textbf{0.26} & \textbf{0.82} & \textbf{0.71} & \textbf{0.81} & \textbf{1.00} \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\caption{Audio-noise stress test.}
+	\label{tab:stress_audio_noise}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Method} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
+		\midrule
+		TRR + LLM & 29.36 & 0.41 & 0.25 & 0.41 & \textbf{1.00} \\
+		Hybrid ($\alpha=0.85$) + LLM & \textbf{0.28} & \textbf{0.72} & \textbf{0.62} & \textbf{0.78} & \textbf{1.00} \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\caption{Dynamic weight summary. $\alpha$ denotes the text weight; the hybrid retriever compensates by increasing the weight of the non-degraded modality.}
+	\label{tab:stress_dynamic_weight_summary}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Scenario} & \textbf{Degraded modality} & \textbf{Single-modality baseline} & \textbf{$\alpha$ (text weight)} & \textbf{Hybrid method} & \textbf{Param. Dist.} $\downarrow$ \\
+		\midrule
+		Text vague & Text & Text + LLM & 0.15 & Hybrid + LLM & 0.26 \\
+		Audio noisy & Audio & TRR + LLM & 0.85 & Hybrid + LLM & 0.28 \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\section{Objective Metrics for Listening Study (Trials 6--10)}
+
+Table~\ref{tab:objective_trials6_10} complements the subjective similarity ratings in Trials 6--10 with objective audio metrics computed against the same reference clips: Frechet Audio Distance with a VGGish backbone (FAD$_{\text{vgg}}$), KL divergence between PANN label distributions (KL$_{\text{pann}}$), and CLAP text--audio similarity (CLAP$_{\text{scr}}$).
+
+\begin{table}[h]
+	\centering
+	\caption{Objective metrics for Trials 6--10.}
+	\label{tab:objective_trials6_10}
+	\small
+	\begin{tabular}{lccc}
+		\toprule
+		\textbf{Model} & \textbf{FAD$_{\text{vgg}}$} $\downarrow$ & \textbf{KL$_{\text{pann}}$} $\downarrow$ & \textbf{CLAP$_{\text{scr}}$} $\uparrow$ \\
+		\midrule
+		MusicGen & 14.22 & 0.41 & \textbf{0.24} \\
+		Audio-Agent (Ours) & \textbf{13.48} & \textbf{0.33} & 0.21 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Fusion Temperature Sensitivity}
+
+Table~\ref{tab:beta_sensitivity} reports the sensitivity sweep over fusion temperature $\beta$ under the same fixed evaluation protocol used in the main paper (1082 total records, 30 held-out queries, 1052 retrieval candidates).
+
+\begin{table}[h]
+	\centering
+	\caption{Fusion sensitivity to $\beta$ on the held-out subset ($N=30$). Results are reported as split-specific evidence under the fixed evaluation protocol.}
+	\label{tab:beta_sensitivity}
+		\begin{tabular}{lcccccc}
+			\toprule
+			$\beta$ & $\mathbb{E}[w_{\text{text}}]$ & $\mathrm{Std}$ & $\min$ & $\max$ & Param. Dist. (Text) & Param. Dist. (Fusion) \\
+		\midrule
+		0.5 & 0.5016 & 0.0015 & 0.4999 & 0.5036 & 13.15 & 0.93 \\
+		1.0 & 0.5031 & 0.0029 & 0.4999 & 0.5072 & 13.15 & 0.93 \\
+		2.0 & 0.5062 & 0.0058 & 0.4997 & 0.5145 & 13.15 & 0.93 \\
+		4.0 & 0.5124 & 0.0116 & 0.4995 & 0.5289 & 13.15 & 0.93 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Wav2Vec2 Layer Sweep}
+
+Table~\ref{tab:layer_sweep} reports the layer-sweep diagnostic used to generate the layer-selection figure in the main paper.
+
+\begin{table}[h]
+	\centering
+		\caption{Layer sweep results ($n=30$ in the reported setup). Lower is better for parameter distance.}
+	\label{tab:layer_sweep}
+	\begin{tabular}{lc}
+		\toprule
+		Layer & Param. Distance \\
+		\midrule
+			1 & 6.3970 \\
+			2 & 5.8823 \\
+			3 & 6.1054 \\
+			4 & 6.1241 \\
+			5 & 6.5368 \\
+			6 & 6.8611 \\
+			7 & 6.4030 \\
+			8 & 6.2779 \\
+			9 & 6.1369 \\
+			10 & \textbf{5.3125} \\
+			11 & 6.3268 \\
+			12 & 6.3712 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\end{document}
