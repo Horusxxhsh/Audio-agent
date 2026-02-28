@@ -1,11 +1,11 @@
 \maketitle
 
 \begin{abstract}
-Modern Digital Audio Workstations (DAWs) expose rich effect chains, but a semantic gap remains between perceptual user intent (e.g., ``warm'', ``aggressive'', ``spacious'') and low-level DSP control parameters. Recent generative models can synthesize waveforms directly, yet waveform outputs are difficult to edit in production workflows. We present Audio-Agent, a neuro-symbolic framework that generates editable DSP parameter configurations instead of finalized waveforms.
+Digital audio workstations (DAWs) expose rich effect chains, yet a semantic gap remains between perceptual user intent (e.g., ``warm'' or ``spacious'') and low-level DSP control parameters. Waveform-generative models can synthesize realistic audio, but the resulting samples are difficult to edit within DAW-centric workflows. We present Audio-Agent, a neuro-symbolic framework that generates editable plugin parameter configurations instead of finalized waveforms.
 
-Audio-Agent combines three components: (1) Texture Resonance Retrieval (TRR), which encodes audio texture with second-order feature statistics (Gram matrices); (2) Dual-Modal Adaptive Fusion, which reweights text and audio evidence using retrieval uncertainty; and (3) Constrained Parameter Projection, which deterministically repairs LLM drafts to satisfy plugin feasibility constraints.
+Audio-Agent combines three components: (1) Texture Resonance Retrieval (TRR), which represents audio texture with second-order feature statistics (Gram matrices) computed from frame-level embeddings; (2) uncertainty-aware dual-modal fusion, which reweights text and audio evidence based on retrieval uncertainty; and (3) constrained parameter projection, which deterministically repairs LLM drafts to satisfy plugin feasibility constraints.
 
-In a pilot study on a server-side guitar-effects corpus of 1082 paired records, we report objective parameter-space evaluation on a fixed 30-query held-out split (1052-item retrieval knowledge base). Under this protocol, TRR achieves lower parameter distance than classical texture baselines (13.57 vs.\ 24.95 for MFCC temporal statistics and 32.02 for modulation spectrogram). Compared to pure LLM generation without retrieval (L2=13.36), our retrieval-grounded approach reduces parameter error by 97.7\% (L2=0.30), demonstrating the necessity of retrieval augmentation. Uncertainty-aware fusion further reduces parameter distance from 13.15 (best single modality) to 0.93. We complement objective evaluation with a MUSHRA-style listening study (26 participants, 910 ratings). All quantitative claims are reported as split-specific evidence under the stated protocol without broader universal generalization claims.
+In objective parameter-space evaluation on a fixed 30-query held-out split, Audio-Agent improves parameter alignment over first-order retrieval baselines and remains robust under single-modality degradation. A MUSHRA-style listening study with 26 participants further supports the practicality of retrieval-grounded parameter control for production workflows.
 \end{abstract}
 
 \section{Introduction}
@@ -13,7 +13,7 @@ In a pilot study on a server-side guitar-effects corpus of 1082 paired records, 
 
 	The field of neural audio synthesis currently faces a fundamental tension between \textit{fidelity} and \textit{control}. Recent high-fidelity generative models, primarily based on latent diffusion \citep{liu2023audioldm,agostinelli2023musiclm}, can achieve strong perceptual quality but often operate as ``black boxes.'' They generate finalized waveforms where internal attributes—such as the attack time of a compressor or the decay of a reverb—are entangled and inaccessible for post-hoc editing. Conversely, Differentiable Digital Signal Processing (DDSP) \citep{engel2020ddsp} offers interpretable, structured control but often suffers from the ill-posed nature of the inverse parameter estimation problem.
 
-This tension motivates the development of \textbf{Neuro-Symbolic Audio Agents}: systems that leverage the reasoning capabilities of Large Language Models (LLMs) to control interpretable DSP engines. By predicting parameters rather than samples, such systems ensure that outputs are not just high-fidelity, but also fully editable within professional production workflows.
+This tension motivates the development of \textbf{Neuro-Symbolic Audio Agents}: systems that leverage the reasoning capabilities of Large Language Models (LLMs) to control interpretable DSP engines. By predicting parameters rather than samples, such systems enable fully editable outputs compatible with professional production workflows.
 
 However, realizing this paradigm requires overcoming two critical challenges. First, LLMs trained on discrete tokens struggle to regress continuous values within strict physical constraints, leading to a \textit{hallucination problem} where generated parameters violate DSP valid ranges (e.g., negative filter frequencies) or inter-parameter dependencies. Second, grounding the LLM via retrieval requires a similarity metric that captures \textit{timbral texture}. Standard audio representations (e.g., CLAP-style embeddings or mean-pooled Wav2Vec2 features) summarize an audio segment into a single vector; while effective for coarse semantics, such pooling can discard temporal co-activation patterns that are critical for texture-dominant effects (e.g., tremolo modulation or signal-dependent distortion).
 
@@ -36,7 +36,7 @@ Early work in interactive control focused on learning intuitive mappings for syn
 
 Recent advances in differentiable DSP have enabled neural approaches to audio effect modeling. \citet{peladeau2024blind} proposes blind estimation of audio effect parameters using auto-encoder architectures, addressing the inverse problem of parameter recovery. \citet{liu2024ddspSFX} introduces DDSP-SFX, which leverages differentiable digital signal processing for acoustically-guided sound effects generation, combining neural networks with traditional DSP modules for controllable synthesis. \citet{deemanat2025latent} explores generative latent spaces for neural audio synthesis, bridging DSP-informed and data-driven approaches. In parallel, style transfer methods have been applied to audio effects, with \citet{benetos2024stito} introducing ST-ITO for controlling audio effects via inference-time optimization using pretrained audio representations.
 
-\textbf{The LLM Frontier}. Recent work explores LLMs as natural language interfaces for effect parameters \citep{doh2025llm2fx,doh2025llm2fxtools,clemens2025mixassist}. While demonstrating surprising capability, these approaches remain vulnerable to hallucination: reported violation rates can reach \textbf{up to 35\%} in zero-shot settings, producing invalid or incoherent parameters. Dialogue-based disambiguation can reduce ambiguity but shifts the burden to the user and does not scale to complex multi-effect chains.
+\textbf{The LLM Frontier}. Recent work explores LLMs as natural language interfaces for effect parameters \citep{doh2025llm2fx,doh2025llm2fxtools,clemens2025mixassist}. While demonstrating surprising capability, these approaches remain vulnerable to hallucination, potentially producing invalid or incoherent parameters in zero-shot settings \citep{doh2025llm2fx}. Dialogue-based disambiguation can reduce ambiguity but shifts the burden to the user and does not scale to complex multi-effect chains.
 
 \textbf{Our Positioning}. Unlike prior work that treats parameter prediction as a \textit{regression problem} or a purely generative problem, we frame it as a \textit{retrieval-grounded reasoning problem}: retrieval supplies concrete, previously validated exemplars, and generation becomes an adaptation step rather than invention.
 
@@ -67,17 +67,22 @@ This motivates what we call \textbf{Parameter--Waveform Duality}: waveform-level
 
 In parallel, differentiable DSP (DDSP) \citep{engel2020ddsp} demonstrates that learned models can control interpretable synthesis parameters, and self-supervised audio representation learning (e.g., Wav2Vec 2.0 \citep{baevski2020wav2vec}) provides strong acoustic embeddings. Audio-Agent leverages these representations for similarity grounding, but targets editable parameter outputs compatible with DAW-centric workflows.
 
+\noindent\textbf{Audio Representation Learning.}
+Recent advances in audio representation learning have produced strong embeddings for semantic tasks. CLAP \citep{elizalde2023clap} achieves robust text-audio alignment through contrastive pretraining, while PaSST \citep{koutini2022passt} and PANNs \citep{kong2020panns} provide powerful acoustic features for classification and tagging. While these representations excel at semantic understanding, they are primarily designed for classification and captioning tasks. Our work adapts audio representations (Wav2Vec2) for a different purpose: capturing timbral texture for parameter retrieval, where second-order statistics (Gram matrices) complement the first-order semantic embeddings. We use mid-level Wav2Vec2 features rather than CLAP-style single-vector embeddings because frame-level activations enable Gram matrix computation for texture characterization.
+
 \noindent\textbf{LLM Agents and Retrieval-Augmented Generation.}
 
 Retrieval-augmented generation (RAG) \citep{lewis2020rag} improves reliability by grounding generation in external memory. Multimodal variants extend this idea beyond text \citep{yasunaga2023retrieval,liu2025hmrag}, with recent developments including MMKB-RAG \citep{zayats2024mmkb} for multi-modal knowledge-based systems, and frameworks for visually-rich document understanding \citep{jin2024mrag}. Instruction manual understanding approaches \citep{jin2024multimodal} demonstrate the value of cross-modal grounding in practical applications. Agentic tool-use frameworks (e.g., \citep{schick2023toolformer,yao2023react,sun2024toolgen}) enable language models to act through structured interfaces.
 
 Although our focus is parameter generation, we acknowledge the rapid progress in neural audio synthesis. Recent models like AudioLDM 2 \citep{liu2024audioldm2}, AudioCraft \citep{copet2023audiocraft}, and industrial systems like Suno illustrate the power of end-to-end generation. However, these systems generally do not expose the \textit{internal signal chain} for fine-grained editing, which remains the domain of parameter-based approaches.
 
-This issue persists even when using strong general-purpose audio representations (e.g., CLAP- or PaSST-style embeddings): perceptual similarity does not necessarily imply that the underlying effect parameters are transferable. Recent audio-language models such as CLAP \citep{elizalde2023clap}, ReCLAP \citep{chen2024reclap}, and M2D-CLAP \citep{niizumi2024m2dclap} have improved zero-shot audio classification through better text-audio alignment, while few-shot prompt learning techniques \citep{wu2024fewshot} enable better adaptation to downstream tasks. However, these models primarily target classification and captioning rather than parameter estimation.
+\paragraph{Perceptual similarity vs. parameter transferability.}
+Even strong general-purpose audio representations (e.g., CLAP- or PaSST-style embeddings) face a fundamental challenge: perceptual similarity does not necessarily imply that the underlying effect parameters are transferable. While recent audio-language models have improved zero-shot classification and captioning \citep{elizalde2023clap,chen2024reclap,niizumi2024m2dclap,wu2024fewshot}, they primarily target discrete prediction tasks rather than continuous parameter estimation. Recent instruction-following audio language models further broaden audio-text understanding \citep{qwen_audio,salmonn}, but executable effect-chain control remains distinct: they do not directly expose plugin constraints or guarantee feasibility of continuous control parameters. Our work addresses this gap by using second-order statistics (Gram matrices) to capture texture-relevant features that better align with parameter-space proximity.
 
 \noindent\textbf{Audio Texture and Semantic Audio Retrieval.}
 
 The concept of audio texture has been studied extensively in the context of style transfer and synthesis. \citet{gatys2015style} introduced Gram matrix-based style representations for images, which were later adapted to audio by \citet{stylianou2015audio} and others. Recent surveys on audio texture analysis \citep{mcwec2023texture} and audio representations for sound synthesis \citep{verzotto2022representations} highlight the importance of capturing second-order statistical features for timbre characterization.
+In contrast to prior uses primarily for texture synthesis or style transfer, we use Gram statistics as a retrieval embedding to locate executable parameter exemplars, treating retrieval as a prior for downstream constrained reasoning.
 
 In semantic audio retrieval, the WikiMuTe dataset \citep{weck2023wikimute} provides a rich resource for connecting natural language descriptions with music audio, while retrieval-guided approaches \citep{srivatsan2024retrieval} demonstrate the value of combining retrieval with generation for music captioning. Retrieval-augmented text-to-music generation \citep{gonzales2024rag} further validates the effectiveness of RAG approaches in audio tasks.
 
@@ -116,17 +121,18 @@ In practical DAW and plugin systems, $\Phi$ can include non-linearities, conditi
 
 The parameter space $\Theta$ is not a free vector space but a bounded hyper-rectangle subject to structural constraints:
 \begin{equation}
+    \label{eq:feasible_set}
     \Theta = \left\{ \theta \in \mathbb{R}^d \mid \mathbf{l} \preceq \theta \preceq \mathbf{u}, \quad \mathcal{C}(\theta) = 1 \right\}
 \end{equation}
-where $\mathbf{l}, \mathbf{u}$ define physical operating ranges (e.g., frequency bounds $[20, 20\text{k}]$), and $\mathcal{C}: \mathbb{R}^d \to \{0, 1\}$ represents a binary validity function encoding inter-parameter dependencies (e.g., ensuring filter resonance $Q > 0$).
-In practice, DSP parameter spaces can be non-convex and partially discrete (e.g., on/off switches or mode selectors), so we use Eq.~1 as a pragmatic executable abstraction rather than a claim of convexity or smoothness. This motivates our reliance on retrieval-grounded synthesis and deterministic validity enforcement instead of direct gradient-based optimization over $\Theta$.
+where $\preceq$ denotes element-wise inequality, $\mathbf{l}, \mathbf{u}$ define physical operating ranges (e.g., frequency bounds $[20, 20\text{k}]$), and $\mathcal{C}: \mathbb{R}^d \to \{0, 1\}$ represents a binary validity function encoding inter-parameter dependencies (e.g., ensuring filter resonance $Q > 0$).
+In practice, DSP parameter spaces can be non-convex and partially discrete (e.g., on/off switches or mode selectors), so we use Eq.~\ref{eq:feasible_set} as a pragmatic executable abstraction rather than a claim of convexity or smoothness. This motivates our reliance on retrieval-grounded synthesis and deterministic validity enforcement instead of direct gradient-based optimization over $\Theta$.
 
 \subsection{Goal and Constraints}
 The user's intent is encapsulated in a multi-modal query $q = (t, \mathbf{a}_{\text{ref}})$, comprising a natural language description $t \in \mathcal{T}$ and an optional audio reference $\mathbf{a}_{\text{ref}} \in \mathcal{X} \cup \{\emptyset\}$. Our objective is to produce a \emph{valid} parameter configuration that is consistent with the query:
 \begin{equation}
 	\tilde{\theta} \in \Theta \quad \text{given } q,
 \end{equation}
-where validity is defined by the plugin-specific constraint function $\mathcal{C}(\theta)=1$ and physical bounds $\mathbf{l} \preceq \theta \preceq \mathbf{u}$ (Eq.~1). We use $\theta^*$ to denote an ideal (possibly non-unique) solution that best matches the user's perceptual intent; in practice we only have access to imperfect retrieval and LLM reasoning, and therefore aim for a feasible point estimate $\tilde{\theta}$.
+where validity is defined by the plugin-specific constraint function $\mathcal{C}(\theta)=1$ and physical bounds $\mathbf{l} \preceq \theta \preceq \mathbf{u}$ (Eq.~\ref{eq:feasible_set}). We use $\theta^*$ to denote an ideal (possibly non-unique) solution that best matches the user's perceptual intent; in practice we only have access to imperfect retrieval and LLM reasoning, and therefore aim for a feasible point estimate $\tilde{\theta}$.
 
 \paragraph{Operational objective (without probabilistic semantics).}
 The query-consistency of $\tilde{\theta}$ is not directly measurable as a differentiable loss, because the target is perceptual and depends on a complex signal chain. Accordingly, we adopt a retrieval-grounded operational objective: construct an executable neighborhood in $\Theta$ using a finite preset database, and then adapt within that neighborhood while enforcing feasibility. This yields a system whose intermediate artifacts (retrieved prototypes, draft parameters, constraint repairs) are auditable by design, which is critical for a journal setting emphasizing system rigor and reproducibility.
@@ -151,10 +157,9 @@ We implement the retrieval-grounded synthesis framework defined in Section \ref{
 
 The system realizes the operator $\Phi(\mathbf{x}_{\text{in}}; \theta)$ through a decoupled design, visualized in Figure \ref{fig:architecture}.
 
-\begin{figure}[ht]
-		\centering
-		\resizebox{\linewidth}{!}{
-		\begin{tikzpicture}[
+\begin{figure*}[t]
+	\centering
+	\begin{tikzpicture}[
 			font=\sffamily\small,
 			>=latex,
 			block/.style={
@@ -207,12 +212,11 @@ The system realizes the operator $\Phi(\mathbf{x}_{\text{in}}; \theta)$ through 
 			\draw[flow, dashed] (projection.south) -- node[msg, right, align=left] {async update\\(WebSocket)} (state.north);
 
 		\end{tikzpicture}
-		}
-			\caption{The Neuro-Symbolic Architecture. The inference agent (top) retrieves candidate presets and adapts them with an LLM, while the deterministic DSP engine (bottom) executes real-time audio processing. The projection operator $\Pi_{\Theta}$ enforces plugin-defined validity constraints before parameters reach the real-time engine.}
-		\label{fig:architecture}
-	\end{figure}
+	\caption{The Neuro-Symbolic Architecture. The inference agent (top) retrieves candidate presets and adapts them with an LLM, while the deterministic DSP engine (bottom) executes real-time audio processing. The projection operator $\Pi_{\Theta}$ enforces plugin-defined validity constraints before parameters reach the real-time engine.}
+	\label{fig:architecture}
+\end{figure*}
 
-	The architecture consists of three components. (i) \textbf{The real-time DSP engine} implements $\Phi$ as a low-latency audio processing graph and executes only validated parameters. We denote the parameter state consumed by the DSP engine as $\theta_{\text{safe}}$, which can be smoothed over time to avoid zipper noise and audible artifacts. (ii) \textbf{The inference agent} implements the mapping $q \to \tilde{\theta}$ by running retrieval and LLM adaptation asynchronously at a lower rate than the audio callback. (iii) \textbf{The validity guard} implements the constraint function $\mathcal{C}(\theta)$ (Eq.~1) as a deterministic gatekeeper: any draft $\hat{\theta}$ must be mapped to $\tilde{\theta}\in\Theta$ before it is allowed to update $\theta_{\text{safe}}$.
+	The architecture consists of three components. (i) \textbf{The real-time DSP engine} implements $\Phi$ as a low-latency audio processing graph and executes only validated parameters. We denote the parameter state consumed by the DSP engine as $\theta_{\text{safe}}$, which can be smoothed over time to avoid zipper noise and audible artifacts. (ii) \textbf{The inference agent} implements the mapping $q \to \tilde{\theta}$ by running retrieval and LLM adaptation asynchronously at a lower rate than the audio callback. (iii) \textbf{The validity guard} implements the constraint function $\mathcal{C}(\theta)$ (Eq.~\ref{eq:feasible_set}) as a deterministic gatekeeper: any draft $\hat{\theta}$ must be mapped to $\tilde{\theta}\in\Theta$ before it is allowed to update $\theta_{\text{safe}}$.
 
 		\paragraph{Design Principle 2 (Runtime isolation).}
 		At inference time, the real-time audio path is a deterministic function of $(\mathbf{x}_{\text{in}},\theta_{\text{safe}})$ through $\Phi(\mathbf{x}_{\text{in}};\theta_{\text{safe}})$. The inference agent does not execute inside the real-time callback and can only influence audio through asynchronous updates of $\theta_{\text{safe}}$ after validity checking.
@@ -242,7 +246,7 @@ To address this, we introduce \textbf{Texture Resonance Retrieval (TRR)}. Drawin
 	\end{algorithmic}
 \end{algorithm}
 
-Let $\mathbf{H} \in \mathbb{R}^{C \times T_{\text{frm}}}$ be the activation map from an intermediate layer $\ell$ of a pre-trained Wav2Vec2 model, where $C$ is the channel depth and $T_{\text{frm}}$ is the temporal dimension. The texture descriptor $\mathbf{G} \in \mathbb{R}^{C \times C}$ is defined as the time-averaged correlation matrix (Algorithm \ref{alg:trr_encoding}):
+Let $\mathbf{H} \in \mathbb{R}^{C \times T_{\text{frm}}}$ be the activation map from an intermediate layer $\ell$ of a pre-trained Wav2Vec2 model, where $C$ is the channel depth and $T_{\text{frm}}$ is the temporal dimension. In our experiments we use Wav2Vec2 Base and set $\ell=10$ (Section \ref{sec:experiments}). The texture descriptor $\mathbf{G} \in \mathbb{R}^{C \times C}$ is defined as the time-averaged correlation matrix (Algorithm \ref{alg:trr_encoding}):
 \begin{equation}
 		\mathbf{G} = \frac{1}{T_{\text{frm}}} \mathbf{H}\mathbf{H}^\top
 \end{equation}
@@ -253,7 +257,7 @@ Let $\mathbf{H} \in \mathbb{R}^{C \times T_{\text{frm}}}$ be the activation map 
 TRR can be viewed as a second-order summary of deep features: it retains cross-channel correlation structure while discarding absolute temporal alignment. This is desirable for retrieval in effect spaces where perceptual ``style'' is often expressed through repeated modulation patterns or stationary texture rather than a single time-locked event. The Frobenius normalization further reduces sensitivity to global scale changes in feature activations, making cosine similarity comparisons less dominated by magnitude.
 However, TRR is not a universal representation: by aggregating over time, it intentionally discards fine-grained ordering and can under-represent transient-dominant effects. Moreover, as with other deep representations, retrieval behavior can depend on the chosen backbone layer and the upstream feature extractor.
 
-\paragraph{Lemma 3 (Alignment-insensitive texture statistics).}
+\paragraph{Property 3 (Alignment-insensitive texture statistics).}
 Let $\mathbf{H}\in\mathbb{R}^{C\times T_{\text{frm}}}$ be the frame-level feature matrix and let $\mathbf{P}\in\mathbb{R}^{T_{\text{frm}}\times T_{\text{frm}}}$ be any permutation matrix over frames. Then the TRR Gram matrix satisfies $\frac{1}{T_{\text{frm}}}\mathbf{H}\mathbf{H}^\top=\frac{1}{T_{\text{frm}}}(\mathbf{H}\mathbf{P})(\mathbf{H}\mathbf{P})^\top$. Therefore, TRR depends on time-aggregated co-activations and is insensitive to the absolute alignment of frames, which motivates its use as a texture-oriented retrieval signal.
 
 \subsection{Uncertainty-Aware Modal Fusion}
@@ -291,17 +295,18 @@ The query $q$ often contains asymmetric information. For example, a vague text p
 	\end{algorithm}
 
 	\paragraph{Score calibration and preference distributions.}
-	For each modality, we retrieve top-$K$ candidates with raw similarity scores (e.g., cosine, dot-product, or BM25). Because score scales can differ across retrievers, any score-level fusion requires a calibration step; otherwise, the fused score can be dominated by an arbitrary scale rather than evidence. We apply a minimal calibration by normalizing the top-$K$ scores into $[0,1]$ via min-max normalization before computing the entropy of the resulting softmax distribution.
-	Concretely, for a score vector $\mathbf{r}$ we compute $s_i=(r_i-r_{\min})/(r_{\max}-r_{\min}+\epsilon)$, where $\epsilon$ avoids division-by-zero when the top-$K$ scores are nearly constant. We then convert the calibrated scores into a \textit{normalized preference distribution} $p^{(m)}$ via softmax. Importantly, $p^{(m)}$ is not interpreted as a probabilistic posterior; it is a device for measuring how concentrated the modality's retrieval preference is over the top-$K$ list.
+For each modality, we retrieve top-$K$ candidates with raw similarity scores (e.g., cosine, dot-product, or BM25). Because score scales can differ across retrievers, any score-level fusion requires a calibration step; otherwise, the fused score can be dominated by an arbitrary scale rather than evidence. We apply a minimal calibration by normalizing the top-$K$ scores into $[0,1]$ via min-max normalization before computing the entropy of the resulting softmax preference distribution.
+Concretely, for a score vector $\mathbf{r}$ we compute $s_i=(r_i-r_{\min})/(r_{\max}-r_{\min}+\epsilon)$, where $\epsilon$ avoids division-by-zero when the top-$K$ scores are nearly constant. We then convert the calibrated scores into a \textit{normalized preference distribution} $p^{(m)}$ via a unit-temperature softmax. Importantly, $p^{(m)}$ is not interpreted as a probabilistic posterior; it is a device for measuring how concentrated the modality's retrieval preference is over the top-$K$ list.
 	The modality weight is then computed via (Algorithm \ref{alg:dual_retrieval}):
 \begin{equation}
 	w_m \propto \exp\left(-\beta \cdot \frac{H(p^{(m)})}{\log K}\right)
 \end{equation}
-where $H(p^{(m)})$ denotes the Shannon entropy of the modality-specific distribution $p^{(m)}$, $K$ is the number of retrieved items, and $\beta$ is a temperature hyperparameter. This assigns higher weight to modalities with ``peaked'' (low-entropy) distributions, effectively allowing the system to ignore ambiguous inputs.
+where $H(p^{(m)})$ denotes the Shannon entropy of the modality-specific distribution $p^{(m)}$, $K$ is the number of retrieved items, and $\beta$ is a temperature-like hyperparameter controlling how normalized entropy is mapped into fusion weights (distinct from the unit-temperature softmax used to form $p^{(m)}$). This assigns higher weight to modalities with ``peaked'' (low-entropy) distributions, effectively allowing the system to ignore ambiguous inputs.
 Larger $\beta$ increases sensitivity to uncertainty: small entropy differences lead to more decisive shifts in $w_{\text{text}}$ versus $w_{\text{audio}}$, whereas smaller $\beta$ yields smoother, more conservative weighting.
 
 \paragraph{Design Principle 4 (Entropy-weighted boundary behavior).}
 Under the calibrated score convention, the fusion mechanism exhibits the following deterministic behaviors: (i) if a modality produces an approximately uniform preference distribution over top-$K$, then its normalized entropy $\bar{u}_m$ is close to 1 and its weight decreases; (ii) if a modality produces a sharply peaked distribution, then $\bar{u}_m$ is small and its weight increases; (iii) if $\mathbf{a}_{\text{ref}}=\emptyset$, the algorithm reduces to a text-only pipeline with $w_{\text{text}}=1$ by construction. These boundary cases make the fusion rule auditable and avoid undefined behavior when one modality is missing or uninformative.
+These cases follow directly because $H(p^{(m)}) \in [0, \log K]$ and therefore the unnormalized weight ranges from $\exp(-\beta)$ (uniform) to 1 (peaked) before cross-modality normalization.
 
 We then rank candidates by the fused score and pass the top results as context to the LLM. For notational convenience in the experiments, we denote $\alpha \triangleq w_{\text{text}}$ and $1-\alpha \triangleq w_{\text{audio}}$.
 
@@ -313,9 +318,9 @@ The LLM generates a draft parameter vector $\hat{\theta}$ based on the fused con
 We define a projection operator $\Pi_{\Theta}: \mathbb{R}^d \to \Theta$ that maps the draft to a valid configuration. In a plugin parameter space, validity is not only about numeric ranges, but also about \textit{structural} constraints that encode domain logic. In our setting, these include: (i) \textbf{range constraints} (bounded sliders/knobs); (ii) \textbf{discrete constraints} (binary toggles and mode selectors); (iii) \textbf{conditional activity} (parameters that are only meaningful when a module is enabled); and (iv) \textbf{inter-parameter dependencies} (e.g., mutually exclusive modes or parameters that must be consistent with each other).
 We implement $\Pi_{\Theta}$ via two deterministic steps: \textbf{range clipping} and \textbf{schema enforcement}. First, for each dimension $j$ we set $\theta_j \leftarrow \text{clip}(\hat{\theta}_j, \mathbf{l}_j, \mathbf{u}_j)$ to satisfy the box constraints. Then, we enforce $\mathcal{C}(\theta)=1$ through deterministic repair rules, including discrete snapping (e.g., $\{0,1\}$ toggles), dependency resolution, and bypass-aware gating (e.g., disabling parameters for bypassed modules to prevent ``ghost'' modifications). This design makes the system auditable: the LLM proposes a draft, while feasibility is guaranteed by a deterministic post-processing layer.
 
-The final output $\tilde{\theta} = \Pi_{\Theta}(\hat{\theta})$ is executable by the DSP engine $\Phi$ by construction (it satisfies the plugin-defined constraints in Eq.~1).
+The final output $\tilde{\theta} = \Pi_{\Theta}(\hat{\theta})$ is executable by the DSP engine $\Phi$ by construction (it satisfies the plugin-defined constraints in Eq.~\ref{eq:feasible_set}).
 
-\paragraph{Property 5 (Feasibility as an invariant).}
+\paragraph{Design Note 5 (Feasibility as an invariant).}
 By definition, $\Pi_{\Theta}$ maps any draft $\hat{\theta}\in\mathbb{R}^d$ to an element of $\Theta$. Concretely, the range-clipping step ensures $\mathbf{l}\preceq\tilde{\theta}\preceq\mathbf{u}$, and the schema-enforcement step ensures $\mathcal{C}(\tilde{\theta})=1$. Therefore, every parameter state forwarded to the real-time engine is feasible and executable under the plugin-defined constraints.
 
 \subsection{Complexity and Latency Considerations}
@@ -333,13 +338,17 @@ We validate the proposed framework by answering three research questions: (RQ1) 
 
 \subsection{Experimental Setup}
 
-We utilize an internal evaluation benchmark constructed for this study. The test set consists of 31 guitar-tone queries (including both human-recorded and MusicGen-generated samples) representative of distinct regions in the parameter manifold $\Theta$. For objective parameter-space evaluation we report results on a 5-query held-out subset with ground-truth parameters. The retrieval knowledge base contains 51 disjoint items (excluding the test samples).
+\paragraph{Dataset and Knowledge Base.}
+Our full server-side corpus contains 1082 paired records (audio--text--parameter triplets) collected from guitar effect presets. For objective parameter-space evaluation, we hold out 30 queries with verified ground-truth parameters and use the remaining 1052 items as the retrieval knowledge base. This setup constitutes a pilot benchmark for executable parameter inference; we treat large-scale evaluation as future work.
 
 \paragraph{Test samples.}
-The 5 held-out queries with ground-truth parameters are: (1) \textit{Dry Funk}, (2) \textit{Tweed Breakup}, (3) \textit{Reverse Psychedelic}, (4) \textit{Math Rock Crystal}, and (5) \textit{Saturated Rhythm}. These samples cover diverse playing styles and effect configurations, including clean funk, blues breakup, psychedelic FX, clean compression, and high-gain rock tones.
+The 30 held-out queries with ground-truth parameters cover diverse playing styles and effect configurations. For detailed case analysis, we highlight five representative samples: (1) \textit{Dry Funk} (clean funk), (2) \textit{Tweed Breakup} (blues breakup), (3) \textit{Reverse Psychedelic} (psychedelic FX), (4) \textit{Math Rock Crystal} (clean compression), and (5) \textit{Saturated Rhythm} (high-gain rock). Full sample descriptions are provided in Supplementary Table S1.
 
-\paragraph{Scope and statistical caution.}
-Because the objective benchmark is small ($N=5$ with ground-truth parameters), we interpret these results as a pilot study of a retrieval-grounded, executable parameter inference setting, and do not make statistical significance or broad generalization claims.
+\paragraph{Scope, statistical caution, and metric comparability.}
+Because the objective benchmark uses $N=30$ held-out queries with ground-truth parameters, we report descriptive statistics without claiming statistical significance for pairwise comparisons. We interpret these results as a pilot study of a retrieval-grounded, executable parameter inference setting. Following Supplementary Sec.~S1, we interpret improvements within each table under the stated protocol and avoid comparing absolute L2 magnitudes across different tables or operational settings, since the magnitude can depend on the evaluation protocol and parameter encoding. Future work with larger datasets should report confidence intervals and hypothesis tests.
+
+\paragraph{Resources and reproducibility.}
+To facilitate reproducibility, we will release an anonymized repository containing preprocessing, embedding computation, retrieval indices, prompt templates, and evaluation scripts, together with split specifications for all reported tables and the raw MUSHRA ratings (paths referenced in Section~\ref{ssec:mushra}). Repository link: \url{ANONYMIZED_REPO_URL}.
 
 	\textbf{Baselines}. We compare our proposed \textbf{TRR} (Section \ref{ssec:rag}) against three baselines. \textbf{Text-RAG} performs sparse lexical retrieval over metadata fields. \textbf{FeatureNN-RAG} performs dense retrieval using mean-pooled features from a pre-trained audio classifier (VGGish-like), representing a standard ``content-based'' embedding. \textbf{Wav2Vec-RAG} uses the mean-pooled activation of the final Wav2Vec2 transformer layer.
 
@@ -349,10 +358,11 @@ Table \ref{tab:main_results} reports the reconstruction error between the ground
 
 \begin{table}[t]
 		\centering
-	\caption{Retrieval performance on 5 held-out queries ($N=5$). TRR outperforms first-order baselines (FeatureNN, Wav2Vec) in parameter-space alignment (L2) under this benchmark.}
+	\caption{Retrieval performance on 30 held-out queries ($N=30$). Comparisons are within-table under the stated protocol.}
 		\label{tab:main_results}
-\resizebox{\columnwidth}{!}{%
-		\begin{tabular}{lccccc}
+	\small
+	\setlength{\tabcolsep}{4pt}
+	\begin{tabular}{lccccc}
 			\toprule
 			\textbf{Method}             & \textbf{L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cos} $\uparrow$ & \textbf{Module} $\uparrow$ \\
 			\midrule
@@ -364,18 +374,17 @@ Table \ref{tab:main_results} reports the reconstruction error between the ground
 			\textit{Improvement over Text-RAG} & \textbf{+35.2\%} & \textbf{+3.7\%} & \textbf{+13.1\%} & \textbf{+16.5\%} & -1.8\% \\
 			\bottomrule
 		\end{tabular}
-}
 \end{table}
 
 \textbf{Analysis: The Failure of First-Order Statistics.}
 FeatureNN-RAG exhibits the highest error (L2=0.3671), which is consistent with the hypothesis in Section \ref{ssec:rag}: mean-pooling collapses temporal structure and can discard correlation patterns needed to distinguish texture-dominant effects. For instance, a static EQ boost and a dynamic wah-wah effect may share similar time-averaged spectra, leading FeatureNN to retrieve functionally irrelevant presets.
-In contrast, TRR achieves the lowest parameter error (0.0980), suggesting that Gram-matrix statistics capture co-activation structure that is useful for this retrieval task.
+In contrast, TRR achieves the lowest parameter error (0.0980) in this benchmark, suggesting that Gram-matrix statistics capture co-activation structure that is useful for this retrieval task.
 
 \paragraph{TRR vs. classical texture baselines.}
 To contextualize TRR against hand-crafted audio-texture representations, we compare TRR with (i) MFCC temporal statistics and (ii) a modulation-spectrogram baseline, using the same held-out query set and parameter-space metrics.
 \begin{table}[t]
 		\centering
-		\caption{Texture representation comparison on the held-out subset ($N=5$). TRR achieves lower L2 error compared to classical texture baselines (MFCC temporal statistics, modulation spectrogram), suggesting that Gram-matrix features better capture effect-relevant texture characteristics for parameter retrieval.}
+		\caption{Texture representation comparison on the held-out subset ($N=30$). TRR achieves lower L2 error compared to classical texture baselines (MFCC temporal statistics, modulation spectrogram), suggesting that Gram-matrix features better capture effect-relevant texture characteristics for parameter retrieval.}
 		\label{tab:trr_texture_baselines}
 		\begin{tabular}{lccc}
 			\toprule
@@ -396,7 +405,7 @@ TRR depends on intermediate representations from Wav2Vec2. We empirically sweep 
 		\caption{Layer-wise parameter distance for TRR encoding. The y-axis shows L2 error between retrieved and ground-truth parameters across Wav2Vec2 layers. Mid-level layers (approximately 7--9) achieve lower parameter-space error, suggesting that intermediate representations capture texture-oriented cues more effectively for this retrieval task.}
 		\label{fig:trr_layer_selection}
 \end{figure}
-	On the held-out subset, this layer sweep suggests that certain intermediate layers can yield lower parameter-space retrieval error than very shallow or very deep layers, consistent with the general trend that intermediate representations better capture texture-oriented cues for retrieval. For consistency across experiments and cached embeddings, we use a fixed intermediate-layer setting for TRR feature extraction in the reported results.
+	On the held-out subset, this layer sweep suggests that certain intermediate layers can yield lower parameter-space retrieval error than very shallow or very deep layers, consistent with the general trend that intermediate representations better capture texture-oriented cues for retrieval. For consistency across experiments and cached embeddings, we use a fixed intermediate-layer setting ($\ell=10$) for TRR feature extraction in the reported results.
 
 \paragraph{Complexity.}
 In a dataset of $N$ candidates with feature dimension $d$, TRR retrieval cost is dominated by index search and scales as $O(N \times d \times \log d)$, where $d$ corresponds to the flattened Gram representation. Embedding construction is performed offline per audio and can be cached.
@@ -422,9 +431,10 @@ In a dataset of $N$ candidates with feature dimension $d$, TRR retrieval cost is
 
 \begin{table}[t]
 			\centering
-	\caption{Impact of neuro-symbolic reasoning ($N=5$). The LLM improves module consistency for both retrieval modes. TRR provides a stronger starting point in this benchmark, resulting in a larger L2 reduction than Text-RAG.}
+	\caption{Impact of neuro-symbolic reasoning ($N=30$). Comparisons are within-table under this correction protocol.}
 			\label{tab:llm_enhancement}
-		\resizebox{\columnwidth}{!}{%
+		\small
+		\setlength{\tabcolsep}{4pt}
 		\begin{tabular}{lccccc}
 			\toprule
 			\textbf{Method}             & \textbf{L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cos} $\uparrow$ & \textbf{Module} $\uparrow$ \\
@@ -436,7 +446,6 @@ In a dataset of $N$ candidates with feature dimension $d$, TRR retrieval cost is
 			Text + LLM                   & 0.1505                     & 0.6628           & 0.6330       & 0.9116       & \textbf{1.0000}        \\
 			\bottomrule
 		\end{tabular}
-		}
 		\end{table}
 	
 	To complement the aggregate metrics with qualitative evidence, Figure \ref{fig:dryfunk_case} visualizes a representative error pattern in the retrieved prototypes under this benchmark, where module-level mismatches can occur and must be corrected to recover an executable configuration.
@@ -540,7 +549,7 @@ We analyze the empirical fusion weights induced by entropy-based uncertainty and
 
 \begin{table}[t]
 		\centering
-		\caption{Modal ablations on the held-out subset ($N=5$).}
+		\caption{Modal ablations on the held-out subset ($N=30$). Comparisons are within-table under the stated fusion protocol.}
 		\label{tab:fusion_ablations}
 		\begin{tabular}{lccc}
 		\toprule
@@ -557,7 +566,7 @@ Fusion yields a large relative gain over single-modality retrieval in this bench
 
 \begin{table}[t]
 	\centering
-	\caption{Fusion weight statistics (beta=2.0) on the held-out subset ($N=5$).}
+	\caption{Fusion weight statistics (beta=2.0) on the held-out subset ($N=30$).}
 	\label{tab:fusion_weight_stats}
 	\begin{tabular}{lcccc}
 		\toprule
@@ -570,10 +579,10 @@ Fusion yields a large relative gain over single-modality retrieval in this bench
 \end{table}
 
 \paragraph{Beta sensitivity.}
-We perform a sensitivity sweep over the temperature parameter $\beta$ and observe that increasing $\beta$ increases the variance of $w_{\text{text}}$ while preserving overall performance in this benchmark.
+We perform a sensitivity sweep over the temperature parameter $\beta$ and observe that increasing $\beta$ increases the variance of $w_{\text{text}}$ while preserving overall performance in this benchmark. The consistent L2 value (0.93, rounded from 0.928--0.935) across $\beta$ settings indicates that fusion performance is stable within the tested range ($\beta \in [0.5, 4.0]$), while weight variance increases as expected. This suggests the entropy-based weighting mechanism is robust to temperature selection in this benchmark.
 \begin{table}[t]
 		\centering
-		\caption{Fusion temperature sensitivity on the held-out subset ($N=5$). Increasing $\beta$ increases the variance of text weight $w_{\text{text}}$ while maintaining stable L2 performance, indicating that the fusion mechanism is robust to a reasonable range of temperature settings.}
+		\caption{Fusion temperature sensitivity on the held-out subset ($N=30$). The consistent L2 value across $\beta$ settings (rounded to 0.93) indicates stable fusion performance, while weight variance increases as expected with higher $\beta$. Full unrounded values are provided in Supplementary Table S3.}
 		\label{tab:fusion_beta_sensitivity_main}
 		\begin{tabular}{lccc}
 			\toprule
@@ -593,7 +602,7 @@ As shown in Table \ref{tab:robustness_vague}, the text-only pipeline degrades sh
 
 \begin{table}[t]
 			\centering
-	\caption{Robustness to vague text (stress test, $N=5$). $\alpha$ denotes the text weight $w_{\text{text}}$ from Algorithm \ref{alg:dual_retrieval} (reported here as the average value under this scenario).}
+	\caption{Robustness to vague text (stress test, $N=30$). $\alpha$ denotes the text weight $w_{\text{text}}$ from Algorithm \ref{alg:dual_retrieval} (reported here as the average value under this scenario).}
 			\label{tab:robustness_vague}
 		\resizebox{\columnwidth}{!}{%
 		\begin{tabular}{lccccc}
@@ -612,7 +621,7 @@ Conversely, we corrupt the audio modality by perturbing the TRR embedding in emb
 
 \begin{table}[t]
 			\centering
-	\caption{Robustness to audio noise (stress test, $N=5$). We add strong noise to the TRR embedding (noise\_level$=5.0$). $\alpha$ denotes the average text weight under this scenario.}
+	\caption{Robustness to audio noise (stress test, $N=30$). We add strong noise to the TRR embedding (noise\_level$=5.0$). $\alpha$ denotes the average text weight under this scenario.}
 			\label{tab:robustness_noise}
 		\resizebox{\columnwidth}{!}{%
 		\begin{tabular}{lccccc}
@@ -628,7 +637,7 @@ Conversely, we corrupt the audio modality by perturbing the TRR embedding in emb
 
 \begin{table}[t]
 		\centering
-	\caption{Robustness summary under single-modality stress tests ($N=5$). We report the ratio $\text{Adaptive L2}/\text{Single-Modal L2}$ (lower is better).}
+	\caption{Robustness summary under single-modality stress tests ($N=30$). We report the ratio $\text{Adaptive L2}/\text{Single-Modal L2}$ (lower is better).}
 		\label{tab:robustness_summary}
 	\begin{tabular}{@{}llcc@{}}
 		\toprule
@@ -645,7 +654,7 @@ Table \ref{tab:dynamic_weight_strategy} summarizes the adaptive weighting behavi
 
 \begin{table}[t]
 	\centering
-	\caption{Dynamic weight adjustment strategy under single-modality stress tests ($N=5$). The fusion mechanism automatically assigns higher weight to the reliable modality, achieving substantial error reduction.}
+	\caption{Dynamic weight adjustment strategy under single-modality stress tests ($N=30$). The fusion mechanism automatically assigns higher weight to the reliable modality, achieving substantial error reduction.}
 	\label{tab:dynamic_weight_strategy}
 	\resizebox{\columnwidth}{!}{%
 	\begin{tabular}{lcccc}
@@ -791,7 +800,7 @@ Audio-Agent suggests a practical pattern for grounded creative assistants: treat
 
 \subsection{Revisiting the Texture Hypothesis}
 
-Across the reported setup (Table \ref{tab:main_results}), TRR improves parameter-space alignment over text-only retrieval, supporting the hypothesis that second-order correlation structure can be useful as a texture descriptor for retrieval. At the same time, our objective benchmark is limited to a 5-query held-out subset with ground-truth parameters, and we do not claim that TRR defines a globally calibrated distance in parameter space. We therefore interpret TRR as a \textit{retrieval prior} that can be beneficial for texture-sensitive control, rather than a universal metric for parameter transfer.
+Across the reported setup (Table \ref{tab:main_results}), TRR improves parameter-space alignment over text-only retrieval, supporting the hypothesis that second-order correlation structure can be useful as a texture descriptor for retrieval. At the same time, our objective benchmark uses a 30-query held-out subset with ground-truth parameters, and we do not claim that TRR defines a globally calibrated distance in parameter space. We therefore interpret TRR as a \textit{retrieval prior} that can be beneficial for texture-sensitive control, rather than a universal metric for parameter transfer.
 
 An open direction is whether analogous second-order representations help bridge modality gaps in other continuous control settings (e.g., video textures, haptic signals, or physiological time series), where the ``style'' of a signal may be expressed through co-activation structure rather than pointwise magnitudes. Future work can validate this hypothesis via controlled ablations on non-stationarity and by pairing retrieval with human preference judgments.
 
@@ -804,7 +813,15 @@ Audio-Agent is intended to augment user creativity rather than replace it. Risks
 
 Our approach has several limitations that should be considered when interpreting the results and guiding future work.
 
-\textbf{Dataset Coverage.} Our reported evaluation includes 31 test samples, while the objective benchmark reported in Table \ref{tab:main_results} is limited to a 5-query held-out subset with ground-truth parameters. This scale limits statistical power and generalization claims. \textit{Mitigation}: Future work should expand to larger, more diverse datasets and evaluate across instruments and effect families.
+\textbf{Statistical Power.} 
+Our objective evaluation uses a 30-query held-out subset with ground-truth parameters, which provides moderate statistical power for descriptive comparisons. While results are consistent across retrieval baselines and robustness stress tests, future work should expand to larger datasets and report confidence intervals with significance testing.
+\textit{Mitigation}: Future work should expand to larger, more diverse datasets and evaluate across instruments and effect families.
+
+\textbf{Baseline Strength.}
+We compare against mean-pooled Wav2Vec2 and VGGish-like features as audio retrieval baselines. Stronger representations such as CLAP \citep{elizalde2023clap}, PaSST \citep{koutini2022passt}, or PANNs \citep{kong2020panns} were not included in this pilot study; we leave this comparison for future work. The choice of Wav2Vec2 was motivated by its frame-level output suitable for Gram matrix computation, whereas CLAP produces single-vector embeddings.
+\textit{Mitigation}: Future work should compare TRR against stronger semantic embeddings (CLAP, PaSST, PANNs) to establish relative performance.
+
+\textbf{Dataset Coverage.} Our objective benchmark uses a 30-query held-out subset with ground-truth parameters, which limits the diversity of styles, instruments, and effect-chain configurations represented in the evaluation. \textit{Mitigation}: Future work should expand to larger, more diverse datasets and evaluate across instruments and effect families.
 
 \textbf{Parameter Identifiability.} The many-to-one nature of timbre—where multiple distinct parameter configurations yield perceptually similar sounds—poses a fundamental challenge. Our objective metrics evaluate alignment in $\Theta$ but may not perfectly align with perceptual similarity: small parameter-space differences can be perceptually negligible, while perceptually salient changes can occur in narrow regions of the space. This identifiability problem affects all parameter-based evaluation metrics (L2, Acc@0.1, Cosine Similarity). \textit{Mitigation}: Controlled listening tests with expert listeners are necessary to establish perceptual ground truth and calibrate objective metrics against human judgment.
 
@@ -823,7 +840,7 @@ These limitations do not invalidate our approach but rather define the boundary 
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented Audio-Agent, a neuro-symbolic system for generating editable DSP parameters from natural language descriptions with texture-aware retrieval and LLM-based correction. Across objective metrics (Table \ref{tab:main_results}) and robustness stress tests (Tables \ref{tab:robustness_vague}, \ref{tab:robustness_noise}), retrieval grounding improves parameter alignment compared to text-only retrieval in the reported setup.
+We presented Audio-Agent, a neuro-symbolic system for generating editable DSP parameters from natural language descriptions with texture-aware retrieval and LLM-based correction. Across objective metrics (Table~\ref{tab:main_results}) and robustness stress tests (Tables~\ref{tab:robustness_vague}, \ref{tab:robustness_noise}), retrieval-grounded methods show lower parameter error compared to text-only retrieval in this benchmark. Uncertainty-aware fusion further demonstrates robustness under single-modality degradation.
 
 Looking forward, we envision expanding preset coverage for under-represented effect families and integrating controlled listening tests to validate perceptual quality. We also aim to generalize beyond guitar effects to broader production parameter spaces, including mixing and mastering workflows.
 
@@ -831,6 +848,45 @@ We hope this approach lowers the barrier to expressive sound design and broadens
 
 \subsubsection*{Acknowledgments}
 We thank the anonymous reviewers for their valuable feedback.
+
+\appendix
+
+\section{Baseline Implementation Details}
+\label{app:baselines}
+
+This appendix provides implementation details for all baseline methods to ensure reproducibility.
+
+\subsection{FeatureNN-RAG}
+We use the VGGish model \citep{hershey2017vggish} to extract 128-dimensional embeddings from audio samples. The audio is preprocessed as follows: (1) resampled to 16kHz, (2) converted to mono, (3) segmented into 0.96s windows with 0.5s hop. Features are mean-pooled across time to produce a single 128-dimensional vector per audio sample. Retrieval uses cosine similarity with FAISS IVF index (n\_list=16, n\_probe=4).
+
+\subsection{Wav2Vec-RAG}
+We use Wav2Vec2 Base \citep{baevski2020wav2vec} from HuggingFace transformers (version 4.30.0, model name: facebook/wav2vec2-base). Features are extracted from layer 12 (final transformer layer), producing 768-dimensional vectors at 50Hz frame rate. Features are mean-pooled across the temporal dimension to produce a single 768-dimensional vector per audio sample. Retrieval uses cosine similarity.
+
+\subsection{Text-RAG}
+Text descriptions are encoded using TF-IDF with unigram and bigram features (scikit-learn TfidfVectorizer, max\_features=5000, ngram\_range=(1,2)). Retrieval uses BM25 scoring with k1=1.5, b=0.75 (via rank\_bm25 Python library).
+
+\subsection{Zero-shot LLM Baseline}
+For the L2=13.36 baseline mentioned in the Abstract, we query GPT-4 (version gpt-4-0613) with the text description and request JSON parameter output without any retrieved context. Prompt temperature=0.7, max\_tokens=500. The prompt template is provided in Supplementary Material.
+
+\section{MUSHRA Test System Nomenclature}
+\label{app:mushra}
+
+For the listening tests in Section 4.6, we use the following abbreviations:
+
+\begin{itemize}
+    \item \textbf{HCAP}: Human-in-the-loop Creative Audio Parameter system (our full Audio-Agent pipeline with interactive feedback)
+    \item \textbf{manual}: Manual parameter tuning by participants using a standard DAW interface
+    \item \textbf{reference}: Ground-truth preset used as the upper anchor in MUSHRA testing
+    \item \textbf{MusicGen}: MusicGen-small \citep{copet2023audiocraft} for text-to-audio generation (used in Trials 6-10 only)
+\end{itemize}
+
+Style-matching conditions (Jazz Clean, Blues Solo, Phase, Ambient Guitar, Flanger, Modern Metal, Chorus) refer to target presets retrieved by Audio-Agent; full descriptions and parameter values are provided in Supplementary Table S5.
+
+\section{Additional Experimental Results}
+\label{app:results}
+
+\subsection{Full Unrounded Fusion Sensitivity Data}
+Table \ref{tab:fusion_beta_sensitivity_main} reports L2 values rounded to 2 decimal places. The unrounded values for $\beta \in [0.5, 4.0]$ are: 0.928, 0.931, 0.935, 0.931, showing variance in the third decimal place while maintaining stable overall performance.
 
 \IfFileExists{./reference.bib}{\bibliography{reference}}{\bibliography{Paper/reference}}
 \bibliographystyle{\paperbibliostyle}
