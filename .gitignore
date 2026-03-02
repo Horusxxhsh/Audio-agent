@@ -198,6 +198,26 @@ PublishScripts/
 *.snupkg
 # The packages folder can be ignored because of Package Restore
 **/[Pp]ackages/*
+
+# -----------------------------------------------------------------------------
+# Audio-Agent local experiment assets (large / machine-specific)
+# -----------------------------------------------------------------------------
+
+# External full dataset drop-in (do not commit the raw JSON)
+Data/External_1267_211/dataset/*.json
+
+# Large rendered audio + embedding caches (keep small curated subset tracked; ignore new local adds)
+Data/Audio_Synthetic/*.wav
+Data/Audio_Synthetic/*.wav2vec.npy
+Data/Audio_Synthetic/*.trr.npy
+Data/Audio_Synthetic/*.clap.npy
+Data/Audio_Synthetic/*.mfcc.npy
+Data/Audio_Synthetic/*.py
+
+# Per-query dumps / stats reports generated locally
+Experiments/AblationStudies/protocolA_per_query_metrics.csv
+Experiments/AblationStudies/protocolA_objective_stats.json
+Experiments/AblationStudies/protocolA_objective_stats.md
 # except build/, which is used as an MSBuild target.
 !**/[Pp]ackages/build/
 # Uncomment if necessary however generally it will be regenerated when needed

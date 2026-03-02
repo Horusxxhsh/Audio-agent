@@ -21,8 +21,32 @@
 
 \section{Objective Metric Definitions and Protocol Notes}
 
-This supplementary material uses the same operational objective metrics defined in the main paper. Briefly, \textbf{Param. Dist.} is computed as RMSE between flattened numeric parameter leaves (missing keys treated as zero), \textbf{Acc@0.1} is the fraction of flattened numeric parameters within $\pm 0.1$, \textbf{Recall} measures recall over active parameters, \textbf{Cosine} is cosine similarity in the same flattened space, and \textbf{Module} is the Jaccard index over active DSP modules.
-Because these metrics are computed in parameter space, absolute values can depend on the parameter encoding and experimental setting; we therefore interpret improvements \emph{within} each table under the stated protocol and avoid comparing magnitudes across tables.
+This supplementary material uses the same operational objective metrics defined in the main paper. Briefly, \textbf{Param. Dist.} is computed as RMSE between flattened numeric parameter leaves (union of keys; missing numeric keys treated as zero; non-numeric leaves ignored), \textbf{Acc@0.1} is the fraction of flattened numeric parameters within $\pm 0.1$, \textbf{Recall} measures recall over active numeric parameters, \textbf{Cosine} is cosine similarity in the same flattened space, and \textbf{Module} is a schema-level Jaccard index over DSP modules inferred from the presence of keys ending in \texttt{On}. We do not apply per-parameter normalization, so RMSE magnitudes can be dominated by large-scale parameters.
+Because these metrics are computed in parameter space, absolute magnitudes can depend on the protocol (split, candidate pool, and schema used to form predicted parameter dictionaries); we therefore interpret improvements \emph{within} each table under the stated protocol and avoid comparing magnitudes across tables.
+
+\section{Representative Held-out Queries and Few-shot Exemplars}
+
+Table~\ref{tab:rep_queries_fewshot} lists the five representative held-out queries highlighted in the main paper and the corresponding few-shot ON/OFF exemplars used in Protocol-B.
+
+\begin{table}[h]
+	\centering
+	\caption{Representative held-out queries and few-shot ON/OFF exemplars (Protocol-B).}
+	\label{tab:rep_queries_fewshot}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{llll}
+		\toprule
+		\textbf{Query} & \textbf{Short description} & \textbf{ON modules} & \textbf{OFF modules} \\
+		\midrule
+		Dry Funk & clean funk & Compressor, Delay, Reverb, Chorus, Equaliser & Driver, Screamer, Flanger, Phaser \\
+		Tweed Breakup & blues breakup & Driver, Reverb, Equaliser & Compressor, Screamer, Delay, Chorus, Flanger, Phaser \\
+		Reverse Psychedelic & psychedelic FX & Equaliser & Compressor, Driver, Screamer, Delay, Reverb, Chorus, Flanger, Phaser \\
+		Math Rock Crystal & clean compression & Compressor, Delay, Reverb, Chorus, Equaliser & Driver, Screamer, Flanger, Phaser \\
+		Saturated Rhythm & high-gain rock & Driver, Reverb, Equaliser & Compressor, Screamer, Delay, Chorus, Flanger, Phaser \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
 
 \section{Direct Retrieval Method Comparison}
 
@@ -30,7 +54,7 @@ Table~\ref{tab:retrieval_methods_direct} reports a direct retrieval comparison t
 
 \begin{table}[h]
 	\centering
-	\caption{Direct retrieval comparison. Lower is better for Param. Dist.; higher is better for the other metrics. Comparisons are within-table under the stated protocol.}
+	\caption{Direct retrieval comparison (Protocol-A, $N=211$). Lower is better for Param. Dist.; higher is better for the other metrics. Comparisons are within-table under the stated protocol.}
 	\label{tab:retrieval_methods_direct}
 	\small
 	\resizebox{\linewidth}{!}{%
@@ -38,23 +62,148 @@ Table~\ref{tab:retrieval_methods_direct} reports a direct retrieval comparison t
 		\toprule
 		\textbf{Method} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
 		\midrule
-		TRR (Ours) & \textbf{0.3028} & \textbf{0.7145} & \textbf{0.6833} & \textbf{0.8399} & 0.9586 \\
-		Wav2Vec-RAG & 0.3679 & 0.6354 & 0.5589 & 0.7189 & 0.8919 \\
-		Text-RAG & 0.4560 & 0.6950 & 0.6266 & 0.7250 & 0.8478 \\
-		FeatureNN-RAG & 1.7211 & 0.6735 & 0.6453 & 0.7550 & \textbf{0.9613} \\
-		Pure LLM (no retrieval) & 13.3575 & 0.4379 & 0.2113 & 0.3736 & 0.6995 \\
+		TRR (Ours) & \textbf{0.3064} & \textbf{0.7253} & \textbf{0.6990} & \textbf{0.8376} & 0.9574 \\
+		Wav2Vec-RAG & 0.3625 & 0.6434 & 0.5748 & 0.7364 & 0.9116 \\
+		Text-RAG & 0.4573 & 0.7034 & 0.6407 & 0.7404 & 0.8625 \\
+		FeatureNN-RAG & 1.1729 & 0.6765 & 0.6485 & 0.7757 & \textbf{0.9602} \\
+		Pure LLM (no retrieval) & 13.6520 & 0.4361 & 0.2127 & 0.3779 & 0.7053 \\
 		\bottomrule
 	\end{tabular}
 	}
 \end{table}
 
-\section{LLM-Enhanced Retrieval (Few-shot Module Correction)}
+\section{Statistical Analysis for Objective Metrics}
 
-Table~\ref{tab:retrieval_methods_llm} reports a four-way comparison between retrieval-only and retrieval+LLM variants on a core subset. The LLM is prompted with 5 manually specified few-shot examples and is instructed to \textbf{ignore} retrieval-provided module hints, predicting only the ON/OFF pattern; parameters are then copied from the retrieved reference conditioned on the predicted ON/OFF pattern.
+For objective metrics, we report 95\% bootstrap confidence intervals over held-out queries and paired permutation tests for TRR versus each baseline (Holm-corrected across the TRR-vs-baseline comparisons). Bootstrap and permutation procedures are applied at the query level (paired across methods).
 
 \begin{table}[h]
 	\centering
-	\caption{LLM-enhanced retrieval comparison.}
+	\caption{Protocol-A: mean and 95\% bootstrap confidence intervals over held-out queries ($n=211$).}
+	\label{tab:protocolA_ci}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Method} & \textbf{Param. Dist.} & \textbf{Acc@0.1} & \textbf{Recall} & \textbf{Cosine} & \textbf{Module} \\
+		\midrule
+		FeatureNN-RAG & 1.1729 [0.6861, 1.7661] & 0.6765 [0.6448, 0.7074] & 0.6485 [0.6060, 0.6886] & 0.7757 [0.7305, 0.8160] & 0.9602 [0.9381, 0.9795] \\
+		TRR (Ours) & 0.3064 [0.2742, 0.3384] & 0.7253 [0.6950, 0.7545] & 0.6990 [0.6625, 0.7351] & 0.8376 [0.8061, 0.8682] & 0.9574 [0.9390, 0.9741] \\
+		Text-RAG & 0.4573 [0.3722, 0.5591] & 0.7034 [0.6715, 0.7337] & 0.6407 [0.5964, 0.6815] & 0.7404 [0.6959, 0.7819] & 0.8625 [0.8256, 0.8979] \\
+		Wav2Vec-RAG & 0.3625 [0.3257, 0.3997] & 0.6434 [0.6067, 0.6800] & 0.5748 [0.5270, 0.6211] & 0.7364 [0.6897, 0.7798] & 0.9116 [0.8794, 0.9403] \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\caption{Protocol-A: TRR improvements vs.\ baselines with 95\% confidence intervals and Holm-corrected permutation $p$-values. Positive $\Delta$ indicates TRR is better (defined as \texttt{baseline - TRR} for Param. Dist., and \texttt{TRR - baseline} for other metrics).}
+	\label{tab:protocolA_sig}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{llccc}
+		\toprule
+		\textbf{Baseline} & \textbf{Metric} & \textbf{Mean $\Delta$} & \textbf{95\% CI} & \textbf{$p$ (Holm)} \\
+		\midrule
+		FeatureNN-RAG & Param. Dist. & 0.8666 & [0.3768, 1.4664] & $1.5\times 10^{-3}$ \\
+		FeatureNN-RAG & Acc@0.1 & 0.0489 & [0.0313, 0.0676] & $1.5\times 10^{-3}$ \\
+		FeatureNN-RAG & Recall & 0.0505 & [0.0222, 0.0809] & $3.0\times 10^{-3}$ \\
+		FeatureNN-RAG & Cosine & 0.0620 & [0.0277, 0.0993] & $3.5\times 10^{-3}$ \\
+		FeatureNN-RAG & Module & -0.0028 & [-0.0296, 0.0253] & 0.842 \\
+		Text-RAG & Param. Dist. & 0.1509 & [0.0645, 0.2551] & $2.8\times 10^{-3}$ \\
+		Text-RAG & Acc@0.1 & 0.0220 & [0.0022, 0.0424] & 0.070 \\
+		Text-RAG & Recall & 0.0583 & [0.0257, 0.0924] & $3.5\times 10^{-3}$ \\
+		Text-RAG & Cosine & 0.0972 & [0.0609, 0.1364] & $1.5\times 10^{-3}$ \\
+		Text-RAG & Module & 0.0949 & [0.0626, 0.1292] & $1.5\times 10^{-3}$ \\
+		Wav2Vec-RAG & Param. Dist. & 0.0561 & [0.0314, 0.0814] & $1.5\times 10^{-3}$ \\
+		Wav2Vec-RAG & Acc@0.1 & 0.0819 & [0.0564, 0.1078] & $1.5\times 10^{-3}$ \\
+		Wav2Vec-RAG & Recall & 0.1242 & [0.0879, 0.1602] & $1.5\times 10^{-3}$ \\
+		Wav2Vec-RAG & Cosine & 0.1012 & [0.0688, 0.1361] & $1.5\times 10^{-3}$ \\
+		Wav2Vec-RAG & Module & 0.0458 & [0.0114, 0.0826] & 0.033 \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\section{Fusion Temperature Sensitivity}
+
+Table~\ref{tab:beta_sensitivity} reports a sensitivity sweep over fusion temperature $\beta$ under Protocol-C (see the main paper's Experimental Setup for split definitions). We report the induced text weight statistics and the resulting fused retrieval distance; comparisons are within-table under this protocol.
+
+\begin{table}[h]
+	\centering
+	\caption{Fusion sensitivity to $\beta$ (Protocol-C).}
+	\label{tab:beta_sensitivity}
+		\begin{tabular}{lcccccc}
+			\toprule
+			$\beta$ & $\mathbb{E}[w_{\text{text}}]$ & $\mathrm{Std}$ & $\min$ & $\max$ & Param. Dist. (Text) & Param. Dist. (Fusion) \\
+		\midrule
+		0.5 & 0.5007 & 0.0015 & 0.4986 & 0.5049 & 21.35 & 31.53 \\
+		1.0 & 0.5014 & 0.0030 & 0.4972 & 0.5097 & 21.35 & 31.53 \\
+		2.0 & 0.5028 & 0.0061 & 0.4945 & 0.5194 & 21.35 & 31.53 \\
+		4.0 & 0.5056 & 0.0121 & 0.4890 & 0.5388 & 21.35 & 31.53 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Wav2Vec2 Layer Sweep}
+
+Table~\ref{tab:layer_sweep} reports the layer-sweep diagnostic used to generate the layer-selection figure in the main paper.
+
+\begin{table}[h]
+	\centering
+		\caption{Layer sweep results (Protocol-A). Lower is better for parameter distance.}
+	\label{tab:layer_sweep}
+	\begin{tabular}{lc}
+		\toprule
+		Layer & Param. Distance \\
+		\midrule
+			1 & 6.5306 \\
+			2 & 5.7695 \\
+			3 & 6.0112 \\
+			4 & 6.0305 \\
+			5 & 6.4570 \\
+			6 & 6.7920 \\
+			7 & 6.3395 \\
+			8 & 6.1894 \\
+			9 & 5.8422 \\
+			10 & \textbf{5.4303} \\
+			11 & 6.5181 \\
+			12 & 6.0477 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Listening Test Stimulus Labels}
+
+Table~\ref{tab:mushra_style_labels} summarizes the labeled style-matching stimuli used in Trial~1 of the MUSHRA-style listening test described in the main paper.
+
+\begin{table}[h]
+	\centering
+	\caption{Trial 1 style-matching stimulus labels used in the listening test.}
+	\label{tab:mushra_style_labels}
+	\small
+	\begin{tabular}{ll}
+		\toprule
+		\textbf{Label} & \textbf{Interpretation} \\
+		\midrule
+		Jazz Clean & clean jazz tone target \\
+		Blues Solo & blues lead tone target \\
+		Phase & phaser/phase-effect target \\
+		Ambient Guitar & ambient guitar texture target \\
+		Flanger & flanger-effect target \\
+		Modern Metal & modern high-gain tone target \\
+		Chorus & chorus-effect target \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{LLM-Enhanced Retrieval (Few-shot Module Correction)}
+
+Table~\ref{tab:retrieval_methods_llm} reports a four-way comparison between retrieval-only and retrieval+LLM variants under Protocol-B (see the main paper's Experimental Setup for split definitions). The LLM is prompted with five manually specified few-shot examples and is instructed to \textbf{ignore} retrieval-provided module hints, predicting only the ON/OFF pattern; parameters are then copied from the retrieved reference conditioned on the predicted ON/OFF pattern.
+
+\begin{table}[h]
+	\centering
+	\caption{LLM-enhanced retrieval comparison (Protocol-B).}
 	\label{tab:retrieval_methods_llm}
 	\small
 	\resizebox{\linewidth}{!}{%
@@ -73,11 +222,11 @@ Table~\ref{tab:retrieval_methods_llm} reports a four-way comparison between retr
 
 \section{Robustness Stress Tests}
 
-We report two extreme stress-test settings where one modality is intentionally degraded. We use $\alpha$ to denote the \textbf{text} weight in the hybrid retriever (thus $1-\alpha$ is the audio weight). Metrics are the same as in Table~\ref{tab:retrieval_methods_direct}.
+We report two extreme stress-test settings where one modality is intentionally degraded under Protocol-C (see the main paper's Experimental Setup for split definitions). We use $\alpha$ to denote the \textbf{text} weight in the hybrid retriever (thus $1-\alpha$ is the audio weight). Metrics are the same as in Table~\ref{tab:retrieval_methods_direct}.
 
 \begin{table}[h]
 	\centering
-	\caption{Text-vague stress test.}
+	\caption{Text-vague stress test (Protocol-C).}
 	\label{tab:stress_text_vague}
 	\small
 	\resizebox{\linewidth}{!}{%
@@ -94,7 +243,7 @@ We report two extreme stress-test settings where one modality is intentionally d
 
 \begin{table}[h]
 	\centering
-	\caption{Audio-noise stress test.}
+	\caption{Audio-noise stress test (Protocol-C).}
 	\label{tab:stress_audio_noise}
 	\small
 	\resizebox{\linewidth}{!}{%
@@ -111,7 +260,7 @@ We report two extreme stress-test settings where one modality is intentionally d
 
 \begin{table}[h]
 	\centering
-	\caption{Dynamic weight summary. $\alpha$ denotes the text weight; the hybrid retriever compensates by increasing the weight of the non-degraded modality.}
+	\caption{Dynamic weight summary (Protocol-C). $\alpha$ denotes the text weight; the hybrid retriever compensates by increasing the weight of the non-degraded modality.}
 	\label{tab:stress_dynamic_weight_summary}
 	\small
 	\resizebox{\linewidth}{!}{%
@@ -124,73 +273,6 @@ We report two extreme stress-test settings where one modality is intentionally d
 		\bottomrule
 	\end{tabular}
 	}
-\end{table}
-
-\section{Objective Metrics for Listening Study (Trials 6--10)}
-
-Table~\ref{tab:objective_trials6_10} complements the subjective similarity ratings in Trials 6--10 with objective audio metrics computed against the same reference clips: Frechet Audio Distance with a VGGish backbone (FAD$_{\text{vgg}}$), KL divergence between PANN label distributions (KL$_{\text{pann}}$), and CLAP text--audio similarity (CLAP$_{\text{scr}}$).
-
-\begin{table}[h]
-	\centering
-	\caption{Objective metrics for Trials 6--10.}
-	\label{tab:objective_trials6_10}
-	\small
-	\begin{tabular}{lccc}
-		\toprule
-		\textbf{Model} & \textbf{FAD$_{\text{vgg}}$} $\downarrow$ & \textbf{KL$_{\text{pann}}$} $\downarrow$ & \textbf{CLAP$_{\text{scr}}$} $\uparrow$ \\
-		\midrule
-		MusicGen & 14.22 & 0.41 & \textbf{0.24} \\
-		Audio-Agent (Ours) & \textbf{13.48} & \textbf{0.33} & 0.21 \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-
-\section{Fusion Temperature Sensitivity}
-
-Table~\ref{tab:beta_sensitivity} reports the sensitivity sweep over fusion temperature $\beta$ under the same fixed evaluation protocol used in the main paper (1082 total records, 30 held-out queries, 1052 retrieval candidates).
-
-\begin{table}[h]
-	\centering
-	\caption{Fusion sensitivity to $\beta$ on the held-out subset ($N=30$). Results are reported as split-specific evidence under the fixed evaluation protocol.}
-	\label{tab:beta_sensitivity}
-		\begin{tabular}{lcccccc}
-			\toprule
-			$\beta$ & $\mathbb{E}[w_{\text{text}}]$ & $\mathrm{Std}$ & $\min$ & $\max$ & Param. Dist. (Text) & Param. Dist. (Fusion) \\
-		\midrule
-		0.5 & 0.5016 & 0.0015 & 0.4999 & 0.5036 & 13.15 & 0.93 \\
-		1.0 & 0.5031 & 0.0029 & 0.4999 & 0.5072 & 13.15 & 0.93 \\
-		2.0 & 0.5062 & 0.0058 & 0.4997 & 0.5145 & 13.15 & 0.93 \\
-		4.0 & 0.5124 & 0.0116 & 0.4995 & 0.5289 & 13.15 & 0.93 \\
-		\bottomrule
-	\end{tabular}
-\end{table}
-
-\section{Wav2Vec2 Layer Sweep}
-
-Table~\ref{tab:layer_sweep} reports the layer-sweep diagnostic used to generate the layer-selection figure in the main paper.
-
-\begin{table}[h]
-	\centering
-		\caption{Layer sweep results ($n=30$ in the reported setup). Lower is better for parameter distance.}
-	\label{tab:layer_sweep}
-	\begin{tabular}{lc}
-		\toprule
-		Layer & Param. Distance \\
-		\midrule
-			1 & 6.3970 \\
-			2 & 5.8823 \\
-			3 & 6.1054 \\
-			4 & 6.1241 \\
-			5 & 6.5368 \\
-			6 & 6.8611 \\
-			7 & 6.4030 \\
-			8 & 6.2779 \\
-			9 & 6.1369 \\
-			10 & \textbf{5.3125} \\
-			11 & 6.3268 \\
-			12 & 6.3712 \\
-		\bottomrule
-	\end{tabular}
 \end{table}
 
 \end{document}

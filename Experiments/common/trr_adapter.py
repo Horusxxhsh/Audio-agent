@@ -1,7 +1,13 @@
 import os
-import torch
 import numpy as np
 from typing import List, Dict, Any, Optional
+
+try:
+    import torch  # noqa: F401
+except ImportError:
+    # Torch is only required when computing TRR embeddings from audio. Many experiment
+    # scripts operate purely on cached vectors, so we keep this optional.
+    torch = None
 
 class TRRRetriever:
     """
@@ -21,6 +27,11 @@ class TRRRetriever:
     def _get_encoder(self):
         """Lazy load the encoder"""
         if self.encoder is None:
+            if torch is None:
+                raise ImportError(
+                    "torch is required to compute TRR embeddings from audio, but it is not installed. "
+                    "Provide cached TRR vectors in the dataset JSON (item['Vectors']['TRR']) or install torch."
+                )
             print("[TRR] Loading TextureEncoder Model (Cache Miss)...")
             try:
                 from Experiments.TextureResonance.texture_encoder import TextureEncoder

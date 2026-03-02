@@ -1,23 +1,22 @@
 """
 检索方法直接对比实验
 
-对比5种方法,直接使用检索到的参数计算指标
-- 纯LLM直接生成 (Pure LLM Generation) - 不使用检索，证明RAG的必要性
+对比检索方法,直接使用检索到的参数计算指标
+- （可选）纯LLM直接生成 (Pure LLM Generation) - 不使用检索，用于对照
 - 纯文本检索 (Text-Retrieval)
 - Wav2Vec-RAG
 - FeatureNN-RAG
 - TRR
 
-测试样本: Dry Funk, Tweed Breakup, Reverse Psychedelic, Math Rock Crystal, Saturated Rhythm,
-          80s Hair Metal, 80s Pop Clean, Acoustic Sim, Ambient Swells, Auto-Wah Funk,
-          Bitcrushed Synth, Black Metal Lo-Fi, Brian May Style, British Invasion, Brown Sound,
-          Classic Plexi, Doom/Stoner Fuzz, Dreamy Shoegaze, Garage Rock Fuzz, Grunge Dirt,
-          Hard Rock Crunch, Indie Jangle, Industrial Metal, Infinite Sustain, Jazz Box,
-          Liquid Lead, Lo-Fi Hip Hop, Midwest Emo, Modern Djent, Neo-Soul Clean (共30个)
+测试样本: 使用论文中的 held-out query pool（Protocol-A，N=211），由 TEST_SAMPLES 定义。
+其中包含 30 个 canonical 名称及其确定性变体（例如 “Dry Funk - ...”）。
 """
 
 import os
 import sys
+import argparse
+import csv
+from pathlib import Path
 import numpy as np
 
 # Add paths
@@ -670,6 +669,28 @@ class PureLLMGeneration:
 
 
 def main():
+    ap = argparse.ArgumentParser(
+        description="Direct retrieval comparison (supports optional per-query metric dump)."
+    )
+    ap.add_argument(
+        "--dump_csv",
+        type=str,
+        default="",
+        help="Optional path to write per-query metrics as CSV (one row per query per method).",
+    )
+    ap.add_argument(
+        "--test_list",
+        type=str,
+        default="",
+        help="Optional newline-separated SongName list for the held-out queries (overrides built-in TEST_SAMPLES).",
+    )
+    ap.add_argument(
+        "--with_pure_llm",
+        action="store_true",
+        help="Include the Pure-LLM baseline (slow / network). Disabled by default.",
+    )
+    args = ap.parse_args()
+
     print("="*100)
     print("     检索方法直接对比实验 (Direct Retrieval Comparison)")
     print("="*100)
@@ -679,8 +700,22 @@ def main():
     data = load_and_merge_data()
 
     # 分离测试集和知识库
-    test_items = [d for d in data if d.get('SongName') in TEST_SAMPLE_SET]
-    kb_items = [d for d in data if d.get('SongName') not in TEST_SAMPLE_SET]
+    test_name_set = TEST_SAMPLE_SET
+    if args.test_list:
+        test_list_path = Path(args.test_list)
+        if not test_list_path.exists():
+            raise FileNotFoundError(f"--test_list not found: {test_list_path}")
+        names = []
+        for line in test_list_path.read_text(encoding="utf-8").splitlines():
+            s = line.strip()
+            if not s or s.startswith("#"):
+                continue
+            names.append(s)
+        test_name_set = set(names)
+        print(f"[Split] Loaded held-out query list from {test_list_path} (n={len(test_name_set)})")
+
+    test_items = [d for d in data if d.get('SongName') in test_name_set]
+    kb_items = [d for d in data if d.get('SongName') not in test_name_set]
 
     print(f"测试集: {len(test_items)} 样本")
     print(f"知识库: {len(kb_items)} 样本")
@@ -691,11 +726,16 @@ def main():
     wav2vec_retrieval = Wav2VecRetrieval(kb_items)
     featurenn_retrieval = FeatureNNRetrieval(kb_items)
     trr_retrieval = TRRRetrieval(kb_items)
-    pure_llm = PureLLMGeneration()
+    include_pure_llm = bool(args.with_pure_llm)
+    pure_llm = PureLLMGeneration() if include_pure_llm else None
 
     print(">> 所有检索器初始化完成")
-    if HAS_OPENAI:
+    if include_pure_llm and HAS_OPENAI:
         print(">> 纯LLM直接生成已启用 (使用DeepSeek API)")
+    elif include_pure_llm and not HAS_OPENAI:
+        print(">> 纯LLM直接生成将使用 fallback (OpenAI库未安装)")
+    elif HAS_OPENAI:
+        print(">> 纯LLM直接生成已禁用 (如需启用请传入 --with_pure_llm)")
     else:
         print(">> 纯LLM直接生成已跳过 (OpenAI库未安装)")
 
@@ -704,12 +744,42 @@ def main():
 
     # 4. 存储结果
     results = {
-        'PureLLM': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []},
         'Text': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []},
         'Wav2Vec': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []},
         'FeatureNN': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []},
         'TRR': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []}
     }
+    if include_pure_llm:
+        results['PureLLM'] = {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []}
+
+    per_query_rows = []
+
+    def record_row(
+        query_idx: int,
+        query_name: str,
+        method: str,
+        retrieved_name: str,
+        l2,
+        acc,
+        recall,
+        cosine,
+        module,
+        missing: int,
+    ) -> None:
+        per_query_rows.append(
+            {
+                "query_idx": query_idx,
+                "query_name": query_name,
+                "method": method,
+                "retrieved_name": retrieved_name,
+                "l2": l2,
+                "acc@0.1": acc,
+                "recall": recall,
+                "cosine": cosine,
+                "module": module,
+                "missing": missing,
+            }
+        )
 
     # 5. 对每个测试样本进行检索和评估
     print("\n" + "="*100)
@@ -723,49 +793,53 @@ def main():
 
         print(f"\n[{idx}/{len(test_items)}] {name}")
 
-        # 纯LLM直接生成 (不使用检索)
-        if HAS_OPENAI:
-            print(f"  [Pure LLM] 生成参数中...")
-            llm_results = pure_llm.retrieve(test_item, k=1)
-            if llm_results:
-                retrieved_params = llm_results[0].get('Parameters', {})
-                l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
-                acc = evaluator.compute_accuracy_tolerance(retrieved_params, gt_params, tolerance=0.1)
-                recall = evaluator.compute_parameter_recall(retrieved_params, gt_params)
-                cosine = evaluator.compute_cosine_similarity(retrieved_params, gt_params)
-                style = evaluator.compute_style_consistency(retrieved_params.get('Style', []), gt_style)
-                module = evaluator.compute_module_consistency(retrieved_params, gt_params, active_threshold=0.1)
+        # 纯LLM直接生成 (不使用检索) - optional (slow / network)
+        if include_pure_llm:
+            if HAS_OPENAI:
+                print(f"  [Pure LLM] 生成参数中...")
+                llm_results = pure_llm.retrieve(test_item, k=1)
+                if llm_results:
+                    retrieved_params = llm_results[0].get('Parameters', {})
+                    l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
+                    acc = evaluator.compute_accuracy_tolerance(retrieved_params, gt_params, tolerance=0.1)
+                    recall = evaluator.compute_parameter_recall(retrieved_params, gt_params)
+                    cosine = evaluator.compute_cosine_similarity(retrieved_params, gt_params)
+                    style = evaluator.compute_style_consistency(retrieved_params.get('Style', []), gt_style)
+                    module = evaluator.compute_module_consistency(retrieved_params, gt_params, active_threshold=0.1)
 
-                results['PureLLM']['l2'].append(l2)
-                results['PureLLM']['acc'].append(acc)
-                results['PureLLM']['recall'].append(recall)
-                results['PureLLM']['cosine'].append(cosine)
-                results['PureLLM']['style'].append(style)
-                results['PureLLM']['module'].append(module)
+                    results['PureLLM']['l2'].append(l2)
+                    results['PureLLM']['acc'].append(acc)
+                    results['PureLLM']['recall'].append(recall)
+                    results['PureLLM']['cosine'].append(cosine)
+                    results['PureLLM']['style'].append(style)
+                    results['PureLLM']['module'].append(module)
+                    record_row(idx, name, "PureLLM", llm_results[0].get("SongName", ""), l2, acc, recall, cosine, module, 0)
 
-                print(f"  Pure LLM:   L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | {llm_results[0]['SongName']}")
+                    print(f"  Pure LLM:   L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | {llm_results[0]['SongName']}")
+                else:
+                    print(f"  Pure LLM:   生成失败")
+                    record_row(idx, name, "PureLLM", "", "", "", "", "", "", 1)
             else:
-                print(f"  Pure LLM:   生成失败")
-        else:
-            # OpenAI不可用，使用fallback参数
-            llm_results = pure_llm.retrieve(test_item, k=1)
-            if llm_results:
-                retrieved_params = llm_results[0].get('Parameters', {})
-                l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
-                acc = evaluator.compute_accuracy_tolerance(retrieved_params, gt_params, tolerance=0.1)
-                recall = evaluator.compute_parameter_recall(retrieved_params, gt_params)
-                cosine = evaluator.compute_cosine_similarity(retrieved_params, gt_params)
-                style = evaluator.compute_style_consistency(retrieved_params.get('Style', []), gt_style)
-                module = evaluator.compute_module_consistency(retrieved_params, gt_params, active_threshold=0.1)
+                # OpenAI不可用，使用fallback参数
+                llm_results = pure_llm.retrieve(test_item, k=1)
+                if llm_results:
+                    retrieved_params = llm_results[0].get('Parameters', {})
+                    l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
+                    acc = evaluator.compute_accuracy_tolerance(retrieved_params, gt_params, tolerance=0.1)
+                    recall = evaluator.compute_parameter_recall(retrieved_params, gt_params)
+                    cosine = evaluator.compute_cosine_similarity(retrieved_params, gt_params)
+                    style = evaluator.compute_style_consistency(retrieved_params.get('Style', []), gt_style)
+                    module = evaluator.compute_module_consistency(retrieved_params, gt_params, active_threshold=0.1)
 
-                results['PureLLM']['l2'].append(l2)
-                results['PureLLM']['acc'].append(acc)
-                results['PureLLM']['recall'].append(recall)
-                results['PureLLM']['cosine'].append(cosine)
-                results['PureLLM']['style'].append(style)
-                results['PureLLM']['module'].append(module)
+                    results['PureLLM']['l2'].append(l2)
+                    results['PureLLM']['acc'].append(acc)
+                    results['PureLLM']['recall'].append(recall)
+                    results['PureLLM']['cosine'].append(cosine)
+                    results['PureLLM']['style'].append(style)
+                    results['PureLLM']['module'].append(module)
+                    record_row(idx, name, "PureLLM", "Fallback", l2, acc, recall, cosine, module, 0)
 
-                print(f"  Pure LLM:   L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | Fallback")
+                    print(f"  Pure LLM:   L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | Fallback")
 
         # 纯文本检索
         text_results = text_retrieval.retrieve(test_item, k=1)
@@ -784,10 +858,12 @@ def main():
             results['Text']['cosine'].append(cosine)
             results['Text']['style'].append(style)
             results['Text']['module'].append(module)
+            record_row(idx, name, "Text-RAG", text_results[0].get("SongName", ""), l2, acc, recall, cosine, module, 0)
 
             print(f"  Text:       L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | {text_results[0]['SongName']}")
         else:
             print(f"  Text:       未检索到")
+            record_row(idx, name, "Text-RAG", "", "", "", "", "", "", 1)
 
         # Wav2Vec检索
         w2v_results = wav2vec_retrieval.retrieve(test_item, k=1)
@@ -806,10 +882,12 @@ def main():
             results['Wav2Vec']['cosine'].append(cosine)
             results['Wav2Vec']['style'].append(style)
             results['Wav2Vec']['module'].append(module)
+            record_row(idx, name, "Wav2Vec-RAG", w2v_results[0].get("SongName", ""), l2, acc, recall, cosine, module, 0)
 
             print(f"  Wav2Vec:    L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | {w2v_results[0]['SongName']}")
         else:
             print(f"  Wav2Vec:    未检索到")
+            record_row(idx, name, "Wav2Vec-RAG", "", "", "", "", "", "", 1)
 
         # FeatureNN检索
         fnn_results = featurenn_retrieval.retrieve(test_item, k=1)
@@ -828,10 +906,12 @@ def main():
             results['FeatureNN']['cosine'].append(cosine)
             results['FeatureNN']['style'].append(style)
             results['FeatureNN']['module'].append(module)
+            record_row(idx, name, "FeatureNN-RAG", fnn_results[0].get("SongName", ""), l2, acc, recall, cosine, module, 0)
 
             print(f"  FeatureNN:  L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | {fnn_results[0]['SongName']}")
         else:
             print(f"  FeatureNN:  未检索到")
+            record_row(idx, name, "FeatureNN-RAG", "", "", "", "", "", "", 1)
 
         # TRR检索
         trr_results = trr_retrieval.retrieve(test_item, k=1)
@@ -850,10 +930,12 @@ def main():
             results['TRR']['cosine'].append(cosine)
             results['TRR']['style'].append(style)
             results['TRR']['module'].append(module)
+            record_row(idx, name, "TRR", trr_results[0].get("SongName", ""), l2, acc, recall, cosine, module, 0)
 
             print(f"  TRR:        L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | {trr_results[0]['SongName']}")
         else:
             print(f"  TRR:        未检索到")
+            record_row(idx, name, "TRR", "", "", "", "", "", "", 1)
 
     # 6. 打印总结表格
     print("\n" + "="*150)
@@ -863,12 +945,13 @@ def main():
     print("-"*150)
 
     methods = [
-        ('纯LLM直接生成', results['PureLLM']),
         ('纯文本检索', results['Text']),
         ('Wav2Vec-RAG', results['Wav2Vec']),
         ('FeatureNN-RAG', results['FeatureNN']),
         ('TRR', results['TRR'])
     ]
+    if include_pure_llm:
+        methods = [('纯LLM直接生成', results['PureLLM'])] + methods
 
     for method_name, metrics in methods:
         l2 = sum(metrics['l2']) / len(metrics['l2']) if metrics['l2'] else 0
@@ -914,22 +997,45 @@ def main():
     best_module_idx = max(range(len(avg_metrics)), key=lambda i: avg_metrics[i][4])
     print(f"  模块一致性最高: {methods[best_module_idx][0]} ({avg_metrics[best_module_idx][4]:.4f})")
 
-    # RAG vs 纯LLM对比
-    print("\n" + "="*150)
-    print("RAG vs 纯LLM直接生成对比 (Proving RAG Necessity)")
-    print("="*150)
-    pure_llm_l2 = sum(results['PureLLM']['l2']) / len(results['PureLLM']['l2'])
-    trr_l2 = sum(results['TRR']['l2']) / len(results['TRR']['l2'])
+    if include_pure_llm:
+        # RAG vs 纯LLM对比
+        print("\n" + "="*150)
+        print("RAG vs 纯LLM直接生成对比 (Proving RAG Necessity)")
+        print("="*150)
+        pure_llm_l2 = sum(results['PureLLM']['l2']) / len(results['PureLLM']['l2'])
+        trr_l2 = sum(results['TRR']['l2']) / len(results['TRR']['l2'])
 
-    print(f"\n纯LLM直接生成 L2误差: {pure_llm_l2:.4f}")
-    print(f"TRR检索 L2误差:        {trr_l2:.4f}")
+        print(f"\n纯LLM直接生成 L2误差: {pure_llm_l2:.4f}")
+        print(f"TRR检索 L2误差:        {trr_l2:.4f}")
 
-    if pure_llm_l2 > trr_l2:
-        improvement = ((pure_llm_l2 - trr_l2) / pure_llm_l2) * 100
-        print(f"\n>>> RAG检索相比纯LLM生成，L2误差降低 {improvement:.1f}%")
-        print(f">>> 结论: RAG检索显著优于纯LLM生成，证明了RAG的必要性")
-    else:
-        print(f"\n>>> 结论: 纯LLM生成优于RAG检索")
+        if pure_llm_l2 > trr_l2:
+            improvement = ((pure_llm_l2 - trr_l2) / pure_llm_l2) * 100
+            print(f"\n>>> RAG检索相比纯LLM生成，L2误差降低 {improvement:.1f}%")
+            print(f">>> 结论: RAG检索显著优于纯LLM生成，证明了RAG的必要性")
+        else:
+            print(f"\n>>> 结论: 纯LLM生成优于RAG检索")
+
+    if args.dump_csv:
+        out_path = Path(args.dump_csv)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        fieldnames = [
+            "query_idx",
+            "query_name",
+            "method",
+            "retrieved_name",
+            "l2",
+            "acc@0.1",
+            "recall",
+            "cosine",
+            "module",
+            "missing",
+        ]
+        with out_path.open("w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=fieldnames)
+            w.writeheader()
+            for row in per_query_rows:
+                w.writerow(row)
+        print(f"\n[Dump] Wrote per-query metrics to: {out_path}")
 
     print("\n" + "="*130)
     print("EXPERIMENT COMPLETE")

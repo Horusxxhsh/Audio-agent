@@ -46,11 +46,17 @@ class RAGRetriever:
     without polluting the main user database.
     """
     def __init__(self, training_data: List[Dict]):
-        if not AudioRAGSystem:
-            raise ImportError("AudioRAGSystem not available")
-        
-        # Store data for direct text retrieval fallback
+        # Always store data for text retrieval.
         self.training_data = training_data
+
+        # If the full RAG stack isn't available (e.g., chromadb not installed),
+        # we still support a deterministic keyword-overlap text retriever so
+        # objective experiments can run offline.
+        self.rag = None
+        self.temp_dir = None
+        if not AudioRAGSystem:
+            print("[RAGRetriever] AudioRAGSystem unavailable; falling back to simple text retrieval only.")
+            return
 
         # Create a temporary directory for the vector DB
         self.temp_dir = tempfile.mkdtemp(prefix="audio_agent_experiment_")
@@ -166,6 +172,11 @@ class RAGRetriever:
             return copy.deepcopy(top_items)
 
         # 2. Audio/Hybrid Retrieval (Use RAG System with Real Vectors)
+        if self.rag is None:
+            # Offline fallback: return empty to make the limitation explicit.
+            # (Most experiment scripts use this adapter only for text-only retrieval.)
+            return []
+
         results = self.rag.retrieve_similar_knowledge(
             query=query_text,
             n_results=k,
@@ -191,12 +202,15 @@ class RAGRetriever:
 
     def cleanup(self):
         """Clean up temporary directory"""
+        if not self.temp_dir:
+            return
+
         try:
             # Close client if possible? Chroma 0.4+ usually handles via GC but good to be safe if specific close exists
-            pass 
-        except:
             pass
-            
+        except Exception:
+            pass
+
         if os.path.exists(self.temp_dir):
             print(f"[RAGRetriever] Cleaning up temp dir: {self.temp_dir}")
             try:

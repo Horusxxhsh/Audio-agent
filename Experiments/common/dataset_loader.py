@@ -7,18 +7,85 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MUSIC_DB_PATH = os.path.join(BASE_DIR, '..', '..', 'music_info.db')
 AUDIO_DB_PATH = os.path.join(BASE_DIR, '..', '..', 'audio_info.db')
 
+def _resolve_local_audio_paths(dataset):
+    """
+    Best-effort mapping from SongName -> local audio file in Data/Audio_Synthetic/.
+
+    This keeps experiment scripts robust when the dataset JSON contains Windows paths
+    or missing AudioPath values.
+    """
+    base_audio_dir = os.path.join(BASE_DIR, '..', '..', 'Data', 'Audio_Synthetic')
+    if not os.path.exists(base_audio_dir):
+        return dataset
+
+    for item in dataset:
+        song_name = item.get("SongName")
+        if not song_name:
+            continue
+
+        # Keep existing path if it already points to a real file.
+        cur = item.get("AudioPath")
+        if cur and os.path.exists(cur):
+            continue
+
+        # Sanitize filename to match generator logic.
+        safe_name = "".join(
+            [c for c in song_name if c.isalpha() or c.isdigit() or c in (" ", "-", "_")]
+        ).strip()
+
+        candidates = [
+            os.path.join(base_audio_dir, f"{safe_name}.wav"),
+            os.path.join(base_audio_dir, f"{song_name}.wav"),
+        ]
+        for c in candidates:
+            if os.path.exists(c):
+                item["AudioPath"] = c
+                break
+        if "AudioPath" not in item:
+            item["AudioPath"] = None
+
+    return dataset
+
+
 def load_and_merge_data():
     """
     Loads data. 
-    OPTIMIZED: Prefers 'dataset_full_vectors.json' if available.
+    OPTIMIZED: Prefers a unified dataset JSON if available.
     Otherwise merges from DBs.
     """
-    # 1. Try JSON First
-    json_path = os.path.join(os.path.dirname(__file__), '..', '..', 'Experiments', 'dataset_full_vectors.json')
+    # 1) Prefer explicit override (useful for large external datasets)
+    env_json_path = (os.environ.get("AUDIO_AGENT_DATASET_JSON") or "").strip()
+    if env_json_path:
+        if not os.path.exists(env_json_path):
+            raise FileNotFoundError(f"AUDIO_AGENT_DATASET_JSON not found: {env_json_path}")
+        print(f"Loading data from AUDIO_AGENT_DATASET_JSON: {env_json_path}")
+        with open(env_json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return _resolve_local_audio_paths(data)
+
+    # 2) Prefer the local external dataset drop-in if present
+    external_json_path = os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "..",
+        "Data",
+        "External_1267_211",
+        "dataset",
+        "dataset_full_vectors_1267.json",
+    )
+    if os.path.exists(external_json_path):
+        print(f"Loading data from external dataset JSON: {external_json_path}")
+        with open(external_json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return _resolve_local_audio_paths(data)
+
+    # 3) Try repo JSON (default small/synth dataset)
+    json_path = os.path.join(os.path.dirname(__file__), "..", "..", "Experiments", "dataset_full_vectors.json")
     if os.path.exists(json_path):
         print(f"Loading data from optimized JSON: {json_path}")
-        with open(json_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        with open(json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return _resolve_local_audio_paths(data)
 
     # 2. Fallback to DB Merge
     """
@@ -104,29 +171,7 @@ def load_and_merge_data():
     
     # Optional: Resolve Local Audio Paths
     # Prioritize Synthetic Data for TRR Experiment
-    base_audio_dir = os.path.join(BASE_DIR, '..', '..', 'Data', 'Audio_Synthetic') 
-    
-    if os.path.exists(base_audio_dir):
-        print(f"Scanning for audio files in {base_audio_dir}...")
-        for item in merged_dataset:
-            song_name = item['SongName']
-            # Sanitize filename to match generator logic
-            safe_name = "".join([c for c in song_name if c.isalpha() or c.isdigit() or c in (' ', '-', '_')]).strip()
-            
-            candidates = [
-                os.path.join(base_audio_dir, f"{safe_name}.wav"),
-                os.path.join(base_audio_dir, f"{song_name}.wav"),
-            ]
-            for c in candidates:
-                if os.path.exists(c):
-                    item['AudioPath'] = c
-                    break
-            if 'AudioPath' not in item:
-                item['AudioPath'] = None
-    else:
-        # Just initialize key
-        for item in merged_dataset:
-            item['AudioPath'] = None
+    merged_dataset = _resolve_local_audio_paths(merged_dataset)
 
     return merged_dataset
 
