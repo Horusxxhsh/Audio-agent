@@ -268,6 +268,34 @@ def find_reference_metadata(csv_path: str, audio_id: str) -> tuple[str, str]:
     raise FileNotFoundError(f"Audio id not found in CSV: {audio_id}")
 
 
+def _resolve_repo_audio_path(raw_path: str) -> str:
+    """
+    Best-effort path resolver for CSVs authored on other machines (e.g., Windows).
+
+    We keep the CSV as-is for provenance, but make local evaluation runnable by
+    mapping the audio filename to known local folders when the original path
+    does not exist.
+    """
+    if not raw_path:
+        return raw_path
+    if os.path.exists(raw_path):
+        return raw_path
+
+    normalized = raw_path.replace("\\", "/")
+    basename = os.path.basename(normalized)
+
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    candidates = [
+        os.path.join(repo_root, "musiccaps_guitar_solo", basename),
+        os.path.join(repo_root, "Data", "Audio_Synthetic", basename),
+    ]
+    for cand in candidates:
+        if os.path.exists(cand):
+            return cand
+
+    return raw_path
+
+
 def compute_fad_between_files(
     config: FadConfig,
     ref_wav: str,
@@ -452,12 +480,12 @@ def main() -> int:
     parser.add_argument(
         "--generated",
         dest="generated_wav",
-        default=r"C:\Users\Public\Documents\Supertonal\Audio-agent\generated_input.wav",
+        default="generated_input.wav",
     )
     parser.add_argument(
         "--final",
         dest="final_wav",
-        default=r"C:\Users\Public\Documents\Supertonal\Audio-agent\final_output.wav",
+        default="final_output.wav",
     )
     parser.add_argument("--caption", dest="caption", default="")
     parser.add_argument("--segment-seconds", dest="segment_seconds", type=float, default=0.0)
@@ -483,6 +511,7 @@ def main() -> int:
 
     csv_path = os.path.abspath(args.csv_path)
     ref_wav, csv_caption = find_reference_metadata(csv_path, args.audio_id)
+    ref_wav = _resolve_repo_audio_path(ref_wav)
     caption = args.caption or csv_caption
 
     print(f"CSV: {csv_path}")

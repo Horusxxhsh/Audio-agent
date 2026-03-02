@@ -214,6 +214,9 @@ Data/Audio_Synthetic/*.clap.npy
 Data/Audio_Synthetic/*.mfcc.npy
 Data/Audio_Synthetic/*.py
 
+# External MusicCaps guitar solo evaluation audio (local-only)
+musiccaps_guitar_solo/
+
 # Per-query dumps / stats reports generated locally
 Experiments/AblationStudies/protocolA_per_query_metrics.csv
 Experiments/AblationStudies/protocolA_objective_stats.json
