@@ -5,7 +5,11 @@ import shutil
 import tempfile
 from dataclasses import dataclass
 
-from frechet_audio_distance import CLAPScore, FrechetAudioDistance
+try:
+    from frechet_audio_distance import CLAPScore, FrechetAudioDistance
+except ModuleNotFoundError:  # pragma: no cover
+    CLAPScore = None  # type: ignore[assignment]
+    FrechetAudioDistance = None  # type: ignore[assignment]
 
 
 @dataclass(frozen=True)
@@ -311,6 +315,12 @@ def compute_fad_between_files(
 ) -> float:
     import math
 
+    if FrechetAudioDistance is None:
+        raise ModuleNotFoundError(
+            "Missing dependency: frechet_audio_distance. Install the FAD package that provides "
+            "`frechet_audio_distance` (pip name may vary, e.g., `frechet-audio-distance`)."
+        )
+
     fad = FrechetAudioDistance(
         model_name=config.model_name,
         sample_rate=config.sample_rate,
@@ -376,6 +386,11 @@ def kl_divergence(p, q, eps: float = 1e-8) -> float:
 
 class PannTagger:
     def __init__(self):
+        if FrechetAudioDistance is None:
+            raise ModuleNotFoundError(
+                "Missing dependency: frechet_audio_distance. Install the FAD package that provides "
+                "`frechet_audio_distance` (pip name may vary, e.g., `frechet-audio-distance`)."
+            )
         self._fad = FrechetAudioDistance(model_name="pann", sample_rate=32000, channels=1, verbose=False)
         self._device = self._fad.device
 
@@ -393,6 +408,11 @@ class PannTagger:
 
 def compute_pann_label_distribution(wav_path: str, segment_seconds: float, hop_seconds: float, tagger: PannTagger):
     import numpy as np
+    if FrechetAudioDistance is None:
+        raise ModuleNotFoundError(
+            "Missing dependency: frechet_audio_distance. Install the FAD package that provides "
+            "`frechet_audio_distance` (pip name may vary, e.g., `frechet-audio-distance`)."
+        )
     from frechet_audio_distance.utils import load_audio_task
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -424,6 +444,11 @@ def make_caption_csv(csv_path: str, caption: str, n_rows: int) -> None:
 
 
 def compute_clap_score(caption: str, wav_path: str, segment_seconds: float, hop_seconds: float, submodel_name: str) -> tuple[float, float]:
+    if CLAPScore is None:
+        raise ModuleNotFoundError(
+            "Missing dependency: frechet_audio_distance. Install the FAD package that provides "
+            "`frechet_audio_distance` (pip name may vary, e.g., `frechet-audio-distance`)."
+        )
     import torch
 
     def get_download_name() -> str:
