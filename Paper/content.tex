@@ -363,7 +363,7 @@ We compare our proposed \textbf{TRR} (Section \ref{ssec:rag}) against three base
 
 \subsection{Metrics}
 \label{ssec:metrics}
-We evaluate alignment in parameter space $\Theta$ using five operational metrics computed on flattened numeric parameter leaves. Concretely, given a nested parameter dictionary, we recursively flatten numeric leaves into a sparse vector indexed by dot-separated keys (e.g., \texttt{DelayOn.Mix}) and ignore non-numeric leaves (e.g., strings). Unless otherwise stated, we form the union of keys between prediction and ground truth, and treat missing numeric keys as zeros for metric computation. Importantly, we do not apply per-parameter normalization; thus L2 magnitudes can be dominated by a small number of large-scale parameters and should be interpreted within each protocol rather than across protocols.
+We evaluate alignment in parameter space $\Theta$ using four operational metrics computed on flattened numeric parameter leaves. Concretely, given a nested parameter dictionary, we recursively flatten numeric leaves into a sparse vector indexed by dot-separated keys (e.g., \texttt{DelayOn.Mix}) and ignore non-numeric leaves (e.g., strings). Unless otherwise stated, we form the union of keys between prediction and ground truth, and treat missing numeric keys as zeros for metric computation. Importantly, we do not apply per-parameter normalization; thus L2 magnitudes can be dominated by a small number of large-scale parameters and should be interpreted within each protocol rather than across protocols.
 
 \paragraph{L2 Error (RMSE).}
 Given flattened vectors $v(\theta_{\text{gt}})$ and $v(\tilde{\theta})$ over the union key set of size $d$, we report the root mean squared error
@@ -513,7 +513,7 @@ Paired permutation tests on per-query L2 (Holm-corrected; reported in the supple
 \end{table}
 
 \paragraph{Beta sensitivity.}
-We perform a sensitivity sweep over the temperature parameter $\beta$ (standard setting) and observe that increasing $\beta$ increases the variance of $w_{\text{text}}$ and shifts the mean weight toward the lower-entropy modality. In this benchmark, moderate $\beta$ values yield lower fused error, while larger $\beta$ over-emphasizes the text channel and can degrade fusion performance.
+We perform a sensitivity sweep over the temperature parameter $\beta$ (standard setting). In this benchmark, with quality weight set to 1.0, quality consistency dominates the weight allocation, resulting in identical fusion results across all $\beta$ values. The entropy-based modulation becomes secondary when quality scores strongly favor one modality.
 \begin{table}[t]
 		\centering
 \caption{Fusion temperature sensitivity under Protocol-C (standard setting). We report the induced text-weight statistics and fused retrieval error; full values are provided in Supplementary Table S5.}
@@ -580,7 +580,7 @@ Conversely, we corrupt the audio modality by perturbing the TRR embedding in emb
 		\textbf{Scenario}       & \textbf{Single-Modal L2} & \textbf{Adaptive L2} & \textbf{Ratio} \\
 		\midrule
 		Vague Text              & 12.6517 (Text-only)      & \textbf{0.2970}     & 0.0235           \\
-		Noisy Audio             & 33.8549 (TRR-only)       & \textbf{1.5180}     & 0.0448           \\
+		Noisy Audio             & 33.8549 (TRR-only)       & \textbf{1.4964}     & 0.0442           \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -598,7 +598,7 @@ Table \ref{tab:dynamic_weight_strategy} summarizes the adaptive weighting behavi
 		\textbf{Scenario} & \textbf{Degradation} & \textbf{Weight Strategy} & \textbf{Single-Modal L2} & \textbf{Hybrid L2} \\
 		\midrule
 		Vague Text        & Generic descriptor (``warm guitar tone'') & $w_{\text{text}}\approx0.499$ & 12.6517 (Text-only) & \textbf{0.2970} \\
-		Noisy Audio       & TRR embedding noise ($\sigma=5.0$)        & $w_{\text{text}}\approx0.848$ & 33.8549 (TRR-only)  & \textbf{1.5180} \\
+		Noisy Audio       & TRR embedding noise ($\sigma=5.0$)        & $w_{\text{text}}\approx0.848$ & 33.8549 (TRR-only)  & \textbf{1.4964} \\
 		\midrule
 		\textbf{Improvement} & --- & --- & --- & \textbf{95.5--97.7\%} \\
 		\bottomrule
