@@ -25,33 +25,9 @@ This supplementary material uses the same operational objective metrics defined 
 Because these metrics are computed in parameter space, absolute magnitudes can depend on the protocol (split, candidate pool, and schema used to form predicted parameter dictionaries); we therefore interpret improvements \emph{within} each table under the stated protocol and avoid comparing magnitudes across tables.
 All supplementary objective results use the same guitar-effect benchmark protocols as the main paper.
 
-\section{Representative Prompt Exemplars for Protocol-B}
-
-Table~\ref{tab:rep_queries_fewshot} lists the five representative style exemplars used in the few-shot prompt for Protocol-B ON/OFF correction. These are prompt exemplars, not the evaluation set itself (evaluation still uses the full held-out pool under the stated protocol).
-
-\begin{table}[h]
-	\centering
-\caption{Representative style exemplars and few-shot ON/OFF templates used in Protocol-B prompting.}
-	\label{tab:rep_queries_fewshot}
-	\small
-	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{llll}
-		\toprule
-		\textbf{Query} & \textbf{Short description} & \textbf{ON modules} & \textbf{OFF modules} \\
-		\midrule
-		Dry Funk & clean funk & Compressor, Delay, Reverb, Chorus, Equaliser & Driver, Screamer, Flanger, Phaser \\
-		Tweed Breakup & blues breakup & Driver, Reverb, Equaliser & Compressor, Screamer, Delay, Chorus, Flanger, Phaser \\
-		Reverse Psychedelic & psychedelic FX & Equaliser & Compressor, Driver, Screamer, Delay, Reverb, Chorus, Flanger, Phaser \\
-		Math Rock Crystal & clean compression & Compressor, Delay, Reverb, Chorus, Equaliser & Driver, Screamer, Flanger, Phaser \\
-		Saturated Rhythm & high-gain rock & Driver, Reverb, Equaliser & Compressor, Screamer, Delay, Chorus, Flanger, Phaser \\
-		\bottomrule
-	\end{tabular}
-	}
-\end{table}
-
 \section{Direct Retrieval Method Comparison}
 
-Table~\ref{tab:retrieval_methods_direct} reports a direct retrieval comparison that includes a \textbf{Pure LLM} baseline (no retrieval). The evaluation uses top-1 retrieval, and reports five operational parameter-space metrics: Param. Dist. (RMSE), Acc@0.1, Recall, Cosine similarity, and Module (Jaccard over active modules).
+Table~\ref{tab:retrieval_methods_direct} reports a direct retrieval comparison across all retrieval methods. The evaluation uses top-1 retrieval, and reports five operational parameter-space metrics: Param. Dist. (RMSE), Acc@0.1, Recall, Cosine similarity, and Module (Jaccard over active modules).
 
 \begin{table}[h]
 	\centering
@@ -68,7 +44,6 @@ Table~\ref{tab:retrieval_methods_direct} reports a direct retrieval comparison t
 		Text-RAG & 0.4573 & 0.7034 & 0.6407 & 0.7404 & 0.8625 \\
 		FeatureNN-RAG & 1.1729 & 0.6765 & 0.6485 & 0.7757 & \textbf{0.9602} \\
 		CLAP (KNN) & 11.6489 & 0.5839 & 0.4844 & 0.5933 & 0.8009 \\
-		Pure LLM (no retrieval) & 13.6520 & 0.4361 & 0.2127 & 0.3779 & 0.7053 \\
 		\bottomrule
 	\end{tabular}
 	}
@@ -203,53 +178,6 @@ Table~\ref{tab:mushra_style_labels} summarizes the labeled style-matching stimul
 		Chorus & chorus-effect target \\
 		\bottomrule
 	\end{tabular}
-\end{table}
-
-\section{Protocol-B Retrieval/Correction Ablations}
-
-Table~\ref{tab:retrieval_methods_llm} reports retrieval-only, Top-K aggregation, and retrieval+LLM variants under Protocol-B (see the main paper's Experimental Setup for split definitions). The LLM is prompted with five manually specified exemplars and is instructed to \textbf{ignore} retrieval-provided module hints, predicting only the ON/OFF pattern; parameters are then copied from the retrieved reference conditioned on the predicted ON/OFF pattern.
-
-\begin{table}[h]
-	\centering
-\caption{Protocol-B correction ablations ($N=211$). Comparisons are within-table under the same retrieval+correction+$\Pi_{\Theta}$ protocol.}
-	\label{tab:retrieval_methods_llm}
-	\small
-	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{lccccc}
-		\toprule
-		\textbf{Method} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
-		\midrule
-		TRR (retrieval only) & \textbf{0.3064} & \textbf{0.7253} & \textbf{0.6990} & \textbf{0.8376} & \textbf{0.9574} \\
-		Text-RAG (retrieval only) & 0.4573 & 0.7034 & 0.6407 & 0.7404 & 0.8625 \\
-		TRR-TopKMean & 17.1237 & 0.4951 & 0.4469 & 0.5648 & \textbf{0.9574} \\
-		TRR-TopKWeightedMean & 16.7716 & 0.4948 & 0.4476 & 0.5667 & \textbf{0.9574} \\
-		TRR + LLM & 6.2434 & 0.6322 & 0.5276 & 0.5817 & 0.6609 \\
-		Text + LLM & 6.3688 & 0.6180 & 0.4900 & 0.5675 & 0.6609 \\
-		\bottomrule
-	\end{tabular}
-	}
-\end{table}
-
-Table~\ref{tab:protocolB_l2_sig} reports paired permutation tests on Protocol-B per-query L2 with Holm correction across the TRR-vs-baseline comparisons. We define $\Delta$ as \texttt{baseline - TRR}, so positive values indicate that TRR has lower parameter distance.
-
-\begin{table}[h]
-	\centering
-	\caption{Protocol-B: paired significance tests on Param. Dist. (RMSE). $\Delta$ is \texttt{baseline - TRR}.}
-	\label{tab:protocolB_l2_sig}
-	\small
-	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{lcccc}
-		\toprule
-		\textbf{Baseline} & \textbf{$n$} & \textbf{Mean $\Delta$} & \textbf{95\% CI} & \textbf{$p$ (Holm)} \\
-		\midrule
-		Text-RAG & 211 & 0.1509 & [0.0658, 0.2527] & 0.00175 \\
-		TRR-TopKMean & 211 & 16.8173 & [14.6012, 19.1221] & 0.00125 \\
-		TRR-TopKWeightedMean & 211 & 16.4652 & [14.2746, 18.7442] & 0.00125 \\
-		TRR+LLM & 211 & 5.9370 & [3.6897, 8.4394] & 0.00125 \\
-		Text+LLM & 211 & 6.0625 & [3.8158, 8.5519] & 0.00125 \\
-		\bottomrule
-	\end{tabular}
-	}
 \end{table}
 
 \section{Robustness Stress Tests}
