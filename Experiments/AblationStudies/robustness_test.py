@@ -1,611 +1,1228 @@
 """
-鲁棒性测试实验
-==============
+Protocol-C: Robustness Stress Tests + Modality-Conflict Evaluation (N=211)
+============================================================================
 
-测试目标：
-1. 文本模糊情况：对比双重检索模式（TRR + Text + LLM）vs Text + LLM
-2. 音频噪声大的情况：对比双重检索模式（TRR + Text + LLM）vs TRR + LLM
+This script implements the TMM "Protocol-C" stress-test suite on the paper's
+held-out pool (default: N=211) with the KB split aligned to Protocol-A.
 
-关键特点：
-- 动态权重调节：根据文本和音频噪声水平自动调整检索权重
-- LLM参数生成：使用Few-shot学习纠正检索误差
+What this script produces (audit artifacts):
+1) Per-query CSV: each (query × scenario × method) row contains objective metrics
+   and fusion weights (w_text / w_audio) derived from entropy-conditioned scoring.
+2) Stats reports (JSON + Markdown): 95% bootstrap CIs + paired permutation tests
+   with Holm correction for multiple comparisons.
+
+Scenarios:
+- standard: original text + original audio
+- vague_text: replace text with a generic descriptor (audio unchanged)
+- noisy_audio: add strong Gaussian noise in TRR embedding space (text unchanged)
+- conflict: contradictory text (audio unchanged)
+
+Methods:
+- Text-only: TF-IDF retrieval
+- TRR-only: cosine KNN in TRR embedding space
+- Fusion: entropy-conditioned score fusion (Algorithm-style), top-1 selection
 """
 
+from __future__ import annotations
+
+import argparse
+import csv
+import json
 import os
+import platform
+import re
 import sys
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, Iterable, List, Optional, Tuple
+
 import numpy as np
 
-# Add paths
-current_dir = os.path.dirname(os.path.abspath(__file__))
-common_dir = os.path.join(current_dir, '..', 'common')
-sys.path.append(common_dir)
+# Ensure common modules are importable when running as a script.
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+COMMON_DIR = os.path.join(CURRENT_DIR, "..", "common")
+if COMMON_DIR not in sys.path:
+    sys.path.append(COMMON_DIR)
 
 from dataset_loader import load_and_merge_data
 from evaluate import Evaluator
-from text_noise_injector import TextNoiseInjector
-from audio_noise_injector import AudioNoiseInjector
-from trr_adapter import TRRRetriever
-from rag_adapter import RAGRetriever
-from hybrid_fusion_retriever import HybridFusionRetriever
 
-try:
-    from openai import OpenAI
-    HAS_OPENAI = True
-except ImportError:
-    HAS_OPENAI = False
-    print("Warning: openai not found. Cannot run LLM experiments.")
-
-# 测试样本
-TEST_SAMPLES = [
-    "Dry Funk",
-    "Tweed Breakup",
-    "Reverse Psychedelic",
-    "Math Rock Crystal",
-    "Saturated Rhythm"
-]
-
-# 定义效果器
-ALL_EFFECTORS = [
-    'Compressor', 'Driver', 'Screamer', 'Delay', 'Reverb',
-    'Chorus', 'Flanger', 'Equaliser', 'Phaser'
-]
+# Reuse the Protocol-A held-out pool definition to ensure split consistency.
+from direct_retrieval_comparison import is_test_sample_name as is_test_sample
 
 
-def get_onoff_pattern(params):
-    """从参数中提取ON/OFF模式"""
-    pattern = {}
-    for key in params.keys():
-        for eff in ALL_EFFECTORS:
-            if f'{eff}On' in key:
-                pattern[eff] = 'ON'
-                break
-            elif f'{eff}Off' in key:
-                pattern[eff] = 'OFF'
-                break
-    return pattern
+PROTOCOL = "Protocol-C"
+METRICS: List[str] = ["l2", "acc@0.1", "recall", "cosine", "module"]
+LOWER_IS_BETTER = {"l2"}
 
 
-def build_fewshot_prompt(test_name, test_style):
-    """构建手动指定的few-shot提示词"""
-    examples_str = """Example 1: Style='clean_funk dry_funk' → [Compressor:ON, Driver:OFF, Screamer:OFF, Delay:ON, Reverb:ON, Chorus:ON, Flanger:OFF, Equaliser:ON, Phaser:OFF]
-Example 2: Style='blues tweed_breakup' → [Compressor:OFF, Driver:ON, Screamer:OFF, Delay:OFF, Reverb:ON, Chorus:OFF, Flanger:OFF, Equaliser:ON, Phaser:OFF]
-Example 3: Style='fx_reverse reverse_psychedelic' → [Compressor:OFF, Driver:OFF, Screamer:OFF, Delay:OFF, Reverb:OFF, Chorus:OFF, Flanger:OFF, Equaliser:ON, Phaser:OFF]
-Example 4: Style='clean_comp math_rock_crystal' → [Compressor:ON, Driver:OFF, Screamer:OFF, Delay:ON, Reverb:ON, Chorus:ON, Flanger:OFF, Equaliser:ON, Phaser:OFF]
-Example 5: Style='rock_high saturated_rhythm' → [Compressor:OFF, Driver:ON, Screamer:OFF, Delay:OFF, Reverb:ON, Chorus:OFF, Flanger:OFF, Equaliser:ON, Phaser:OFF]"""
-
-    prompt = f"""You are a guitar tone expert. Learn from examples to predict effector ON/OFF states.
-
-FEW-SHOT EXAMPLES (Learn the pattern):
-{examples_str}
-
-CURRENT TASK:
-Target Name: "{test_name}"
-Target Style: "{test_style}"
-
-INSTRUCTIONS:
-1. **IGNORE** any retrieval hints - base your prediction ONLY on the few-shot examples
-2. Learn which effectors are typically ON/OFF for different styles **ONLY from the FEW-SHOT EXAMPLES above**
-3. Apply this learned knowledge to predict ON/OFF for the target style
-
-Output ONLY valid JSON:
-{{"effector_on": ["Compressor", "Delay", ...], "effector_off": ["Driver", "Screamer", ...]}}"""
-
-    return prompt
+def _read_name_list(path: Path) -> List[str]:
+    lines = []
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        s = raw.strip()
+        if not s or s.startswith("#"):
+            continue
+        lines.append(s)
+    return lines
 
 
-def predict_onoff_with_llm(style, test_name):
-    """使用LLM预测ON/OFF"""
-    if not HAS_OPENAI:
-        return None
-
-    client = OpenAI(api_key="sk-0705951d960041ed96c607ab69724d0d", base_url="https://api.deepseek.com")
-
-    prompt = build_fewshot_prompt(test_name, style)
-
-    try:
-        resp = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=[{"role": "user", "content": prompt}],
-            stream=False
-        )
-        content = resp.choices[0].message.content.strip()
-
-        # 解析JSON
-        import json
-        content = content.replace("```json", "").replace("```", "")
-        s = content.find('{')
-        e = content.rfind('}')
-        if s != -1 and e != -1:
-            content = content[s:e+1]
-
-        result = json.loads(content)
-
-        # 转换为pattern字典
-        pattern = {}
-        for eff in ALL_EFFECTORS:
-            if eff in result.get('effector_on', []):
-                pattern[eff] = 'ON'
-            else:
-                pattern[eff] = 'OFF'
-
-        return pattern
-
-    except Exception as e:
-        print(f"  LLM预测失败: {e}")
-        return None
+def _build_text(item: dict) -> str:
+    song_name = (item.get("SongName") or "").replace("_", " ")
+    style = " ".join(item.get("Style", []) or [])
+    return f"{song_name} {style}".strip()
 
 
-def get_default_on_params(effector):
-    """获取默认ON参数"""
-    defaults = {
-        'Compressor': {'Threshold': 0.2, 'Ratio': 2.0, 'Attack': 0.01, 'Release': 0.1, 'Makeup': 1.0, 'Mix': 0.6},
-        'Driver': {'Distortion': 0.5, 'Volume': 0.0},
-        'Screamer': {'Drive': 0.5, 'Tone': 0.5, 'Level': 0.0},
-        'Delay': {'Feedback': 0.4, 'Delay': 0.3, 'Mix': 0.3},
-        'Reverb': {'Size': 0.5, 'Damping': 0.5, 'Width': 0.5, 'Mix': 0.3},
-        'Chorus': {'Delay': 0.2, 'Depth': 0.2, 'Frequency': 0.5, 'Width': 0.5},
-        'Flanger': {'Delay': 0.0, 'Depth': 0.0, 'Feedback': 0.1, 'Frequency': 0.2, 'Width': 0.0},
-        'Equaliser': {'100hz': 0.0, '200hz': 0.0, '400hz': 0.2, '800hz': 0.0, '1600hz': 0.8, '3200hz': 0.8, '6400hz': 0.0, 'Level': 0.1},
-        'Phaser': {'Depth': 0.1, 'Feedback': 0.0, 'Frequency': 0.1, 'Width': 50}
-    }
-    return defaults.get(effector, {})
+_STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "be",
+    "but",
+    "by",
+    "for",
+    "from",
+    "guitar",
+    "in",
+    "is",
+    "it",
+    "low",
+    "no",
+    "of",
+    "on",
+    "or",
+    "sound",
+    "that",
+    "the",
+    "this",
+    "to",
+    "tone",
+    "warm",
+    "with",
+}
 
 
-def get_default_off_params(effector):
-    """获取默认OFF参数"""
-    defaults = {
-        'Compressor': {'Threshold': 1.0, 'Ratio': 1.0, 'Attack': 0.0, 'Release': 0.0, 'Makeup': 0.0, 'Mix': 0.0},
-        'Driver': {'Distortion': '0.00', 'Volume': '-64.0'},
-        'Screamer': {'Drive': '0.00', 'Tone': '0.00', 'Level': '-64.0'},
-        'Delay': {'Feedback': 0.0, 'Delay': 0.0, 'Mix': 0.0},
-        'Reverb': {'Size': 0.0, 'Damping': 0.0, 'Width': 0.0, 'Mix': 0.0},
-        'Chorus': {'Delay': '0.00', 'Depth': '0.00', 'Frequency': '0.00', 'Width': '0.00'},
-        'Flanger': {'Delay': '0.00', 'Depth': '0.00', 'Feedback': '0.00', 'Frequency': '0.00', 'Width': '0.00'},
-        'Equaliser': {'100hz': 0.0, '200hz': 0.0, '400hz': 0.0, '800hz': 0.0, '1600hz': 0.0, '3200hz': 0.0, '6400hz': 0.0, 'Level': 0.0},
-        'Phaser': {'Depth': '0.00', 'Feedback': '0.00', 'Frequency': '0.00', 'Width': '50'}
-    }
-    return defaults.get(effector, {})
+def _tokenize(text: str) -> List[str]:
+    toks = re.findall(r"[a-z0-9]+", (text or "").lower())
+    return [t for t in toks if t not in _STOPWORDS]
 
 
-def add_noise_to_trr_vector(trr_vector, noise_level=0.5):
-    """给TRR向量添加噪声，模拟音频噪声"""
-    import numpy as np
-    vector = np.array(trr_vector)
+def _build_text_index(kb_items: List[dict]) -> Tuple[List[set], Dict[str, float]]:
+    """
+    Lightweight TF-IDF-like scorer (no sklearn dependency).
 
-    # 计算向量标准差
-    vector_std = np.std(vector)
-    noise_std = vector_std * noise_level
-
-    # 生成高斯噪声
-    noise = np.random.normal(0, noise_std, vector.shape)
-
-    # 添加噪声
-    noisy_vector = vector + noise
-
-    return noisy_vector.tolist()
-
-
-def copy_params_with_onoff(reference_params, onoff_pattern):
-    """根据ON/OFF模式复制参数"""
-    new_params = {}
-
-    for eff, state in onoff_pattern.items():
-        on_key = f'{eff}On'
-        off_key = f'{eff}Off'
-
-        if state == 'ON':
-            if on_key in reference_params:
-                new_params[on_key] = reference_params[on_key]
-            else:
-                # 如果参考样本没有ON，检查是否有OFF，如果有则转换为ON
-                if off_key in reference_params:
-                    # 使用OFF的参数但调整为ON的合理值
-                    new_params[on_key] = get_default_on_params(eff)
-                else:
-                    new_params[on_key] = get_default_on_params(eff)
-        else:
-            if off_key in reference_params:
-                new_params[off_key] = reference_params[off_key]
-            else:
-                # 如果参考样本没有OFF，使用默认值（避免使用极端的-64.0）
-                default_off = get_default_off_params(eff)
-                # 将Level等参数从-64.0改为0.0，减少L2误差
-                if eff in ['Driver', 'Screamer'] and 'Level' in default_off:
-                    default_off['Level'] = 0.0
-                new_params[off_key] = default_off
-
-    return new_params
+    Returns:
+    - doc_token_sets: list of token sets per KB item
+    - idf: token -> idf weight
+    """
+    doc_token_sets: List[set] = []
+    df: Dict[str, int] = {}
+    for it in kb_items:
+        toks = set(_tokenize(_build_text(it)))
+        doc_token_sets.append(toks)
+        for t in toks:
+            df[t] = df.get(t, 0) + 1
+    n = max(1, len(doc_token_sets))
+    idf = {t: float(np.log((n + 1.0) / (c + 1.0)) + 1.0) for t, c in df.items()}
+    return doc_token_sets, idf
 
 
-def compute_text_noise_level(original_text, noisy_text):
-    """计算文本噪声水平"""
-    original_words = set(original_text.lower().split())
-    noisy_words = set(noisy_text.lower().split())
-
-    if len(original_words) == 0:
+def _score_text_query(query_text: str, doc_tokens: set, idf: Dict[str, float]) -> float:
+    q = set(_tokenize(query_text))
+    if not q or not doc_tokens:
         return 0.0
-
-    # 计算保留的单词比例
-    intersection = len(original_words & noisy_words)
-    retention_rate = intersection / len(original_words)
-
-    # 噪声水平 = 1 - 保留率
-    return 1.0 - retention_rate
+    inter = q.intersection(doc_tokens)
+    return float(sum(idf.get(t, 0.0) for t in inter))
 
 
-def run_text_noise_experiment(data, trr_retriever, text_retriever, hybrid_retriever, evaluator):
-    """实验1：文本模糊情况下的对比"""
-    print("\n" + "="*180)
-    print("实验1：文本模糊情况下的鲁棒性测试")
-    print("="*180)
+def _load_trr_vector(item: dict) -> Optional[np.ndarray]:
+    if isinstance(item.get("Vectors"), dict) and item["Vectors"].get("TRR"):
+        try:
+            return np.asarray(item["Vectors"]["TRR"], dtype=np.float64)
+        except Exception:
+            pass
+    audio_path = item.get("AudioPath")
+    if audio_path:
+        cache_path = str(audio_path) + ".trr.npy"
+        if os.path.exists(cache_path):
+            try:
+                return np.load(cache_path).astype(np.float64)
+            except Exception:
+                pass
+    return None
 
-    # 分离测试集和知识库
-    test_items = [d for d in data if d['SongName'] in TEST_SAMPLES]
 
-    # 存储结果
-    results = {
-        'Text+LLM': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'module': []},
-        'Hybrid(α=0.15)+LLM': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'module': []}
-    }
+def _cosine_scores(query_vec: np.ndarray, mat: np.ndarray) -> np.ndarray:
+    q = query_vec.astype(np.float64)
+    q = q / (np.linalg.norm(q) + 1e-12)
+    m = mat / (np.linalg.norm(mat, axis=1, keepdims=True) + 1e-12)
+    return m @ q
 
-    print(f"\n测试样本数: {len(test_items)}")
-    print(f"噪声类型: 使用模糊词（warm等）进行检索")
-    print(f"对比策略:")
-    print(f"  - Text+LLM: 纯文本检索（模糊查询）")
-    print(f"  - Hybrid(α=0.15)+LLM: 动态权重（模糊查询 + 原始TRR，音频权重高以补偿文本损失）")
 
-    for idx, test_item in enumerate(test_items, 1):
-        name = test_item['SongName']
-        gt_params = test_item['Parameters']
-        gt_style = test_item.get('Style', [])
-        style_str = " ".join(gt_style) if gt_style else name
+def _minmax(x: np.ndarray) -> np.ndarray:
+    lo = float(np.min(x))
+    hi = float(np.max(x))
+    if hi - lo < 1e-12:
+        return np.zeros_like(x, dtype=np.float64)
+    return (x - lo) / (hi - lo)
 
-        print(f"\n[{idx}/{len(test_items)}] {name}")
-        print(f"  原始Style: {style_str}")
 
-        # 使用模糊词进行检索
-        vague_queries = {
-            "Dry Funk": "warm funky guitar tone",
-            "Tweed Breakup": "warm blues breakup sound",
-            "Reverse Psychedelic": "warm psychedelic reverse effect",
-            "Math Rock Crystal": "warm clean crystal tone",
-            "Saturated Rhythm": "warm high gain rhythm"
+def _entropy_from_topk(scores: np.ndarray) -> float:
+    """
+    Shannon entropy computed over a softmax distribution derived from similarity scores.
+    """
+    s = scores.astype(np.float64)
+    s = s - np.max(s)
+    p = np.exp(s)
+    p = p / (np.sum(p) + 1e-12)
+    return float(-np.sum(p * np.log(p + 1e-12)))
+
+
+def _compute_quality_score(scores: np.ndarray, top_k: int) -> float:
+    """
+    Compute retrieval quality score from top-K similarity scores.
+
+    The intuition is:
+    - "Peaked but wrong": low max score + low variance → low quality
+    - "Peaked and correct": high max score + high variance → high quality
+    - "Diversely correct": medium max + high variance → medium quality
+
+    Quality = (max_score / (max_possible_score)) × peakedness_factor
+
+    where peakedness_factor captures how much the top result stands out.
+
+    Args:
+        scores: Top-K similarity scores (sorted ascending)
+        top_k: Number of scores
+
+    Returns:
+        Quality score in [0, 1], higher is better
+    """
+    if top_k <= 1 or len(scores) == 0:
+        return 0.5
+
+    # Get the max score (top-1 result)
+    max_score = float(scores[-1]) if len(scores) > 0 else 0.0
+
+    # For cosine similarity, max possible is 1.0
+    # Normalize by max possible to get absolute strength
+    absolute_strength = min(1.0, max_score)
+
+    # Peakedness: ratio of max to second-best (if available)
+    # This captures how much the top result stands out
+    if len(scores) >= 2:
+        second_best = float(scores[-2])
+        # Avoid division by zero
+        if second_best > 1e-12:
+            peakedness = min(2.0, max_score / second_best) / 2.0  # Normalize to [0, 1]
+        else:
+            peakedness = 1.0
+    else:
+        peakedness = 1.0
+
+    # Quality = absolute strength × peakedness
+    # High absolute strength AND high peakedness → high quality
+    # Low absolute strength OR low peakedness → low quality
+    quality = absolute_strength * peakedness
+
+    return float(quality)
+
+
+def _entropy_weights_quality_aware(
+    text_topk: np.ndarray,
+    audio_topk: np.ndarray,
+    *,
+    beta: float,
+    quality_weight: float = 0.5,
+) -> Dict[str, float]:
+    """
+    Quality-aware entropy fusion weights.
+
+    Formula:
+        Q_m = (1 - α) × exp(-β × U_m) + α × quality_m
+        w_m = Q_m / (Q_text + Q_audio)
+
+    where:
+        U_m = H(p_m) / log(K) - normalized entropy
+        quality_m = normalized confidence score
+
+    Args:
+        text_topk: Top-K text retrieval scores
+        audio_topk: Top-K audio retrieval scores
+        beta: Entropy temperature
+        quality_weight: Weight of quality factor [0, 1]
+
+    Returns:
+        Dictionary with weights and metadata
+    """
+    top_k = int(text_topk.shape[0])
+    if top_k <= 1:
+        return {
+            "w_text": 0.5,
+            "w_audio": 0.5,
+            "u_text_norm": 0.0,
+            "u_audio_norm": 0.0,
+            "q_text": 0.5,
+            "q_audio": 0.5,
         }
 
-        vague_query = vague_queries.get(name, "warm guitar tone")
-        print(f"  模糊查询: {vague_query}")
+    # Compute normalized entropy
+    u_text = _entropy_from_topk(text_topk)
+    u_audio = _entropy_from_topk(audio_topk)
+    u_max = float(np.log(top_k))
+    u_text_norm = float(u_text / (u_max + 1e-12))
+    u_audio_norm = float(u_audio / (u_max + 1e-12))
 
-        # === 方法1: Text + LLM ===
-        print("  [Text+LLM] 文本检索（使用模糊查询）...")
-        text_results = text_retriever.retrieve_top_k(vague_query, k=1)
-        text_ref_params = text_results[0].get('Parameters', text_results[0].get('params', {}))
-        text_retrieved_name = text_results[0].get('SongName', 'Unknown')
-        print(f"    检索到: {text_retrieved_name}")
+    # Compute quality scores
+    q_text = _compute_quality_score(text_topk, top_k)
+    q_audio = _compute_quality_score(audio_topk, top_k)
 
-        if HAS_OPENAI:
-            print("  [Text+LLM] LLM预测ON/OFF...")
-            onoff_pattern = predict_onoff_with_llm(style_str, name)
-            if onoff_pattern:
-                pred_params = copy_params_with_onoff(text_ref_params, onoff_pattern)
-            else:
-                pred_params = text_ref_params
-        else:
-            pred_params = text_ref_params
+    # Combine entropy and quality
+    # Low entropy + high quality → high weight
+    # High entropy + low quality → low weight
+    entropy_text = float(np.exp(-float(beta) * u_text_norm))
+    entropy_audio = float(np.exp(-float(beta) * u_audio_norm))
 
-        l2 = evaluator.compute_parameter_distance(pred_params, gt_params)
-        acc = evaluator.compute_accuracy_tolerance(pred_params, gt_params, tolerance=0.1)
-        recall = evaluator.compute_parameter_recall(pred_params, gt_params)
-        cosine = evaluator.compute_cosine_similarity(pred_params, gt_params)
-        module = evaluator.compute_module_consistency(pred_params, gt_params, active_threshold=0.1)
+    # Weighted combination of entropy confidence and quality score
+    w_text_raw = (1.0 - quality_weight) * entropy_text + quality_weight * q_text
+    w_audio_raw = (1.0 - quality_weight) * entropy_audio + quality_weight * q_audio
 
-        results['Text+LLM']['l2'].append(l2)
-        results['Text+LLM']['acc'].append(acc)
-        results['Text+LLM']['recall'].append(recall)
-        results['Text+LLM']['cosine'].append(cosine)
-        results['Text+LLM']['module'].append(module)
+    # Normalize
+    z = w_text_raw + w_audio_raw + 1e-12
+    w_text = w_text_raw / z
+    w_audio = w_audio_raw / z
 
-        print(f"    L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Module={module:.4f}")
-
-        # === 方法2: Hybrid (α=0.15) + LLM [动态权重：使用模糊查询] ===
-        print("  [Hybrid(α=0.15)+LLM] 混合检索（动态权重 + 模糊查询）...")
-        alpha_dynamic = 0.15  # 15%文本, 85%音频
-        print(f"  动态权重: α={alpha_dynamic} (文本={alpha_dynamic:.0%}, 音频={1-alpha_dynamic:.0%})")
-        print(f"  查询类型: 模糊查询（'warm'等词）")
-
-        # 使用模糊查询 + 原始TRR向量
-        hybrid_results_15 = hybrid_retriever.retrieve_top_k(vague_query, query_trr_vector=test_item['Vectors']['TRR'], alpha=alpha_dynamic, k=1)
-        hybrid_ref_params_15 = hybrid_results_15[0].get('params', hybrid_results_15[0].get('Parameters', {}))
-        hybrid_retrieved_name_15 = hybrid_results_15[0].get('song_name', hybrid_results_15[0].get('SongName', 'Unknown'))
-        print(f"    检索到: {hybrid_retrieved_name_15} (α={alpha_dynamic})")
-
-        if HAS_OPENAI:
-            print("  [Hybrid(α=0.15)+LLM] LLM预测ON/OFF...")
-            onoff_pattern = predict_onoff_with_llm(style_str, name)
-            if onoff_pattern:
-                pred_params_15 = copy_params_with_onoff(hybrid_ref_params_15, onoff_pattern)
-            else:
-                pred_params_15 = hybrid_ref_params_15
-        else:
-            pred_params_15 = hybrid_ref_params_15
-
-        l2_15 = evaluator.compute_parameter_distance(pred_params_15, gt_params)
-        acc_15 = evaluator.compute_accuracy_tolerance(pred_params_15, gt_params, tolerance=0.1)
-        recall_15 = evaluator.compute_parameter_recall(pred_params_15, gt_params)
-        cosine_15 = evaluator.compute_cosine_similarity(pred_params_15, gt_params)
-        module_15 = evaluator.compute_module_consistency(pred_params_15, gt_params, active_threshold=0.1)
-
-        results['Hybrid(α=0.15)+LLM']['l2'].append(l2_15)
-        results['Hybrid(α=0.15)+LLM']['acc'].append(acc_15)
-        results['Hybrid(α=0.15)+LLM']['recall'].append(recall_15)
-        results['Hybrid(α=0.15)+LLM']['cosine'].append(cosine_15)
-        results['Hybrid(α=0.15)+LLM']['module'].append(module_15)
-
-        print(f"    L2={l2_15:.4f} Acc={acc_15:.4f} Recall={recall_15:.4f} Cos={cosine_15:.4f} Module={module_15:.4f}")
-
-    # 打印总结
-    print("\n" + "="*180)
-    print("实验1结果：文本模糊情况下的性能对比")
-    print("="*180)
-    print(f"{'方法':<20} {'L2误差↓':<15} {'准确率↑':<15} {'召回率↑':<15} {'余弦相似度↑':<18} {'模块一致性↑':<18}")
-    print("-"*180)
-
-    methods = [
-        ('Text+LLM', results['Text+LLM']),
-        ('Hybrid(α=0.15)+LLM', results['Hybrid(α=0.15)+LLM'])
-    ]
-
-    for method_name, metrics in methods:
-        l2 = sum(metrics['l2']) / len(metrics['l2']) if metrics['l2'] else 0
-        acc = sum(metrics['acc']) / len(metrics['acc']) if metrics['acc'] else 0
-        recall = sum(metrics['recall']) / len(metrics['recall']) if metrics['recall'] else 0
-        cosine = sum(metrics['cosine']) / len(metrics['cosine']) if metrics['cosine'] else 0
-        module = sum(metrics['module']) / len(metrics['module']) if metrics['module'] else 0
-
-        print(f"{method_name:<20} {l2:<15.4f} {acc:<15.4f} {recall:<15.4f} {cosine:<18.4f} {module:<18.4f}")
-
-    print("-"*180)
-
-    # 计算改进
-    text_l2 = sum(results['Text+LLM']['l2']) / len(results['Text+LLM']['l2'])
-    hybrid_15_l2 = sum(results['Hybrid(α=0.15)+LLM']['l2']) / len(results['Hybrid(α=0.15)+LLM']['l2'])
-
-    print(f"\n改进分析:")
-    if hybrid_15_l2 < text_l2:
-        improvement = ((text_l2 - hybrid_15_l2) / text_l2) * 100
-        print(f"  Hybrid(α=0.15)+LLM vs Text+LLM: L2降低 {improvement:.1f}%")
-    else:
-        degradation = ((hybrid_15_l2 - text_l2) / text_l2) * 100
-        print(f"  Hybrid(α=0.15)+LLM vs Text+LLM: L2上升 {degradation:.1f}%")
-
-    return results
-
-
-def run_audio_noise_experiment(data, trr_retriever, text_retriever, hybrid_retriever, evaluator):
-    """实验2：音频噪声大的情况下的对比"""
-    print("\n" + "="*180)
-    print("实验2：音频噪声大的情况下的鲁棒性测试")
-    print("="*180)
-
-    # 分离测试集和知识库
-    test_items = [d for d in data if d['SongName'] in TEST_SAMPLES]
-
-    # 初始化音频噪声注入器
-    audio_injector = AudioNoiseInjector(noise_type="mix", noise_level=0.8)
-
-    # 存储结果
-    results = {
-        'TRR+LLM': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'module': []},
-        'Hybrid(α=0.85)+LLM': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'module': []}
+    return {
+        "w_text": w_text,
+        "w_audio": w_audio,
+        "u_text_norm": u_text_norm,
+        "u_audio_norm": u_audio_norm,
+        "q_text": q_text,
+        "q_audio": q_audio,
     }
 
-    print(f"\n测试样本数: {len(test_items)}")
-    print(f"噪声类型: mix (高斯+丢包)")
-    print(f"噪声水平: 5.0（极强噪声）")
-    print(f"对比策略:")
-    print(f"  - TRR+LLM: 纯音频检索（使用次优结果模拟噪声）")
-    print(f"  - Hybrid(α=0.85)+LLM: 动态权重（加噪声音频 + 原始Style，文本权重高以补偿音频损失）")
 
-    for idx, test_item in enumerate(test_items, 1):
-        name = test_item['SongName']
-        gt_params = test_item['Parameters']
-        gt_style = test_item.get('Style', [])
-        style_str = " ".join(gt_style) if gt_style else name
-        audio_path = test_item.get('AudioPath')
+def _adaptive_fusion_weights(
+    text_topk: np.ndarray,
+    audio_topk: np.ndarray,
+    *,
+    beta: float,
+    quality_weight: float = 0.5,
+    quality_threshold: float = 0.3,
+    audio_bias: float = 0.0,
+) -> Dict[str, float]:
+    """
+    Adaptive fusion weights that can fall back to single-modality retrieval.
 
-        print(f"\n[{idx}/{len(test_items)}] {name}")
-        print(f"  Style: {style_str}")
+    Strategy:
+    1. Compute quality scores for both modalities
+    2. Apply audio_bias to account for TRR's generally better reliability
+    3. If one modality has significantly higher quality (above threshold),
+       use it exclusively (winner-takes-all)
+    4. Otherwise, use quality-aware weighted fusion
 
-        if not audio_path or not os.path.exists(audio_path):
-            print(f"  跳过（音频文件不存在）")
-            continue
+    The audio_bias parameter allows giving TRR a baseline advantage since
+    experiments show TRR is generally more reliable than Text.
 
-        # 注入音频噪声
-        noisy_audio_path = audio_injector.inject_noise_to_file(audio_path)
-        audio_quality = audio_injector.compute_audio_quality(noisy_audio_path)
-        print(f"  音频质量分数: {audio_quality:.2f} (参考：实际音频噪声不影响TRR向量噪声)")
-        print(f"  注：TRR向量直接添加noise_level=5.0的强噪声")
+    Args:
+        text_topk: Top-K text retrieval scores
+        audio_topk: Top-K audio retrieval scores
+        beta: Entropy temperature
+        quality_weight: Weight of quality factor [0, 1]
+        quality_threshold: Quality difference threshold for exclusive selection
+        audio_bias: Baseline advantage for audio [0-1], 0=no bias, 1=audio-only
 
-        # === 方法1: TRR + LLM ===
-        print("  [TRR+LLM] TRR检索（使用原始音频向量，模拟强噪声影响）...")
-        trr_results_all = trr_retriever.retrieve_top_k("ignored", query_vector=test_item['Vectors']['TRR'], k=3)
+    Returns:
+        Dictionary with weights and metadata
+    """
+    top_k = int(text_topk.shape[0])
+    if top_k <= 1:
+        return {
+            "w_text": 0.5,
+            "w_audio": 0.5,
+            "u_text_norm": 0.0,
+            "u_audio_norm": 0.0,
+            "q_text": 0.5,
+            "q_audio": 0.5,
+        }
 
-        # 模拟强噪声影响：强制使用次优结果
-        import random
-        # 从top-3中随机选择一个（模拟噪声导致检索不稳定）
-        random_idx = random.randint(1, min(2, len(trr_results_all)-1))  # 选择第2或第3个结果
-        trr_ref_params = trr_results_all[random_idx]['params']
-        trr_retrieved_name = trr_results_all[random_idx]['song_name']
-        print(f"    检索到: {trr_retrieved_name} (模拟噪声：使用第{random_idx+1}优结果)")
+    # Compute normalized entropy
+    u_text = _entropy_from_topk(text_topk)
+    u_audio = _entropy_from_topk(audio_topk)
+    u_max = float(np.log(top_k))
+    u_text_norm = float(u_text / (u_max + 1e-12))
+    u_audio_norm = float(u_audio / (u_max + 1e-12))
 
-        if HAS_OPENAI:
-            print("  [TRR+LLM] LLM预测ON/OFF...")
-            onoff_pattern = predict_onoff_with_llm(style_str, name)
-            if onoff_pattern:
-                pred_params = copy_params_with_onoff(trr_ref_params, onoff_pattern)
-            else:
-                pred_params = trr_ref_params
+    # Compute quality scores
+    q_text = _compute_quality_score(text_topk, top_k)
+    q_audio = _compute_quality_score(audio_topk, top_k)
+
+    # Apply audio_bias: boost audio quality by the bias factor
+    q_audio_biased = min(1.0, q_audio * (1.0 + float(audio_bias)))
+
+    # Check if one modality is significantly better
+    quality_diff = abs(q_audio_biased - q_text)
+
+    if quality_diff > quality_threshold:
+        # Winner-takes-all: use the better modality exclusively
+        if q_audio_biased > q_text:
+            w_text, w_audio = 0.0, 1.0
         else:
-            pred_params = trr_ref_params
+            w_text, w_audio = 1.0, 0.0
+    else:
+        # Use quality-aware weighted fusion with biased audio quality
+        entropy_text = float(np.exp(-float(beta) * u_text_norm))
+        entropy_audio = float(np.exp(-float(beta) * u_audio_norm))
 
-        l2 = evaluator.compute_parameter_distance(pred_params, gt_params)
-        acc = evaluator.compute_accuracy_tolerance(pred_params, gt_params, tolerance=0.1)
-        recall = evaluator.compute_parameter_recall(pred_params, gt_params)
-        cosine = evaluator.compute_cosine_similarity(pred_params, gt_params)
-        module = evaluator.compute_module_consistency(pred_params, gt_params, active_threshold=0.1)
+        w_text_raw = (1.0 - quality_weight) * entropy_text + quality_weight * q_text
+        w_audio_raw = (1.0 - quality_weight) * entropy_audio + quality_weight * q_audio_biased
 
-        results['TRR+LLM']['l2'].append(l2)
-        results['TRR+LLM']['acc'].append(acc)
-        results['TRR+LLM']['recall'].append(recall)
-        results['TRR+LLM']['cosine'].append(cosine)
-        results['TRR+LLM']['module'].append(module)
+        z = w_text_raw + w_audio_raw + 1e-12
+        w_text = w_text_raw / z
+        w_audio = w_audio_raw / z
 
-        print(f"    L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Module={module:.4f}")
+    return {
+        "w_text": w_text,
+        "w_audio": w_audio,
+        "u_text_norm": u_text_norm,
+        "u_audio_norm": u_audio_norm,
+        "q_text": q_text,
+        "q_audio": q_audio,
+    }
 
-        # === 方法2: Hybrid (α=0.85) + LLM [动态权重：使用噪声音频] ===
-        print("  [Hybrid(α=0.85)+LLM] 混合检索（动态权重 + 噪声音频）...")
-        # 音频噪声大时，大幅增加文本权重（alpha大，文本权重大）
-        alpha_dynamic = 0.85  # 85%文本, 15%音频
-        print(f"  动态权重: α={alpha_dynamic} (文本={alpha_dynamic:.0%}, 音频={1-alpha_dynamic:.0%})")
-        print(f"  音频质量: 加噪声（noise_level=5.0, 极强噪声）")
 
-        # 给TRR向量加噪声，模拟音频噪声影响（使用更高噪声水平）
-        noisy_trr_vector = add_noise_to_trr_vector(test_item['Vectors']['TRR'], noise_level=5.0)
+def _entropy_weights(text_topk: np.ndarray, audio_topk: np.ndarray, *, beta: float) -> Dict[str, float]:
+    """Original entropy-only weights (for backward compatibility)."""
+    return _entropy_weights_quality_aware(text_topk, audio_topk, beta=beta, quality_weight=0.0)
 
-        # 使用加噪声的TRR向量进行检索
-        hybrid_results_85 = hybrid_retriever.retrieve_top_k(style_str, query_trr_vector=noisy_trr_vector, alpha=alpha_dynamic, k=1)
-        hybrid_ref_params_85 = hybrid_results_85[0].get('params', hybrid_results_85[0].get('Parameters', {}))
-        hybrid_retrieved_name_85 = hybrid_results_85[0].get('song_name', hybrid_results_85[0].get('SongName', 'Unknown'))
-        print(f"    检索到: {hybrid_retrieved_name_85} (α={alpha_dynamic}, 噪声音频)")
 
-        if HAS_OPENAI:
-            print("  [Hybrid(α=0.85)+LLM] LLM预测ON/OFF...")
-            onoff_pattern = predict_onoff_with_llm(style_str, name)
-            if onoff_pattern:
-                pred_params_85 = copy_params_with_onoff(hybrid_ref_params_85, onoff_pattern)
-            else:
-                pred_params_85 = hybrid_ref_params_85
-        else:
-            pred_params_85 = hybrid_ref_params_85
+def _add_noise_unit(vec: np.ndarray, *, noise_level: float, rng: np.random.Generator) -> np.ndarray:
+    v = vec.astype(np.float64)
+    v = v / (np.linalg.norm(v) + 1e-12)
+    eps = rng.normal(loc=0.0, scale=float(noise_level), size=v.shape).astype(np.float64)
+    out = v + eps
+    out = out / (np.linalg.norm(out) + 1e-12)
+    return out
 
-        l2_85 = evaluator.compute_parameter_distance(pred_params_85, gt_params)
-        acc_85 = evaluator.compute_accuracy_tolerance(pred_params_85, gt_params, tolerance=0.1)
-        recall_85 = evaluator.compute_parameter_recall(pred_params_85, gt_params)
-        cosine_85 = evaluator.compute_cosine_similarity(pred_params_85, gt_params)
-        module_85 = evaluator.compute_module_consistency(pred_params_85, gt_params, active_threshold=0.1)
 
-        results['Hybrid(α=0.85)+LLM']['l2'].append(l2_85)
-        results['Hybrid(α=0.85)+LLM']['acc'].append(acc_85)
-        results['Hybrid(α=0.85)+LLM']['recall'].append(recall_85)
-        results['Hybrid(α=0.85)+LLM']['cosine'].append(cosine_85)
-        results['Hybrid(α=0.85)+LLM']['module'].append(module_85)
+def _generate_conflict_text(item: dict) -> str:
+    """
+    Heuristic contradictory-text generator for modality-conflict stress tests.
 
-        print(f"    L2={l2_85:.4f} Acc={acc_85:.4f} Recall={recall_85:.4f} Cos={cosine_85:.4f} Module={module_85:.4f}")
+    We flip a coarse "clean-ish" vs "heavy-ish" intent based on SongName/style tokens.
+    This is intentionally simple and auditable (no LLM).
+    """
+    base = _build_text(item).lower()
 
-    # 清理临时文件
-    audio_injector.cleanup()
-
-    # 打印总结
-    print("\n" + "="*180)
-    print("实验2结果：音频噪声大的情况下的性能对比")
-    print("="*180)
-    print(f"{'方法':<20} {'L2误差↓':<15} {'准确率↑':<15} {'召回率↑':<15} {'余弦相似度↑':<18} {'模块一致性↑':<18}")
-    print("-"*180)
-
-    methods = [
-        ('TRR+LLM', results['TRR+LLM']),
-        ('Hybrid(α=0.85)+LLM', results['Hybrid(α=0.85)+LLM'])
+    heavy_tokens = [
+        "metal",
+        "djent",
+        "high gain",
+        "gain",
+        "distortion",
+        "fuzz",
+        "crunch",
+        "grunge",
+        "doom",
+        "stoner",
+        "industrial",
+        "saturated",
+        "breakup",
+        "drive",
+    ]
+    clean_tokens = [
+        "clean",
+        "acoustic",
+        "jazz",
+        "neo-soul",
+        "crystal",
+        "dry",
+        "funk",
+        "pop",
+        "box",
+        "jangle",
     ]
 
-    for method_name, metrics in methods:
-        l2 = sum(metrics['l2']) / len(metrics['l2']) if metrics['l2'] else 0
-        acc = sum(metrics['acc']) / len(metrics['acc']) if metrics['acc'] else 0
-        recall = sum(metrics['recall']) / len(metrics['recall']) if metrics['recall'] else 0
-        cosine = sum(metrics['cosine']) / len(metrics['cosine']) if metrics['cosine'] else 0
-        module = sum(metrics['module']) / len(metrics['module']) if metrics['module'] else 0
+    is_heavy = any(t in base for t in heavy_tokens)
+    is_clean = any(t in base for t in clean_tokens)
 
-        print(f"{method_name:<20} {l2:<15.4f} {acc:<15.4f} {recall:<15.4f} {cosine:<18.4f} {module:<18.4f}")
-
-    print("-"*180)
-
-    # 计算改进
-    trr_l2 = sum(results['TRR+LLM']['l2']) / len(results['TRR+LLM']['l2'])
-    hybrid_85_l2 = sum(results['Hybrid(α=0.85)+LLM']['l2']) / len(results['Hybrid(α=0.85)+LLM']['l2'])
-
-    print(f"\n改进分析:")
-    if hybrid_85_l2 < trr_l2:
-        improvement = ((trr_l2 - hybrid_85_l2) / trr_l2) * 100
-        print(f"  Hybrid(α=0.85)+LLM vs TRR+LLM: L2降低 {improvement:.1f}%")
-    else:
-        degradation = ((hybrid_85_l2 - trr_l2) / trr_l2) * 100
-        print(f"  Hybrid(α=0.85)+LLM vs TRR+LLM: L2上升 {degradation:.1f}%")
-
-    return results
+    if is_heavy and not is_clean:
+        return "clean dry jazz guitar tone, low gain, no distortion"
+    if is_clean and not is_heavy:
+        return "aggressive high-gain distorted guitar tone, heavy saturation, modern metal"
+    return "aggressive high-gain distorted guitar tone, heavy saturation, modern metal"
 
 
-def main():
-    print("="*180)
-    print("                    鲁棒性测试实验")
-    print("="*180)
+@dataclass(frozen=True)
+class PerQueryRow:
+    protocol: str
+    scenario: str
+    query_idx: int
+    query_name: str
+    query_text: str
+    method: str
+    retrieved_name: str
+    w_text: float
+    w_audio: float
+    u_text_norm: float
+    u_audio_norm: float
+    l2: float
+    acc_at_0_1: float
+    recall: float
+    cosine: float
+    module: float
 
-    # 1. 加载数据
-    print("\n[1] 加载数据...")
-    data = load_and_merge_data()
 
-    # 分离测试集和知识库
-    test_items = [d for d in data if d['SongName'] in TEST_SAMPLES]
-    kb_items = [d for d in data if d['SongName'] not in TEST_SAMPLES]
+def _bootstrap_ci_mean(x: np.ndarray, *, n_boot: int, seed: int, alpha: float) -> Tuple[float, float]:
+    rng = np.random.default_rng(int(seed))
+    n = int(x.shape[0])
+    idx = rng.integers(0, n, size=(int(n_boot), n))
+    samples = x[idx].mean(axis=1)
+    lo = float(np.quantile(samples, alpha / 2.0))
+    hi = float(np.quantile(samples, 1.0 - alpha / 2.0))
+    return lo, hi
 
-    print(f"测试集: {len(test_items)} 样本")
-    print(f"知识库: {len(kb_items)} 样本")
 
-    # 2. 初始化检索器
-    print("\n[2] 初始化检索器...")
-    trr_retriever = TRRRetriever(kb_items)
-    text_retriever = RAGRetriever(kb_items)
-    hybrid_retriever = HybridFusionRetriever(kb_items, fusion_mode='weighted')
+def _bootstrap_ci_mean_diff(d: np.ndarray, *, n_boot: int, seed: int, alpha: float) -> Tuple[float, float]:
+    rng = np.random.default_rng(int(seed))
+    n = int(d.shape[0])
+    idx = rng.integers(0, n, size=(int(n_boot), n))
+    samples = d[idx].mean(axis=1)
+    lo = float(np.quantile(samples, alpha / 2.0))
+    hi = float(np.quantile(samples, 1.0 - alpha / 2.0))
+    return lo, hi
 
-    # 3. 初始化评估器
+
+def _paired_permutation_pvalue(d: np.ndarray, *, n_perm: int, seed: int) -> float:
+    """
+    Two-sided paired permutation test via random sign-flipping.
+    """
+    rng = np.random.default_rng(int(seed))
+    n = int(d.shape[0])
+    obs = float(d.mean())
+    signs = rng.choice(np.array([-1.0, 1.0], dtype=float), size=(int(n_perm), n), replace=True)
+    perm_means = (signs * d).mean(axis=1)
+    p = (float(np.sum(np.abs(perm_means) >= abs(obs))) + 1.0) / (float(n_perm) + 1.0)
+    return float(p)
+
+
+def _holm_bonferroni(pvals: List[float]) -> List[float]:
+    """
+    Holm-Bonferroni adjusted p-values (step-down), preserving original order.
+    """
+    m = len(pvals)
+    order = sorted(range(m), key=lambda i: pvals[i])
+    adj = [0.0] * m
+    prev = 0.0
+    for rank, i in enumerate(order):
+        p_adj = (m - rank) * pvals[i]
+        p_adj = min(1.0, max(p_adj, prev))
+        adj[i] = p_adj
+        prev = p_adj
+    return adj
+
+
+def _scenario_specs(args: argparse.Namespace) -> List[Tuple[str, str]]:
+    all_specs = [
+        ("standard", "Standard inputs (original text + original audio)."),
+        ("vague_text", f"Vague text: replace text with `{args.vague_text}` (audio unchanged)."),
+        ("noisy_audio", f"Noisy audio: add embedding-space Gaussian noise (noise_level={args.noise_level})."),
+        ("conflict", "Modality conflict: contradictory text (audio unchanged)."),
+    ]
+    keep = set([s.strip() for s in (args.scenarios or "").split(",") if s.strip()])
+    if not keep:
+        return all_specs
+    return [(k, d) for (k, d) in all_specs if k in keep]
+
+
+def _select_split(dataset: List[dict], test_list: str) -> Tuple[List[int], List[int], str]:
+    test_source = "built-in held-out pool (Protocol-A)"
+    test_name_set: Optional[set] = None
+    if test_list:
+        p = Path(test_list)
+        test_name_set = set(_read_name_list(p))
+        test_source = str(p)
+
+    def is_test(name: str) -> bool:
+        if test_name_set is not None:
+            return name in test_name_set
+        return is_test_sample(name)
+
+    test_indices = [i for i, it in enumerate(dataset) if is_test(it.get("SongName") or "")]
+    kb_indices = [i for i in range(len(dataset)) if i not in set(test_indices)]
+    return test_indices, kb_indices, test_source
+
+
+def _eval_metrics(evaluator: Evaluator, pred_params: dict, gt_params: dict) -> Tuple[float, float, float, float, float]:
+    l2 = float(evaluator.compute_parameter_distance(pred_params, gt_params))
+    acc = float(evaluator.compute_accuracy_tolerance(pred_params, gt_params, tolerance=0.1))
+    rec = float(evaluator.compute_parameter_recall(pred_params, gt_params))
+    cos = float(evaluator.compute_cosine_similarity(pred_params, gt_params))
+    mod = float(evaluator.compute_module_consistency(pred_params, gt_params, active_threshold=0.1))
+    return l2, acc, rec, cos, mod
+
+
+def _run_one_scenario(
+    *,
+    dataset: List[dict],
+    test_indices: List[int],
+    kb_items: List[dict],
+    kb_doc_tokens: List[set],
+    idf: Dict[str, float],
+    kb_trr_arr: np.ndarray,
+    trr_dim: int,
+    evaluator: Evaluator,
+    scenario_key: str,
+    beta: float,
+    quality_weight: float,
+    quality_threshold: float,
+    audio_bias: float,
+    top_k: int,
+    vague_text: str,
+    noise_level: float,
+    seed: int,
+) -> Tuple[List[PerQueryRow], Dict[int, float]]:
+    rows: List[PerQueryRow] = []
+    fusion_l2_by_q: Dict[int, float] = {}
+
+    for q_pos, q_idx in enumerate(test_indices, 1):
+        q_item = dataset[int(q_idx)]
+        q_name = q_item.get("SongName") or f"idx={q_idx}"
+
+        q_text_std = _build_text(q_item)
+        if scenario_key == "standard":
+            q_text = q_text_std
+        elif scenario_key == "vague_text":
+            q_text = str(vague_text)
+        elif scenario_key == "noisy_audio":
+            q_text = q_text_std
+        elif scenario_key == "conflict":
+            q_text = _generate_conflict_text(q_item)
+        else:
+            raise ValueError(f"Unknown scenario: {scenario_key}")
+
+        q_trr = _load_trr_vector(q_item)
+        if q_trr is None or int(q_trr.shape[0]) != int(trr_dim):
+            q_trr = np.zeros(int(trr_dim), dtype=np.float64)
+
+        if scenario_key == "noisy_audio":
+            rng = np.random.default_rng(int(seed) + int(q_idx))
+            q_trr = _add_noise_unit(q_trr, noise_level=float(noise_level), rng=rng)
+
+        # Text scores: lightweight TF-IDF-like overlap using precomputed IDF weights.
+        text_scores_full = np.asarray(
+            [_score_text_query(q_text, doc, idf) for doc in kb_doc_tokens], dtype=np.float64
+        )
+
+        audio_scores_full = _cosine_scores(q_trr, kb_trr_arr) if kb_trr_arr.size else np.zeros(len(kb_items))
+
+        k_eff = int(min(int(top_k), len(kb_items)))
+        text_topk = np.sort(text_scores_full)[-k_eff:] if k_eff > 0 else np.zeros(1)
+        audio_topk = np.sort(audio_scores_full)[-k_eff:] if k_eff > 0 else np.zeros(1)
+
+        # Use adaptive fusion if threshold > 0 or bias > 0, otherwise use quality-aware fusion
+        if float(quality_threshold) > 0 or float(audio_bias) > 0:
+            w = _adaptive_fusion_weights(
+                text_topk,
+                audio_topk,
+                beta=float(beta),
+                quality_weight=float(quality_weight),
+                quality_threshold=float(quality_threshold),
+                audio_bias=float(audio_bias),
+            )
+        else:
+            w = _entropy_weights_quality_aware(
+                text_topk, audio_topk, beta=float(beta), quality_weight=float(quality_weight)
+            )
+
+        text_best_pos = int(np.argmax(text_scores_full)) if len(text_scores_full) else 0
+        trr_best_pos = int(np.argmax(audio_scores_full)) if len(audio_scores_full) else 0
+        fused_scores = w["w_text"] * _minmax(text_scores_full) + w["w_audio"] * _minmax(audio_scores_full)
+        fused_best_pos = int(np.argmax(fused_scores)) if len(fused_scores) else 0
+
+        gt_params = q_item.get("Parameters") or {}
+
+        def one(method: str, best_pos: int) -> PerQueryRow:
+            retrieved_item = kb_items[int(best_pos)]
+            retrieved_name = retrieved_item.get("SongName") or "Unknown"
+            pred_params = retrieved_item.get("Parameters") or {}
+            l2, acc, rec, cos, mod = _eval_metrics(evaluator, pred_params, gt_params)
+            return PerQueryRow(
+                protocol=PROTOCOL,
+                scenario=scenario_key,
+                query_idx=int(q_idx),
+                query_name=str(q_name),
+                query_text=str(q_text),
+                method=str(method),
+                retrieved_name=str(retrieved_name),
+                w_text=float(w["w_text"]),
+                w_audio=float(w["w_audio"]),
+                u_text_norm=float(w["u_text_norm"]),
+                u_audio_norm=float(w["u_audio_norm"]),
+                l2=float(l2),
+                acc_at_0_1=float(acc),
+                recall=float(rec),
+                cosine=float(cos),
+                module=float(mod),
+            )
+
+        for method, pos in [
+            ("Text-only", text_best_pos),
+            ("TRR-only", trr_best_pos),
+            ("Fusion", fused_best_pos),
+        ]:
+            r = one(method, pos)
+            rows.append(r)
+            if method == "Fusion":
+                fusion_l2_by_q[int(q_idx)] = float(r.l2)
+
+        if q_pos % 50 == 0 or q_pos == len(test_indices):
+            print(f"  processed {q_pos}/{len(test_indices)} queries...")
+
+    return rows, fusion_l2_by_q
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Protocol-C stress tests + modality conflict evaluation (N=211).")
+    ap.add_argument(
+        "--test_list",
+        type=str,
+        default="",
+        help="Optional newline-separated SongName list for held-out queries (overrides built-in held-out pool).",
+    )
+    ap.add_argument(
+        "--dump_csv",
+        type=str,
+        default="Experiments/AblationStudies/protocolC_per_query_metrics.csv",
+        help="Output per-query CSV path.",
+    )
+    ap.add_argument("--stats_out_json", type=str, default="Experiments/AblationStudies/protocolC_objective_stats.json")
+    ap.add_argument("--stats_out_md", type=str, default="Experiments/AblationStudies/protocolC_objective_stats.md")
+    ap.add_argument("--beta", type=float, default=2.0, help="Fusion temperature beta (default: 2.0).")
+    ap.add_argument(
+        "--quality_weight",
+        type=float,
+        default=0.5,
+        help="Quality-aware fusion weight [0-1], 0=entropy-only, 1=quality-only (default: 0.5).",
+    )
+    ap.add_argument(
+        "--quality_threshold",
+        type=float,
+        default=0.0,
+        help="Adaptive fusion threshold [0-1], >0 enables winner-takes-all when quality diff > threshold (default: 0.0=disabled).",
+    )
+    ap.add_argument(
+        "--audio_bias",
+        type=float,
+        default=0.0,
+        help="Baseline advantage for audio/TRR [0-1], 0=no bias, 0.5=moderate, 1.0=strong (default: 0.0).",
+    )
+    ap.add_argument("--top_k", type=int, default=5, help="Top-K for entropy computation (default: 5).")
+    ap.add_argument("--vague_text", type=str, default="warm guitar tone", help="Generic descriptor for vague-text stress.")
+    ap.add_argument("--noise_level", type=float, default=5.0, help="Audio embedding noise level (default: 5.0).")
+    ap.add_argument(
+        "--scenarios",
+        type=str,
+        default="standard,vague_text,noisy_audio,conflict",
+        help="Comma-separated scenario keys to run.",
+    )
+    ap.add_argument("--seed", type=int, default=42, help="RNG seed (default: 42).")
+    ap.add_argument("--stats_n_boot", type=int, default=10000, help="Bootstrap resamples (default: 10000).")
+    ap.add_argument("--stats_n_perm", type=int, default=20000, help="Permutation samples (default: 20000).")
+    ap.add_argument(
+        "--beta_sweep_out",
+        type=str,
+        default="",
+        help="Optional CSV output path. If set, runs a beta sweep over {0.5,1,2,4} in STANDARD scenario.",
+    )
+    args = ap.parse_args()
+
+    dataset = load_and_merge_data()
+    n_total = int(len(dataset))
+
+    test_indices, kb_indices, test_source = _select_split(dataset, args.test_list)
+    n_test = int(len(test_indices))
+    n_kb = int(len(kb_indices))
+
+    print("=" * 88)
+    print("Protocol-C: Robustness Stress Tests + Modality Conflict")
+    print("=" * 88)
+    print(f"- Protocol label: {PROTOCOL}")
+    print(f"- Dataset size: N_total={n_total}")
+    print(f"- Held-out queries: N_test={n_test} (source: {test_source})")
+    print(f"- Knowledge base: N_kb={n_kb}")
+    print(f"- Fusion beta={float(args.beta)} top_k={int(args.top_k)}")
+
+    if n_test == 0:
+        raise SystemExit("No held-out queries found. Check your dataset JSON and/or --test_list.")
+
+    kb_items = [dataset[i] for i in kb_indices]
+    kb_doc_tokens, idf = _build_text_index(kb_items)
+
+    # Candidate TRR vectors
+    trr_dim = None
+    kb_trr: List[np.ndarray] = []
+    for it in kb_items:
+        v = _load_trr_vector(it)
+        if v is not None and trr_dim is None:
+            trr_dim = int(v.shape[0])
+        kb_trr.append(v if v is not None else np.zeros(1, dtype=np.float64))
+    trr_dim = trr_dim or 4096
+    kb_trr_arr = np.stack(
+        [
+            (v if (v is not None and int(v.shape[0]) == trr_dim) else np.zeros(trr_dim, dtype=np.float64))
+            for v in kb_trr
+        ],
+        axis=0,
+    ).astype(np.float64)
+
     evaluator = Evaluator()
 
-    # 4. 运行实验1：文本模糊情况
-    print("\n" + "="*180)
-    print("开始实验1：文本模糊情况下的鲁棒性测试")
-    print("="*180)
-    text_noise_results = run_text_noise_experiment(data, trr_retriever, text_retriever, hybrid_retriever, evaluator)
+    scenario_specs = _scenario_specs(args)
+    all_rows: List[PerQueryRow] = []
+    fusion_l2_standard: Dict[int, float] = {}
 
-    # 5. 运行实验2：音频噪声大的情况
-    print("\n" + "="*180)
-    print("开始实验2：音频噪声大的情况下的鲁棒性测试")
-    print("="*180)
-    audio_noise_results = run_audio_noise_experiment(data, trr_retriever, text_retriever, hybrid_retriever, evaluator)
+    for scenario_key, scenario_desc in scenario_specs:
+        print(f"\n[Scenario: {scenario_key}] {scenario_desc}")
+        rows, fusion_l2_by_q = _run_one_scenario(
+            dataset=dataset,
+            test_indices=test_indices,
+            kb_items=kb_items,
+            kb_doc_tokens=kb_doc_tokens,
+            idf=idf,
+            kb_trr_arr=kb_trr_arr,
+            trr_dim=int(trr_dim),
+            evaluator=evaluator,
+            scenario_key=scenario_key,
+            beta=float(args.beta),
+            quality_weight=float(args.quality_weight),
+            quality_threshold=float(args.quality_threshold),
+            audio_bias=float(args.audio_bias),
+            top_k=int(args.top_k),
+            vague_text=str(args.vague_text),
+            noise_level=float(args.noise_level),
+            seed=int(args.seed),
+        )
+        all_rows.extend(rows)
+        if scenario_key == "standard":
+            fusion_l2_standard = fusion_l2_by_q
 
-    # 6. 总体总结
-    print("\n" + "="*180)
-    print("总体总结")
-    print("="*180)
+    # Per-query CSV
+    out_csv = Path(args.dump_csv)
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
+    with out_csv.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(
+            [
+                "protocol",
+                "scenario",
+                "query_idx",
+                "query_name",
+                "query_text",
+                "method",
+                "retrieved_name",
+                "w_text",
+                "w_audio",
+                "u_text_norm",
+                "u_audio_norm",
+                "l2",
+                "acc@0.1",
+                "recall",
+                "cosine",
+                "module",
+            ]
+        )
+        for r in all_rows:
+            writer.writerow(
+                [
+                    r.protocol,
+                    r.scenario,
+                    r.query_idx,
+                    r.query_name,
+                    r.query_text,
+                    r.method,
+                    r.retrieved_name,
+                    f"{r.w_text:.8f}",
+                    f"{r.w_audio:.8f}",
+                    f"{r.u_text_norm:.8f}",
+                    f"{r.u_audio_norm:.8f}",
+                    f"{r.l2:.8f}",
+                    f"{r.acc_at_0_1:.8f}",
+                    f"{r.recall:.8f}",
+                    f"{r.cosine:.8f}",
+                    f"{r.module:.8f}",
+                ]
+            )
+    print(f"\nWrote per-query CSV: {out_csv}")
 
-    print("\n实验1：文本模糊情况")
-    text_l2 = sum(text_noise_results['Text+LLM']['l2']) / len(text_noise_results['Text+LLM']['l2'])
-    hybrid_15_l2_text = sum(text_noise_results['Hybrid(α=0.15)+LLM']['l2']) / len(text_noise_results['Hybrid(α=0.15)+LLM']['l2'])
-    print(f"  Text+LLM: L2={text_l2:.4f}")
-    print(f"  Hybrid(α=0.15)+LLM: L2={hybrid_15_l2_text:.4f}")
+    # Stats
+    by_scenario: Dict[str, Dict[str, List[PerQueryRow]]] = {}
+    for r in all_rows:
+        by_scenario.setdefault(r.scenario, {}).setdefault(r.method, []).append(r)
 
-    print("\n实验2：音频噪声大的情况")
-    trr_l2 = sum(audio_noise_results['TRR+LLM']['l2']) / len(audio_noise_results['TRR+LLM']['l2'])
-    hybrid_85_l2_audio = sum(audio_noise_results['Hybrid(α=0.85)+LLM']['l2']) / len(audio_noise_results['Hybrid(α=0.85)+LLM']['l2'])
-    print(f"  TRR+LLM: L2={trr_l2:.4f}")
-    print(f"  Hybrid(α=0.85)+LLM: L2={hybrid_85_l2_audio:.4f}")
+    def series(rows_: List[PerQueryRow], metric: str) -> np.ndarray:
+        if metric == "l2":
+            return np.asarray([r.l2 for r in rows_], dtype=np.float64)
+        if metric == "acc@0.1":
+            return np.asarray([r.acc_at_0_1 for r in rows_], dtype=np.float64)
+        if metric == "recall":
+            return np.asarray([r.recall for r in rows_], dtype=np.float64)
+        if metric == "cosine":
+            return np.asarray([r.cosine for r in rows_], dtype=np.float64)
+        if metric == "module":
+            return np.asarray([r.module for r in rows_], dtype=np.float64)
+        raise ValueError(metric)
 
-    print("\n关键发现:")
-    print("  1. 文本模糊情况下，混合检索能利用音频信息补偿文本损失")
-    print("  2. 音频噪声大的情况下，混合检索能利用文本信息补偿音频损失")
-    print("  3. 动态权重调节能根据输入质量自动优化检索策略")
-    print("  4. LLM Few-shot学习能纠正检索误差，达到100%模块一致性")
-    print("  5. 混合检索在两种噪声场景下都显著优于单一检索方法")
+    stats = {
+        "protocol": PROTOCOL,
+        "input_dataset": "dataset_loader.load_and_merge_data()",
+        "n_total": int(n_total),
+        "n_test": int(n_test),
+        "n_kb": int(n_kb),
+        "test_source": test_source,
+        "beta": float(args.beta),
+        "quality_weight": float(args.quality_weight),
+        "quality_threshold": float(args.quality_threshold),
+        "audio_bias": float(args.audio_bias),
+        "top_k": int(args.top_k),
+        "noise_level": float(args.noise_level),
+        "vague_text": str(args.vague_text),
+        "env": {
+            "python": sys.version.replace("\n", " "),
+            "platform": platform.platform(),
+            "processor": platform.processor(),
+        },
+        "scenarios": {},
+        "comparisons": [],
+        "comparisons_note": "Signed diffs are defined so that positive means Fusion is better.",
+    }
 
-    print("\n" + "="*180)
-    print("EXPERIMENT COMPLETE")
-    print("="*180)
+    raw_pvals: List[float] = []
+
+    for scenario_key, _ in scenario_specs:
+        methods = by_scenario.get(scenario_key, {})
+        if not methods:
+            continue
+
+        # Weight distribution is read from Fusion rows (same weights per query in this scenario).
+        w_rows = methods.get("Fusion", [])
+        w_text_arr = np.asarray([r.w_text for r in w_rows], dtype=np.float64)
+        w_audio_arr = np.asarray([r.w_audio for r in w_rows], dtype=np.float64)
+
+        stats["scenarios"][scenario_key] = {
+            "n": int(len(w_rows)),
+            "weights": {
+                "w_text": {
+                    "mean": float(w_text_arr.mean()) if len(w_text_arr) else float("nan"),
+                    "std": float(w_text_arr.std(ddof=1)) if len(w_text_arr) > 1 else 0.0,
+                    "p25": float(np.quantile(w_text_arr, 0.25)) if len(w_text_arr) else float("nan"),
+                    "p50": float(np.quantile(w_text_arr, 0.50)) if len(w_text_arr) else float("nan"),
+                    "p75": float(np.quantile(w_text_arr, 0.75)) if len(w_text_arr) else float("nan"),
+                    "min": float(w_text_arr.min()) if len(w_text_arr) else float("nan"),
+                    "max": float(w_text_arr.max()) if len(w_text_arr) else float("nan"),
+                },
+                "w_audio": {
+                    "mean": float(w_audio_arr.mean()) if len(w_audio_arr) else float("nan"),
+                    "std": float(w_audio_arr.std(ddof=1)) if len(w_audio_arr) > 1 else 0.0,
+                    "p25": float(np.quantile(w_audio_arr, 0.25)) if len(w_audio_arr) else float("nan"),
+                    "p50": float(np.quantile(w_audio_arr, 0.50)) if len(w_audio_arr) else float("nan"),
+                    "p75": float(np.quantile(w_audio_arr, 0.75)) if len(w_audio_arr) else float("nan"),
+                    "min": float(w_audio_arr.min()) if len(w_audio_arr) else float("nan"),
+                    "max": float(w_audio_arr.max()) if len(w_audio_arr) else float("nan"),
+                },
+            },
+            "methods": {},
+        }
+
+        for method_name, method_rows in methods.items():
+            stats["scenarios"][scenario_key]["methods"][method_name] = {"n": int(len(method_rows)), "metrics": {}}
+            for metric in METRICS:
+                x = series(method_rows, metric)
+                lo, hi = _bootstrap_ci_mean(
+                    x, n_boot=int(args.stats_n_boot), seed=int(args.seed), alpha=0.05
+                )
+                stats["scenarios"][scenario_key]["methods"][method_name]["metrics"][metric] = {
+                    "mean": float(x.mean()),
+                    "std": float(x.std(ddof=1)) if len(x) > 1 else 0.0,
+                    "ci95": [float(lo), float(hi)],
+                }
+
+        fusion_rows = methods.get("Fusion", [])
+        if not fusion_rows:
+            continue
+
+        fusion_by_q = {int(r.query_idx): r for r in fusion_rows}
+        for baseline in ["Text-only", "TRR-only"]:
+            base_rows = methods.get(baseline, [])
+            if not base_rows:
+                continue
+            base_by_q = {int(r.query_idx): r for r in base_rows}
+            shared_q = sorted(set(fusion_by_q.keys()).intersection(base_by_q.keys()))
+            if not shared_q:
+                continue
+            for metric in METRICS:
+                a = np.asarray([series([fusion_by_q[q]], metric)[0] for q in shared_q], dtype=np.float64)
+                b = np.asarray([series([base_by_q[q]], metric)[0] for q in shared_q], dtype=np.float64)
+                if metric in LOWER_IS_BETTER:
+                    d = b - a  # positive means Fusion better
+                else:
+                    d = a - b
+                lo, hi = _bootstrap_ci_mean_diff(
+                    d, n_boot=int(args.stats_n_boot), seed=int(args.seed), alpha=0.05
+                )
+                p = _paired_permutation_pvalue(d, n_perm=int(args.stats_n_perm), seed=int(args.seed))
+                stats["comparisons"].append(
+                    {
+                        "scenario": scenario_key,
+                        "baseline": baseline,
+                        "metric": metric,
+                        "n": int(len(shared_q)),
+                        "mean_diff_signed": float(d.mean()),
+                        "ci95_signed": [float(lo), float(hi)],
+                        "p_perm_two_sided": float(p),
+                    }
+                )
+                raw_pvals.append(float(p))
+
+    if raw_pvals:
+        adj = _holm_bonferroni(raw_pvals)
+        for rec, p_adj in zip(stats["comparisons"], adj):
+            rec["p_holm"] = float(p_adj)
+
+    # Modality-conflict degradation + representative failures (largest Fusion ΔL2).
+    if (
+        "standard" in by_scenario
+        and "Fusion" in by_scenario["standard"]
+        and "conflict" in by_scenario
+        and "Fusion" in by_scenario["conflict"]
+    ):
+        standard_fusion_rows = by_scenario["standard"]["Fusion"]
+        conflict_fusion_rows = by_scenario["conflict"]["Fusion"]
+
+        std_by_q = {int(r.query_idx): r for r in standard_fusion_rows}
+        conflict_by_q = {int(r.query_idx): r for r in conflict_fusion_rows}
+        shared_q = sorted(set(std_by_q.keys()).intersection(conflict_by_q.keys()))
+
+        if shared_q:
+            # Degradation statistics for Fusion under conflict vs standard.
+            degradation = {"n": int(len(shared_q)), "metrics": {}}
+            for metric in METRICS:
+                std_vals = np.asarray([series([std_by_q[q]], metric)[0] for q in shared_q], dtype=np.float64)
+                conflict_vals = np.asarray([series([conflict_by_q[q]], metric)[0] for q in shared_q], dtype=np.float64)
+                d = conflict_vals - std_vals  # positive means worse for LOWER_IS_BETTER metrics
+                lo, hi = _bootstrap_ci_mean_diff(
+                    d, n_boot=int(args.stats_n_boot), seed=int(args.seed), alpha=0.05
+                )
+                degradation["metrics"][metric] = {
+                    "mean_delta": float(d.mean()),
+                    "ci95_delta": [float(lo), float(hi)],
+                }
+            stats["conflict_degradation_vs_standard_fusion"] = degradation
+
+            # Representative worst failures by ΔL2.
+            worst = []
+            for q in shared_q:
+                r = conflict_by_q[q]
+                base = std_by_q[q].l2
+                worst.append((float(r.l2 - base), r, float(base)))
+            worst.sort(key=lambda t: t[0], reverse=True)
+            top = worst[:3]
+            stats["conflict_failure_cases"] = [
+                {
+                    "query_idx": int(r.query_idx),
+                    "query_name": r.query_name,
+                    "standard_fusion_l2": float(base_l2),
+                    "conflict_fusion_l2": float(r.l2),
+                    "delta_l2": float(delta),
+                    "conflict_text": r.query_text,
+                    "w_text": float(r.w_text),
+                    "w_audio": float(r.w_audio),
+                    "u_text_norm": float(r.u_text_norm),
+                    "u_audio_norm": float(r.u_audio_norm),
+                    "retrieved_name": r.retrieved_name,
+                }
+                for (delta, r, base_l2) in top
+            ]
+
+    out_json = Path(args.stats_out_json)
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_json.write_text(json.dumps(stats, indent=2, sort_keys=True), encoding="utf-8")
+    print(f"Wrote stats JSON: {out_json}")
+
+    # Markdown report
+    out_md = Path(args.stats_out_md)
+    out_md.parent.mkdir(parents=True, exist_ok=True)
+
+    def fmt_ci(ci: Iterable[float]) -> str:
+        a, b = list(ci)
+        return f"[{a:.4f}, {b:.4f}]"
+
+    lines: List[str] = []
+    lines.append("# Protocol-C: Robustness + Modality-Conflict (Objective Metrics)")
+    lines.append("")
+    lines.append(f"- Protocol: **{PROTOCOL}**")
+    lines.append(f"- Per-query CSV: `{out_csv}`")
+    lines.append(f"- Dataset: N_total={n_total}, N_test={n_test}, N_kb={n_kb}")
+    lines.append(f"- Test source: `{test_source}`")
+    lines.append(f"- Fusion beta={float(args.beta)} quality_weight={float(args.quality_weight)} quality_threshold={float(args.quality_threshold)} audio_bias={float(args.audio_bias)} top_k={int(args.top_k)}")
+    lines.append(f"- Vague text: `{args.vague_text}`")
+    lines.append(f"- Audio noise_level: {float(args.noise_level)}")
+    lines.append(f"- Bootstrap: n_boot={int(args.stats_n_boot)} (seed={int(args.seed)})")
+    lines.append(f"- Paired permutation: n_perm={int(args.stats_n_perm)} (seed={int(args.seed)})")
+    lines.append("")
+
+    lines.append("## Scenario Summaries (Mean Over Queries, 95% CI)")
+    for scenario_key, desc in scenario_specs:
+        if scenario_key not in stats["scenarios"]:
+            continue
+        srec = stats["scenarios"][scenario_key]
+        lines.append("")
+        lines.append(f"### {scenario_key}")
+        lines.append(f"- {desc}")
+        wtxt = srec["weights"]["w_text"]
+        waud = srec["weights"]["w_audio"]
+        lines.append(
+            f"- Weight stats (Fusion): "
+            f"w_text mean={wtxt['mean']:.4f} std={wtxt['std']:.4f} "
+            f"p25/p50/p75={wtxt['p25']:.4f}/{wtxt['p50']:.4f}/{wtxt['p75']:.4f} "
+            f"min/max={wtxt['min']:.4f}/{wtxt['max']:.4f}"
+        )
+        lines.append(
+            f"- Weight stats (Fusion): "
+            f"w_audio mean={waud['mean']:.4f} std={waud['std']:.4f} "
+            f"p25/p50/p75={waud['p25']:.4f}/{waud['p50']:.4f}/{waud['p75']:.4f} "
+            f"min/max={waud['min']:.4f}/{waud['max']:.4f}"
+        )
+        lines.append("")
+        header = ["Method", "n"] + [f"{m} (mean, 95% CI)" for m in METRICS]
+        lines.append("| " + " | ".join(header) + " |")
+        lines.append("| " + " | ".join(["---"] * len(header)) + " |")
+        for method_name in ["Text-only", "TRR-only", "Fusion"]:
+            mrec = srec["methods"].get(method_name)
+            if not mrec:
+                continue
+            row = [method_name, str(int(mrec["n"]))]
+            for metric in METRICS:
+                mm = mrec["metrics"][metric]
+                row.append(f"{mm['mean']:.4f}, {fmt_ci(mm['ci95'])}")
+            lines.append("| " + " | ".join(row) + " |")
+
+    lines.append("")
+    lines.append("## Paired Tests (Fusion vs Baselines, Holm-Corrected)")
+    lines.append("")
+    if not stats["comparisons"]:
+        lines.append("_No comparisons were generated._")
+    else:
+        header = ["Scenario", "Baseline", "Metric", "n", "MeanΔ (signed)", "95% CI", "p", "p(Holm)"]
+        lines.append("| " + " | ".join(header) + " |")
+        lines.append("| " + " | ".join(["---"] * len(header)) + " |")
+        for rec in stats["comparisons"]:
+            lines.append(
+                "| "
+                + " | ".join(
+                    [
+                        rec["scenario"],
+                        rec["baseline"],
+                        rec["metric"],
+                        str(int(rec["n"])),
+                        f"{float(rec['mean_diff_signed']):.4f}",
+                        fmt_ci(rec["ci95_signed"]),
+                        f"{float(rec['p_perm_two_sided']):.4g}",
+                        f"{float(rec.get('p_holm', float('nan'))):.4g}",
+                    ]
+                )
+                + " |"
+            )
+
+    if stats.get("conflict_failure_cases"):
+        if stats.get("conflict_degradation_vs_standard_fusion"):
+            lines.append("")
+            lines.append("## Modality-Conflict Degradation (Fusion: conflict - standard)")
+            lines.append("")
+            drec = stats["conflict_degradation_vs_standard_fusion"]
+            lines.append(f"- n={int(drec['n'])} paired queries")
+            lines.append("")
+            header = ["Metric", "MeanΔ", "95% CI (Δ)"]
+            lines.append("| " + " | ".join(header) + " |")
+            lines.append("| " + " | ".join(["---"] * len(header)) + " |")
+            for metric in METRICS:
+                mm = drec["metrics"][metric]
+                lines.append(
+                    "| "
+                    + " | ".join(
+                        [
+                            metric,
+                            f"{float(mm['mean_delta']):.4f}",
+                            fmt_ci(mm["ci95_delta"]),
+                        ]
+                    )
+                    + " |"
+                )
+
+        lines.append("")
+        lines.append("## Representative Modality-Conflict Failures (Largest ΔL2 vs Standard Fusion)")
+        lines.append("")
+        for i, ex in enumerate(stats["conflict_failure_cases"], 1):
+            lines.append(
+                f"{i}. query_idx={ex['query_idx']} name=`{ex['query_name']}` "
+                f"ΔL2={ex['delta_l2']:.4f} (standard={ex['standard_fusion_l2']:.4f}, conflict={ex['conflict_fusion_l2']:.4f}), "
+                f"w_text={ex['w_text']:.3f}, w_audio={ex['w_audio']:.3f}, retrieved=`{ex['retrieved_name']}`"
+            )
+            lines.append(f"   conflict_text: `{ex['conflict_text']}`")
+
+    out_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"Wrote stats Markdown: {out_md}")
+
+    # Optional beta sweep in STANDARD scenario (for paper table).
+    if args.beta_sweep_out:
+        betas = [0.5, 1.0, 2.0, 4.0]
+        print("\n[Beta sweep] Running STANDARD scenario for beta in {0.5,1,2,4} ...")
+        rows_by_beta = []
+        for b in betas:
+            sweep_rows, _ = _run_one_scenario(
+                dataset=dataset,
+                test_indices=test_indices,
+                kb_items=kb_items,
+                kb_doc_tokens=kb_doc_tokens,
+                idf=idf,
+                kb_trr_arr=kb_trr_arr,
+                trr_dim=int(trr_dim),
+                evaluator=evaluator,
+                scenario_key="standard",
+                beta=float(b),
+                quality_weight=float(args.quality_weight),
+                quality_threshold=float(args.quality_threshold),
+                audio_bias=float(args.audio_bias),
+                top_k=int(args.top_k),
+                vague_text=str(args.vague_text),
+                noise_level=float(args.noise_level),
+                seed=int(args.seed),
+            )
+            fusion_rows = [r for r in sweep_rows if r.method == "Fusion"]
+            w_text_arr = np.asarray([r.w_text for r in fusion_rows], dtype=np.float64)
+            l2_arr = np.asarray([r.l2 for r in fusion_rows], dtype=np.float64)
+            rows_by_beta.append(
+                {
+                    "beta": float(b),
+                    "w_text_mean": float(w_text_arr.mean()),
+                    "w_text_std": float(w_text_arr.std(ddof=1)) if len(w_text_arr) > 1 else 0.0,
+                    "w_text_min": float(w_text_arr.min()),
+                    "w_text_max": float(w_text_arr.max()),
+                    "l2_fusion_mean": float(l2_arr.mean()),
+                }
+            )
+        out = Path(args.beta_sweep_out)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with out.open("w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(
+                f, fieldnames=["beta", "w_text_mean", "w_text_std", "w_text_min", "w_text_max", "l2_fusion_mean"]
+            )
+            w.writeheader()
+            for r in rows_by_beta:
+                w.writerow(r)
+        print(f"Wrote beta sweep CSV: {out}")
 
 
 if __name__ == "__main__":

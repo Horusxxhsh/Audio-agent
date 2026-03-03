@@ -23,14 +23,15 @@
 
 This supplementary material uses the same operational objective metrics defined in the main paper. Briefly, \textbf{Param. Dist.} is computed as RMSE between flattened numeric parameter leaves (union of keys; missing numeric keys treated as zero; non-numeric leaves ignored), \textbf{Acc@0.1} is the fraction of flattened numeric parameters within $\pm 0.1$, \textbf{Recall} measures recall over active numeric parameters, \textbf{Cosine} is cosine similarity in the same flattened space, and \textbf{Module} is a schema-level Jaccard index over DSP modules inferred from the presence of keys ending in \texttt{On}. We do not apply per-parameter normalization, so RMSE magnitudes can be dominated by large-scale parameters.
 Because these metrics are computed in parameter space, absolute magnitudes can depend on the protocol (split, candidate pool, and schema used to form predicted parameter dictionaries); we therefore interpret improvements \emph{within} each table under the stated protocol and avoid comparing magnitudes across tables.
+All supplementary objective results use the same guitar-effect benchmark protocols as the main paper.
 
-\section{Representative Held-out Queries and Few-shot Exemplars}
+\section{Representative Prompt Exemplars for Protocol-B}
 
-Table~\ref{tab:rep_queries_fewshot} lists the five representative held-out queries highlighted in the main paper and the corresponding few-shot ON/OFF exemplars used in Protocol-B.
+Table~\ref{tab:rep_queries_fewshot} lists the five representative style exemplars used in the few-shot prompt for Protocol-B ON/OFF correction. These are prompt exemplars, not the evaluation set itself (evaluation still uses the full held-out pool under the stated protocol).
 
 \begin{table}[h]
 	\centering
-	\caption{Representative held-out queries and few-shot ON/OFF exemplars (Protocol-B).}
+\caption{Representative style exemplars and few-shot ON/OFF templates used in Protocol-B prompting.}
 	\label{tab:rep_queries_fewshot}
 	\small
 	\resizebox{\linewidth}{!}{%
@@ -54,7 +55,7 @@ Table~\ref{tab:retrieval_methods_direct} reports a direct retrieval comparison t
 
 \begin{table}[h]
 	\centering
-	\caption{Direct retrieval comparison (Protocol-A, $N=211$). Lower is better for Param. Dist.; higher is better for the other metrics. Comparisons are within-table under the stated protocol.}
+\caption{Direct retrieval comparison (Protocol-A, $N=211$). Lower is better for Param. Dist.; higher is better for the other metrics. CLAP is an embedding-based KNN retriever. Comparisons are within-table under the stated protocol.}
 	\label{tab:retrieval_methods_direct}
 	\small
 	\resizebox{\linewidth}{!}{%
@@ -66,6 +67,7 @@ Table~\ref{tab:retrieval_methods_direct} reports a direct retrieval comparison t
 		Wav2Vec-RAG & 0.3625 & 0.6434 & 0.5748 & 0.7364 & 0.9116 \\
 		Text-RAG & 0.4573 & 0.7034 & 0.6407 & 0.7404 & 0.8625 \\
 		FeatureNN-RAG & 1.1729 & 0.6765 & 0.6485 & 0.7757 & \textbf{0.9602} \\
+		CLAP (KNN) & 11.6489 & 0.5839 & 0.4844 & 0.5933 & 0.8009 \\
 		Pure LLM (no retrieval) & 13.6520 & 0.4361 & 0.2127 & 0.3779 & 0.7053 \\
 		\bottomrule
 	\end{tabular}
@@ -78,18 +80,19 @@ For objective metrics, we report 95\% bootstrap confidence intervals over held-o
 
 \begin{table}[h]
 	\centering
-	\caption{Protocol-A: mean and 95\% bootstrap confidence intervals over held-out queries ($n=211$).}
+	\caption{Protocol-A: mean and 95\% bootstrap confidence intervals over held-out queries. $n$ denotes the number of available queries for each method (embedding baselines can have missing cached embeddings).}
 	\label{tab:protocolA_ci}
 	\small
 	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{lccccc}
+	\begin{tabular}{lcccccc}
 		\toprule
-		\textbf{Method} & \textbf{Param. Dist.} & \textbf{Acc@0.1} & \textbf{Recall} & \textbf{Cosine} & \textbf{Module} \\
+		\textbf{Method} & \textbf{$n$} & \textbf{Param. Dist.} & \textbf{Acc@0.1} & \textbf{Recall} & \textbf{Cosine} & \textbf{Module} \\
 		\midrule
-		FeatureNN-RAG & 1.1729 [0.6861, 1.7661] & 0.6765 [0.6448, 0.7074] & 0.6485 [0.6060, 0.6886] & 0.7757 [0.7305, 0.8160] & 0.9602 [0.9381, 0.9795] \\
-		TRR (Ours) & 0.3064 [0.2742, 0.3384] & 0.7253 [0.6950, 0.7545] & 0.6990 [0.6625, 0.7351] & 0.8376 [0.8061, 0.8682] & 0.9574 [0.9390, 0.9741] \\
-		Text-RAG & 0.4573 [0.3722, 0.5591] & 0.7034 [0.6715, 0.7337] & 0.6407 [0.5964, 0.6815] & 0.7404 [0.6959, 0.7819] & 0.8625 [0.8256, 0.8979] \\
-		Wav2Vec-RAG & 0.3625 [0.3257, 0.3997] & 0.6434 [0.6067, 0.6800] & 0.5748 [0.5270, 0.6211] & 0.7364 [0.6897, 0.7798] & 0.9116 [0.8794, 0.9403] \\
+		FeatureNN-RAG & 211 & 1.1729 [0.6856, 1.7586] & 0.6765 [0.6456, 0.7072] & 0.6485 [0.6064, 0.6890] & 0.7757 [0.7311, 0.8172] & 0.9602 [0.9385, 0.9795] \\
+		Text-RAG & 211 & 0.4573 [0.3719, 0.5579] & 0.7034 [0.6717, 0.7342] & 0.6407 [0.5967, 0.6825] & 0.7404 [0.6960, 0.7827] & 0.8625 [0.8256, 0.8979] \\
+		Wav2Vec-RAG & 211 & 0.3625 [0.3258, 0.3992] & 0.6434 [0.6069, 0.6798] & 0.5748 [0.5271, 0.6214] & 0.7364 [0.6905, 0.7800] & 0.9116 [0.8806, 0.9403] \\
+		CLAP (KNN) & 211 & 11.6489 [8.4105, 15.1112] & 0.5839 [0.5465, 0.6211] & 0.4844 [0.4381, 0.5313] & 0.5933 [0.5376, 0.6487] & 0.8009 [0.7594, 0.8406] \\
+		TRR (Ours) & 211 & 0.3064 [0.2739, 0.3388] & 0.7253 [0.6953, 0.7542] & 0.6990 [0.6622, 0.7350] & 0.8376 [0.8068, 0.8683] & 0.9574 [0.9391, 0.9740] \\
 		\bottomrule
 	\end{tabular}
 	}
@@ -97,29 +100,34 @@ For objective metrics, we report 95\% bootstrap confidence intervals over held-o
 
 \begin{table}[h]
 	\centering
-	\caption{Protocol-A: TRR improvements vs.\ baselines with 95\% confidence intervals and Holm-corrected permutation $p$-values. Positive $\Delta$ indicates TRR is better (defined as \texttt{baseline - TRR} for Param. Dist., and \texttt{TRR - baseline} for other metrics).}
+	\caption{Protocol-A (guitar benchmark): TRR improvements vs.\ baselines with 95\% confidence intervals and Holm-corrected permutation $p$-values. Positive $\Delta$ indicates TRR is better (defined as \texttt{baseline - TRR} for Param. Dist., and \texttt{TRR - baseline} for other metrics). $n$ denotes the paired query intersection between TRR and each baseline (embedding caches can reduce $n$).}
 	\label{tab:protocolA_sig}
 	\small
 	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{llccc}
+	\begin{tabular}{llcccc}
 		\toprule
-		\textbf{Baseline} & \textbf{Metric} & \textbf{Mean $\Delta$} & \textbf{95\% CI} & \textbf{$p$ (Holm)} \\
+		\textbf{Baseline} & \textbf{Metric} & \textbf{$n$} & \textbf{Mean $\Delta$} & \textbf{95\% CI} & \textbf{$p$ (Holm)} \\
 		\midrule
-		FeatureNN-RAG & Param. Dist. & 0.8666 & [0.3768, 1.4664] & $1.5\times 10^{-3}$ \\
-		FeatureNN-RAG & Acc@0.1 & 0.0489 & [0.0313, 0.0676] & $1.5\times 10^{-3}$ \\
-		FeatureNN-RAG & Recall & 0.0505 & [0.0222, 0.0809] & $3.0\times 10^{-3}$ \\
-		FeatureNN-RAG & Cosine & 0.0620 & [0.0277, 0.0993] & $3.5\times 10^{-3}$ \\
-		FeatureNN-RAG & Module & -0.0028 & [-0.0296, 0.0253] & 0.842 \\
-		Text-RAG & Param. Dist. & 0.1509 & [0.0645, 0.2551] & $2.8\times 10^{-3}$ \\
-		Text-RAG & Acc@0.1 & 0.0220 & [0.0022, 0.0424] & 0.070 \\
-		Text-RAG & Recall & 0.0583 & [0.0257, 0.0924] & $3.5\times 10^{-3}$ \\
-		Text-RAG & Cosine & 0.0972 & [0.0609, 0.1364] & $1.5\times 10^{-3}$ \\
-		Text-RAG & Module & 0.0949 & [0.0626, 0.1292] & $1.5\times 10^{-3}$ \\
-		Wav2Vec-RAG & Param. Dist. & 0.0561 & [0.0314, 0.0814] & $1.5\times 10^{-3}$ \\
-		Wav2Vec-RAG & Acc@0.1 & 0.0819 & [0.0564, 0.1078] & $1.5\times 10^{-3}$ \\
-		Wav2Vec-RAG & Recall & 0.1242 & [0.0879, 0.1602] & $1.5\times 10^{-3}$ \\
-		Wav2Vec-RAG & Cosine & 0.1012 & [0.0688, 0.1361] & $1.5\times 10^{-3}$ \\
-		Wav2Vec-RAG & Module & 0.0458 & [0.0114, 0.0826] & 0.033 \\
+		FeatureNN-RAG & Param. Dist. & 211 & 0.8666 & [0.3759, 1.4615] & 0.0010 \\
+		FeatureNN-RAG & Acc@0.1 & 211 & 0.0489 & [0.0314, 0.0679] & 0.0010 \\
+		FeatureNN-RAG & Recall & 211 & 0.0505 & [0.0224, 0.0810] & 0.0028 \\
+		FeatureNN-RAG & Cosine & 211 & 0.0620 & [0.0278, 0.0993] & 0.0033 \\
+		FeatureNN-RAG & Module & 211 & -0.0028 & [-0.0296, 0.0249] & 0.839 \\
+		Text-RAG & Param. Dist. & 211 & 0.1509 & [0.0658, 0.2527] & 0.0028 \\
+		Text-RAG & Acc@0.1 & 211 & 0.0220 & [0.0023, 0.0422] & 0.0695 \\
+		Text-RAG & Recall & 211 & 0.0583 & [0.0259, 0.0925] & 0.0040 \\
+		Text-RAG & Cosine & 211 & 0.0972 & [0.0610, 0.1361] & 0.0010 \\
+		Text-RAG & Module & 211 & 0.0949 & [0.0633, 0.1290] & 0.0010 \\
+		Wav2Vec-RAG & Param. Dist. & 211 & 0.0561 & [0.0318, 0.0812] & 0.0010 \\
+		Wav2Vec-RAG & Acc@0.1 & 211 & 0.0819 & [0.0563, 0.1082] & 0.0010 \\
+		Wav2Vec-RAG & Recall & 211 & 0.1242 & [0.0884, 0.1613] & 0.0010 \\
+		Wav2Vec-RAG & Cosine & 211 & 0.1012 & [0.0691, 0.1356] & 0.0010 \\
+		Wav2Vec-RAG & Module & 211 & 0.0458 & [0.0118, 0.0815] & 0.0322 \\
+		CLAP (KNN) & Param. Dist. & 211 & 11.3426 & [8.1041, 14.8009] & 0.0010 \\
+		CLAP (KNN) & Acc@0.1 & 211 & 0.1415 & [0.1126, 0.1702] & 0.0010 \\
+		CLAP (KNN) & Recall & 211 & 0.2145 & [0.1710, 0.2574] & 0.0010 \\
+		CLAP (KNN) & Cosine & 211 & 0.2443 & [0.1947, 0.2947] & 0.0010 \\
+		CLAP (KNN) & Module & 211 & 0.1565 & [0.1219, 0.1921] & 0.0010 \\
 		\bottomrule
 	\end{tabular}
 	}
@@ -137,10 +145,10 @@ Table~\ref{tab:beta_sensitivity} reports a sensitivity sweep over fusion tempera
 			\toprule
 			$\beta$ & $\mathbb{E}[w_{\text{text}}]$ & $\mathrm{Std}$ & $\min$ & $\max$ & Param. Dist. (Text) & Param. Dist. (Fusion) \\
 		\midrule
-		0.5 & 0.5007 & 0.0015 & 0.4986 & 0.5049 & 21.35 & 31.53 \\
-		1.0 & 0.5014 & 0.0030 & 0.4972 & 0.5097 & 21.35 & 31.53 \\
-		2.0 & 0.5028 & 0.0061 & 0.4945 & 0.5194 & 21.35 & 31.53 \\
-		4.0 & 0.5056 & 0.0121 & 0.4890 & 0.5388 & 21.35 & 31.53 \\
+		0.5 & 0.4716 & 0.4968 & 0.0000 & 1.0000 & 1.4964 & 0.3056 \\
+		1.0 & 0.4716 & 0.4968 & 0.0000 & 1.0000 & 1.4964 & 0.3056 \\
+		2.0 & 0.4716 & 0.4968 & 0.0000 & 1.0000 & 1.4964 & 0.3056 \\
+		4.0 & 0.4716 & 0.4968 & 0.0000 & 1.0000 & 1.4964 & 0.3056 \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -175,7 +183,7 @@ Table~\ref{tab:layer_sweep} reports the layer-sweep diagnostic used to generate 
 
 \section{Listening Test Stimulus Labels}
 
-Table~\ref{tab:mushra_style_labels} summarizes the labeled style-matching stimuli used in Trial~1 of the MUSHRA-style listening test described in the main paper.
+Table~\ref{tab:mushra_style_labels} summarizes the labeled style-matching stimuli used in Trial~1 of the multiple-stimulus listening test with a hidden reference described in the main paper.
 
 \begin{table}[h]
 	\centering
@@ -197,13 +205,13 @@ Table~\ref{tab:mushra_style_labels} summarizes the labeled style-matching stimul
 	\end{tabular}
 \end{table}
 
-\section{LLM-Enhanced Retrieval (Few-shot Module Correction)}
+\section{Protocol-B Retrieval/Correction Ablations}
 
-Table~\ref{tab:retrieval_methods_llm} reports a four-way comparison between retrieval-only and retrieval+LLM variants under Protocol-B (see the main paper's Experimental Setup for split definitions). The LLM is prompted with five manually specified few-shot examples and is instructed to \textbf{ignore} retrieval-provided module hints, predicting only the ON/OFF pattern; parameters are then copied from the retrieved reference conditioned on the predicted ON/OFF pattern.
+Table~\ref{tab:retrieval_methods_llm} reports retrieval-only, Top-K aggregation, and retrieval+LLM variants under Protocol-B (see the main paper's Experimental Setup for split definitions). The LLM is prompted with five manually specified exemplars and is instructed to \textbf{ignore} retrieval-provided module hints, predicting only the ON/OFF pattern; parameters are then copied from the retrieved reference conditioned on the predicted ON/OFF pattern.
 
 \begin{table}[h]
 	\centering
-	\caption{LLM-enhanced retrieval comparison (Protocol-B).}
+\caption{Protocol-B correction ablations ($N=211$). Comparisons are within-table under the same retrieval+correction+$\Pi_{\Theta}$ protocol.}
 	\label{tab:retrieval_methods_llm}
 	\small
 	\resizebox{\linewidth}{!}{%
@@ -211,10 +219,34 @@ Table~\ref{tab:retrieval_methods_llm} reports a four-way comparison between retr
 		\toprule
 		\textbf{Method} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
 		\midrule
-		TRR (retrieval only) & 0.4104 & 0.7381 & \textbf{0.7101} & 0.7430 & 0.7833 \\
-		Text (retrieval only) & 0.4396 & 0.6645 & 0.5717 & 0.6425 & 0.6833 \\
-		TRR + LLM & \textbf{0.2631} & \textbf{0.8156} & \textbf{0.7101} & \textbf{0.8115} & \textbf{1.0000} \\
-		Text + LLM & 0.2769 & 0.7180 & 0.6178 & 0.7821 & \textbf{1.0000} \\
+		TRR (retrieval only) & \textbf{0.3064} & \textbf{0.7253} & \textbf{0.6990} & \textbf{0.8376} & \textbf{0.9574} \\
+		Text-RAG (retrieval only) & 0.4573 & 0.7034 & 0.6407 & 0.7404 & 0.8625 \\
+		TRR-TopKMean & 17.1237 & 0.4951 & 0.4469 & 0.5648 & \textbf{0.9574} \\
+		TRR-TopKWeightedMean & 16.7716 & 0.4948 & 0.4476 & 0.5667 & \textbf{0.9574} \\
+		TRR + LLM & 6.2434 & 0.6322 & 0.5276 & 0.5817 & 0.6609 \\
+		Text + LLM & 6.3688 & 0.6180 & 0.4900 & 0.5675 & 0.6609 \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+Table~\ref{tab:protocolB_l2_sig} reports paired permutation tests on Protocol-B per-query L2 with Holm correction across the TRR-vs-baseline comparisons. We define $\Delta$ as \texttt{baseline - TRR}, so positive values indicate that TRR has lower parameter distance.
+
+\begin{table}[h]
+	\centering
+	\caption{Protocol-B: paired significance tests on Param. Dist. (RMSE). $\Delta$ is \texttt{baseline - TRR}.}
+	\label{tab:protocolB_l2_sig}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lcccc}
+		\toprule
+		\textbf{Baseline} & \textbf{$n$} & \textbf{Mean $\Delta$} & \textbf{95\% CI} & \textbf{$p$ (Holm)} \\
+		\midrule
+		Text-RAG & 211 & 0.1509 & [0.0658, 0.2527] & 0.00175 \\
+		TRR-TopKMean & 211 & 16.8173 & [14.6012, 19.1221] & 0.00125 \\
+		TRR-TopKWeightedMean & 211 & 16.4652 & [14.2746, 18.7442] & 0.00125 \\
+		TRR+LLM & 211 & 5.9370 & [3.6897, 8.4394] & 0.00125 \\
+		Text+LLM & 211 & 6.0625 & [3.8158, 8.5519] & 0.00125 \\
 		\bottomrule
 	\end{tabular}
 	}
@@ -222,7 +254,7 @@ Table~\ref{tab:retrieval_methods_llm} reports a four-way comparison between retr
 
 \section{Robustness Stress Tests}
 
-We report two extreme stress-test settings where one modality is intentionally degraded under Protocol-C (see the main paper's Experimental Setup for split definitions). We use $\alpha$ to denote the \textbf{text} weight in the hybrid retriever (thus $1-\alpha$ is the audio weight). Metrics are the same as in Table~\ref{tab:retrieval_methods_direct}.
+We report stress-test settings under Protocol-C where one modality is intentionally degraded (vague text or corrupted audio), and additionally include a modality-conflict setting where the text is contradictory to the reference audio. We use $w_{\text{text}}$ to denote the \textbf{text} weight in the fused retriever (thus $w_{\text{audio}}=1-w_{\text{text}}$). Metrics are the same as in Table~\ref{tab:retrieval_methods_direct}.
 
 \begin{table}[h]
 	\centering
@@ -234,8 +266,9 @@ We report two extreme stress-test settings where one modality is intentionally d
 		\toprule
 		\textbf{Method} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
 		\midrule
-		Text + LLM & 29.28 & 0.62 & 0.43 & 0.51 & \textbf{1.00} \\
-		Hybrid ($\alpha=0.15$) + LLM & \textbf{0.26} & \textbf{0.82} & \textbf{0.71} & \textbf{0.81} & \textbf{1.00} \\
+		Text-only & 12.6517 & 0.5959 & 0.3384 & 0.3709 & 0.5066 \\
+		TRR-only & \textbf{0.2970} & \textbf{0.7330} & \textbf{0.7061} & \textbf{0.8420} & \textbf{0.9574} \\
+		Fusion (Ours) & \textbf{0.2970} & \textbf{0.7330} & \textbf{0.7061} & \textbf{0.8420} & \textbf{0.9574} \\
 		\bottomrule
 	\end{tabular}
 	}
@@ -251,8 +284,9 @@ We report two extreme stress-test settings where one modality is intentionally d
 		\toprule
 		\textbf{Method} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
 		\midrule
-		TRR + LLM & 29.36 & 0.41 & 0.25 & 0.41 & \textbf{1.00} \\
-		Hybrid ($\alpha=0.85$) + LLM & \textbf{0.28} & \textbf{0.72} & \textbf{0.62} & \textbf{0.78} & \textbf{1.00} \\
+		Text-only & \textbf{1.4964} & \textbf{0.7144} & \textbf{0.6733} & \textbf{0.7851} & \textbf{0.9065} \\
+		TRR-only & 33.8549 & 0.3080 & 0.1949 & 0.1783 & 0.4493 \\
+		Fusion (Ours) & \textbf{1.4964} & \textbf{0.7144} & \textbf{0.6733} & \textbf{0.7851} & \textbf{0.9065} \\
 		\bottomrule
 	\end{tabular}
 	}
@@ -260,16 +294,61 @@ We report two extreme stress-test settings where one modality is intentionally d
 
 \begin{table}[h]
 	\centering
-	\caption{Dynamic weight summary (Protocol-C). $\alpha$ denotes the text weight; the hybrid retriever compensates by increasing the weight of the non-degraded modality.}
+	\caption{Modality-conflict stress test (Protocol-C): contradictory text, audio unchanged.}
+	\label{tab:stress_modality_conflict}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Method} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
+		\midrule
+		Text-only & 12.8572 & 0.4623 & 0.3537 & 0.3315 & 0.5192 \\
+		TRR-only & \textbf{0.2970} & \textbf{0.7330} & \textbf{0.7061} & \textbf{0.8420} & \textbf{0.9574} \\
+		Fusion (Ours) & 4.5259 & 0.5741 & 0.4687 & 0.5715 & 0.7309 \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\begin{table}[h]
+	\centering
+	\caption{Dynamic weight summary (Protocol-C). We report mean fusion weights and the recovered fused distance relative to the degraded single-modality baseline.}
 	\label{tab:stress_dynamic_weight_summary}
 	\small
 	\resizebox{\linewidth}{!}{%
 	\begin{tabular}{lccccc}
 		\toprule
-		\textbf{Scenario} & \textbf{Degraded modality} & \textbf{Single-modality baseline} & \textbf{$\alpha$ (text weight)} & \textbf{Hybrid method} & \textbf{Param. Dist.} $\downarrow$ \\
+		\textbf{Scenario} & \textbf{Degraded modality} & \textbf{Single-modality baseline} & \textbf{$w_{\text{text}}$ (mean)} & \textbf{Hybrid method} & \textbf{Param. Dist.} $\downarrow$ \\
 		\midrule
-		Text vague & Text & Text + LLM & 0.15 & Hybrid + LLM & 0.26 \\
-		Audio noisy & Audio & TRR + LLM & 0.85 & Hybrid + LLM & 0.28 \\
+		Text vague & Text & Text-only & 0.000 & Fusion & 0.2970 \\
+		Audio noisy & Audio & TRR-only & 1.000 & Fusion & 1.4964 \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\section{Protocol-C Statistical Tests (Fusion vs.\ Baselines)}
+
+For Protocol-C, we additionally report paired permutation tests for \textbf{Fusion vs.\ each baseline} under each stress scenario, with Holm correction applied within each scenario across the Fusion-vs-baseline comparisons. In Table~\ref{tab:protocolC_l2_sig}, we focus on Param. Dist. (RMSE) and define $\Delta$ as \texttt{baseline - fusion} so that positive values indicate that Fusion achieves a lower parameter distance.
+
+\begin{table}[h]
+	\centering
+	\caption{Protocol-C: paired significance tests on Param. Dist. (RMSE). $\Delta$ is \texttt{baseline - fusion}.}
+	\label{tab:protocolC_l2_sig}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{llcccc}
+		\toprule
+		\textbf{Scenario} & \textbf{Baseline} & \textbf{$n$} & \textbf{Mean $\Delta$} & \textbf{95\% CI} & \textbf{$p$ (Holm)} \\
+		\midrule
+		Standard & Text-only & 211 & 0.3201 & [-0.5933, 1.4830] & 1.0000 \\
+		Standard & TRR-only  & 211 & -0.8977 & [-2.0712, -0.0139] & 0.0040 \\
+		Vague text & Text-only & 211 & 12.3546 & [9.1087, 15.8210] & 0.0040 \\
+		Vague text & TRR-only  & 211 & 0.0000 & [0.0000, 0.0000] & 1.0000 \\
+		Noisy audio & Text-only & 211 & -0.0032 & [-1.2180, 1.2081] & 1.0000 \\
+		Noisy audio & TRR-only  & 211 & 32.3369 & [27.9100, 36.7207] & 0.0040 \\
+		Conflict & Text-only & 211 & 0.0000 & [0.0000, 0.0000] & 1.0000 \\
+		Conflict & TRR-only  & 211 & -12.5602 & [-16.0095, -9.3333] & 0.0040 \\
 		\bottomrule
 	\end{tabular}
 	}
