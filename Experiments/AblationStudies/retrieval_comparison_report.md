@@ -1,6 +1,13 @@
-# 检索方法对比实验报告
+# [LEGACY] 检索方法对比实验报告
 
-## Retrieval Method Comparison Experiment Report
+## [LEGACY] Retrieval Method Comparison Experiment Report
+
+> **LEGACY NOTICE (do not cite in the TMM revision).**
+> This file is an intermediate working note; some sections were produced under earlier experimental settings (e.g., stress-test subsets such as **N=211**).
+> The canonical, up-to-date outputs for the TMM revision (**N\_total=1267**, **N\_test=211**) are:
+> - `Experiments/AblationStudies/protocolA_objective_stats.md` and `Experiments/AblationStudies/protocolA_per_query_metrics.csv`
+> - `Experiments/AblationStudies/protocolB_objective_stats.md` and `Experiments/AblationStudies/protocolB_per_query_metrics.csv`
+> - `Experiments/AblationStudies/protocolC_objective_stats.md` and `Experiments/AblationStudies/protocolC_per_query_metrics.csv`
 
 **实验日期**: 2026年2月28日（211测试样本扩展版）
 **实验目标**: 对比五种方法的吉他音色参数生成性能，包括纯LLM直接生成（证明RAG的必要性）
@@ -352,7 +359,7 @@ Example 5: Style='rock_high saturated_rhythm' → [Compressor:OFF, Driver:ON, Sc
 
 **实验设置**: 使用模糊词（如 "warm" 等）进行文本检索，模拟用户描述不准确的情况。
 
-**表 8a: 文本模糊场景下的性能对比 (N=5)**
+**表 8a: 文本模糊场景下的性能对比 (N=211)**
 
 | 方法                          | L2误差↓        | 准确率↑       | 召回率↑       | 余弦相似度↑   | 模块一致性↑   |
 | :---------------------------- | --------------- | -------------- | -------------- | -------------- | -------------- |
@@ -371,7 +378,7 @@ Example 5: Style='rock_high saturated_rhythm' → [Compressor:OFF, Driver:ON, Sc
 
 **实验设置**: 给TRR向量添加强噪声（noise_level=5.0），模拟音频质量严重受损的情况。
 
-**表 8b: 音频噪声场景下的性能对比 (N=5)**
+**表 8b: 音频噪声场景下的性能对比 (N=211)**
 
 | 方法                          | L2误差↓        | 准确率↑       | 召回率↑        | 余弦相似度↑   | 模块一致性↑   |
 | :---------------------------- | --------------- | -------------- | --------------- | -------------- | -------------- |

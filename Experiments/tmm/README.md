@@ -31,3 +31,11 @@ On macOS, the default documents path is `~/Documents`. Override with `DOCUMENTS_
 ## Notes
 - This initial synth pipeline is designed to be a *reproducible scaling step* (E0/E1).
 - If your paper claims require modules not covered by offline rendering, you should extend the renderer and re-generate.
+
+## Optional: SOTA Retrieval Baselines (CLAP / PaSST / PANNs)
+Some TMM ablation scripts can optionally evaluate stronger audio representation baselines.
+
+Install the optional dependencies:
+`python -m pip install -r Experiments/requirements_sota.txt`
+
+Embedding extraction is done offline and cached to avoid repeated computation.

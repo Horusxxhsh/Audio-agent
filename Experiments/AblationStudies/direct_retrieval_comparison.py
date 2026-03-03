@@ -7,6 +7,9 @@
 - Wav2Vec-RAG
 - FeatureNN-RAG
 - TRR
+- CLAP（cached embedding KNN）
+- PaSST（cached embedding KNN）
+- PANNs（cached embedding KNN）
 
 测试样本: 使用论文中的 held-out query pool（Protocol-A，N=211），由 TEST_SAMPLES 定义。
 其中包含 30 个 canonical 名称及其确定性变体（例如 “Dry Funk - ...”）。
@@ -26,6 +29,7 @@ sys.path.append(common_dir)
 
 from dataset_loader import load_and_merge_data
 from evaluate import Evaluator
+from embedding_knn_retriever import CLAPRetriever, PaSSTRetriever, PANNsRetriever
 
 try:
     from openai import OpenAI
@@ -555,7 +559,13 @@ def generate_params_with_llm(style, test_name):
     if not HAS_OPENAI:
         return None
 
-    client = OpenAI(api_key="sk-0705951d960041ed96c607ab69724d0d", base_url="https://api.deepseek.com")
+    api_key = os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY")
+    base_url = os.environ.get("DEEPSEEK_BASE_URL") or os.environ.get("OPENAI_BASE_URL") or "https://api.deepseek.com"
+    if not api_key:
+        print("    LLM未配置：请设置环境变量 DEEPSEEK_API_KEY（或 OPENAI_API_KEY）。")
+        return None
+
+    client = OpenAI(api_key=api_key, base_url=base_url)
 
     prompt = build_llm_generation_prompt(test_name, style)
 
@@ -717,6 +727,7 @@ def main():
     test_items = [d for d in data if d.get('SongName') in test_name_set]
     kb_items = [d for d in data if d.get('SongName') not in test_name_set]
 
+    print(f"总数据: {len(data)} 样本")
     print(f"测试集: {len(test_items)} 样本")
     print(f"知识库: {len(kb_items)} 样本")
 
@@ -725,11 +736,20 @@ def main():
     text_retrieval = TextRetrieval(kb_items)
     wav2vec_retrieval = Wav2VecRetrieval(kb_items)
     featurenn_retrieval = FeatureNNRetrieval(kb_items)
+    clap_retrieval = CLAPRetriever(kb_items)
+    passt_retrieval = PaSSTRetriever(kb_items)
+    panns_retrieval = PANNsRetriever(kb_items)
     trr_retrieval = TRRRetrieval(kb_items)
     include_pure_llm = bool(args.with_pure_llm)
     pure_llm = PureLLMGeneration() if include_pure_llm else None
 
     print(">> 所有检索器初始化完成")
+    if not clap_retrieval.is_available:
+        print(">> [Warn] CLAP baseline unavailable (missing *.clap.npy caches).")
+    if not passt_retrieval.is_available:
+        print(">> [Warn] PaSST baseline unavailable (missing *.passt.npy caches). Run precompute_embeddings.py.")
+    if not panns_retrieval.is_available:
+        print(">> [Warn] PANNs baseline unavailable (missing *.panns.npy caches). Run precompute_embeddings.py.")
     if include_pure_llm and HAS_OPENAI:
         print(">> 纯LLM直接生成已启用 (使用DeepSeek API)")
     elif include_pure_llm and not HAS_OPENAI:
@@ -747,6 +767,9 @@ def main():
         'Text': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []},
         'Wav2Vec': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []},
         'FeatureNN': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []},
+        'CLAP': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []},
+        'PaSST': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []},
+        'PANNs': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []},
         'TRR': {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []}
     }
     if include_pure_llm:
@@ -913,6 +936,78 @@ def main():
             print(f"  FeatureNN:  未检索到")
             record_row(idx, name, "FeatureNN-RAG", "", "", "", "", "", "", 1)
 
+        # CLAP检索
+        clap_results = clap_retrieval.retrieve(test_item, k=1)
+        if clap_results:
+            retrieved_params = clap_results[0].get('Parameters', {})
+            l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
+            acc = evaluator.compute_accuracy_tolerance(retrieved_params, gt_params, tolerance=0.1)
+            recall = evaluator.compute_parameter_recall(retrieved_params, gt_params)
+            cosine = evaluator.compute_cosine_similarity(retrieved_params, gt_params)
+            style = evaluator.compute_style_consistency(retrieved_params.get('Style', []), gt_style)
+            module = evaluator.compute_module_consistency(retrieved_params, gt_params, active_threshold=0.1)
+
+            results['CLAP']['l2'].append(l2)
+            results['CLAP']['acc'].append(acc)
+            results['CLAP']['recall'].append(recall)
+            results['CLAP']['cosine'].append(cosine)
+            results['CLAP']['style'].append(style)
+            results['CLAP']['module'].append(module)
+            record_row(idx, name, "CLAP", clap_results[0].get("SongName", ""), l2, acc, recall, cosine, module, 0)
+
+            print(f"  CLAP:       L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | {clap_results[0]['SongName']}")
+        else:
+            print(f"  CLAP:       未检索到")
+            record_row(idx, name, "CLAP", "", "", "", "", "", "", 1)
+
+        # PaSST检索
+        passt_results = passt_retrieval.retrieve(test_item, k=1)
+        if passt_results:
+            retrieved_params = passt_results[0].get('Parameters', {})
+            l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
+            acc = evaluator.compute_accuracy_tolerance(retrieved_params, gt_params, tolerance=0.1)
+            recall = evaluator.compute_parameter_recall(retrieved_params, gt_params)
+            cosine = evaluator.compute_cosine_similarity(retrieved_params, gt_params)
+            style = evaluator.compute_style_consistency(retrieved_params.get('Style', []), gt_style)
+            module = evaluator.compute_module_consistency(retrieved_params, gt_params, active_threshold=0.1)
+
+            results['PaSST']['l2'].append(l2)
+            results['PaSST']['acc'].append(acc)
+            results['PaSST']['recall'].append(recall)
+            results['PaSST']['cosine'].append(cosine)
+            results['PaSST']['style'].append(style)
+            results['PaSST']['module'].append(module)
+            record_row(idx, name, "PaSST", passt_results[0].get("SongName", ""), l2, acc, recall, cosine, module, 0)
+
+            print(f"  PaSST:      L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | {passt_results[0]['SongName']}")
+        else:
+            print(f"  PaSST:      未检索到")
+            record_row(idx, name, "PaSST", "", "", "", "", "", "", 1)
+
+        # PANNs检索
+        panns_results = panns_retrieval.retrieve(test_item, k=1)
+        if panns_results:
+            retrieved_params = panns_results[0].get('Parameters', {})
+            l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
+            acc = evaluator.compute_accuracy_tolerance(retrieved_params, gt_params, tolerance=0.1)
+            recall = evaluator.compute_parameter_recall(retrieved_params, gt_params)
+            cosine = evaluator.compute_cosine_similarity(retrieved_params, gt_params)
+            style = evaluator.compute_style_consistency(retrieved_params.get('Style', []), gt_style)
+            module = evaluator.compute_module_consistency(retrieved_params, gt_params, active_threshold=0.1)
+
+            results['PANNs']['l2'].append(l2)
+            results['PANNs']['acc'].append(acc)
+            results['PANNs']['recall'].append(recall)
+            results['PANNs']['cosine'].append(cosine)
+            results['PANNs']['style'].append(style)
+            results['PANNs']['module'].append(module)
+            record_row(idx, name, "PANNs", panns_results[0].get("SongName", ""), l2, acc, recall, cosine, module, 0)
+
+            print(f"  PANNs:      L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | {panns_results[0]['SongName']}")
+        else:
+            print(f"  PANNs:      未检索到")
+            record_row(idx, name, "PANNs", "", "", "", "", "", "", 1)
+
         # TRR检索
         trr_results = trr_retrieval.retrieve(test_item, k=1)
         if trr_results:
@@ -948,17 +1043,20 @@ def main():
         ('纯文本检索', results['Text']),
         ('Wav2Vec-RAG', results['Wav2Vec']),
         ('FeatureNN-RAG', results['FeatureNN']),
+        ('CLAP', results['CLAP']),
+        ('PaSST', results['PaSST']),
+        ('PANNs', results['PANNs']),
         ('TRR', results['TRR'])
     ]
     if include_pure_llm:
         methods = [('纯LLM直接生成', results['PureLLM'])] + methods
 
     for method_name, metrics in methods:
-        l2 = sum(metrics['l2']) / len(metrics['l2']) if metrics['l2'] else 0
-        acc = sum(metrics['acc']) / len(metrics['acc']) if metrics['acc'] else 0
-        recall = sum(metrics['recall']) / len(metrics['recall']) if metrics['recall'] else 0
-        cosine = sum(metrics['cosine']) / len(metrics['cosine']) if metrics['cosine'] else 0
-        module = sum(metrics['module']) / len(metrics['module']) if metrics['module'] else 0
+        l2 = sum(metrics['l2']) / len(metrics['l2']) if metrics['l2'] else float("nan")
+        acc = sum(metrics['acc']) / len(metrics['acc']) if metrics['acc'] else float("nan")
+        recall = sum(metrics['recall']) / len(metrics['recall']) if metrics['recall'] else float("nan")
+        cosine = sum(metrics['cosine']) / len(metrics['cosine']) if metrics['cosine'] else float("nan")
+        module = sum(metrics['module']) / len(metrics['module']) if metrics['module'] else float("nan")
 
         print(f"{method_name:<20} {l2:<15.4f} {acc:<15.4f} {recall:<15.4f} {cosine:<18.4f} {module:<18.4f}")
 

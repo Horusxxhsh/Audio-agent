@@ -212,6 +212,8 @@ Data/Audio_Synthetic/*.wav2vec.npy
 Data/Audio_Synthetic/*.trr.npy
 Data/Audio_Synthetic/*.clap.npy
 Data/Audio_Synthetic/*.mfcc.npy
+Data/Audio_Synthetic/*.passt.npy
+Data/Audio_Synthetic/*.panns.npy
 Data/Audio_Synthetic/*.py
 
 # External MusicCaps guitar solo evaluation audio (local-only)
@@ -221,6 +223,22 @@ musiccaps_guitar_solo/
 Experiments/AblationStudies/protocolA_per_query_metrics.csv
 Experiments/AblationStudies/protocolA_objective_stats.json
 Experiments/AblationStudies/protocolA_objective_stats.md
+Experiments/AblationStudies/protocolB_per_query_metrics.csv
+Experiments/AblationStudies/protocolB_objective_stats.json
+Experiments/AblationStudies/protocolB_objective_stats.md
+Experiments/AblationStudies/protocolC_per_query_metrics.csv
+Experiments/AblationStudies/protocolC_objective_stats.json
+Experiments/AblationStudies/protocolC_objective_stats.md
+Experiments/AblationStudies/protocolC_beta_sweep.csv
+
+# LLM cache outputs (local-only)
+Experiments/llm_cache/
+# Latency profiling outputs
+Experiments/latency/latency_report.json
+Experiments/latency/latency_report.md
+
+# Embedding coverage reports / missing lists (local-only)
+Experiments/baselines/reports/
 # except build/, which is used as an MSBuild target.
 !**/[Pp]ackages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
@@ -403,3 +421,5 @@ results_journal.txt
 test_rag_db/
 vector_db/
 Experiments/dataset_full_vectors.json
+Experiments/dataset_full_vectors.backup_*.json
+Experiments/common/dataset_full_vectors.json

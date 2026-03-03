@@ -28,20 +28,45 @@ def _resolve_local_audio_paths(dataset):
         if cur and os.path.exists(cur):
             continue
 
-        # Sanitize filename to match generator logic.
-        safe_name = "".join(
-            [c for c in song_name if c.isalpha() or c.isdigit() or c in (" ", "-", "_")]
-        ).strip()
+        def sanitize(name: str) -> str:
+            # Match the synthetic audio generator's filename logic (remove slashes, punctuation, etc.).
+            return "".join([c for c in name if c.isalpha() or c.isdigit() or c in (" ", "-", "_")]).strip()
 
-        candidates = [
-            os.path.join(base_audio_dir, f"{safe_name}.wav"),
-            os.path.join(base_audio_dir, f"{song_name}.wav"),
-        ]
+        candidates = []
+
+        # 1) If AudioPath is a Windows-like absolute path, map by basename.
+        # Example: "C:\\...\\Data\\Audio_Synthetic\\Dry Funk.wav" -> "<repo>/Data/Audio_Synthetic/Dry Funk.wav"
+        if isinstance(cur, str) and cur:
+            base = cur.replace("\\", "/").split("/")[-1]
+            if base.lower().endswith(".wav"):
+                candidates.append(os.path.join(base_audio_dir, base))
+
+        # 2) Map by SongName.
+        safe_name = sanitize(str(song_name))
+        candidates.extend(
+            [
+                os.path.join(base_audio_dir, f"{safe_name}.wav"),
+                os.path.join(base_audio_dir, f"{song_name}.wav"),
+            ]
+        )
+
+        # 3) Many held-out queries are deterministic name variants ("<Base> - <Suffix>") that reuse the same audio.
+        if " - " in str(song_name):
+            base_name = str(song_name).split(" - ", 1)[0].strip()
+            if base_name:
+                safe_base = sanitize(base_name)
+                candidates.extend(
+                    [
+                        os.path.join(base_audio_dir, f"{safe_base}.wav"),
+                        os.path.join(base_audio_dir, f"{base_name}.wav"),
+                    ]
+                )
         for c in candidates:
             if os.path.exists(c):
                 item["AudioPath"] = c
                 break
-        if "AudioPath" not in item:
+        else:
+            # Ensure missing paths don't silently remain as invalid strings (e.g., Windows paths on macOS).
             item["AudioPath"] = None
 
     return dataset

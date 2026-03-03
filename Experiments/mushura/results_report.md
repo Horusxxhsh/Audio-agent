@@ -1,98 +1,120 @@
-﻿# MUSHRA 实验结果总结
+# Multiple-Stimulus Listening Test with Hidden Reference (No Explicit Anchor)
 
-本报告将 Trial 分为三组分别统计：
-- Trial 1
-- Trial 2-5
-- Trial 6-10
+This report summarizes descriptive statistics and repeated-measures tests.
+Important: the study includes a hidden reference (`reference`) but no explicit low-quality anchor.
+
+- Input CSV: `/Users/xyh/Code/Audio-agent/Experiments/mushura/mushra.csv`
+- Participants (unique emails): 26
+- Total ratings: 910
 
 ## Trial 1
 
-### 实验介绍
-任务概述：在本次测试中，您需要评价经由 AI 效果器处理后的音频，在多大程度上准确还原了给定的“风格描述词”（例如：“温暖复古”、“激进金属”或“明亮现代”）。评价准则：请针对每个测试条件，根据以下两个维度对音色匹配度进行评分：1.风格准确性： 处理后的音色是否真实、贴切地体现了描述词的特征？2.音频完整性： 在音色改变的同时，输出音频是否包含不必要的数字伪影（如：异常杂音、不自然的断音或失真）？评分说明：请通过滑块进行评分。高分代表 AI 成功捕捉并呈现了该风格的精髓；低分则代表音色不匹配或处理质量较差。
+### Data Overview
+- Trials: ['trial1']
+- Ratings (rows): 208
+- Participants: 26
+- Stimuli: 8 (Ambient Guitar, Blues Solo, Chorus, Flanger, Jazz Clean, Modern Metal, Phase, reference)
 
-### 实验数据概况
-- 样本行数: 208
-- 被试人数: 26
-- 系统数量: 8
-- 试次数量: 1
+### Descriptive Stats (Raw Ratings)
+- mean=72.92
+- median=77.50
+- std=22.72
+- min=3.00
+- max=100.00
 
-### 评分总体统计
-- 均值: 72.92
-- 中位数: 77.50
-- 标准差: 22.72
-- 最小值: 3.00
-- 最大值: 100.00
+### System-Level Stats (Within-Subject Means)
 
-### 系统级箱线图
+| Stimulus | n_subj | mean | median | std |
+| --- | --- | --- | --- | --- |
+| reference | 26 | 86.85 | 92.50 | 16.70 |
+| Jazz Clean | 26 | 76.19 | 81.00 | 20.80 |
+| Phase | 26 | 75.38 | 80.50 | 20.88 |
+| Flanger | 26 | 69.12 | 74.00 | 23.08 |
+| Ambient Guitar | 26 | 72.35 | 73.50 | 18.45 |
+| Modern Metal | 26 | 65.58 | 70.00 | 30.22 |
+| Blues Solo | 26 | 72.96 | 69.50 | 21.19 |
+| Chorus | 26 | 64.92 | 66.50 | 23.12 |
+
+### Plot
 ![](system_boxplot_Trial_1.png)
-
-### 系统级统计（基于被试内均值）
-
-                 count       mean  median        std
-rating_stimulus                                     
-reference           26  86.846154    92.5  16.696568
-Jazz Clean          26  76.192308    81.0  20.796190
-Phase               26  75.384615    80.5  20.878845
-Flanger             26  69.115385    74.0  23.079561
-Ambient Guitar      26  72.346154    73.5  18.447639
-Modern Metal        26  65.576923    70.0  30.218105
-Blues Solo          26  72.961538    69.5  21.193359
-Chorus              26  64.923077    66.5  23.115230
 
 ## Trial 2-5
 
-### 实验介绍
-对比一些热门吉他solo，评判参考音频与各测试项之间检测到的所有差异。
+### Data Overview
+- Trials: ['trial2', 'trial3', 'trial4', 'trial5']
+- Ratings (rows): 312
+- Participants: 26
+- Stimuli: 3 (HCAP, manual, reference)
 
-### 实验数据概况
-- 样本行数: 312
-- 被试人数: 26
-- 系统数量: 3
-- 试次数量: 4
+### Descriptive Stats (Raw Ratings)
+- mean=69.53
+- median=73.50
+- std=23.53
+- min=0.00
+- max=100.00
 
-### 评分总体统计
-- 均值: 69.53
-- 中位数: 73.50
-- 标准差: 23.53
-- 最小值: 0.00
-- 最大值: 100.00
+### System-Level Stats (Within-Subject Means)
 
-### 系统级箱线图
+| Stimulus | n_subj | mean | median | std |
+| --- | --- | --- | --- | --- |
+| reference | 26 | 85.33 | 85.25 | 12.52 |
+| HCAP | 26 | 71.55 | 72.88 | 12.41 |
+| manual | 26 | 51.72 | 55.00 | 17.15 |
+
+### Plot
 ![](system_boxplot_Trial_2_5.png)
 
-### 系统级统计（基于被试内均值）
+### Repeated-Measures Tests (Complete Cases)
+- n_complete=26
+- k_stimuli=3
 
-                 count       mean  median        std
-rating_stimulus                                     
-reference           26  85.326923  85.250  12.521535
-HCAP                26  71.548077  72.875  12.410483
-manual              26  51.721154  55.000  17.150995
+- Friedman Q=41.6154, p_perm=5e-05 (one-sided)
+
+#### Pairwise Wilcoxon Signed-Rank (Permutation) + Holm Correction
+
+| A | B | n | mean(A-B) | median(A-B) | rbc | p | p(Holm) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| reference | HCAP | 26 | 13.78 | 8.38 | 0.860 | 0.0001 | 0.00015 |
+| reference | manual | 26 | 33.61 | 26.00 | 0.983 | 5e-05 | 0.00015 |
+| HCAP | manual | 26 | 19.83 | 17.25 | 1.000 | 5e-05 | 0.00015 |
 
 ## Trial 6-10
 
-### 实验介绍
-在本次测试中，您将听到一段参考音频（Reference）及其对应的文字描述。随后，您将听到由不同 AI 模型生成的测试样本。您的任务是评价这些生成样本在风格、音色及音乐内容上与参考音频的相似程度。评价准则：请根据“与参考音的相似度”调节滑块：高分 (80-100): 生成的音频在风格和质量上与参考音几乎一致。中分 (40-70): 捕捉到了大致的氛围，但在音色或音乐表现力上有明显差异。低分 (0-30): 无法匹配参考音，或者包含严重的杂音/失真。
+### Data Overview
+- Trials: ['trial10', 'trial6', 'trial7', 'trial8', 'trial9']
+- Ratings (rows): 390
+- Participants: 26
+- Stimuli: 3 (HCAP, MusicGen, reference)
 
-### 实验数据概况
-- 样本行数: 390
-- 被试人数: 26
-- 系统数量: 3
-- 试次数量: 5
+### Descriptive Stats (Raw Ratings)
+- mean=57.54
+- median=59.00
+- std=32.24
+- min=0.00
+- max=100.00
 
-### 评分总体统计
-- 均值: 57.54
-- 中位数: 59.00
-- 标准差: 32.24
-- 最小值: 0.00
-- 最大值: 100.00
+### System-Level Stats (Within-Subject Means)
 
-### 系统级箱线图
+| Stimulus | n_subj | mean | median | std |
+| --- | --- | --- | --- | --- |
+| reference | 26 | 89.02 | 91.50 | 10.04 |
+| MusicGen | 26 | 41.29 | 43.90 | 19.58 |
+| HCAP | 26 | 42.31 | 41.90 | 19.30 |
+
+### Plot
 ![](system_boxplot_Trial_6_10.png)
 
-### 系统级统计（基于被试内均值）
+### Repeated-Measures Tests (Complete Cases)
+- n_complete=26
+- k_stimuli=3
 
-                 count       mean  median        std
-rating_stimulus                                     
-reference           26  89.015385    91.5  10.042936
-MusicGen            26  41.292308    43.9  19.584421
-HCAP                26  42.307692    41.9  19.300672
+- Friedman Q=36.2308, p_perm=5e-05 (one-sided)
+
+#### Pairwise Wilcoxon Signed-Rank (Permutation) + Holm Correction
+
+| A | B | n | mean(A-B) | median(A-B) | rbc | p | p(Holm) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| reference | MusicGen | 26 | 47.72 | 50.90 | 1.000 | 5e-05 | 0.00015 |
+| reference | HCAP | 26 | 46.71 | 51.30 | 0.994 | 5e-05 | 0.00015 |
+| MusicGen | HCAP | 24 | -1.10 | 0.80 | 0.067 | 0.7797 | 0.7797 |
+

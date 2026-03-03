@@ -1,5 +1,12 @@
-# 检索方法对比实验报告
-## Retrieval Method Comparison Experiment Report
+# [LEGACY] 检索方法对比实验报告
+## [LEGACY] Retrieval Method Comparison Experiment Report
+
+> **LEGACY NOTICE (do not cite in the TMM revision).**
+> This report was generated on an older diagnostic setup (e.g., **N=5** queries / small KB) and is kept only for internal reference.
+> The canonical, up-to-date outputs for the TMM revision (**N\_total=1267**, **N\_test=211**) are:
+> - `Experiments/AblationStudies/protocolA_objective_stats.md` and `Experiments/AblationStudies/protocolA_per_query_metrics.csv`
+> - `Experiments/AblationStudies/protocolB_objective_stats.md` and `Experiments/AblationStudies/protocolB_per_query_metrics.csv`
+> - `Experiments/AblationStudies/protocolC_objective_stats.md` and `Experiments/AblationStudies/protocolC_per_query_metrics.csv`
 
 **实验日期**: 2025年1月9日
 **实验目标**: 对比四种检索方法的吉他音色参数生成性能

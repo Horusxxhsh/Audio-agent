@@ -35,11 +35,15 @@ class MethodSeries:
     values: Dict[str, np.ndarray]  # metric -> shape (n,)
 
 
-def _read_per_query_csv(path: Path) -> Dict[str, MethodSeries]:
+def _read_per_query_csv(path: Path) -> Tuple[Dict[str, MethodSeries], int]:
     rows: List[dict] = []
     with path.open(newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             rows.append(row)
+
+    # Total query count is defined by the union of query_idx in the CSV (including missing rows).
+    all_qidx = sorted({int(r["query_idx"]) for r in rows})
+    n_total = int(len(all_qidx))
 
     # (method, query_idx) -> metric dict
     table: Dict[Tuple[str, int], dict] = {}
@@ -48,32 +52,31 @@ def _read_per_query_csv(path: Path) -> Dict[str, MethodSeries]:
         qidx = int(r["query_idx"])
         missing = int(r.get("missing", "0") or 0)
         if missing:
-            # Skip missing retrievals for stats (should be 0 for Protocol-A).
+            # Missing retrievals are allowed for local sanity checks (e.g., baselines
+            # without cached embeddings). We compute method-level summaries on the
+            # available subset and paired comparisons on the intersection.
             continue
         table[(method, qidx)] = r
 
     methods = sorted({m for (m, _) in table.keys()})
-    query_idx = np.array(sorted({q for (_, q) in table.keys()}), dtype=int)
 
     by_method: Dict[str, MethodSeries] = {}
     for m in methods:
+        qidx = sorted([q for (mm, q) in table.keys() if mm == m])
         vals: Dict[str, List[float]] = {k: [] for k in METRICS}
-        missing_q = []
-        for q in query_idx:
-            r = table.get((m, int(q)))
-            if r is None:
-                missing_q.append(int(q))
-                continue
+        for q in qidx:
+            r = table[(m, int(q))]
             for k in METRICS:
-                vals[k].append(float(r[k]))
-        if missing_q:
-            raise ValueError(f"Missing rows for method={m}: query_idx={missing_q[:10]} (count={len(missing_q)})")
+                try:
+                    vals[k].append(float(r[k]))
+                except Exception as e:
+                    raise ValueError(f"Invalid value for method={m} query_idx={q} metric={k}: {r.get(k)!r}") from e
         by_method[m] = MethodSeries(
-            query_idx=query_idx,
+            query_idx=np.asarray(qidx, dtype=int),
             values={k: np.asarray(vals[k], dtype=float) for k in METRICS},
         )
 
-    return by_method
+    return by_method, n_total
 
 
 def _bootstrap_ci_mean(x: np.ndarray, *, n_boot: int, seed: int, alpha: float) -> Tuple[float, float]:
@@ -142,20 +145,20 @@ def main() -> None:
     args = ap.parse_args()
 
     csv_path = Path(args.csv)
-    by_method = _read_per_query_csv(csv_path)
+    by_method, n_total = _read_per_query_csv(csv_path)
 
     methods = sorted(by_method.keys())
-    n = int(next(iter(by_method.values())).query_idx.shape[0])
 
     # Method-level summaries
     method_summary = {}
     for m in methods:
         ms = by_method[m]
-        method_summary[m] = {"n": n, "metrics": {}}
+        n_m = int(ms.query_idx.shape[0])
+        method_summary[m] = {"n": n_m, "n_total": int(n_total), "missing": int(n_total - n_m), "metrics": {}}
         for k in METRICS:
             x = ms.values[k]
-            mean = float(x.mean())
-            std = float(x.std(ddof=1)) if n > 1 else 0.0
+            mean = float(x.mean()) if x.size else float("nan")
+            std = float(x.std(ddof=1)) if n_m > 1 else 0.0
             lo, hi = _bootstrap_ci_mean(x, n_boot=args.n_boot, seed=args.seed, alpha=0.05)
             method_summary[m]["metrics"][k] = {
                 "mean": mean,
@@ -167,6 +170,7 @@ def main() -> None:
     if "TRR" not in by_method:
         raise ValueError("Expected a method named 'TRR' in the CSV.")
     trr = by_method["TRR"]
+    n_trr = int(trr.query_idx.shape[0])
 
     comparisons = []
     raw_pvals = []
@@ -175,9 +179,16 @@ def main() -> None:
         if baseline == "TRR":
             continue
         base = by_method[baseline]
+        shared = sorted(set(trr.query_idx.tolist()).intersection(set(base.query_idx.tolist())))
+        if not shared:
+            continue
+        trr_pos = {int(q): i for i, q in enumerate(trr.query_idx.tolist())}
+        base_pos = {int(q): i for i, q in enumerate(base.query_idx.tolist())}
+        trr_idx = np.asarray([trr_pos[int(q)] for q in shared], dtype=int)
+        base_idx = np.asarray([base_pos[int(q)] for q in shared], dtype=int)
         for k in METRICS:
-            a = trr.values[k]
-            b = base.values[k]
+            a = trr.values[k][trr_idx]
+            b = base.values[k][base_idx]
             # Define signed difference so that positive = TRR better.
             if k in LOWER_IS_BETTER:
                 # Lower is better => improvement means baseline - TRR > 0
@@ -191,7 +202,7 @@ def main() -> None:
                 {
                     "baseline": baseline,
                     "metric": k,
-                    "n": n,
+                    "n": int(d.shape[0]),
                     "mean_diff_signed": mean_diff,
                     "ci95_signed": [lo, hi],
                     "p_perm_two_sided": p,
@@ -206,7 +217,8 @@ def main() -> None:
 
     out = {
         "input_csv": str(csv_path),
-        "n_queries": n,
+        "n_queries_total": int(n_total),
+        "n_queries_trr": int(n_trr),
         "methods": methods,
         "metrics": METRICS,
         "method_summary": method_summary,
@@ -228,18 +240,20 @@ def main() -> None:
     lines.append("# Protocol-A Objective Metrics: Confidence Intervals and Significance")
     lines.append("")
     lines.append(f"- Input CSV: `{csv_path}`")
-    lines.append(f"- Queries: n={n} (paired across methods by `query_idx`)")  # avoid ambiguity on duplicate names
+    lines.append(f"- Queries (total in CSV): n={int(n_total)}")
+    lines.append(f"- TRR available queries: n={int(n_trr)}")
+    lines.append("- Pairwise tests use the intersection of `query_idx` between TRR and each baseline.")
     lines.append(f"- Bootstrap resamples: {int(args.n_boot)} (seed={int(args.seed)})")
     lines.append(f"- Paired permutation samples: {int(args.n_perm)} (seed={int(args.seed)})")
     lines.append("")
 
     lines.append("## Per-Method 95% CIs (Mean Over Queries)")
     lines.append("")
-    header = ["Method"] + [f"{k} (mean, 95% CI)" for k in METRICS]
+    header = ["Method", "n"] + [f"{k} (mean, 95% CI)" for k in METRICS]
     lines.append("| " + " | ".join(header) + " |")
     lines.append("| " + " | ".join(["---"] * len(header)) + " |")
     for m in methods:
-        row = [m]
+        row = [m, str(int(method_summary[m]["n"]))]
         for k in METRICS:
             rec = method_summary[m]["metrics"][k]
             row.append(f"{rec['mean']:.4f}, {fmt_ci(rec['ci95'])}")
@@ -253,7 +267,7 @@ def main() -> None:
     lines.append("- For other metrics: `TRR - baseline` (positive means TRR increases the score).")
     lines.append("")
 
-    header = ["Baseline", "Metric", "Mean Δ", "95% CI", "p (perm, 2-sided)", "p (Holm)"]
+    header = ["Baseline", "Metric", "n", "Mean Δ", "95% CI", "p (perm, 2-sided)", "p (Holm)"]
     lines.append("| " + " | ".join(header) + " |")
     lines.append("| " + " | ".join(["---"] * len(header)) + " |")
     for rec in comparisons:
@@ -263,6 +277,7 @@ def main() -> None:
                 [
                     rec["baseline"],
                     rec["metric"],
+                    str(int(rec["n"])),
                     f"{rec['mean_diff_signed']:.4f}",
                     fmt_ci(rec["ci95_signed"]),
                     f"{rec['p_perm_two_sided']:.3g}",

@@ -63,14 +63,17 @@ class RAGRetriever:
         print(f"[RAGRetriever] Initializing temporary RAG DB at: {self.temp_dir}")
 
         # Initialize RAG System with temp dir
-        # Priority: DEEPSEEK_API_KEY -> OPENAI_API_KEY -> Hardcoded Default
-        default_key = "sk-0705951d960041ed96c607ab69724d0d" 
-        api_key = os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", default_key)
+        # Priority: DEEPSEEK_API_KEY -> OPENAI_API_KEY (no hardcoded secrets)
+        api_key = os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY")
+        base_url = os.environ.get("DEEPSEEK_BASE_URL") or os.environ.get("OPENAI_BASE_URL") or "https://api.deepseek.com"
+        if not api_key:
+            print("[RAGRetriever] Missing API key (DEEPSEEK_API_KEY / OPENAI_API_KEY); falling back to simple text retrieval only.")
+            return
         
         self.rag = AudioRAGSystem(
             api_key=api_key,
             persist_directory=self.temp_dir,
-            base_url="https://api.deepseek.com" # Explicitly force DeepSeek URL if using DeepSeek Key
+            base_url=base_url,
         )
 
         # Populate DB with training data
