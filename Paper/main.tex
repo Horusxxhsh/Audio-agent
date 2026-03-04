@@ -1,0 +1,34 @@
+\documentclass[journal,10pt]{IEEEtran}
+
+\makeatletter
+\def\input@path{{./}{Paper/}}
+\makeatother
+
+% Optional math commands
+\input{math_commands.tex}
+
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{color}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,fit,calc,shadows,shapes.geometric}
+
+\usepackage[numbers,sort&compress]{natbib}
+
+% Path to figures (supports compiling from Paper/ or repo root)
+\graphicspath{{./figures/}{Paper/figures/}}
+
+\title{Adaptive TRR-RAG: Personalized Audio Effect Synthesis via Texture-Aware Memory Retrieval-Augmented Generation}
+\author{Anonymous Authors}
+
+\begin{document}
+\newcommand{\paperbibliostyle}{IEEEtranN}
+\input{content.tex}
+\end{document}
