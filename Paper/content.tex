@@ -172,10 +172,17 @@ Because $\mathbf{a}_{\text{ref}}$ is optional, the synthesis pipeline must remai
 
 We implement the retrieval-based framework defined in Section \ref{sec:problem_formulation} via \textbf{Texture Resonance Retrieval (TRR)} to retrieve candidate presets using second-order texture statistics.
 
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/adaptive_trr_rag_architecture.pdf}
+    \caption{Adaptive TRR-RAG system architecture with standardized flowchart notation. The pipeline processes dual-modal inputs (text and audio) through separate retrieval paths, fuses results via adaptive weighting, and produces executable DSP parameters with real-time constraint validation.}
+    \label{fig:system_architecture}
+\end{figure*}
+
 \subsection{System Architecture}
 \label{ssec:architecture}
 
-The system realizes the operator $\Phi(\mathbf{x}_{\text{in}}; \theta)$ through a decoupled design, visualized in Figure \ref{fig:architecture}.
+The system realizes the operator $\Phi(\mathbf{x}_{\text{in}}; \theta)$ through a decoupled design, visualized in Figure \ref{fig:architecture}. Figure \ref{fig:system_architecture} provides an alternative high-level view using standardized flowchart notation.
 
 \begin{figure*}[t]
 		\centering
@@ -273,6 +280,13 @@ To address this, we introduce \textbf{Texture Resonance Retrieval (TRR)}. Drawin
 		\RETURN $\mathbf{G}_{\text{norm}}$
 	\end{algorithmic}
 \end{algorithm}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/trr_encoding_pipeline.pdf}
+    \caption{The TRR encoding pipeline with multi-layer fusion. Input audio is processed through Wav2Vec2 Base to extract features from layers 4, 5, and 6. Each layer's features are projected from $C=768$ to $P=32$ dimensions before computing Gram matrices. The three Gram matrices are averaged to produce a fused representation, which is flattened and L2-normalized to yield the final 1024-dimensional texture embedding.}
+    \label{fig:trr_pipeline}
+\end{figure*}
 
 Let $\mathbf{H} \in \mathbb{R}^{C \times T_{\text{frm}}}$ be the activation map from an intermediate layer $\ell$ of a pre-trained Wav2Vec2 model, where $C$ is the channel depth and $T_{\text{frm}}$ is the temporal dimension. In our experiments we use Wav2Vec2 Base and set $\ell=10$ (Section \ref{sec:experiments}). The texture descriptor $\mathbf{G} \in \mathbb{R}^{C \times C}$ is defined as the time-averaged correlation matrix (Algorithm \ref{alg:trr_encoding}):
 \begin{equation}
