@@ -68,13 +68,10 @@ class HybridFusionRetriever:
         print(f"  >> Text Retriever Ready ({len(self.dataset)} items)")
 
     def _build_text(self, item):
-        """构建文本表示（参考RAGRetriever，使用Style字段）"""
+        """构建文本表示：仅使用 Style + Feature，不使用 SongName。"""
         style = " ".join(item.get('Style', []))
         feature = " ".join(item.get('Feature', []))
-        song_name = item.get('SongName', '').replace('_', ' ')  # 将下划线替换为空格，提高匹配度
-        # 只使用SongName和Style，不使用Feature（Feature包含过多无关描述）
-        # 这样可以更好地匹配Base样本
-        return f"{song_name} {style}"
+        return f"{style} {feature}".strip()
 
     def _init_audio_retriever(self):
         """初始化 TRR 音频检索器"""
@@ -160,9 +157,104 @@ class HybridFusionRetriever:
         except:
             return 0.0
 
+    def _normalize_scores(self, scores: np.ndarray, mode: str) -> np.ndarray:
+        if mode == "none":
+            return scores
+        if scores.size == 0:
+            return scores
+        if mode == "zscore":
+            mean = float(np.mean(scores))
+            std = float(np.std(scores))
+            if std <= 1e-12:
+                return np.zeros_like(scores)
+            return (scores - mean) / std
+        if mode == "minmax":
+            min_v = float(np.min(scores))
+            max_v = float(np.max(scores))
+            if max_v - min_v <= 1e-12:
+                return np.zeros_like(scores)
+            return (scores - min_v) / (max_v - min_v)
+        raise ValueError(f"Unknown score normalization mode: {mode}")
+
+    def _top2_margin(self, scores: np.ndarray) -> float:
+        if scores.size == 0:
+            return 0.0
+        ranked = np.sort(scores)[::-1]
+        if ranked.size == 1:
+            return float(ranked[0])
+        return float(ranked[0] - ranked[1])
+
+    def _sigmoid_confidence(self, margin: float, temperature: float) -> float:
+        if margin <= 0:
+            return 0.0
+        x = float(np.clip(margin * temperature, -20.0, 20.0))
+        return float(1.0 / (1.0 + np.exp(-x)))
+
+    def _compute_confidence_alpha(
+        self,
+        text_scores_scaled: np.ndarray,
+        audio_scores_scaled: np.ndarray,
+        alpha_min: float,
+        alpha_max: float,
+        confidence_temperature: float,
+    ) -> Dict[str, float]:
+        text_margin = self._top2_margin(text_scores_scaled)
+        audio_margin = self._top2_margin(audio_scores_scaled)
+        text_peak = float(np.max(text_scores_scaled)) if text_scores_scaled.size else 0.0
+        audio_peak = float(np.max(audio_scores_scaled)) if audio_scores_scaled.size else 0.0
+
+        # Confidence combines local rank sharpness (top1-top2 margin) and
+        # absolute peak strength. This suppresses branches that have a winner
+        # only by a tiny margin but whose overall scores are still weak.
+        peak_temperature = max(1.0, float(confidence_temperature) * 0.35)
+        text_conf = 0.0 if np.allclose(text_scores_scaled, text_scores_scaled[:1]) else (
+            self._sigmoid_confidence(text_margin, confidence_temperature) *
+            self._sigmoid_confidence(max(0.0, text_peak), peak_temperature)
+        )
+        audio_conf = 0.0 if np.allclose(audio_scores_scaled, audio_scores_scaled[:1]) else (
+            self._sigmoid_confidence(audio_margin, confidence_temperature) *
+            self._sigmoid_confidence(max(0.0, audio_peak), peak_temperature)
+        )
+
+        denom = text_conf + audio_conf
+        if denom <= 1e-12:
+            alpha = 0.5 * (alpha_min + alpha_max)
+        else:
+            alpha = text_conf / denom
+            peak_gap = max(0.0, text_peak - audio_peak)
+            weak_audio = max(0.0, text_conf - audio_conf)
+            low_audio_peak = max(0.0, 1.5 - audio_peak)
+            low_audio_margin = max(0.0, 0.35 - audio_margin)
+            gap_bias = 0.22 * self._sigmoid_confidence(peak_gap, peak_temperature)
+            weak_audio_bias = 0.20 * self._sigmoid_confidence(weak_audio, confidence_temperature)
+            low_peak_bias = 0.18 * self._sigmoid_confidence(low_audio_peak, peak_temperature)
+            low_margin_bias = 0.16 * self._sigmoid_confidence(low_audio_margin, confidence_temperature)
+            alpha = float(np.clip(alpha + gap_bias + weak_audio_bias + low_peak_bias + low_margin_bias, alpha_min, alpha_max))
+
+        return {
+            "alpha": float(alpha),
+            "text_margin": float(text_margin),
+            "audio_margin": float(audio_margin),
+            "text_peak": float(text_peak),
+            "audio_peak": float(audio_peak),
+            "peak_gap_bias": float(gap_bias if denom > 1e-12 else 0.0),
+            "weak_audio_bias": float(weak_audio_bias if denom > 1e-12 else 0.0),
+            "low_audio_peak_bias": float(low_peak_bias if denom > 1e-12 else 0.0),
+            "low_audio_margin_bias": float(low_margin_bias if denom > 1e-12 else 0.0),
+            "text_confidence": float(text_conf),
+            "audio_confidence": float(audio_conf),
+        }
+
     def retrieve_top_k_weighted(self, query_text: str, query_audio_path: Optional[str] = None,
                                query_trr_vector: Optional[List[float]] = None,
-                               alpha: float = 0.5, k: int = 5) -> List[Dict]:
+                               alpha: float = 0.5, k: int = 5,
+                               score_norm: str = "none",
+                               text_scale: float = 1.0,
+                               audio_scale: float = 1.0,
+                               adaptive_alpha_mode: str = "none",
+                               alpha_min: float = 0.3,
+                               alpha_max: float = 0.8,
+                               confidence_temperature: float = 8.0) -> List[Dict]:
         """
         加权融合模式
 
@@ -175,6 +267,9 @@ class HybridFusionRetriever:
             query_trr_vector: 查询TRR向量（可选，直接使用JSON中的向量）
             alpha: 融合权重
             k: 返回结果数量
+            score_norm: 分数归一化方式 ('none', 'zscore', 'minmax')
+            text_scale: 文本分数缩放系数
+            audio_scale: 音频分数缩放系数
         """
         # 1. 文本检索分数
         query_vec = self.vectorizer.transform([query_text])
@@ -218,20 +313,40 @@ class HybridFusionRetriever:
         else:
             audio_scores = np.zeros(len(self.dataset))
 
-        # 3. 分数缩放（不使用min-max归一化，以保留噪声对排名的影响）
-
-        # 文本分数：TF-IDF余弦相似度，保持在[0, 1]范围
-        text_scores_scaled = text_scores
-
-        # 音频分数：TRR点积
-        # 调试发现原始点积在0.5-1.0范围（可能TRR向量已归一化）
-        # 使用缩放因子1.0（不缩放），让audio分数与text分数在相似范围
-        # 或者使用乘数放大audio分数的影响
-        TRR_SCALE_FACTOR = 1.0  # 不缩放
-        audio_scores_scaled = audio_scores / TRR_SCALE_FACTOR
+        # 3. 分数校准
+        # 默认保留原始行为；需要时可通过 score_norm / text_scale / audio_scale
+        # 将文本与音频分数调整到更可比较的量级。
+        text_scores_scaled = self._normalize_scores(text_scores, score_norm) * float(text_scale)
+        audio_scores_scaled = self._normalize_scores(audio_scores, score_norm) * float(audio_scale)
 
         # 4. 加权融合
         # 现在两个分数的量纲相似，可以直接加权
+        alpha_info = {
+            "alpha": float(alpha),
+            "text_margin": 0.0,
+            "audio_margin": 0.0,
+            "text_peak": 0.0,
+            "audio_peak": 0.0,
+            "peak_gap_bias": 0.0,
+            "weak_audio_bias": 0.0,
+            "low_audio_peak_bias": 0.0,
+            "low_audio_margin_bias": 0.0,
+            "text_confidence": 0.0,
+            "audio_confidence": 0.0,
+            "alpha_source": "fixed",
+        }
+        if adaptive_alpha_mode == "confidence":
+            auto = self._compute_confidence_alpha(
+                text_scores_scaled=text_scores_scaled,
+                audio_scores_scaled=audio_scores_scaled,
+                alpha_min=float(alpha_min),
+                alpha_max=float(alpha_max),
+                confidence_temperature=float(confidence_temperature),
+            )
+            alpha = auto["alpha"]
+            alpha_info.update(auto)
+            alpha_info["alpha_source"] = "confidence"
+
         final_scores = alpha * text_scores_scaled + (1 - alpha) * audio_scores_scaled
 
         # 调试输出：显示Top-5样本的分数详情（已关闭）
@@ -256,8 +371,24 @@ class HybridFusionRetriever:
                 'song_name': self.dataset[idx]['SongName'],
                 'text_score': float(text_scores[idx]),
                 'audio_score': float(audio_scores[idx]) if idx < len(audio_scores) else 0.0,
+                'text_score_scaled': float(text_scores_scaled[idx]),
+                'audio_score_scaled': float(audio_scores_scaled[idx]) if idx < len(audio_scores_scaled) else 0.0,
                 'type': 'hybrid_fusion',
-                'alpha': alpha
+                'alpha': float(alpha),
+                'alpha_source': alpha_info['alpha_source'],
+                'text_margin': float(alpha_info['text_margin']),
+                'audio_margin': float(alpha_info['audio_margin']),
+                'text_peak': float(alpha_info['text_peak']),
+                'audio_peak': float(alpha_info['audio_peak']),
+                'peak_gap_bias': float(alpha_info['peak_gap_bias']),
+                'weak_audio_bias': float(alpha_info['weak_audio_bias']),
+                'low_audio_peak_bias': float(alpha_info['low_audio_peak_bias']),
+                'low_audio_margin_bias': float(alpha_info['low_audio_margin_bias']),
+                'text_confidence': float(alpha_info['text_confidence']),
+                'audio_confidence': float(alpha_info['audio_confidence']),
+                'score_norm': score_norm,
+                'text_scale': float(text_scale),
+                'audio_scale': float(audio_scale),
             })
 
         return results
@@ -358,7 +489,14 @@ class HybridFusionRetriever:
 
     def retrieve_top_k(self, query_text: str, query_audio_path: Optional[str] = None,
                      query_trr_vector: Optional[List[float]] = None,
-                     alpha: float = 0.5, k: int = 5) -> List[Dict]:
+                     alpha: float = 0.5, k: int = 5,
+                     score_norm: str = "none",
+                     text_scale: float = 1.0,
+                     audio_scale: float = 1.0,
+                     adaptive_alpha_mode: str = "none",
+                     alpha_min: float = 0.3,
+                     alpha_max: float = 0.8,
+                     confidence_temperature: float = 8.0) -> List[Dict]:
         """
         检索最相关的 k 个项目（统一接口）
 
@@ -370,7 +508,20 @@ class HybridFusionRetriever:
             k: 返回结果数量
         """
         if self.fusion_mode == 'weighted':
-            return self.retrieve_top_k_weighted(query_text, query_audio_path, query_trr_vector, alpha, k)
+            return self.retrieve_top_k_weighted(
+                query_text,
+                query_audio_path,
+                query_trr_vector,
+                alpha,
+                k,
+                score_norm=score_norm,
+                text_scale=text_scale,
+                audio_scale=audio_scale,
+                adaptive_alpha_mode=adaptive_alpha_mode,
+                alpha_min=alpha_min,
+                alpha_max=alpha_max,
+                confidence_temperature=confidence_temperature,
+            )
         elif self.fusion_mode == 'voting':
             return self.retrieve_top_k_voting(query_text, query_audio_path, k)
         elif self.fusion_mode == 'cascade':
