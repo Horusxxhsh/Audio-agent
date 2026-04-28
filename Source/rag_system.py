@@ -52,6 +52,7 @@ class AudioRAGSystem:
         # 创建或获取集合
         self.music_collection = self._get_or_create_collection("music_knowledge")
         self.parameter_collection = self._get_or_create_collection("parameter_presets")
+        self.memory_collection = self._get_or_create_collection("user_preference_memory")
         
         # Audio collection for storing raw audio vectors
         # Note: We use a simple collection where we provide embeddings directly
@@ -279,7 +280,52 @@ class AudioRAGSystem:
                         print(f"Updated parameter preset (Audio): {preset_name}")
                 except Exception as e2:
                     print(f"Error adding parameter preset (Audio): {e2}")
-    
+
+    def save_to_memory(self,
+                       query: str,
+                       parameters: Dict[str, Any],
+                       audio_vector: List[float],
+                       metadata: Optional[Dict[str, Any]] = None):
+        """
+        将用户偏好（微调后的参数）保存到记忆库中 (TAM)
+        
+        Args:
+            query: 原始自然语言查询
+            parameters: 用户微调后的最终 DSP 参数
+            audio_vector: 输入音频的 TRR 向量
+            metadata: 额外元数据
+        """
+        # 构建文档内容
+        doc_text = f"User Preference Memory\n"
+        doc_text += f"Query: {query}\n"
+        doc_text += f"Parameters: {json.dumps(parameters, ensure_ascii=False)}\n"
+        
+        # 使用时间戳和查询哈希生成唯一 ID
+        import time
+        timestamp = int(time.time())
+        doc_id = f"mem_{timestamp}_{hashlib.md5(query.encode()).hexdigest()[:6]}"
+        
+        # 准备元数据
+        doc_metadata = {
+            "type": "user_memory",
+            "query": query,
+            "parameters": json.dumps(parameters, ensure_ascii=False),
+            "timestamp": timestamp
+        }
+        if metadata:
+            doc_metadata.update(metadata)
+            
+        try:
+            self.memory_collection.add(
+                ids=[doc_id],
+                embeddings=[audio_vector],
+                metadatas=[doc_metadata],
+                documents=[doc_text]
+            )
+            print(f"Saved preference to memory: {query} (ID: {doc_id})")
+        except Exception as e:
+            print(f"Error saving to memory: {e}")
+
     def retrieve_similar_knowledge(self, 
                                    query: str,
                                    n_results: int = 5,
@@ -304,7 +350,32 @@ class AudioRAGSystem:
         # 1. Fetch Candidates
         text_results = []
         audio_results = []
+        memory_results = []
         
+        # Memory Query (High Priority)
+        if audio_query_vector is not None and collection_type == "parameter":
+            try:
+                raw_mem_res = self.memory_collection.query(
+                    query_embeddings=[audio_query_vector],
+                    n_results=n_results
+                )
+                if raw_mem_res['documents']:
+                    for i in range(len(raw_mem_res['documents'][0])):
+                        dist = raw_mem_res['distances'][0][i] if raw_mem_res['distances'] else 1.0
+                        sim = max(0.0, 1.0 - dist)
+                        # Memory Threshold check (e.g., 0.95 similarity)
+                        if sim >= 0.90: # Slightly lower than 0.95 for flexibility in simulation
+                            item = {
+                                'document': raw_mem_res['documents'][0][i],
+                                'metadata': raw_mem_res['metadatas'][0][i],
+                                'id': raw_mem_res['ids'][0][i],
+                                'score': sim,
+                                'is_memory': True
+                            }
+                            memory_results.append(item)
+            except Exception as e:
+                print(f"Memory retrieval error: {e}")
+
         # Text Query
         try:
             if query and len(query.strip()) > 0:
@@ -355,20 +426,35 @@ class AudioRAGSystem:
         # Create a map of all unique IDs
         unique_items = {}
         
-        # Process Audio Results
-        for item in audio_results:
+        # Process Memory Results (Highest Priority)
+        for item in memory_results:
             uid = item['id']
             unique_items[uid] = {
                 'item': item,
                 'audio_score': item['score'],
-                'text_score': 0.0 # Default if not found in text results
+                'text_score': 1.0, # Treat as perfect text match for priority
+                'is_memory': True
             }
+
+        # Process Audio Results
+        for item in audio_results:
+            uid = item['id']
+            if uid not in unique_items:
+                unique_items[uid] = {
+                    'item': item,
+                    'audio_score': item['score'],
+                    'text_score': 0.0 # Default if not found in text results
+                }
+            else:
+                # Update audio score if higher
+                unique_items[uid]['audio_score'] = max(unique_items[uid]['audio_score'], item['score'])
             
         # Process Text Results (Update or Add)
         for item in text_results:
             uid = item['id']
             if uid in unique_items:
-                unique_items[uid]['text_score'] = item['score']
+                # Update text score if higher
+                unique_items[uid]['text_score'] = max(unique_items[uid]['text_score'], item['score'])
             else:
                 unique_items[uid] = {
                     'item': item,
@@ -380,19 +466,25 @@ class AudioRAGSystem:
         final_candidates = []
         for uid, data in unique_items.items():
             # Weighted Sum
-            final_score = (data['audio_score'] * weight_audio) + (data['text_score'] * (1.0 - weight_audio))
+            is_mem = data.get('is_memory', False)
+            
+            if is_mem:
+                # Boost memory items significantly
+                final_score = 1.0 + data['audio_score'] 
+            else:
+                final_score = (data['audio_score'] * weight_audio) + (data['text_score'] * (1.0 - weight_audio))
             
             candidate = data['item'].copy()
-            candidate['distance'] = 1.0 - final_score # Convert back to 'distance' format for compatibility
+            candidate['distance'] = 1.0 - min(1.0, final_score) # Keep distance in 0..1 range
             candidate['fusion_score'] = final_score
-            candidate['source_modality'] = 'hybrid'
+            candidate['source_modality'] = 'memory' if is_mem else 'hybrid'
             final_candidates.append(candidate)
             
         # 3. Sort and Return Top K
         final_candidates.sort(key=lambda x: x['fusion_score'], reverse=True)
         
         # DEBUG
-        print(f"DEBUG: Fusion - AudioRes: {len(audio_results)}, TextRes: {len(text_results)}")
+        print(f"DEBUG: Fusion - MemRes: {len(memory_results)}, AudioRes: {len(audio_results)}, TextRes: {len(text_results)}")
         if final_candidates:
              top = final_candidates[0]
              print(f"DEBUG: Top Candidate: Score={top['fusion_score']:.4f} (Audio={top.get('audio_score',-1):.2f}, Text={top.get('text_score',-1):.2f}), Modality={top.get('source_modality')}")
@@ -629,7 +721,7 @@ if __name__ == "__main__":
     
     # 初始化
     rag = AudioRAGSystem(
-        api_key="sk-1b73586fde854a329ec187dc371f53ef",
+        api_key=os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", ""),
         base_url="https://api.deepseek.com"
     )
     

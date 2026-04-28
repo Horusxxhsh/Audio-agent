@@ -1,0 +1,144 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+
+\definecolor{revisionblue}{RGB}{0,102,204}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=revisionblue,
+    urlcolor=revisionblue
+}
+
+\begin{document}
+
+\begin{center}
+    {\Large\bfseries Response to Reviewers}\\[0.5em]
+    {\large IEEE Transactions on Multimedia}\\[1em]
+    {\bfseries Manuscript ID: \#8159}\\[0.3em]
+    {\bfseries Title: Texture Resonance Retrieval for Retrieval-Grounded Editable Audio Effect Preset Selection}\\[1.2em]
+\end{center}
+
+\noindent Dear Editor and Reviewers,
+
+\medskip
+
+We thank the reviewers for the detailed critiques. The central lesson from the reviews was that our earlier package mixed a verified retrieval benchmark with broader system claims that were not supported to the same standard. In the revision, we therefore prioritized \emph{evidence hardening} over scope expansion. The revised manuscript now makes fewer claims, but each retained claim is tied to a canonical repository artifact.
+
+\section*{Canonical Evidence Sources}
+
+The revised submission uses the following repository artifacts as the sole experimental sources of truth:
+
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{Experiments/tmm/protocolA\_split\_audit.md}
+    \item \texttt{Experiments/tmm/protocolA\_audio\_grouped\_leakage\_report.json}
+    \item \texttt{Experiments/AblationStudies/protocolA\_audio\_grouped\_objective\_stats.md}
+    \item \texttt{Experiments/AblationStudies/protocolA\_audio\_grouped\_per\_query\_metrics.csv}
+    \item \texttt{Experiments/AblationStudies/protocolC\_objective\_stats.md}
+    \item \texttt{Experiments/mushura/results\_report.md}
+\end{itemize}
+
+We do not use the legacy retrieval report, the deprecated Protocol-B outputs, or the repository's exploratory personalization/memory code as formal evidence in this revision.
+
+\section*{Summary of Revision Actions}
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{Scope narrowed to retrieval-grounded editable control.} The manuscript now centers on Texture Resonance Retrieval (TRR) as a retrieval representation for executable preset control. Personalization, AEM memory, and related extensions are explicitly presented as exploratory rather than validated core contributions.
+
+    \item \textbf{Objective claims re-anchored to an audited Protocol-A split.} A post-hoc audit of the legacy song-name-based Protocol-A list found 16 cross-split shared resolved audio paths. We therefore moved the main objective comparison to a stricter resolved-audio-grouped split with 1267 total records, 204 held-out queries, and a 1063-item retrieval knowledge base. We report means, 95\% bootstrap confidence intervals, and Holm-corrected paired permutation tests from the canonical Protocol-A artifacts for this stricter split.
+
+    \item \textbf{Per-query diagnostics added.} We generated a derived analysis directly from the canonical Protocol-A per-query CSV for the stricter split, including win/loss/tie summaries, signed-delta diagnostics, and representative success/failure cases. These diagnostics are now cited in the supplementary material so that the main result is not supported by mean values alone.
+
+    \item \textbf{CLAP added as a verified stronger baseline.} We now include a CLAP retrieval baseline in the verified evidence chain on the stricter Protocol-A split. TRR remains stronger than CLAP on the 201 shared queries with cached CLAP embeddings. We do not claim that PaSST, PANNs, or direct parameter regressors have been completed.
+
+    \item \textbf{Protocol-C repositioned as boundary-condition analysis.} We removed any claim that the current Protocol-C is a realistic real-audio robustness benchmark. The revised paper explicitly states that the audio degradation branch remains a synthetic embedding-space perturbation, and we use the resulting evidence only to characterize the current fusion heuristic under single-modality degradation and modality conflict.
+
+    \item \textbf{Listening-study terminology and statistics corrected.} The study is consistently described as a multiple-stimulus listening test with a hidden reference and no explicit low-quality anchor. The revision reports the canonical nonparametric statistics already present in the repository: Friedman omnibus tests, Holm-corrected Wilcoxon signed-rank post-hoc tests, and rank-biserial effect sizes, together with an explicit limitation that the logs do not preserve device metadata, participant expertise, or the provenance/time budget of the manual baseline.
+
+    \item \textbf{Submission package synchronized.} The manuscript, supplementary material, response documents, and revision checklist were edited to remove stale claims about larger datasets, stronger baselines, normalized metrics, real-audio Protocol-C, and AEM learning curves that are not part of the current verified evidence chain.
+\end{enumerate}
+
+\section*{Responses to the Main Reviewer Themes}
+
+\subsection*{1. Novelty and scope}
+
+We agree that the strongest supported contribution is not a full personalized agent system, but a retrieval-grounded parameter-control formulation centered on TRR. The revised manuscript therefore frames the contribution around texture-aware retrieval for editable preset control and avoids claims that would require additional evidence beyond the current benchmark.
+
+\subsection*{2. Benchmark scale, split transparency, and statistical reporting}
+
+The objective results are now anchored to the stricter resolved-audio-grouped Protocol-A benchmark with $N_{\mathrm{test}}=204$ and $N_{\mathrm{kb}}=1063$. The revised manuscript and supplementary material report:
+
+\begin{itemize}[leftmargin=2em]
+    \item the legacy split audit (16 shared resolved audio paths across split);
+    \item the stricter anti-leakage split with zero exact shared resolved audio paths under the current audit;
+    \item method means with 95\% bootstrap confidence intervals;
+    \item paired permutation tests for TRR versus each retrieval baseline;
+    \item Holm-corrected $p$ values;
+    \item per-query diagnostics derived directly from the canonical Protocol-A CSV.
+\end{itemize}
+
+\subsection*{3. Stronger baselines}
+
+We now include \emph{CLAP} as a verified stronger retrieval baseline on the stricter Protocol-A split. The revised manuscript therefore makes the narrower and better-supported statement that TRR is the strongest among the currently evaluated retrieval baselines on the audited Protocol-A benchmark, including CLAP on the 201 shared queries with cached CLAP embeddings. We still do not claim to have completed PaSST, PANNs, or direct parameter-regression baselines.
+
+\subsection*{4. Metric limitations}
+
+We also do \emph{not} claim to have replaced the metric system with a normalized or categorical-aware suite. Instead, the revision clarifies the exact operational metric definitions and their limitations:
+
+\begin{itemize}[leftmargin=2em]
+    \item flattened numeric leaves only;
+    \item missing numeric keys treated as zero;
+    \item no per-parameter normalization;
+    \item within-protocol interpretation only.
+\end{itemize}
+
+These limitations are now stated explicitly in both the main paper and the supplementary material.
+
+\subsection*{5. Protocol-C realism}
+
+We agree with the reviewers that synthetic embedding-space degradation is not equivalent to real audio corruption. Accordingly, Protocol-C is no longer framed as a realistic robustness benchmark. The revision uses it only to characterize fallback behavior of the current score-level fusion heuristic:
+
+\begin{itemize}[leftmargin=2em]
+    \item under \textit{vague text}, fusion falls back to audio;
+    \item under \textit{noisy audio}, fusion falls back to text;
+    \item under \textit{modality conflict}, fusion becomes substantially worse than TRR-only.
+\end{itemize}
+
+\subsection*{6. Listening-study rigor}
+
+The revised package now surfaces the canonical listening-study statistics already present in the repository:
+
+\begin{itemize}[leftmargin=2em]
+    \item 26 participants and 910 ratings;
+    \item Friedman omnibus tests for Trials 2--5 and Trials 6--10;
+    \item Holm-corrected Wilcoxon signed-rank post-hoc tests;
+    \item rank-biserial correlation ($rbc$);
+    \item explicit statement that the raw \texttt{HCAP} label corresponds to the TRR-based system described in the paper.
+\end{itemize}
+
+We also state clearly that the TRR-based system and MusicGen are statistically indistinguishable in Trials 6--10 under the reported post-hoc test, so this block is interpreted as parity rather than superiority.
+
+\subsection*{7. Scope mismatch between paper and repository}
+
+This concern was valid in earlier drafts. The revision addresses it by making the repository's exploratory modules non-central:
+
+\begin{itemize}[leftmargin=2em]
+    \item AEM / personalization is described as exploratory only;
+    \item deprecated Protocol-B results are removed from the primary evidence path;
+    \item legacy reports are no longer used as formal evidence;
+    \item the main architecture figure now depicts only the verified retrieval-grounded pipeline.
+\end{itemize}
+
+\section*{Closing Statement}
+
+We appreciate the reviewers' insistence on a tighter evidence chain. The revised submission is intentionally more conservative than earlier drafts: it makes fewer claims, but each retained claim is now tied to a canonical artifact with clearer statistical support and clearer scope boundaries.
+
+\medskip
+
+\noindent Sincerely,\\
+The Authors
+
+\end{document}

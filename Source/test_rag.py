@@ -5,6 +5,7 @@ Demonstrates how to use the RAG system with the existing Audio-agent project
 
 import sys
 import json
+import os
 from rag_system import AudioRAGSystem, initialize_knowledge_base
 from rag_integration import integrate_rag_with_existing_system, add_preset_to_rag
 
@@ -17,7 +18,7 @@ def test_rag_basic():
     
     # 初始化 RAG 系统
     rag = AudioRAGSystem(
-        api_key="sk-1b73586fde854a329ec187dc371f53ef",
+        api_key=os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", ""),
         base_url="https://api.deepseek.com"
     )
     
@@ -49,7 +50,7 @@ def test_rag_with_parameters():
     print("=" * 60)
     
     rag = AudioRAGSystem(
-        api_key="sk-1b73586fde854a329ec187dc371f53ef",
+        api_key=os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", ""),
         base_url="https://api.deepseek.com"
     )
     
@@ -122,7 +123,7 @@ def test_rag_generation():
     print("=" * 60)
     
     rag = AudioRAGSystem(
-        api_key="sk-1b73586fde854a329ec187dc371f53ef",
+        api_key=os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", ""),
         base_url="https://api.deepseek.com"
     )
     
@@ -209,7 +210,7 @@ def test_integration_workflow():
         
         # 步骤5：模拟生成参数后添加到 RAG
         print(f"\n【步骤5】参数生成完成，添加到 RAG 知识库...")
-        rag = AudioRAGSystem(api_key="sk-1b73586fde854a329ec187dc371f53ef")
+        rag = AudioRAGSystem(api_key=os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", ""))
         
         generated_parameters = {
             "ReverbOn": {"Size": 0.70, "Damping": 0.40, "Width": 0.80, "Mix": 0.45},
@@ -239,7 +240,7 @@ def interactive_test():
     print("\n输入您的查询，或输入 'quit' 退出")
     
     rag = AudioRAGSystem(
-        api_key="sk-1b73586fde854a329ec187dc371f53ef",
+        api_key=os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", ""),
         base_url="https://api.deepseek.com"
     )
     

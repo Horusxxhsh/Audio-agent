@@ -1,0 +1,109 @@
+{
+  "dataset_json": "/Users/xyh/Code/Audio-agent/Data/External_1267_211/dataset/dataset_full_vectors_1267.json",
+  "n_total_items": 1267,
+  "n_unique_song_names": 1264,
+  "n_duplicate_song_names": 3,
+  "missing_field_counts": {
+    "SongName": 0,
+    "Parameters": 0,
+    "Style": 0,
+    "Feature": 0
+  },
+  "n_items_with_existing_audio": 1249,
+  "n_items_missing_audio": 18,
+  "n_unreadable_audio": 0,
+  "audio_seconds_summary": {
+    "count": 1249,
+    "min": 4.94,
+    "p10": 4.94,
+    "median": 4.94,
+    "mean": 4.96373098478783,
+    "p90": 5.06,
+    "max": 5.06
+  },
+  "audio_sample_rate_summary": {
+    "count": 1249,
+    "min": 32000.0,
+    "p10": 32000.0,
+    "median": 32000.0,
+    "mean": 32000.0,
+    "p90": 32000.0,
+    "max": 32000.0
+  },
+  "audio_peak_dbfs_summary": {
+    "count": 1249,
+    "min": -54.05046649368761,
+    "p10": -11.886260859823306,
+    "median": -5.228896773434571,
+    "mean": -6.040844644843302,
+    "p90": -0.29165944351722384,
+    "max": 0.00026506827970091155
+  },
+  "audio_rms_dbfs_summary": {
+    "count": 1249,
+    "min": -79.23236220186838,
+    "p10": -27.65557506650169,
+    "median": -19.489197113616033,
+    "mean": -20.706241435852853,
+    "p90": -14.215336329653521,
+    "max": -7.744481415430304
+  },
+  "n_silent_audio": 0,
+  "silent_audio_examples": [],
+  "n_clipped_audio": 113,
+  "clipped_audio_examples": [
+    "Spanky Funk",
+    "Saturated Rhythm",
+    "Modern Djent",
+    "Thrash Metal Scoop",
+    "Bitpop Chiptune",
+    "Blue-Eyed Soul",
+    "D-beat Punk",
+    "Digital Hardcore",
+    "Disco Funk",
+    "Futurebass Vocal Chop",
+    "Garage Funk",
+    "G-funk Synth",
+    "Glitch Hop",
+    "Glitter Rock",
+    "Jazz Fusion Complex",
+    "J-Pop Bright",
+    "J-Rock Power",
+    "Memphis Soul",
+    "Motown Groove",
+    "Nu-Disco Groove"
+  ],
+  "audio_missing_examples": [
+    "Math Rock Crystal Cleans",
+    "Vintage Tweed Breakup",
+    "Dry Funk Rhythm",
+    "Saturated Drive Rhythm",
+    "Reverse Psychedelic Delay",
+    "80s Hair Metal Arena",
+    "Acoustic Sim Natural",
+    "Auto-Wah Funk Rhythm",
+    "Brian May Queen Tone",
+    "Brown Sound Modern",
+    "Plexi Classic Hot",
+    "Dreamy Shoegaze Ethereal",
+    "Jazz Hollowbody Warm",
+    "Lo-Fi Hip Hop Chill",
+    "Punk Rock Raw Energy",
+    "Rotary Speaker Fast",
+    "Texas Blues Warm",
+    "Touch Sensitive Lead Smooth"
+  ],
+  "audio_unreadable_examples": [],
+  "splits": {
+    "seed0": {
+      "n_train": 1056,
+      "n_val": 0,
+      "n_test": 211,
+      "overlap_train_val": [],
+      "overlap_train_test": [],
+      "overlap_val_test": [],
+      "n_unknown_names": 0,
+      "unknown_name_examples": []
+    }
+  }
+}

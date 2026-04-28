@@ -6,7 +6,7 @@ compatibility: 需要 openspec CLI。
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.1.1-1"
+  generatedBy: "1.2.0"
 ---
 
 使用实验性的产出物驱动方法启动新变更。

@@ -1,0 +1,1125 @@
+{
+  "n_total": 1267,
+  "n_test": 211,
+  "n_kb": 1056,
+  "n_unique_song_names_total": 1264,
+  "n_duplicate_song_names_total": 3,
+  "n_duplicate_song_names_test": 1,
+  "n_unique_base_names_test": 30,
+  "n_unique_base_names_kb": 1054,
+  "n_shared_base_names_test_kb": 0,
+  "shared_base_names_test_kb": [],
+  "coverage": {
+    "test": {
+      "audio_exists": 211,
+      "has_trr": 211,
+      "has_wav2vec": 211,
+      "has_featurenn": 211,
+      "has_clap": 0,
+      "has_clap_cache": 211
+    },
+    "kb": {
+      "audio_exists": 1038,
+      "has_trr": 1056,
+      "has_wav2vec": 1051,
+      "has_featurenn": 1051,
+      "has_clap": 1002,
+      "has_clap_cache": 1038
+    }
+  },
+  "shared_resolved_audio_paths_cross_split": [
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/80s Hair Metal.wav",
+      "test_song_names": [
+        "80s Hair Metal",
+        "80s Hair Metal - Heavy Riff Pass",
+        "80s Hair Metal - High Gain Forge",
+        "80s Hair Metal - Palm Mute Crush",
+        "80s Hair Metal - Precision Chug Version",
+        "80s Hair Metal - Steel Edge Mix",
+        "80s Hair Metal - Wall of Gain Edit"
+      ],
+      "kb_song_names": [
+        "80s Hair Metal Arena"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/80s Pop Clean.wav",
+      "test_song_names": [
+        "80s Pop Clean",
+        "80s Pop Clean - Bright Air Version",
+        "80s Pop Clean - Glass Tone Pass",
+        "80s Pop Clean - Natural Body Edit",
+        "80s Pop Clean - Open Chord Mix",
+        "80s Pop Clean - Round Note Cut",
+        "80s Pop Clean - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "80s Pop Clean Studio"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Ambient Swells.wav",
+      "test_song_names": [
+        "Ambient Swells",
+        "Ambient Swells - Cinematic Drift Cut",
+        "Ambient Swells - Cloud Reverb Pass",
+        "Ambient Swells - Ethereal Wash Mix",
+        "Ambient Swells - Floating Texture Edit",
+        "Ambient Swells - Halo Sustain Version",
+        "Ambient Swells - Wide Bloom Take"
+      ],
+      "kb_song_names": [
+        "Ambient Swells Ethereal"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Auto-Wah Funk.wav",
+      "test_song_names": [
+        "Auto-Wah Funk",
+        "Auto-Wah Funk - Chic Rhythm Pass",
+        "Auto-Wah Funk - Muted Snap Take",
+        "Auto-Wah Funk - Pocket Groove Cut",
+        "Auto-Wah Funk - Sync Pulse Mix",
+        "Auto-Wah Funk - Tight Jam Edit",
+        "Auto-Wah Funk - Velvet Groove Version"
+      ],
+      "kb_song_names": [
+        "Auto-Wah Funk Rhythm"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Black Metal Lo-Fi.wav",
+      "test_song_names": [
+        "Black Metal Lo-Fi",
+        "Black Metal Lo-Fi - Heavy Riff Pass",
+        "Black Metal Lo-Fi - High Gain Forge",
+        "Black Metal Lo-Fi - Palm Mute Crush",
+        "Black Metal Lo-Fi - Precision Chug Version",
+        "Black Metal Lo-Fi - Steel Edge Mix",
+        "Black Metal Lo-Fi - Wall of Gain Edit"
+      ],
+      "kb_song_names": [
+        "Black Metal LoFi Raw"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/British Invasion.wav",
+      "test_song_names": [
+        "British Invasion",
+        "British Invasion - Alt Take",
+        "British Invasion - Extended Edit",
+        "British Invasion - Night Drive Cut",
+        "British Invasion - Session Pass",
+        "British Invasion - Signature Version",
+        "British Invasion - Studio Mix"
+      ],
+      "kb_song_names": [
+        "British Invasion Classic"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/DoomStoner Fuzz.wav",
+      "test_song_names": [
+        "Doom/Stoner Fuzz",
+        "Doom/Stoner Fuzz - Heavy Riff Pass",
+        "Doom/Stoner Fuzz - High Gain Forge",
+        "Doom/Stoner Fuzz - Palm Mute Crush",
+        "Doom/Stoner Fuzz - Precision Chug Version",
+        "Doom/Stoner Fuzz - Steel Edge Mix",
+        "Doom/Stoner Fuzz - Wall of Gain Edit"
+      ],
+      "kb_song_names": [
+        "DoomStoner Fuzz Heavy"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Garage Rock Fuzz.wav",
+      "test_song_names": [
+        "Garage Rock Fuzz",
+        "Garage Rock Fuzz - Classic Crunch Edit",
+        "Garage Rock Fuzz - Grit Stack Take",
+        "Garage Rock Fuzz - Hot Valve Version",
+        "Garage Rock Fuzz - Raw Amp Pass",
+        "Garage Rock Fuzz - Saturated Bite Cut",
+        "Garage Rock Fuzz - Vintage Drive Mix"
+      ],
+      "kb_song_names": [
+        "Garage Rock Fuzz Raw"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Grunge Dirt.wav",
+      "test_song_names": [
+        "Grunge Dirt",
+        "Grunge Dirt - Classic Crunch Edit",
+        "Grunge Dirt - Grit Stack Take",
+        "Grunge Dirt - Hot Valve Version",
+        "Grunge Dirt - Raw Amp Pass",
+        "Grunge Dirt - Saturated Bite Cut",
+        "Grunge Dirt - Vintage Drive Mix"
+      ],
+      "kb_song_names": [
+        "Grunge Dirt Seattle"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Indie Jangle.wav",
+      "test_song_names": [
+        "Indie Jangle",
+        "Indie Jangle - Bright Air Version",
+        "Indie Jangle - Glass Tone Pass",
+        "Indie Jangle - Natural Body Edit",
+        "Indie Jangle - Open Chord Mix",
+        "Indie Jangle - Round Note Cut",
+        "Indie Jangle - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Indie Jangle Bright"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Industrial Metal.wav",
+      "test_song_names": [
+        "Industrial Metal",
+        "Industrial Metal - Heavy Riff Pass",
+        "Industrial Metal - High Gain Forge",
+        "Industrial Metal - Palm Mute Crush",
+        "Industrial Metal - Precision Chug Version",
+        "Industrial Metal - Steel Edge Mix",
+        "Industrial Metal - Wall of Gain Edit"
+      ],
+      "kb_song_names": [
+        "Industrial Metal Aggressive"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Infinite Sustain.wav",
+      "test_song_names": [
+        "Infinite Sustain",
+        "Infinite Sustain - Cinematic Drift Cut",
+        "Infinite Sustain - Cloud Reverb Pass",
+        "Infinite Sustain - Ethereal Wash Mix",
+        "Infinite Sustain - Floating Texture Edit",
+        "Infinite Sustain - Halo Sustain Version",
+        "Infinite Sustain - Wide Bloom Take"
+      ],
+      "kb_song_names": [
+        "Infinite Sustain Lead"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Liquid Lead.wav",
+      "test_song_names": [
+        "Liquid Lead",
+        "Liquid Lead - Classic Crunch Edit",
+        "Liquid Lead - Grit Stack Take",
+        "Liquid Lead - Hot Valve Version",
+        "Liquid Lead - Raw Amp Pass",
+        "Liquid Lead - Saturated Bite Cut",
+        "Liquid Lead - Vintage Drive Mix"
+      ],
+      "kb_song_names": [
+        "Liquid Lead Smooth"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Midwest Emo.wav",
+      "test_song_names": [
+        "Midwest Emo",
+        "Midwest Emo - Bright Air Version",
+        "Midwest Emo - Glass Tone Pass",
+        "Midwest Emo - Natural Body Edit",
+        "Midwest Emo - Open Chord Mix",
+        "Midwest Emo - Round Note Cut",
+        "Midwest Emo - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Midwest Emo Twinkled"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Modern Djent.wav",
+      "test_song_names": [
+        "Modern Djent",
+        "Modern Djent - Heavy Riff Pass",
+        "Modern Djent - High Gain Forge",
+        "Modern Djent - Palm Mute Crush",
+        "Modern Djent - Precision Chug Version",
+        "Modern Djent - Steel Edge Mix",
+        "Modern Djent - Wall of Gain Edit"
+      ],
+      "kb_song_names": [
+        "Modern Djent Chug"
+      ]
+    },
+    {
+      "audio_path_resolved": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version"
+      ],
+      "kb_song_names": [
+        "Neo-Soul Clean Rhythm"
+      ]
+    }
+  ],
+  "n_shared_resolved_audio_paths_cross_split": 16,
+  "near_duplicate_threshold": 0.995,
+  "near_duplicate_pairs_cross_split": [
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acoustic Sim.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Atmospheric Grime.wav",
+      "cosine": 0.9973296523094177,
+      "test_song_names": [
+        "Acoustic Sim",
+        "Acoustic Sim - Bright Air Version",
+        "Acoustic Sim - Glass Tone Pass",
+        "Acoustic Sim - Natural Body Edit",
+        "Acoustic Sim - Open Chord Mix",
+        "Acoustic Sim - Round Note Cut",
+        "Acoustic Sim - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Atmospheric Grime"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acoustic Sim.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Beat Tape Lo-Fi.wav",
+      "cosine": 0.9950514435768127,
+      "test_song_names": [
+        "Acoustic Sim",
+        "Acoustic Sim - Bright Air Version",
+        "Acoustic Sim - Glass Tone Pass",
+        "Acoustic Sim - Natural Body Edit",
+        "Acoustic Sim - Open Chord Mix",
+        "Acoustic Sim - Round Note Cut",
+        "Acoustic Sim - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Beat Tape Lo-Fi"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acoustic Sim.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Bossa Nova Acoustic Moonrise.wav",
+      "cosine": 0.9966691732406616,
+      "test_song_names": [
+        "Acoustic Sim",
+        "Acoustic Sim - Bright Air Version",
+        "Acoustic Sim - Glass Tone Pass",
+        "Acoustic Sim - Natural Body Edit",
+        "Acoustic Sim - Open Chord Mix",
+        "Acoustic Sim - Round Note Cut",
+        "Acoustic Sim - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Bossa Nova Acoustic Moonrise"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acoustic Sim.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Bossa Nova Acoustic Voyage.wav",
+      "cosine": 0.9975270628929138,
+      "test_song_names": [
+        "Acoustic Sim",
+        "Acoustic Sim - Bright Air Version",
+        "Acoustic Sim - Glass Tone Pass",
+        "Acoustic Sim - Natural Body Edit",
+        "Acoustic Sim - Open Chord Mix",
+        "Acoustic Sim - Round Note Cut",
+        "Acoustic Sim - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Bossa Nova Acoustic Voyage"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acoustic Sim.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Marimba Tropical.wav",
+      "cosine": 0.9966827034950256,
+      "test_song_names": [
+        "Acoustic Sim",
+        "Acoustic Sim - Bright Air Version",
+        "Acoustic Sim - Glass Tone Pass",
+        "Acoustic Sim - Natural Body Edit",
+        "Acoustic Sim - Open Chord Mix",
+        "Acoustic Sim - Round Note Cut",
+        "Acoustic Sim - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Marimba Tropical"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acoustic Sim.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Philadelphia Soul Gospel.wav",
+      "cosine": 0.9956346154212952,
+      "test_song_names": [
+        "Acoustic Sim",
+        "Acoustic Sim - Bright Air Version",
+        "Acoustic Sim - Glass Tone Pass",
+        "Acoustic Sim - Natural Body Edit",
+        "Acoustic Sim - Open Chord Mix",
+        "Acoustic Sim - Round Note Cut",
+        "Acoustic Sim - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Philadelphia Soul Gospel"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acoustic Sim.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Rai Algerian.wav",
+      "cosine": 0.9965623617172241,
+      "test_song_names": [
+        "Acoustic Sim",
+        "Acoustic Sim - Bright Air Version",
+        "Acoustic Sim - Glass Tone Pass",
+        "Acoustic Sim - Natural Body Edit",
+        "Acoustic Sim - Open Chord Mix",
+        "Acoustic Sim - Round Note Cut",
+        "Acoustic Sim - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Rai Algerian"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acoustic Sim.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Spanish Flamenco.wav",
+      "cosine": 0.9956760406494141,
+      "test_song_names": [
+        "Acoustic Sim",
+        "Acoustic Sim - Bright Air Version",
+        "Acoustic Sim - Glass Tone Pass",
+        "Acoustic Sim - Natural Body Edit",
+        "Acoustic Sim - Open Chord Mix",
+        "Acoustic Sim - Round Note Cut",
+        "Acoustic Sim - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Spanish Flamenco"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acoustic Sim.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Spanish Guitar.wav",
+      "cosine": 0.9956440925598145,
+      "test_song_names": [
+        "Acoustic Sim",
+        "Acoustic Sim - Bright Air Version",
+        "Acoustic Sim - Glass Tone Pass",
+        "Acoustic Sim - Natural Body Edit",
+        "Acoustic Sim - Open Chord Mix",
+        "Acoustic Sim - Round Note Cut",
+        "Acoustic Sim - Warm Room Take"
+      ],
+      "kb_song_names": [
+        "Spanish Guitar"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Ambient Swells.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Contemporary Jazz Groove.wav",
+      "cosine": 0.9955015778541565,
+      "test_song_names": [
+        "Ambient Swells",
+        "Ambient Swells - Cinematic Drift Cut",
+        "Ambient Swells - Cloud Reverb Pass",
+        "Ambient Swells - Ethereal Wash Mix",
+        "Ambient Swells - Floating Texture Edit",
+        "Ambient Swells - Halo Sustain Version",
+        "Ambient Swells - Wide Bloom Take",
+        "Ambient Swells Ethereal"
+      ],
+      "kb_song_names": [
+        "Contemporary Jazz Groove"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Ambient Swells.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Dark Ambient Drone Glitch.wav",
+      "cosine": 0.9966812133789062,
+      "test_song_names": [
+        "Ambient Swells",
+        "Ambient Swells - Cinematic Drift Cut",
+        "Ambient Swells - Cloud Reverb Pass",
+        "Ambient Swells - Ethereal Wash Mix",
+        "Ambient Swells - Floating Texture Edit",
+        "Ambient Swells - Halo Sustain Version",
+        "Ambient Swells - Wide Bloom Take",
+        "Ambient Swells Ethereal"
+      ],
+      "kb_song_names": [
+        "Dark Ambient Drone Glitch"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Ambient Swells.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Desert Blues.wav",
+      "cosine": 0.996697723865509,
+      "test_song_names": [
+        "Ambient Swells",
+        "Ambient Swells - Cinematic Drift Cut",
+        "Ambient Swells - Cloud Reverb Pass",
+        "Ambient Swells - Ethereal Wash Mix",
+        "Ambient Swells - Floating Texture Edit",
+        "Ambient Swells - Halo Sustain Version",
+        "Ambient Swells - Wide Bloom Take",
+        "Ambient Swells Ethereal"
+      ],
+      "kb_song_names": [
+        "Desert Blues"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Ambient Swells.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Macedonian Brass.wav",
+      "cosine": 0.996643602848053,
+      "test_song_names": [
+        "Ambient Swells",
+        "Ambient Swells - Cinematic Drift Cut",
+        "Ambient Swells - Cloud Reverb Pass",
+        "Ambient Swells - Ethereal Wash Mix",
+        "Ambient Swells - Floating Texture Edit",
+        "Ambient Swells - Halo Sustain Version",
+        "Ambient Swells - Wide Bloom Take",
+        "Ambient Swells Ethereal"
+      ],
+      "kb_song_names": [
+        "Macedonian Brass"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Ambient Swells.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Overtone Drone Aether.wav",
+      "cosine": 0.9972556829452515,
+      "test_song_names": [
+        "Ambient Swells",
+        "Ambient Swells - Cinematic Drift Cut",
+        "Ambient Swells - Cloud Reverb Pass",
+        "Ambient Swells - Ethereal Wash Mix",
+        "Ambient Swells - Floating Texture Edit",
+        "Ambient Swells - Halo Sustain Version",
+        "Ambient Swells - Wide Bloom Take",
+        "Ambient Swells Ethereal"
+      ],
+      "kb_song_names": [
+        "Overtone Drone Aether"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Ambient Swells.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Pacific Islander.wav",
+      "cosine": 0.9970936179161072,
+      "test_song_names": [
+        "Ambient Swells",
+        "Ambient Swells - Cinematic Drift Cut",
+        "Ambient Swells - Cloud Reverb Pass",
+        "Ambient Swells - Ethereal Wash Mix",
+        "Ambient Swells - Floating Texture Edit",
+        "Ambient Swells - Halo Sustain Version",
+        "Ambient Swells - Wide Bloom Take",
+        "Ambient Swells Ethereal"
+      ],
+      "kb_song_names": [
+        "Pacific Islander"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Auto-Wah Funk.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Wah-Wah Rock.wav",
+      "cosine": 0.9987952709197998,
+      "test_song_names": [
+        "Auto-Wah Funk",
+        "Auto-Wah Funk - Chic Rhythm Pass",
+        "Auto-Wah Funk - Muted Snap Take",
+        "Auto-Wah Funk - Pocket Groove Cut",
+        "Auto-Wah Funk - Sync Pulse Mix",
+        "Auto-Wah Funk - Tight Jam Edit",
+        "Auto-Wah Funk - Velvet Groove Version",
+        "Auto-Wah Funk Rhythm"
+      ],
+      "kb_song_names": [
+        "Wah-Wah Rock"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Bitcrushed Synth.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Free Jazz Avantgarde Nocturne.wav",
+      "cosine": 0.9959055185317993,
+      "test_song_names": [
+        "Bitcrushed Synth",
+        "Bitcrushed Synth - Alt Take",
+        "Bitcrushed Synth - Extended Edit",
+        "Bitcrushed Synth - Night Drive Cut",
+        "Bitcrushed Synth - Session Pass",
+        "Bitcrushed Synth - Signature Version",
+        "Bitcrushed Synth - Studio Mix"
+      ],
+      "kb_song_names": [
+        "Free Jazz Avantgarde Nocturne"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Bitcrushed Synth.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Granular Texture Glitch.wav",
+      "cosine": 0.9955927133560181,
+      "test_song_names": [
+        "Bitcrushed Synth",
+        "Bitcrushed Synth - Alt Take",
+        "Bitcrushed Synth - Extended Edit",
+        "Bitcrushed Synth - Night Drive Cut",
+        "Bitcrushed Synth - Session Pass",
+        "Bitcrushed Synth - Signature Version",
+        "Bitcrushed Synth - Studio Mix"
+      ],
+      "kb_song_names": [
+        "Granular Texture Glitch"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Bitcrushed Synth.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Japanese Ambient.wav",
+      "cosine": 0.9952313899993896,
+      "test_song_names": [
+        "Bitcrushed Synth",
+        "Bitcrushed Synth - Alt Take",
+        "Bitcrushed Synth - Extended Edit",
+        "Bitcrushed Synth - Night Drive Cut",
+        "Bitcrushed Synth - Session Pass",
+        "Bitcrushed Synth - Signature Version",
+        "Bitcrushed Synth - Studio Mix"
+      ],
+      "kb_song_names": [
+        "Japanese Ambient"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Bitcrushed Synth.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Reverse Ambient Void.wav",
+      "cosine": 0.9955202341079712,
+      "test_song_names": [
+        "Bitcrushed Synth",
+        "Bitcrushed Synth - Alt Take",
+        "Bitcrushed Synth - Extended Edit",
+        "Bitcrushed Synth - Night Drive Cut",
+        "Bitcrushed Synth - Session Pass",
+        "Bitcrushed Synth - Signature Version",
+        "Bitcrushed Synth - Studio Mix"
+      ],
+      "kb_song_names": [
+        "Reverse Ambient Void"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Bitcrushed Synth.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Rhodes Soul.wav",
+      "cosine": 0.9961223006248474,
+      "test_song_names": [
+        "Bitcrushed Synth",
+        "Bitcrushed Synth - Alt Take",
+        "Bitcrushed Synth - Extended Edit",
+        "Bitcrushed Synth - Night Drive Cut",
+        "Bitcrushed Synth - Session Pass",
+        "Bitcrushed Synth - Signature Version",
+        "Bitcrushed Synth - Studio Mix"
+      ],
+      "kb_song_names": [
+        "Rhodes Soul"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Black Metal Lo-Fi.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acid Jazz Funk Improv.wav",
+      "cosine": 0.9957764148712158,
+      "test_song_names": [
+        "Black Metal Lo-Fi",
+        "Black Metal Lo-Fi - Heavy Riff Pass",
+        "Black Metal Lo-Fi - High Gain Forge",
+        "Black Metal Lo-Fi - Palm Mute Crush",
+        "Black Metal Lo-Fi - Precision Chug Version",
+        "Black Metal Lo-Fi - Steel Edge Mix",
+        "Black Metal Lo-Fi - Wall of Gain Edit",
+        "Black Metal LoFi Raw"
+      ],
+      "kb_song_names": [
+        "Acid Jazz Funk Improv"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Black Metal Lo-Fi.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Mathcore Dissonant Chaos.wav",
+      "cosine": 0.997370183467865,
+      "test_song_names": [
+        "Black Metal Lo-Fi",
+        "Black Metal Lo-Fi - Heavy Riff Pass",
+        "Black Metal Lo-Fi - High Gain Forge",
+        "Black Metal Lo-Fi - Palm Mute Crush",
+        "Black Metal Lo-Fi - Precision Chug Version",
+        "Black Metal Lo-Fi - Steel Edge Mix",
+        "Black Metal Lo-Fi - Wall of Gain Edit",
+        "Black Metal LoFi Raw"
+      ],
+      "kb_song_names": [
+        "Mathcore Dissonant Chaos"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Black Metal Lo-Fi.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Schlager Pop.wav",
+      "cosine": 0.9968878626823425,
+      "test_song_names": [
+        "Black Metal Lo-Fi",
+        "Black Metal Lo-Fi - Heavy Riff Pass",
+        "Black Metal Lo-Fi - High Gain Forge",
+        "Black Metal Lo-Fi - Palm Mute Crush",
+        "Black Metal Lo-Fi - Precision Chug Version",
+        "Black Metal Lo-Fi - Steel Edge Mix",
+        "Black Metal Lo-Fi - Wall of Gain Edit",
+        "Black Metal LoFi Raw"
+      ],
+      "kb_song_names": [
+        "Schlager Pop"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Black Metal Lo-Fi.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Symphonic Metal.wav",
+      "cosine": 0.9972939491271973,
+      "test_song_names": [
+        "Black Metal Lo-Fi",
+        "Black Metal Lo-Fi - Heavy Riff Pass",
+        "Black Metal Lo-Fi - High Gain Forge",
+        "Black Metal Lo-Fi - Palm Mute Crush",
+        "Black Metal Lo-Fi - Precision Chug Version",
+        "Black Metal Lo-Fi - Steel Edge Mix",
+        "Black Metal Lo-Fi - Wall of Gain Edit",
+        "Black Metal LoFi Raw"
+      ],
+      "kb_song_names": [
+        "Symphonic Metal"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Black Metal Lo-Fi.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Synth Funk.wav",
+      "cosine": 0.9954659938812256,
+      "test_song_names": [
+        "Black Metal Lo-Fi",
+        "Black Metal Lo-Fi - Heavy Riff Pass",
+        "Black Metal Lo-Fi - High Gain Forge",
+        "Black Metal Lo-Fi - Palm Mute Crush",
+        "Black Metal Lo-Fi - Precision Chug Version",
+        "Black Metal Lo-Fi - Steel Edge Mix",
+        "Black Metal Lo-Fi - Wall of Gain Edit",
+        "Black Metal LoFi Raw"
+      ],
+      "kb_song_names": [
+        "Synth Funk"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Hard Rock Crunch.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Trap Metal Aggressive.wav",
+      "cosine": 0.9959705471992493,
+      "test_song_names": [
+        "Hard Rock Crunch",
+        "Hard Rock Crunch",
+        "Hard Rock Crunch - Classic Crunch Edit",
+        "Hard Rock Crunch - Grit Stack Take",
+        "Hard Rock Crunch - Hot Valve Version",
+        "Hard Rock Crunch - Raw Amp Pass",
+        "Hard Rock Crunch - Saturated Bite Cut",
+        "Hard Rock Crunch - Vintage Drive Mix"
+      ],
+      "kb_song_names": [
+        "Trap Metal Aggressive"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Analog Warm Bass.wav",
+      "cosine": 0.9978815317153931,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Analog Warm Bass"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Bossa Nova Acoustic Mystic.wav",
+      "cosine": 0.9975269436836243,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Bossa Nova Acoustic Mystic"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Calypso Rhythm.wav",
+      "cosine": 0.9966332912445068,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Calypso Rhythm"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Contemporary Jazz Blue.wav",
+      "cosine": 0.9974783062934875,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Contemporary Jazz Blue"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Contemporary Jazz Vibe.wav",
+      "cosine": 0.9979305863380432,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Contemporary Jazz Vibe"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Cool Jazz Vibe.wav",
+      "cosine": 0.9976064562797546,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Cool Jazz Vibe"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Flamenco Fusion.wav",
+      "cosine": 0.9975249767303467,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Flamenco Fusion"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Free Jazz Avantgarde Groove.wav",
+      "cosine": 0.9960595965385437,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Free Jazz Avantgarde Groove"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Lush Reverb Pad.wav",
+      "cosine": 0.9982068538665771,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Lush Reverb Pad"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Microtonal Fusion Aether.wav",
+      "cosine": 0.9984533190727234,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Microtonal Fusion Aether"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Overtone Drone Drift.wav",
+      "cosine": 0.9982592463493347,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Overtone Drone Drift"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Overtone Drone Glitch.wav",
+      "cosine": 0.9968512654304504,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Overtone Drone Glitch"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Shoegaze Drone.wav",
+      "cosine": 0.9975091814994812,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Shoegaze Drone"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Smooth Jazz Lead Improv.wav",
+      "cosine": 0.9985159635543823,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Smooth Jazz Lead Improv"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Space Cowboy.wav",
+      "cosine": 0.9963027834892273,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Space Cowboy"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Neo-Soul Clean.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Synthwave Guitar Digital.wav",
+      "cosine": 0.9974207282066345,
+      "test_song_names": [
+        "Neo-Soul Clean",
+        "Neo-Soul Clean - Chic Rhythm Pass",
+        "Neo-Soul Clean - Muted Snap Take",
+        "Neo-Soul Clean - Pocket Groove Cut",
+        "Neo-Soul Clean - Sync Pulse Mix",
+        "Neo-Soul Clean - Tight Jam Edit",
+        "Neo-Soul Clean - Velvet Groove Version",
+        "Neo-Soul Clean Rhythm"
+      ],
+      "kb_song_names": [
+        "Synthwave Guitar Digital"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Tweed Breakup.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Acid Jazz Groove.wav",
+      "cosine": 0.9967758655548096,
+      "test_song_names": [
+        "Tweed Breakup",
+        "Tweed Breakup - Classic Crunch Edit",
+        "Tweed Breakup - Grit Stack Take",
+        "Tweed Breakup - Hot Valve Version",
+        "Tweed Breakup - Raw Amp Pass",
+        "Tweed Breakup - Saturated Bite Cut",
+        "Tweed Breakup - Vintage Drive Mix"
+      ],
+      "kb_song_names": [
+        "Acid Jazz Groove"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Tweed Breakup.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Balearic Beat.wav",
+      "cosine": 0.9963761568069458,
+      "test_song_names": [
+        "Tweed Breakup",
+        "Tweed Breakup - Classic Crunch Edit",
+        "Tweed Breakup - Grit Stack Take",
+        "Tweed Breakup - Hot Valve Version",
+        "Tweed Breakup - Raw Amp Pass",
+        "Tweed Breakup - Saturated Bite Cut",
+        "Tweed Breakup - Vintage Drive Mix"
+      ],
+      "kb_song_names": [
+        "Balearic Beat"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Tweed Breakup.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Bubblegum Bass.wav",
+      "cosine": 0.996650218963623,
+      "test_song_names": [
+        "Tweed Breakup",
+        "Tweed Breakup - Classic Crunch Edit",
+        "Tweed Breakup - Grit Stack Take",
+        "Tweed Breakup - Hot Valve Version",
+        "Tweed Breakup - Raw Amp Pass",
+        "Tweed Breakup - Saturated Bite Cut",
+        "Tweed Breakup - Vintage Drive Mix"
+      ],
+      "kb_song_names": [
+        "Bubblegum Bass"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Tweed Breakup.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Golden Age Hip Hop.wav",
+      "cosine": 0.9984245896339417,
+      "test_song_names": [
+        "Tweed Breakup",
+        "Tweed Breakup - Classic Crunch Edit",
+        "Tweed Breakup - Grit Stack Take",
+        "Tweed Breakup - Hot Valve Version",
+        "Tweed Breakup - Raw Amp Pass",
+        "Tweed Breakup - Saturated Bite Cut",
+        "Tweed Breakup - Vintage Drive Mix"
+      ],
+      "kb_song_names": [
+        "Golden Age Hip Hop"
+      ]
+    },
+    {
+      "test_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Tweed Breakup.wav",
+      "kb_audio_path": "/Users/xyh/Code/Audio-agent/Data/Audio_Synthetic/Synth Pop Indie.wav",
+      "cosine": 0.9951879978179932,
+      "test_song_names": [
+        "Tweed Breakup",
+        "Tweed Breakup - Classic Crunch Edit",
+        "Tweed Breakup - Grit Stack Take",
+        "Tweed Breakup - Hot Valve Version",
+        "Tweed Breakup - Raw Amp Pass",
+        "Tweed Breakup - Saturated Bite Cut",
+        "Tweed Breakup - Vintage Drive Mix"
+      ],
+      "kb_song_names": [
+        "Synth Pop Indie"
+      ]
+    }
+  ],
+  "n_near_duplicate_pairs_cross_split": 48,
+  "selection_rule": "Protocol-A test set is defined exactly as rows whose SongName appears in direct_retrieval_comparison.TEST_SAMPLE_SET; KB is the complement.",
+  "text_provenance_note": "The dataset JSON exposes SongName/Style/Feature/Parameters/Vectors but does not include a separate auditable text-source field; Style/Feature are therefore the only explicit text-side provenance fields available in-repo.",
+  "parameter_provenance_note": "Ground-truth parameters are taken from the dataset JSON Parameters field as stored in the external 1267 benchmark drop-in."
+}

@@ -149,9 +149,9 @@ tags: [workflow, archive, experimental]
 
 **防护措施**
 - 如果未提供变更，始终提示选择
-- 使用产出物图（openspec status --json）进行完成度检查
+- 使用产出物图（openspec-cn status --json）进行完成度检查
 - 不要在警告时阻止归档 - 只需告知并确认
 - 移动到归档时保留 .openspec.yaml（它与目录一起移动）
 - 显示清晰的操作摘要
-- 如果请求同步，使用 /opsx:sync 方法（代理驱动）
+- 如果请求同步，使用 Skill tool 调用 `openspec-sync-specs`（代理驱动）
 - 如果存在增量规格说明，请始终运行同步评估，并在提示前显示综合摘要

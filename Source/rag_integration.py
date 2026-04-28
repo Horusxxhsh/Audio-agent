@@ -25,7 +25,7 @@ def integrate_rag_with_existing_system(
     song_style: list,
     guitar_features: list,
     memoryEnabled: str,
-    api_key: str = "sk-0705951d960041ed96c607ab69724d0d"
+    api_key: str = ""
 ):
     """
     将 RAG 系统集成到现有的推理流程中
@@ -370,7 +370,7 @@ def example_integration():
         # 4. 将新参数添加到 RAG（在生成参数后）
         print(f"\n步骤5 - 参数生成后添加到RAG:")
         if RAG_AVAILABLE:
-            rag = AudioRAGSystem(api_key="sk-1b73586fde854a329ec187dc371f53ef")
+            rag = AudioRAGSystem(api_key=os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", ""))
             example_parameters = {
                 "ReverbOn": {"Size": 0.75, "Mix": 0.45},
                 "DelayOn": {"Delay": 380, "Feedback": 0.35, "Mix": 0.30}

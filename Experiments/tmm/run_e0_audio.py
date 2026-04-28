@@ -39,6 +39,7 @@ def main() -> int:
     ap.add_argument("--poll_sec", type=float, default=0.25)
     ap.add_argument("--split_seeds", type=int, nargs="+", default=[0, 1, 2])
     ap.add_argument("--near_dup_threshold", type=float, default=0.995)
+    ap.add_argument("--group_mode", type=str, default="base_name")
     ap.add_argument("--skip_preflight", action="store_true")
     args = ap.parse_args()
 
@@ -120,6 +121,8 @@ def main() -> int:
             args.dataset_name,
             "--seeds",
             *[str(x) for x in args.split_seeds],
+            "--group_mode",
+            args.group_mode,
         ],
         repo_root=repo_root,
         log_path=run_root / "02_splits.log",
@@ -150,6 +153,8 @@ def main() -> int:
             "Experiments/tmm/leakage_scan.py",
             "--dataset_json",
             str(Path(args.dataset_json)),
+            "--split_root",
+            str(Path("Experiments/tmm/splits") / args.dataset_name),
             "--out",
             str(leakage_out.relative_to(repo_root)),
             "--near_dup_threshold",
@@ -183,6 +188,7 @@ def main() -> int:
             "n_near_duplicate_pairs": leakage.get("n_near_duplicate_pairs"),
             "near_duplicate_threshold": leakage.get("near_duplicate_threshold"),
         },
+        "split_reports": leakage.get("split_reports", {}),
     }
     _write_json(run_root / "summary.json", summary)
     return 0
@@ -190,4 +196,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

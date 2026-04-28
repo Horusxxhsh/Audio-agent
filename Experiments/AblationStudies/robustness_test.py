@@ -46,6 +46,7 @@ if COMMON_DIR not in sys.path:
 
 from dataset_loader import load_and_merge_data
 from evaluate import Evaluator
+from query_splits import select_query_indices
 
 # Reuse the Protocol-A held-out pool definition to ensure split consistency.
 from direct_retrieval_comparison import is_test_sample_name as is_test_sample
@@ -54,16 +55,6 @@ from direct_retrieval_comparison import is_test_sample_name as is_test_sample
 PROTOCOL = "Protocol-C"
 METRICS: List[str] = ["l2", "acc@0.1", "recall", "cosine", "module"]
 LOWER_IS_BETTER = {"l2"}
-
-
-def _read_name_list(path: Path) -> List[str]:
-    lines = []
-    for raw in path.read_text(encoding="utf-8").splitlines():
-        s = raw.strip()
-        if not s or s.startswith("#"):
-            continue
-        lines.append(s)
-    return lines
 
 
 def _build_text(item: dict) -> str:
@@ -537,20 +528,24 @@ def _scenario_specs(args: argparse.Namespace) -> List[Tuple[str, str]]:
     return [(k, d) for (k, d) in all_specs if k in keep]
 
 
-def _select_split(dataset: List[dict], test_list: str) -> Tuple[List[int], List[int], str]:
+def _select_split(dataset: List[dict], test_list: str, query_split: str) -> Tuple[List[int], List[int], str]:
+    split_selector = query_split or (f"file:{test_list}" if test_list else "")
+    if split_selector:
+        selection = select_query_indices(dataset, split_selector, default_split="30")
+        test_indices = [int(i) for i in selection.test_indices]
+        test_index_set = set(test_indices)
+        kb_indices = [i for i in range(len(dataset)) if i not in test_index_set]
+        test_source = selection.split
+        print(f"[Split] Selector={selection.split} matched {len(selection.found_names)}/{len(selection.requested_names)} names")
+        if selection.missing_names:
+            preview = ", ".join(selection.missing_names[:5])
+            print(f"[Split] Missing {len(selection.missing_names)} requested names: {preview}")
+        if selection.used_random_fallback:
+            print(f"[Split] WARNING: selector {selection.split} had no matches; used deterministic random fallback.")
+        return test_indices, kb_indices, test_source
+
     test_source = "built-in held-out pool (Protocol-A)"
-    test_name_set: Optional[set] = None
-    if test_list:
-        p = Path(test_list)
-        test_name_set = set(_read_name_list(p))
-        test_source = str(p)
-
-    def is_test(name: str) -> bool:
-        if test_name_set is not None:
-            return name in test_name_set
-        return is_test_sample(name)
-
-    test_indices = [i for i, it in enumerate(dataset) if is_test(it.get("SongName") or "")]
+    test_indices = [i for i, it in enumerate(dataset) if is_test_sample(it.get("SongName") or "")]
     kb_indices = [i for i in range(len(dataset)) if i not in set(test_indices)]
     return test_indices, kb_indices, test_source
 
@@ -690,7 +685,13 @@ def main() -> None:
         "--test_list",
         type=str,
         default="",
-        help="Optional newline-separated SongName list for held-out queries (overrides built-in held-out pool).",
+        help="Legacy alias for an explicit held-out SongName list file. Prefer --query_split file:/path/to/test.txt.",
+    )
+    ap.add_argument(
+        "--query_split",
+        type=str,
+        default="",
+        help="Optional query split selector. Supports built-in aliases (5/30/31) or file:/path/to/test.txt.",
     )
     ap.add_argument(
         "--dump_csv",
@@ -742,7 +743,7 @@ def main() -> None:
     dataset = load_and_merge_data()
     n_total = int(len(dataset))
 
-    test_indices, kb_indices, test_source = _select_split(dataset, args.test_list)
+    test_indices, kb_indices, test_source = _select_split(dataset, args.test_list, args.query_split)
     n_test = int(len(test_indices))
     n_kb = int(len(kb_indices))
 
@@ -756,7 +757,9 @@ def main() -> None:
     print(f"- Fusion beta={float(args.beta)} top_k={int(args.top_k)}")
 
     if n_test == 0:
-        raise SystemExit("No held-out queries found. Check your dataset JSON and/or --test_list.")
+        raise SystemExit("No held-out queries found. Check your dataset JSON and/or --query_split/--test_list.")
+    if n_kb == 0:
+        raise SystemExit("Knowledge base is empty after split selection. Check your --query_split/--test_list.")
 
     kb_items = [dataset[i] for i in kb_indices]
     kb_doc_tokens, idf = _build_text_index(kb_items)

@@ -6,7 +6,7 @@ compatibility: 需要 openspec CLI。
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.1.1-1"
+  generatedBy: "1.2.0"
 ---
 
 引导用户完成他们的第一个完整OpenSpec工作流周期。这是一个教学体验——你将在他们的代码库中完成实际工作，同时解释每个步骤。
@@ -15,16 +15,19 @@ metadata:
 
 ## 准备阶段
 
-开始前，检查OpenSpec是否已初始化：
+开始前，检查OpenSpec CLI是否已安装：
 
 ```bash
-openspec-cn status --json 2>&1 || echo "NOT_INITIALIZED"
+# Unix/macOS
+openspec-cn --version 2>&1 || echo "CLI_NOT_INSTALLED"
+# Windows (PowerShell)
+# if (Get-Command openspec-cn -ErrorAction SilentlyContinue) { openspec-cn --version } else { echo "CLI_NOT_INSTALLED" }
 ```
 
-**如果未初始化：**
-> OpenSpec尚未在此项目中设置。请先运行 `openspec-cn init`，然后返回 `/opsx:onboard`。
+**如果CLI未安装：**
+> OpenSpec CLI 未安装。请先安装它，然后返回 `/opsx:onboard`。
 
-如果未初始化，请在此停止。
+如果未安装，请在此停止。
 
 ---
 
@@ -67,7 +70,10 @@ openspec-cn status --json 2>&1 || echo "NOT_INITIALIZED"
 
 同时检查最近的git活动：
 ```bash
+# Unix/macOS
 git log --oneline -10 2>/dev/null || echo "No git history"
+# Windows (PowerShell)
+# git log --oneline -10 2>$null; if ($LASTEXITCODE -ne 0) { echo "No git history" }
 ```
 
 ### 提出建议
@@ -262,7 +268,10 @@ openspec-cn instructions proposal --change "<name>" --json
 
 **执行：** 创建规格说明文件：
 ```bash
+# Unix/macOS
 mkdir -p openspec/changes/<name>/specs/<capability-name>
+# Windows (PowerShell)
+# New-Item -ItemType Directory -Force -Path "openspec/changes/<name>/specs/<capability-name>"
 ```
 
 起草规格说明内容：
@@ -274,11 +283,11 @@ mkdir -p openspec/changes/<name>/specs/<capability-name>
 
 ## 新增需求
 
-### 需求：<名称>
+### 需求: <名称>
 
 <系统应该做什么的描述>
 
-#### 场景：<场景名称>
+#### 场景: <场景名称>
 
 - **当** <触发条件>
 - **那么** <预期结果>
@@ -457,21 +466,29 @@ openspec-cn archive "<name>"
 
 ## 命令参考
 
+**核心工作流：**
+
 | 命令 | 做什么 |
 |---------|--------------|
+| `/opsx:propose` | 创建变更并生成所有产出物 |
 | `/opsx:explore` | 在工作之前/期间思考问题 |
-| `/opsx:new` | 开始新变更，逐步通过产出物 |
-| `/opsx:ff` | 快进：一次创建所有产出物 |
-| `/opsx:continue` | 继续处理现有变更 |
 | `/opsx:apply` | 实现变更中的任务 |
-| `/opsx:verify` | 验证实现是否匹配产出物 |
 | `/opsx:archive` | 归档完成的变更 |
+
+**其他命令：**
+
+| 命令 | 做什么 |
+|---------|--------------|
+| `/opsx:new` | 开始新变更，逐步通过产出物 |
+| `/opsx:continue` | 继续处理现有变更 |
+| `/opsx:ff` | 快进：一次创建所有产出物 |
+| `/opsx:verify` | 验证实现是否匹配产出物 |
 
 ---
 
 ## 下一步是什么？
 
-尝试 `/opsx:new` 或 `/opsx:ff` 在您实际想要构建的内容上。您现在掌握了节奏！
+尝试 `/opsx:propose` 在您实际想要构建的内容上。您现在掌握了节奏！
 ```
 
 ---
@@ -501,17 +518,25 @@ openspec-cn archive "<name>"
 ```
 ## OpenSpec快速参考
 
+**核心工作流：**
+
 | 命令 | 做什么 |
 |---------|--------------|
+| `/opsx:propose <name>` | 创建变更并生成所有产出物 |
 | `/opsx:explore` | 思考问题（无代码更改） |
-| `/opsx:new <name>` | 开始新变更，逐步进行 |
-| `/opsx:ff <name>` | 快进：一次创建所有产出物 |
-| `/opsx:continue <name>` | 继续现有变更 |
 | `/opsx:apply <name>` | 实现任务 |
-| `/opsx:verify <name>` | 验证实现 |
 | `/opsx:archive <name>` | 完成后归档 |
 
-尝试 `/opsx:new` 开始您的第一个变更，或 `/opsx:ff` 如果您想快速移动。
+**其他命令：**
+
+| 命令 | 做什么 |
+|---------|--------------|
+| `/opsx:new <name>` | 开始新变更，逐步进行 |
+| `/opsx:continue <name>` | 继续现有变更 |
+| `/opsx:ff <name>` | 快进：一次创建所有产出物 |
+| `/opsx:verify <name>` | 验证实现 |
+
+尝试 `/opsx:propose` 开始您的第一个变更。
 ```
 
 优雅退出。

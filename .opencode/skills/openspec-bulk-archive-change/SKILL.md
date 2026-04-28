@@ -6,7 +6,7 @@ compatibility: 需要 openspec CLI。
 metadata:
   author: openspec
   version: "1.0"
-  generatedBy: "1.1.1-1"
+  generatedBy: "1.2.0"
 ---
 
 在单个操作中归档多个已完成的变更。
@@ -19,7 +19,7 @@ metadata:
 
 1. **获取活动变更**
 
-   运行 `openspec list --json` 获取所有活动变更。
+   运行 `openspec-cn list --json` 获取所有活动变更。
 
    如果不存在活动变更，通知用户并停止。
 
@@ -36,7 +36,7 @@ metadata:
 
    对于每个选定的变更，收集：
 
-   a. **产出物状态** - 运行 `openspec status --change "<name>" --json`
+   a. **产出物状态** - 运行 `openspec-cn status --change "<name>" --json`
       - 解析 `schemaName` 和 `artifacts` 列表
       - 注意哪些产出物是 `done` 状态而非其他状态
 
@@ -46,7 +46,7 @@ metadata:
 
    c. **增量规格说明** - 检查 `openspec/changes/<name>/specs/` 目录
       - 列出存在哪些能力规格说明
-      - 对于每个，提取需求名称（匹配 `### 需求： <name>` 的行）
+      - 对于每个，提取需求名称（匹配 `### 需求: <name>` 的行）
 
 4. **检测规格说明冲突**
 

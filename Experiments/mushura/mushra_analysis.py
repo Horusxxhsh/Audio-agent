@@ -256,13 +256,14 @@ def _maybe_plot_boxplot(
         import matplotlib.pyplot as plt
 
         plt.figure(figsize=(10, 4.5))
-        plt.boxplot(data, labels=stimuli, showfliers=False)
+        plt.boxplot(data, tick_labels=stimuli, showfliers=False)
         for i, s in enumerate(stimuli, 1):
             y = per_subject_scores[s]
             x = np.random.normal(loc=i, scale=0.04, size=len(y))
             plt.scatter(x, y, s=8, alpha=0.4, color="black")
         plt.xticks(rotation=25, ha="right")
         plt.ylim(min(min(xs) for xs in data), max(max(xs) for xs in data))
+        plt.ylabel("Listener score (0-100)")
         plt.title(title)
         plt.tight_layout()
         plt.savefig(out_path, dpi=200)
@@ -456,4 +457,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

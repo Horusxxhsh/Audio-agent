@@ -1,45 +1,139 @@
 import json
 import math
+import os
+import logging
+from pathlib import Path
+from typing import Dict, Optional, Tuple
+
+logger = logging.getLogger(__name__)
+
+# Default path for parameter ranges config
+_PARAM_RANGES_PATH = Path(__file__).parent / "param_ranges.json"
+
+
+def load_param_ranges(path: Optional[str] = None) -> Dict:
+    """Load DSP parameter physical ranges for min-max normalization.
+
+    Args:
+        path: Path to param_ranges.json. Uses default if None.
+
+    Returns:
+        Nested dict of parameter ranges with min/max values.
+    """
+    p = Path(path) if path else _PARAM_RANGES_PATH
+    if not p.exists():
+        logger.warning(f"param_ranges.json not found at {p}, normalization disabled")
+        return {}
+    with open(p, "r") as f:
+        data = json.load(f)
+    # Remove _doc key
+    data.pop("_doc", None)
+    return data
+
 
 class Evaluator:
-    def __init__(self):
-        pass
+    def __init__(self, normalize: bool = False, param_ranges_path: Optional[str] = None):
+        """Initialize Evaluator.
+
+        Args:
+            normalize: If True, apply min-max normalization using DSP physical ranges
+                       before computing metrics. This maps all parameters to [0, 1].
+            param_ranges_path: Path to param_ranges.json (optional).
+        """
+        self.normalize = normalize
+        self._param_ranges: Optional[Dict] = None
+        self._param_ranges_path = param_ranges_path
+        if normalize:
+            self._param_ranges = load_param_ranges(param_ranges_path)
+            if not self._param_ranges:
+                logger.warning("Normalization requested but no ranges loaded; falling back to raw mode")
+                self.normalize = False
+
+    def _get_range(self, key: str) -> Tuple[float, float]:
+        """Get (min, max) for a flattened parameter key like 'CompressorOn.Threshold'.
+
+        Args:
+            key: Dot-separated parameter key.
+
+        Returns:
+            (min_val, max_val) tuple. Returns (0.0, 1.0) as fallback.
+        """
+        if not self._param_ranges:
+            return (0.0, 1.0)
+        parts = key.split(".", 1)
+        if len(parts) == 2:
+            module, param = parts
+            module_ranges = self._param_ranges.get(module, {})
+            if isinstance(module_ranges, dict):
+                param_info = module_ranges.get(param, {})
+                if isinstance(param_info, dict) and "min" in param_info and "max" in param_info:
+                    return (float(param_info["min"]), float(param_info["max"]))
+        return (0.0, 1.0)
+
+    def _normalize_value(self, key: str, value: float) -> float:
+        """Normalize a single parameter value to [0, 1] using physical ranges.
+
+        Args:
+            key: Flattened parameter key.
+            value: Raw parameter value.
+
+        Returns:
+            Normalized value in [0, 1].
+        """
+        if not self.normalize:
+            return value
+        lo, hi = self._get_range(key)
+        if abs(hi - lo) < 1e-12:
+            return 0.0
+        return max(0.0, min(1.0, (value - lo) / (hi - lo)))
 
     def compute_parameter_distance(self, pred_params, gt_params):
+        """Compute RMSE between parameter sets.
+
+        If normalize=True, parameters are min-max normalized to [0,1]
+        using DSP physical ranges before computing distance.
+
+        Args:
+            pred_params: Predicted parameter dict.
+            gt_params: Ground-truth parameter dict.
+
+        Returns:
+            RMSE distance (float).
         """
-        Compute normalized Euclidean distance between parameter sets.
-        We flatten the JSON objects to numerical vectors.
-        """
-        # Flatten
         v1 = self._flatten_params(pred_params)
         v2 = self._flatten_params(gt_params)
-        
-        # Get union of keys
+
         all_keys = set(v1.keys()) | set(v2.keys())
-        
+
         error_sum = 0
         count = 0
-        
+
         for k in all_keys:
-            val1 = v1.get(k, 0.0) # Assume 0 if missing (not ideal but consistent)
+            val1 = v1.get(k, 0.0)
             val2 = v2.get(k, 0.0)
-            
-            # Simple difference, normalized??
-            # Since we don't know the range of each param, we just take raw diff
-            # In a real system, we'd use metadata to normalize to [0,1]
+
+            if self.normalize:
+                val1 = self._normalize_value(k, val1)
+                val2 = self._normalize_value(k, val2)
+
             diff = val1 - val2
             error_sum += diff * diff
             count += 1
-            
+
         if count == 0:
             return 0.0
-            
-        return math.sqrt(error_sum / count) # RMSE
+
+        return math.sqrt(error_sum / count)  # RMSE
 
     def _flatten_params(self, params, prefix=''):
-        """
-        Recursively flatten json to float dict.
-        Non-numeric leaves are ignored.
+        """Recursively flatten json to float dict.
+
+        Args:
+            params: Nested parameter dict.
+            prefix: Key prefix for recursion.
+
+        Returns:
+            Flat dict mapping dotted keys to float values.
         """
         flat = {}
         for k, v in params.items():
@@ -48,7 +142,11 @@ class Evaluator:
                 flat.update(self._flatten_params(v, key))
             elif isinstance(v, (int, float)):
                 flat[key] = float(v)
-            # Ignore strings/bools for distance metric for now
+            elif isinstance(v, str):
+                try:
+                    flat[key] = float(v)
+                except ValueError:
+                    pass
         return flat
 
     def evaluate_retrieval(self, retrieved_params, gt_params, k=1):
@@ -64,99 +162,123 @@ class Evaluator:
         return 1 if s1 == s2 else 0
 
     def compute_cosine_similarity(self, pred_params, gt_params):
-        """
-        Compute Cosine Similarity between parameter vectors.
-        1.0 = Perfect direction match (relative ratios are correct).
+        """Compute Cosine Similarity between parameter vectors.
+
+        1.0 = Perfect direction match. If normalize=True, values are
+        min-max normalized before computation.
         """
         v1_dict = self._flatten_params(pred_params)
         v2_dict = self._flatten_params(gt_params)
-        
+
         all_keys = set(v1_dict.keys()) | set(v2_dict.keys())
-        keys = sorted(list(all_keys)) # Ensure order
-        
-        vec1 = [v1_dict.get(k, 0.0) for k in keys]
-        vec2 = [v2_dict.get(k, 0.0) for k in keys]
-        
-        dot_product = sum(a*b for a,b in zip(vec1, vec2))
-        norm1 = math.sqrt(sum(a*a for a in vec1))
-        norm2 = math.sqrt(sum(a*a for a in vec2))
-        
+        keys = sorted(list(all_keys))
+
+        if self.normalize:
+            vec1 = [self._normalize_value(k, v1_dict.get(k, 0.0)) for k in keys]
+            vec2 = [self._normalize_value(k, v2_dict.get(k, 0.0)) for k in keys]
+        else:
+            vec1 = [v1_dict.get(k, 0.0) for k in keys]
+            vec2 = [v2_dict.get(k, 0.0) for k in keys]
+
+        dot_product = sum(a * b for a, b in zip(vec1, vec2))
+        norm1 = math.sqrt(sum(a * a for a in vec1))
+        norm2 = math.sqrt(sum(a * a for a in vec2))
+
         if norm1 == 0 or norm2 == 0:
             return 0.0
-            
+
         return dot_product / (norm1 * norm2)
 
     def compute_accuracy_tolerance(self, pred_params, gt_params, tolerance=0.1):
-        """
-        Percentage of parameters that are within 'tolerance' (e.g. 0.1) of GT.
+        """Percentage of parameters within tolerance of GT.
+
+        If normalize=True, comparison is in [0,1] space, so tolerance=0.1
+        means 10% of the physical range.
         """
         v1_dict = self._flatten_params(pred_params)
         v2_dict = self._flatten_params(gt_params)
-        
+
         all_keys = set(v1_dict.keys()) | set(v2_dict.keys())
-        
+
         hit_count = 0
         total_count = 0
-        
+
         for k in all_keys:
             val1 = v1_dict.get(k, 0.0)
             val2 = v2_dict.get(k, 0.0)
+
+            if self.normalize:
+                val1 = self._normalize_value(k, val1)
+                val2 = self._normalize_value(k, val2)
+
             if abs(val1 - val2) <= tolerance:
                 hit_count += 1
             total_count += 1
-            
-        if total_count == 0: return 0.0
+
+        if total_count == 0:
+            return 0.0
         return hit_count / total_count
 
     def compute_max_error(self, pred_params, gt_params):
-        """
-        The largest single parameter error (Chebyshev distance / L-infinity).
+        """Largest single parameter error (L-infinity / Chebyshev).
+
+        If normalize=True, error is computed in normalized space.
         """
         v1_dict = self._flatten_params(pred_params)
         v2_dict = self._flatten_params(gt_params)
         all_keys = set(v1_dict.keys()) | set(v2_dict.keys())
-        
+
         max_err = 0.0
         for k in all_keys:
             val1 = v1_dict.get(k, 0.0)
             val2 = v2_dict.get(k, 0.0)
+
+            if self.normalize:
+                val1 = self._normalize_value(k, val1)
+                val2 = self._normalize_value(k, val2)
+
             err = abs(val1 - val2)
             if err > max_err:
                 max_err = err
         return max_err
 
     def compute_parameter_recall(self, pred_params, gt_params, threshold=0.1):
-        """
-        Recall of *Active* (Non-zero) Parameters.
-        Measures: Of the effects that SHOULD be active, how many did we activate correctly?
-        
-        TP: GT is active (abs>0), Pred is active AND close to GT.
-        FN: GT is active, Pred is inactive OR far from GT.
+        """Recall of *Active* (Non-zero) Parameters.
+
+        TP: GT is active (abs>active_threshold), Pred is close to GT.
+        FN: GT is active, Pred is inactive or far from GT.
+        If normalize=True, comparison is in normalized space.
         """
         v1_dict = self._flatten_params(pred_params)
         v2_dict = self._flatten_params(gt_params)
         all_keys = set(v1_dict.keys()) | set(v2_dict.keys())
-        
+
         tp = 0
         fn = 0
-        
-        active_threshold = 0.05 # What counts as "Active" in GT?
-        match_tolerance = threshold # How close must Pred be to count as a Hit?
-        
+
+        active_threshold = 0.05
+        match_tolerance = threshold
+
         for k in all_keys:
             gt_val = v2_dict.get(k, 0.0)
             pred_val = v1_dict.get(k, 0.0)
-            
-            if abs(gt_val) > active_threshold:
-                # This parameter matters (it's active in GT)
-                if abs(pred_val - gt_val) <= match_tolerance:
+
+            if self.normalize:
+                gt_val_n = self._normalize_value(k, gt_val)
+                pred_val_n = self._normalize_value(k, pred_val)
+            else:
+                gt_val_n = gt_val
+                pred_val_n = pred_val
+
+            if abs(gt_val_n) > active_threshold:
+                if abs(pred_val_n - gt_val_n) <= match_tolerance:
                     tp += 1
                 else:
                     fn += 1
-        
+
         if (tp + fn) == 0:
-            return 1.0 # No active parameters to recall, perfect score trivially
-            
+            return 1.0
+
         return tp / (tp + fn)
 
     def compute_constraint_violation(self, pred_params, gt_params):
@@ -244,8 +366,17 @@ class Evaluator:
         return intersection / union
 
 if __name__ == "__main__":
+    # Raw mode (backward compatible)
     ev = Evaluator()
     p1 = {"a": 10, "b": {"c": 5}}
     p2 = {"a": 12, "b": {"c": 5}}
-    print("Distance:", ev.compute_parameter_distance(p1, p2)) # sqrt((4+0)/2) = 1.414
+    print("Distance (raw):", ev.compute_parameter_distance(p1, p2))
     print("Recall:", ev.evaluate_retrieval(p1, p2))
+
+    # Normalized mode
+    ev_norm = Evaluator(normalize=True)
+    p3 = {"CompressorOn": {"Threshold": -50.0, "Ratio": 4.0}}
+    p4 = {"CompressorOn": {"Threshold": -30.0, "Ratio": 6.0}}
+    print("Distance (normalized):", ev_norm.compute_parameter_distance(p3, p4))
+    print("Acc@0.1 (normalized):", ev_norm.compute_accuracy_tolerance(p3, p4))
+

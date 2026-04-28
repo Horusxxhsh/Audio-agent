@@ -1,0 +1,2796 @@
+{
+  "dataset_json": "/Users/xyh/Code/Audio-agent/Data/External_1267_211/dataset/dataset_full_vectors_1267.json",
+  "n_items_with_audio": 1249,
+  "exact_duplicate_groups": [
+    [
+      "Dreamy Shoegaze",
+      "Dreamy Shoegaze - Ethereal Wash Mix",
+      "Dreamy Shoegaze - Cloud Reverb Pass",
+      "Dreamy Shoegaze - Wide Bloom Take",
+      "Dreamy Shoegaze - Floating Texture Edit",
+      "Dreamy Shoegaze - Halo Sustain Version",
+      "Dreamy Shoegaze - Cinematic Drift Cut"
+    ],
+    [
+      "Neo-Soul Clean",
+      "Neo-Soul Clean Rhythm",
+      "Neo-Soul Clean - Pocket Groove Cut",
+      "Neo-Soul Clean - Sync Pulse Mix",
+      "Neo-Soul Clean - Muted Snap Take",
+      "Neo-Soul Clean - Chic Rhythm Pass",
+      "Neo-Soul Clean - Tight Jam Edit",
+      "Neo-Soul Clean - Velvet Groove Version"
+    ],
+    [
+      "80s Pop Clean",
+      "80s Pop Clean Studio",
+      "80s Pop Clean - Warm Room Take",
+      "80s Pop Clean - Open Chord Mix",
+      "80s Pop Clean - Glass Tone Pass",
+      "80s Pop Clean - Natural Body Edit",
+      "80s Pop Clean - Bright Air Version",
+      "80s Pop Clean - Round Note Cut"
+    ],
+    [
+      "Ambient Swells",
+      "Ambient Swells Ethereal",
+      "Ambient Swells - Ethereal Wash Mix",
+      "Ambient Swells - Cloud Reverb Pass",
+      "Ambient Swells - Wide Bloom Take",
+      "Ambient Swells - Floating Texture Edit",
+      "Ambient Swells - Halo Sustain Version",
+      "Ambient Swells - Cinematic Drift Cut"
+    ],
+    [
+      "Jazz Box",
+      "Jazz Box - Warm Room Take",
+      "Jazz Box - Open Chord Mix",
+      "Jazz Box - Glass Tone Pass",
+      "Jazz Box - Natural Body Edit",
+      "Jazz Box - Bright Air Version",
+      "Jazz Box - Round Note Cut"
+    ],
+    [
+      "Acoustic Sim",
+      "Acoustic Sim - Warm Room Take",
+      "Acoustic Sim - Open Chord Mix",
+      "Acoustic Sim - Glass Tone Pass",
+      "Acoustic Sim - Natural Body Edit",
+      "Acoustic Sim - Bright Air Version",
+      "Acoustic Sim - Round Note Cut"
+    ],
+    [
+      "Lo-Fi Hip Hop",
+      "Lo-Fi Hip Hop - Alt Take",
+      "Lo-Fi Hip Hop - Studio Mix",
+      "Lo-Fi Hip Hop - Session Pass",
+      "Lo-Fi Hip Hop - Extended Edit",
+      "Lo-Fi Hip Hop - Signature Version",
+      "Lo-Fi Hip Hop - Night Drive Cut"
+    ],
+    [
+      "Math Rock Crystal",
+      "Math Rock Crystal - Alt Take",
+      "Math Rock Crystal - Studio Mix",
+      "Math Rock Crystal - Session Pass",
+      "Math Rock Crystal - Extended Edit",
+      "Math Rock Crystal - Signature Version",
+      "Math Rock Crystal - Night Drive Cut"
+    ],
+    [
+      "Tweed Breakup",
+      "Tweed Breakup - Vintage Drive Mix",
+      "Tweed Breakup - Raw Amp Pass",
+      "Tweed Breakup - Grit Stack Take",
+      "Tweed Breakup - Classic Crunch Edit",
+      "Tweed Breakup - Hot Valve Version",
+      "Tweed Breakup - Saturated Bite Cut"
+    ],
+    [
+      "British Invasion",
+      "British Invasion Classic",
+      "British Invasion - Alt Take",
+      "British Invasion - Studio Mix",
+      "British Invasion - Session Pass",
+      "British Invasion - Extended Edit",
+      "British Invasion - Signature Version",
+      "British Invasion - Night Drive Cut"
+    ],
+    [
+      "Indie Jangle",
+      "Indie Jangle Bright",
+      "Indie Jangle - Warm Room Take",
+      "Indie Jangle - Open Chord Mix",
+      "Indie Jangle - Glass Tone Pass",
+      "Indie Jangle - Natural Body Edit",
+      "Indie Jangle - Bright Air Version",
+      "Indie Jangle - Round Note Cut"
+    ],
+    [
+      "Midwest Emo",
+      "Midwest Emo Twinkled",
+      "Midwest Emo - Warm Room Take",
+      "Midwest Emo - Open Chord Mix",
+      "Midwest Emo - Glass Tone Pass",
+      "Midwest Emo - Natural Body Edit",
+      "Midwest Emo - Bright Air Version",
+      "Midwest Emo - Round Note Cut"
+    ],
+    [
+      "Dry Funk",
+      "Dry Funk - Pocket Groove Cut",
+      "Dry Funk - Sync Pulse Mix",
+      "Dry Funk - Muted Snap Take",
+      "Dry Funk - Chic Rhythm Pass",
+      "Dry Funk - Tight Jam Edit",
+      "Dry Funk - Velvet Groove Version"
+    ],
+    [
+      "Classic Plexi",
+      "Classic Plexi - Vintage Drive Mix",
+      "Classic Plexi - Raw Amp Pass",
+      "Classic Plexi - Grit Stack Take",
+      "Classic Plexi - Classic Crunch Edit",
+      "Classic Plexi - Hot Valve Version",
+      "Classic Plexi - Saturated Bite Cut"
+    ],
+    [
+      "Brown Sound",
+      "Brown Sound - Vintage Drive Mix",
+      "Brown Sound - Raw Amp Pass",
+      "Brown Sound - Grit Stack Take",
+      "Brown Sound - Classic Crunch Edit",
+      "Brown Sound - Hot Valve Version",
+      "Brown Sound - Saturated Bite Cut"
+    ],
+    [
+      "Garage Rock Fuzz",
+      "Garage Rock Fuzz Raw",
+      "Garage Rock Fuzz - Vintage Drive Mix",
+      "Garage Rock Fuzz - Raw Amp Pass",
+      "Garage Rock Fuzz - Grit Stack Take",
+      "Garage Rock Fuzz - Classic Crunch Edit",
+      "Garage Rock Fuzz - Hot Valve Version",
+      "Garage Rock Fuzz - Saturated Bite Cut"
+    ],
+    [
+      "Grunge Dirt",
+      "Grunge Dirt Seattle",
+      "Grunge Dirt - Vintage Drive Mix",
+      "Grunge Dirt - Raw Amp Pass",
+      "Grunge Dirt - Grit Stack Take",
+      "Grunge Dirt - Classic Crunch Edit",
+      "Grunge Dirt - Hot Valve Version",
+      "Grunge Dirt - Saturated Bite Cut"
+    ],
+    [
+      "Saturated Rhythm",
+      "Saturated Rhythm - Alt Take",
+      "Saturated Rhythm - Studio Mix",
+      "Saturated Rhythm - Session Pass",
+      "Saturated Rhythm - Extended Edit",
+      "Saturated Rhythm - Signature Version",
+      "Saturated Rhythm - Night Drive Cut"
+    ],
+    [
+      "Hard Rock Crunch",
+      "Hard Rock Crunch",
+      "Hard Rock Crunch - Vintage Drive Mix",
+      "Hard Rock Crunch - Raw Amp Pass",
+      "Hard Rock Crunch - Grit Stack Take",
+      "Hard Rock Crunch - Classic Crunch Edit",
+      "Hard Rock Crunch - Hot Valve Version",
+      "Hard Rock Crunch - Saturated Bite Cut"
+    ],
+    [
+      "Brian May Style",
+      "Brian May Style - Alt Take",
+      "Brian May Style - Studio Mix",
+      "Brian May Style - Session Pass",
+      "Brian May Style - Extended Edit",
+      "Brian May Style - Signature Version",
+      "Brian May Style - Night Drive Cut"
+    ],
+    [
+      "80s Hair Metal",
+      "80s Hair Metal Arena",
+      "80s Hair Metal - High Gain Forge",
+      "80s Hair Metal - Steel Edge Mix",
+      "80s Hair Metal - Palm Mute Crush",
+      "80s Hair Metal - Heavy Riff Pass",
+      "80s Hair Metal - Wall of Gain Edit",
+      "80s Hair Metal - Precision Chug Version"
+    ],
+    [
+      "Modern Djent",
+      "Modern Djent Chug",
+      "Modern Djent - High Gain Forge",
+      "Modern Djent - Steel Edge Mix",
+      "Modern Djent - Palm Mute Crush",
+      "Modern Djent - Heavy Riff Pass",
+      "Modern Djent - Wall of Gain Edit",
+      "Modern Djent - Precision Chug Version"
+    ],
+    [
+      "Doom/Stoner Fuzz",
+      "DoomStoner Fuzz Heavy",
+      "Doom/Stoner Fuzz - High Gain Forge",
+      "Doom/Stoner Fuzz - Steel Edge Mix",
+      "Doom/Stoner Fuzz - Palm Mute Crush",
+      "Doom/Stoner Fuzz - Heavy Riff Pass",
+      "Doom/Stoner Fuzz - Wall of Gain Edit",
+      "Doom/Stoner Fuzz - Precision Chug Version"
+    ],
+    [
+      "Industrial Metal",
+      "Industrial Metal Aggressive",
+      "Industrial Metal - High Gain Forge",
+      "Industrial Metal - Steel Edge Mix",
+      "Industrial Metal - Palm Mute Crush",
+      "Industrial Metal - Heavy Riff Pass",
+      "Industrial Metal - Wall of Gain Edit",
+      "Industrial Metal - Precision Chug Version"
+    ],
+    [
+      "Liquid Lead",
+      "Liquid Lead Smooth",
+      "Liquid Lead - Vintage Drive Mix",
+      "Liquid Lead - Raw Amp Pass",
+      "Liquid Lead - Grit Stack Take",
+      "Liquid Lead - Classic Crunch Edit",
+      "Liquid Lead - Hot Valve Version",
+      "Liquid Lead - Saturated Bite Cut"
+    ],
+    [
+      "Black Metal Lo-Fi",
+      "Black Metal LoFi Raw",
+      "Black Metal Lo-Fi - High Gain Forge",
+      "Black Metal Lo-Fi - Steel Edge Mix",
+      "Black Metal Lo-Fi - Palm Mute Crush",
+      "Black Metal Lo-Fi - Heavy Riff Pass",
+      "Black Metal Lo-Fi - Wall of Gain Edit",
+      "Black Metal Lo-Fi - Precision Chug Version"
+    ],
+    [
+      "Bitcrushed Synth",
+      "Bitcrushed Synth - Alt Take",
+      "Bitcrushed Synth - Studio Mix",
+      "Bitcrushed Synth - Session Pass",
+      "Bitcrushed Synth - Extended Edit",
+      "Bitcrushed Synth - Signature Version",
+      "Bitcrushed Synth - Night Drive Cut"
+    ],
+    [
+      "Infinite Sustain",
+      "Infinite Sustain Lead",
+      "Infinite Sustain - Ethereal Wash Mix",
+      "Infinite Sustain - Cloud Reverb Pass",
+      "Infinite Sustain - Wide Bloom Take",
+      "Infinite Sustain - Floating Texture Edit",
+      "Infinite Sustain - Halo Sustain Version",
+      "Infinite Sustain - Cinematic Drift Cut"
+    ],
+    [
+      "Reverse Psychedelic",
+      "Reverse Psychedelic - Alt Take",
+      "Reverse Psychedelic - Studio Mix",
+      "Reverse Psychedelic - Session Pass",
+      "Reverse Psychedelic - Extended Edit",
+      "Reverse Psychedelic - Signature Version",
+      "Reverse Psychedelic - Night Drive Cut"
+    ],
+    [
+      "Auto-Wah Funk",
+      "Auto-Wah Funk Rhythm",
+      "Auto-Wah Funk - Pocket Groove Cut",
+      "Auto-Wah Funk - Sync Pulse Mix",
+      "Auto-Wah Funk - Muted Snap Take",
+      "Auto-Wah Funk - Chic Rhythm Pass",
+      "Auto-Wah Funk - Tight Jam Edit",
+      "Auto-Wah Funk - Velvet Groove Version"
+    ]
+  ],
+  "n_exact_duplicate_groups": 30,
+  "near_duplicate_threshold": 0.995,
+  "near_duplicate_pairs": [
+    {
+      "a": "Dreamy Shoegaze",
+      "b": "Dreamy Shoegaze - Ethereal Wash Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Dreamy Shoegaze",
+      "b": "Dreamy Shoegaze - Cloud Reverb Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Dreamy Shoegaze",
+      "b": "Dreamy Shoegaze - Wide Bloom Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Dreamy Shoegaze",
+      "b": "Dreamy Shoegaze - Floating Texture Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Dreamy Shoegaze",
+      "b": "Dreamy Shoegaze - Halo Sustain Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Dreamy Shoegaze",
+      "b": "Dreamy Shoegaze - Cinematic Drift Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Calypso Rhythm",
+      "cos": 0.9966332912445068
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Flamenco Fusion",
+      "cos": 0.9975249767303467
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Analog Warm Bass",
+      "cos": 0.9978815317153931
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Lush Reverb Pad",
+      "cos": 0.9982068538665771
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Shoegaze Drone",
+      "cos": 0.9975091814994812
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Space Cowboy",
+      "cos": 0.9963027834892273
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Bossa Nova Acoustic Mystic",
+      "cos": 0.9975269436836243
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Synthwave Guitar Digital",
+      "cos": 0.9974207282066345
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Microtonal Fusion Aether",
+      "cos": 0.9984533190727234
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Overtone Drone Drift",
+      "cos": 0.9982592463493347
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Overtone Drone Glitch",
+      "cos": 0.9968512654304504
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Smooth Jazz Lead Improv",
+      "cos": 0.9985159635543823
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Cool Jazz Vibe",
+      "cos": 0.9976064562797546
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Free Jazz Avantgarde Groove",
+      "cos": 0.9960595965385437
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Contemporary Jazz Blue",
+      "cos": 0.9974783062934875
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Contemporary Jazz Vibe",
+      "cos": 0.9979305863380432
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Neo-Soul Clean Rhythm",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Neo-Soul Clean - Pocket Groove Cut",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Neo-Soul Clean - Sync Pulse Mix",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Neo-Soul Clean - Muted Snap Take",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Neo-Soul Clean - Chic Rhythm Pass",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Neo-Soul Clean - Tight Jam Edit",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Neo-Soul Clean",
+      "b": "Neo-Soul Clean - Velvet Groove Version",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Pop Clean",
+      "b": "80s Pop Clean Studio",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Pop Clean",
+      "b": "80s Pop Clean - Warm Room Take",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Pop Clean",
+      "b": "80s Pop Clean - Open Chord Mix",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Pop Clean",
+      "b": "80s Pop Clean - Glass Tone Pass",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Pop Clean",
+      "b": "80s Pop Clean - Natural Body Edit",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Pop Clean",
+      "b": "80s Pop Clean - Bright Air Version",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Pop Clean",
+      "b": "80s Pop Clean - Round Note Cut",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Desert Blues",
+      "cos": 0.996697723865509
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Macedonian Brass",
+      "cos": 0.996643602848053
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Pacific Islander",
+      "cos": 0.9970936179161072
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Overtone Drone Aether",
+      "cos": 0.9972556829452515
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Dark Ambient Drone Glitch",
+      "cos": 0.9966812133789062
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Contemporary Jazz Groove",
+      "cos": 0.9955015778541565
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Ambient Swells Ethereal",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Ambient Swells - Ethereal Wash Mix",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Ambient Swells - Cloud Reverb Pass",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Ambient Swells - Wide Bloom Take",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Ambient Swells - Floating Texture Edit",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Ambient Swells - Halo Sustain Version",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Ambient Swells",
+      "b": "Ambient Swells - Cinematic Drift Cut",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Jazz Box",
+      "b": "Jazz Box - Warm Room Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Jazz Box",
+      "b": "Jazz Box - Open Chord Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Jazz Box",
+      "b": "Jazz Box - Glass Tone Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Jazz Box",
+      "b": "Jazz Box - Natural Body Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Jazz Box",
+      "b": "Jazz Box - Bright Air Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Jazz Box",
+      "b": "Jazz Box - Round Note Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Rai Algerian",
+      "cos": 0.9965623617172241
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Spanish Flamenco",
+      "cos": 0.9956760406494141
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Atmospheric Grime",
+      "cos": 0.9973296523094177
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Beat Tape Lo-Fi",
+      "cos": 0.9950514435768127
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Marimba Tropical",
+      "cos": 0.9966827034950256
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Spanish Guitar",
+      "cos": 0.9956440925598145
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Bossa Nova Acoustic Moonrise",
+      "cos": 0.9966691732406616
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Bossa Nova Acoustic Voyage",
+      "cos": 0.9975270628929138
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Philadelphia Soul Gospel",
+      "cos": 0.9956346154212952
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Acoustic Sim - Warm Room Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Acoustic Sim - Open Chord Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Acoustic Sim - Glass Tone Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Acoustic Sim - Natural Body Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Acoustic Sim - Bright Air Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Acoustic Sim",
+      "b": "Acoustic Sim - Round Note Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Lo-Fi Hip Hop",
+      "b": "Lo-Fi Hip Hop - Alt Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Lo-Fi Hip Hop",
+      "b": "Lo-Fi Hip Hop - Studio Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Lo-Fi Hip Hop",
+      "b": "Lo-Fi Hip Hop - Session Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Lo-Fi Hip Hop",
+      "b": "Lo-Fi Hip Hop - Extended Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Lo-Fi Hip Hop",
+      "b": "Lo-Fi Hip Hop - Signature Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Lo-Fi Hip Hop",
+      "b": "Lo-Fi Hip Hop - Night Drive Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Math Rock Crystal",
+      "b": "Math Rock Crystal - Alt Take",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Math Rock Crystal",
+      "b": "Math Rock Crystal - Studio Mix",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Math Rock Crystal",
+      "b": "Math Rock Crystal - Session Pass",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Math Rock Crystal",
+      "b": "Math Rock Crystal - Extended Edit",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Math Rock Crystal",
+      "b": "Math Rock Crystal - Signature Version",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Math Rock Crystal",
+      "b": "Math Rock Crystal - Night Drive Cut",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Acid Jazz Groove",
+      "cos": 0.9967758655548096
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Balearic Beat",
+      "cos": 0.9963761568069458
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Bubblegum Bass",
+      "cos": 0.996650218963623
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Golden Age Hip Hop",
+      "cos": 0.9984245896339417
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Synth Pop Indie",
+      "cos": 0.9951879978179932
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Tweed Breakup - Vintage Drive Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Tweed Breakup - Raw Amp Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Tweed Breakup - Grit Stack Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Tweed Breakup - Classic Crunch Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Tweed Breakup - Hot Valve Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Tweed Breakup",
+      "b": "Tweed Breakup - Saturated Bite Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "British Invasion",
+      "b": "British Invasion Classic",
+      "cos": 1.0
+    },
+    {
+      "a": "British Invasion",
+      "b": "British Invasion - Alt Take",
+      "cos": 1.0
+    },
+    {
+      "a": "British Invasion",
+      "b": "British Invasion - Studio Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "British Invasion",
+      "b": "British Invasion - Session Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "British Invasion",
+      "b": "British Invasion - Extended Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "British Invasion",
+      "b": "British Invasion - Signature Version",
+      "cos": 1.0
+    },
+    {
+      "a": "British Invasion",
+      "b": "British Invasion - Night Drive Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Indie Jangle",
+      "b": "Indie Jangle Bright",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Indie Jangle",
+      "b": "Indie Jangle - Warm Room Take",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Indie Jangle",
+      "b": "Indie Jangle - Open Chord Mix",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Indie Jangle",
+      "b": "Indie Jangle - Glass Tone Pass",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Indie Jangle",
+      "b": "Indie Jangle - Natural Body Edit",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Indie Jangle",
+      "b": "Indie Jangle - Bright Air Version",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Indie Jangle",
+      "b": "Indie Jangle - Round Note Cut",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Midwest Emo",
+      "b": "Midwest Emo Twinkled",
+      "cos": 1.0
+    },
+    {
+      "a": "Midwest Emo",
+      "b": "Midwest Emo - Warm Room Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Midwest Emo",
+      "b": "Midwest Emo - Open Chord Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Midwest Emo",
+      "b": "Midwest Emo - Glass Tone Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Midwest Emo",
+      "b": "Midwest Emo - Natural Body Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Midwest Emo",
+      "b": "Midwest Emo - Bright Air Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Midwest Emo",
+      "b": "Midwest Emo - Round Note Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Dry Funk",
+      "b": "Dry Funk - Pocket Groove Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Dry Funk",
+      "b": "Dry Funk - Sync Pulse Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Dry Funk",
+      "b": "Dry Funk - Muted Snap Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Dry Funk",
+      "b": "Dry Funk - Chic Rhythm Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Dry Funk",
+      "b": "Dry Funk - Tight Jam Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Dry Funk",
+      "b": "Dry Funk - Velvet Groove Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Classic Plexi",
+      "b": "Classic Plexi - Vintage Drive Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Classic Plexi",
+      "b": "Classic Plexi - Raw Amp Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Classic Plexi",
+      "b": "Classic Plexi - Grit Stack Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Classic Plexi",
+      "b": "Classic Plexi - Classic Crunch Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Classic Plexi",
+      "b": "Classic Plexi - Hot Valve Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Classic Plexi",
+      "b": "Classic Plexi - Saturated Bite Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Brown Sound",
+      "b": "Brown Sound - Vintage Drive Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Brown Sound",
+      "b": "Brown Sound - Raw Amp Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Brown Sound",
+      "b": "Brown Sound - Grit Stack Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Brown Sound",
+      "b": "Brown Sound - Classic Crunch Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Brown Sound",
+      "b": "Brown Sound - Hot Valve Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Brown Sound",
+      "b": "Brown Sound - Saturated Bite Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Garage Rock Fuzz",
+      "b": "Garage Rock Fuzz Raw",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Garage Rock Fuzz",
+      "b": "Garage Rock Fuzz - Vintage Drive Mix",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Garage Rock Fuzz",
+      "b": "Garage Rock Fuzz - Raw Amp Pass",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Garage Rock Fuzz",
+      "b": "Garage Rock Fuzz - Grit Stack Take",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Garage Rock Fuzz",
+      "b": "Garage Rock Fuzz - Classic Crunch Edit",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Garage Rock Fuzz",
+      "b": "Garage Rock Fuzz - Hot Valve Version",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Garage Rock Fuzz",
+      "b": "Garage Rock Fuzz - Saturated Bite Cut",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Grunge Dirt",
+      "b": "Grunge Dirt Seattle",
+      "cos": 1.0
+    },
+    {
+      "a": "Grunge Dirt",
+      "b": "Grunge Dirt - Vintage Drive Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Grunge Dirt",
+      "b": "Grunge Dirt - Raw Amp Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Grunge Dirt",
+      "b": "Grunge Dirt - Grit Stack Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Grunge Dirt",
+      "b": "Grunge Dirt - Classic Crunch Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Grunge Dirt",
+      "b": "Grunge Dirt - Hot Valve Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Grunge Dirt",
+      "b": "Grunge Dirt - Saturated Bite Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Saturated Rhythm",
+      "b": "Saturated Rhythm - Alt Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Saturated Rhythm",
+      "b": "Saturated Rhythm - Studio Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Saturated Rhythm",
+      "b": "Saturated Rhythm - Session Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Saturated Rhythm",
+      "b": "Saturated Rhythm - Extended Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Saturated Rhythm",
+      "b": "Saturated Rhythm - Signature Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Saturated Rhythm",
+      "b": "Saturated Rhythm - Night Drive Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Wah-Wah Rock",
+      "b": "Auto-Wah Funk",
+      "cos": 0.9987952709197998
+    },
+    {
+      "a": "Wah-Wah Rock",
+      "b": "Auto-Wah Funk Rhythm",
+      "cos": 0.9987952709197998
+    },
+    {
+      "a": "Wah-Wah Rock",
+      "b": "Auto-Wah Funk - Pocket Groove Cut",
+      "cos": 0.9987952709197998
+    },
+    {
+      "a": "Wah-Wah Rock",
+      "b": "Auto-Wah Funk - Sync Pulse Mix",
+      "cos": 0.9987952709197998
+    },
+    {
+      "a": "Wah-Wah Rock",
+      "b": "Auto-Wah Funk - Muted Snap Take",
+      "cos": 0.9987952709197998
+    },
+    {
+      "a": "Wah-Wah Rock",
+      "b": "Auto-Wah Funk - Chic Rhythm Pass",
+      "cos": 0.9987952709197998
+    },
+    {
+      "a": "Wah-Wah Rock",
+      "b": "Auto-Wah Funk - Tight Jam Edit",
+      "cos": 0.9987952709197998
+    },
+    {
+      "a": "Wah-Wah Rock",
+      "b": "Auto-Wah Funk - Velvet Groove Version",
+      "cos": 0.9987952709197998
+    },
+    {
+      "a": "Hard Rock Crunch",
+      "b": "Trap Metal Aggressive",
+      "cos": 0.9959705471992493
+    },
+    {
+      "a": "Hard Rock Crunch",
+      "b": "Hard Rock Crunch",
+      "cos": 1.0
+    },
+    {
+      "a": "Hard Rock Crunch",
+      "b": "Hard Rock Crunch - Vintage Drive Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Hard Rock Crunch",
+      "b": "Hard Rock Crunch - Raw Amp Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Hard Rock Crunch",
+      "b": "Hard Rock Crunch - Grit Stack Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Hard Rock Crunch",
+      "b": "Hard Rock Crunch - Classic Crunch Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Hard Rock Crunch",
+      "b": "Hard Rock Crunch - Hot Valve Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Hard Rock Crunch",
+      "b": "Hard Rock Crunch - Saturated Bite Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "Brian May Style",
+      "b": "Brian May Style - Alt Take",
+      "cos": 1.0
+    },
+    {
+      "a": "Brian May Style",
+      "b": "Brian May Style - Studio Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Brian May Style",
+      "b": "Brian May Style - Session Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Brian May Style",
+      "b": "Brian May Style - Extended Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Brian May Style",
+      "b": "Brian May Style - Signature Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Brian May Style",
+      "b": "Brian May Style - Night Drive Cut",
+      "cos": 1.0
+    },
+    {
+      "a": "80s Hair Metal",
+      "b": "80s Hair Metal Arena",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Hair Metal",
+      "b": "80s Hair Metal - High Gain Forge",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Hair Metal",
+      "b": "80s Hair Metal - Steel Edge Mix",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Hair Metal",
+      "b": "80s Hair Metal - Palm Mute Crush",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Hair Metal",
+      "b": "80s Hair Metal - Heavy Riff Pass",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Hair Metal",
+      "b": "80s Hair Metal - Wall of Gain Edit",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "80s Hair Metal",
+      "b": "80s Hair Metal - Precision Chug Version",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Modern Djent",
+      "b": "Modern Djent Chug",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Modern Djent",
+      "b": "Modern Djent - High Gain Forge",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Modern Djent",
+      "b": "Modern Djent - Steel Edge Mix",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Modern Djent",
+      "b": "Modern Djent - Palm Mute Crush",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Modern Djent",
+      "b": "Modern Djent - Heavy Riff Pass",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Modern Djent",
+      "b": "Modern Djent - Wall of Gain Edit",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Modern Djent",
+      "b": "Modern Djent - Precision Chug Version",
+      "cos": 1.0000001192092896
+    },
+    {
+      "a": "Doom/Stoner Fuzz",
+      "b": "DoomStoner Fuzz Heavy",
+      "cos": 1.0
+    },
+    {
+      "a": "Doom/Stoner Fuzz",
+      "b": "Doom/Stoner Fuzz - High Gain Forge",
+      "cos": 1.0
+    },
+    {
+      "a": "Doom/Stoner Fuzz",
+      "b": "Doom/Stoner Fuzz - Steel Edge Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Doom/Stoner Fuzz",
+      "b": "Doom/Stoner Fuzz - Palm Mute Crush",
+      "cos": 1.0
+    },
+    {
+      "a": "Doom/Stoner Fuzz",
+      "b": "Doom/Stoner Fuzz - Heavy Riff Pass",
+      "cos": 1.0
+    },
+    {
+      "a": "Doom/Stoner Fuzz",
+      "b": "Doom/Stoner Fuzz - Wall of Gain Edit",
+      "cos": 1.0
+    },
+    {
+      "a": "Doom/Stoner Fuzz",
+      "b": "Doom/Stoner Fuzz - Precision Chug Version",
+      "cos": 1.0
+    },
+    {
+      "a": "Industrial Metal",
+      "b": "Industrial Metal Aggressive",
+      "cos": 1.0
+    },
+    {
+      "a": "Industrial Metal",
+      "b": "Industrial Metal - High Gain Forge",
+      "cos": 1.0
+    },
+    {
+      "a": "Industrial Metal",
+      "b": "Industrial Metal - Steel Edge Mix",
+      "cos": 1.0
+    },
+    {
+      "a": "Industrial Metal",
+      "b": "Industrial Metal - Palm Mute Crush",
+      "cos": 1.0
+    },
+    {
+      "a": "Industrial Metal",
+      "b": "Industrial Metal - Heavy Riff Pass",
+      "cos": 1.0
+    }
+  ],
+  "n_near_duplicate_pairs": 200,
+  "note": "Near-duplicate scan uses a cheap log-STFT fingerprint; upgrade to TRR/CLAP-based scan for stricter auditing.",
+  "split_root": "/Users/xyh/Code/Audio-agent/Experiments/tmm/splits/tmm_external1267_grouped",
+  "split_reports": {
+    "seed0": {
+      "n_named_items": 1264,
+      "n_items_with_audio": 1248,
+      "exact_cross_split_pairs": [
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Pocket Groove Cut",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Sync Pulse Mix",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Muted Snap Take",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Chic Rhythm Pass",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Tight Jam Edit",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Velvet Groove Version",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Infinite Sustain",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Infinite Sustain - Ethereal Wash Mix",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Infinite Sustain - Cloud Reverb Pass",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Infinite Sustain - Wide Bloom Take",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Infinite Sustain - Floating Texture Edit",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Infinite Sustain - Halo Sustain Version",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test"
+        },
+        {
+          "a": "Infinite Sustain - Cinematic Drift Cut",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test"
+        }
+      ],
+      "near_cross_split_pairs": [
+        {
+          "a": "Philadelphia Soul Gospel",
+          "b": "Southern Soul Gospel Soulful",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.99615079164505
+        },
+        {
+          "a": "Synth Pop Indie",
+          "b": "Glitch Hop",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9958946108818054
+        },
+        {
+          "a": "Synth Pop Indie",
+          "b": "Dirty South Trap",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9969565272331238
+        },
+        {
+          "a": "Synth Pop Indie",
+          "b": "Deep House Beat",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9971178770065308
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Flamenco Fusion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9972104430198669
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Overtone Drone Glitch",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9957196116447449
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Lo-Fi House",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9951171875
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Deathcore Breakdown Venom",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.995500922203064
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Shoegaze Drone",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9962300062179565
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Neo-Soul Clean",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9963027834892273
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Neo-Soul Clean - Pocket Groove Cut",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9963027834892273
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Neo-Soul Clean - Sync Pulse Mix",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9963027834892273
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Neo-Soul Clean - Muted Snap Take",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9963027834892273
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Neo-Soul Clean - Chic Rhythm Pass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9963027834892273
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Neo-Soul Clean - Tight Jam Edit",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9963027834892273
+        },
+        {
+          "a": "Space Cowboy",
+          "b": "Neo-Soul Clean - Velvet Groove Version",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9963027834892273
+        },
+        {
+          "a": "Chicago Soul Gospel",
+          "b": "Granular Texture Prism",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9952187538146973
+        },
+        {
+          "a": "Synthwave Sunset",
+          "b": "Thrashcore Fast",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9960359334945679
+        },
+        {
+          "a": "Deep House Digital",
+          "b": "Glitch Hop",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9955501556396484
+        },
+        {
+          "a": "Deep House Digital",
+          "b": "Dirty South Trap",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9982526898384094
+        },
+        {
+          "a": "MPB Brazilian",
+          "b": "Granular Texture Prism",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9961402416229248
+        },
+        {
+          "a": "Hauntology Library",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9973450899124146
+        },
+        {
+          "a": "Hauntology Library",
+          "b": "Complex Jazz Fusion Groove",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.995821475982666
+        },
+        {
+          "a": "Hauntology Library",
+          "b": "Acid Jazz Funk Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9951882362365723
+        },
+        {
+          "a": "Hauntology Library",
+          "b": "Urban Cowboy",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9950642585754395
+        },
+        {
+          "a": "Hauntology Library",
+          "b": "Berlin Techno",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.996903121471405
+        },
+        {
+          "a": "Hauntology Library",
+          "b": "Cool Jazz Crescendo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9970309138298035
+        },
+        {
+          "a": "Floating Synth",
+          "b": "Granular Texture Prism",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9957793354988098
+        },
+        {
+          "a": "Floating Synth",
+          "b": "Spanish Guitar",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9954764246940613
+        },
+        {
+          "a": "Palm Muted Riff",
+          "b": "Granular Texture Aether",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9962178468704224
+        },
+        {
+          "a": "Palm Muted Riff",
+          "b": "Mexican Mariachi",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9950389862060547
+        },
+        {
+          "a": "Emo Revival",
+          "b": "Post-Hardcore Screamo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9951003789901733
+        },
+        {
+          "a": "Emo Revival",
+          "b": "Synthwave Guitar Cyber",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9964336156845093
+        },
+        {
+          "a": "Black Metal LoFi Raw",
+          "b": "Symphonic Metal",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9972939491271973
+        },
+        {
+          "a": "Gypsy Jazz Manouche Smoky",
+          "b": "Shoegaze Drone",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.995585560798645
+        },
+        {
+          "a": "Hyperpop Glitch Neon",
+          "b": "Samba Percussion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.996634304523468
+        },
+        {
+          "a": "Hyperpop Glitch Neon",
+          "b": "Acid Jazz Funk Smoky",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9968741536140442
+        },
+        {
+          "a": "Hyperpop Glitch Neon",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9960455298423767
+        },
+        {
+          "a": "Hyperpop Glitch Neon",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9986204504966736
+        },
+        {
+          "a": "Hyperpop Glitch Neon",
+          "b": "Complex Jazz Fusion Groove",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9954739212989807
+        },
+        {
+          "a": "Hyperpop Glitch Neon",
+          "b": "Cool Jazz Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9975908994674683
+        },
+        {
+          "a": "Hyperpop Glitch Neon",
+          "b": "Acid Jazz Funk Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9968010783195496
+        },
+        {
+          "a": "Hyperpop Glitch Neon",
+          "b": "Urban Cowboy",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9969378113746643
+        },
+        {
+          "a": "Hyperpop Glitch Neon",
+          "b": "Cool Jazz Crescendo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9973511099815369
+        },
+        {
+          "a": "Acoustic Sim",
+          "b": "Spanish Guitar",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9956440925598145
+        },
+        {
+          "a": "Acoustic Sim - Warm Room Take",
+          "b": "Spanish Guitar",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9956440925598145
+        },
+        {
+          "a": "Acoustic Sim - Open Chord Mix",
+          "b": "Spanish Guitar",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9956440925598145
+        },
+        {
+          "a": "Acoustic Sim - Glass Tone Pass",
+          "b": "Spanish Guitar",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9956440925598145
+        },
+        {
+          "a": "Acoustic Sim - Natural Body Edit",
+          "b": "Spanish Guitar",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9956440925598145
+        },
+        {
+          "a": "Acoustic Sim - Bright Air Version",
+          "b": "Spanish Guitar",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9956440925598145
+        },
+        {
+          "a": "Acoustic Sim - Round Note Cut",
+          "b": "Spanish Guitar",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9956440925598145
+        },
+        {
+          "a": "Contemporary Jazz Groove",
+          "b": "Western Swing Rambler",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9951611757278442
+        },
+        {
+          "a": "Contemporary Jazz Groove",
+          "b": "Deathcore Breakdown Venom",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9965413808822632
+        },
+        {
+          "a": "Contemporary Jazz Groove",
+          "b": "Analog Warm Bass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9967659711837769
+        },
+        {
+          "a": "Yoruba Praise",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9983798861503601
+        },
+        {
+          "a": "Yoruba Praise",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9973819255828857
+        },
+        {
+          "a": "Yoruba Praise",
+          "b": "Complex Jazz Fusion Groove",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9995133876800537
+        },
+        {
+          "a": "Yoruba Praise",
+          "b": "Cool Jazz Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9956532716751099
+        },
+        {
+          "a": "Yoruba Praise",
+          "b": "Acid Jazz Funk Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9978241920471191
+        },
+        {
+          "a": "Yoruba Praise",
+          "b": "Cool Jazz Crescendo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9982861876487732
+        },
+        {
+          "a": "Chromatic Jazz",
+          "b": "Samba Percussion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9968783855438232
+        },
+        {
+          "a": "Chromatic Jazz",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9992091655731201
+        },
+        {
+          "a": "Chromatic Jazz",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.998741865158081
+        },
+        {
+          "a": "Chromatic Jazz",
+          "b": "Complex Jazz Fusion Groove",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9992914199829102
+        },
+        {
+          "a": "Chromatic Jazz",
+          "b": "Cool Jazz Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.997967541217804
+        },
+        {
+          "a": "Chromatic Jazz",
+          "b": "Acid Jazz Funk Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.999411940574646
+        },
+        {
+          "a": "Chromatic Jazz",
+          "b": "Urban Cowboy",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9967191219329834
+        },
+        {
+          "a": "Chromatic Jazz",
+          "b": "Cool Jazz Crescendo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9997270107269287
+        },
+        {
+          "a": "Technical Thrash Rage",
+          "b": "Technical Thrash Chaos",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9964278936386108
+        },
+        {
+          "a": "Bluegrass Flatpick Honky",
+          "b": "Talk Box Funk",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9962165355682373
+        },
+        {
+          "a": "Bluegrass Flatpick Honky",
+          "b": "Synth Pop Sparkle",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9963846802711487
+        },
+        {
+          "a": "Beat Tape Lo-Fi",
+          "b": "Granular Texture Prism",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9955359697341919
+        },
+        {
+          "a": "Lounge Bossa",
+          "b": "Samba Percussion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9964432120323181
+        },
+        {
+          "a": "Lounge Bossa",
+          "b": "Acid Jazz Funk Smoky",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9955272674560547
+        },
+        {
+          "a": "Lounge Bossa",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9978460669517517
+        },
+        {
+          "a": "Lounge Bossa",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9985703825950623
+        },
+        {
+          "a": "Lounge Bossa",
+          "b": "Complex Jazz Fusion Groove",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9967923760414124
+        },
+        {
+          "a": "Lounge Bossa",
+          "b": "Cool Jazz Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9971356391906738
+        },
+        {
+          "a": "Lounge Bossa",
+          "b": "Acid Jazz Funk Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9986220002174377
+        },
+        {
+          "a": "Lounge Bossa",
+          "b": "Urban Cowboy",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.998687207698822
+        },
+        {
+          "a": "Lounge Bossa",
+          "b": "Berlin Techno",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9967485666275024
+        },
+        {
+          "a": "Lounge Bossa",
+          "b": "Cool Jazz Crescendo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9982078075408936
+        },
+        {
+          "a": "Smooth Jazz Lead Groove",
+          "b": "Sub-Bass Drone",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9972859025001526
+        },
+        {
+          "a": "Smooth Jazz Lead Groove",
+          "b": "Granular Texture Aether",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9981610774993896
+        },
+        {
+          "a": "Techno Industrial Bass",
+          "b": "Thrashcore Fast",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9954541325569153
+        },
+        {
+          "a": "Sonic Youth Noise",
+          "b": "Samba Percussion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9965614676475525
+        },
+        {
+          "a": "Sonic Youth Noise",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9987672567367554
+        },
+        {
+          "a": "Sonic Youth Noise",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9971364140510559
+        },
+        {
+          "a": "Sonic Youth Noise",
+          "b": "Complex Jazz Fusion Groove",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9986570477485657
+        },
+        {
+          "a": "Sonic Youth Noise",
+          "b": "Cool Jazz Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9966650009155273
+        },
+        {
+          "a": "Sonic Youth Noise",
+          "b": "Acid Jazz Funk Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9992908239364624
+        },
+        {
+          "a": "Sonic Youth Noise",
+          "b": "Cool Jazz Crescendo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9989195466041565
+        },
+        {
+          "a": "Schlager Pop",
+          "b": "Symphonic Metal",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9953199028968811
+        },
+        {
+          "a": "Rai Algerian",
+          "b": "Granular Texture Prism",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9962546825408936
+        },
+        {
+          "a": "Rai Algerian",
+          "b": "Spanish Guitar",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9991613626480103
+        },
+        {
+          "a": "Neo-Soul Rhythm Smooth",
+          "b": "Prepared Guitar Echo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9956291913986206
+        },
+        {
+          "a": "Spectral Ambient",
+          "b": "Plunderphonics Collage",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9958746433258057
+        },
+        {
+          "a": "Spectral Ambient",
+          "b": "Mexican Mariachi",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.995643675327301
+        },
+        {
+          "a": "Gaelic Folk",
+          "b": "Granular Texture Aether",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9965524673461914
+        },
+        {
+          "a": "Folk Metal Acoustic Fury",
+          "b": "Talk Box Funk",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9953712821006775
+        },
+        {
+          "a": "Jazz Organ Trio",
+          "b": "Glitch Hop",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9950882792472839
+        },
+        {
+          "a": "Jazz Organ Trio",
+          "b": "Acid Jazz Funk Smoky",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9974145889282227
+        },
+        {
+          "a": "Jazz Organ Trio",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9962802529335022
+        },
+        {
+          "a": "Jazz Organ Trio",
+          "b": "Deep House Beat",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9975140690803528
+        },
+        {
+          "a": "Post-Rock Crescendo",
+          "b": "Western Swing Rambler",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9951983690261841
+        },
+        {
+          "a": "Post-Rock Crescendo",
+          "b": "Flamenco Fusion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9977903962135315
+        },
+        {
+          "a": "Post-Rock Crescendo",
+          "b": "Overtone Drone Glitch",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9951898455619812
+        },
+        {
+          "a": "Post-Rock Crescendo",
+          "b": "Deathcore Breakdown Venom",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.996860921382904
+        },
+        {
+          "a": "Post-Rock Crescendo",
+          "b": "Analog Warm Bass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9954162240028381
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Flamenco Fusion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9975249767303467
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Overtone Drone Glitch",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9968512654304504
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Shoegaze Drone",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9975091814994812
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Pocket Groove Cut",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Sync Pulse Mix",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Muted Snap Take",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Chic Rhythm Pass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Tight Jam Edit",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Neo-Soul Clean - Velvet Groove Version",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Neo-Soul Clean Rhythm",
+          "b": "Analog Warm Bass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9978815317153931
+        },
+        {
+          "a": "Latin Rock Fusion Sunset",
+          "b": "Talk Box Funk",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9958524107933044
+        },
+        {
+          "a": "Contemporary Jazz Blue",
+          "b": "Flamenco Fusion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9973849654197693
+        },
+        {
+          "a": "Contemporary Jazz Blue",
+          "b": "Overtone Drone Glitch",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.997627854347229
+        },
+        {
+          "a": "Contemporary Jazz Blue",
+          "b": "Neo-Soul Clean",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9974783062934875
+        },
+        {
+          "a": "Contemporary Jazz Blue",
+          "b": "Neo-Soul Clean - Pocket Groove Cut",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9974783062934875
+        },
+        {
+          "a": "Contemporary Jazz Blue",
+          "b": "Neo-Soul Clean - Sync Pulse Mix",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9974783062934875
+        },
+        {
+          "a": "Contemporary Jazz Blue",
+          "b": "Neo-Soul Clean - Muted Snap Take",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9974783062934875
+        },
+        {
+          "a": "Contemporary Jazz Blue",
+          "b": "Neo-Soul Clean - Chic Rhythm Pass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9974783062934875
+        },
+        {
+          "a": "Contemporary Jazz Blue",
+          "b": "Neo-Soul Clean - Tight Jam Edit",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9974783062934875
+        },
+        {
+          "a": "Contemporary Jazz Blue",
+          "b": "Neo-Soul Clean - Velvet Groove Version",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9974783062934875
+        },
+        {
+          "a": "Contemporary Jazz Blue",
+          "b": "Analog Warm Bass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9970292448997498
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Western Swing Rambler",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9964268803596497
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Flamenco Fusion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9963802695274353
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Overtone Drone Glitch",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9953417181968689
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Deathcore Breakdown Venom",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9973154067993164
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Neo-Soul Clean",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9960595965385437
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Neo-Soul Clean - Pocket Groove Cut",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9960595965385437
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Neo-Soul Clean - Sync Pulse Mix",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9960595965385437
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Neo-Soul Clean - Muted Snap Take",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9960595965385437
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Neo-Soul Clean - Chic Rhythm Pass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9960595965385437
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Neo-Soul Clean - Tight Jam Edit",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9960595965385437
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Neo-Soul Clean - Velvet Groove Version",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9960595965385437
+        },
+        {
+          "a": "Free Jazz Avantgarde Groove",
+          "b": "Analog Warm Bass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9978910088539124
+        },
+        {
+          "a": "Lo-Fi Bedroom Pop Hazy",
+          "b": "Spectral Glow",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.995166540145874
+        },
+        {
+          "a": "Contemporary Jazz Crescendo",
+          "b": "Synth Pop Sparkle",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9957553744316101
+        },
+        {
+          "a": "Complex Jazz Fusion Blue",
+          "b": "Nashville Session Frontier",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9950228333473206
+        },
+        {
+          "a": "Reggae Skank Tropical",
+          "b": "Samba Percussion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.997678279876709
+        },
+        {
+          "a": "Reggae Skank Tropical",
+          "b": "Acid Jazz Funk Smoky",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9962900876998901
+        },
+        {
+          "a": "Reggae Skank Tropical",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9962631464004517
+        },
+        {
+          "a": "Reggae Skank Tropical",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9990265369415283
+        },
+        {
+          "a": "Reggae Skank Tropical",
+          "b": "Complex Jazz Fusion Groove",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9959299564361572
+        },
+        {
+          "a": "Reggae Skank Tropical",
+          "b": "Cool Jazz Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9980607032775879
+        },
+        {
+          "a": "Reggae Skank Tropical",
+          "b": "Acid Jazz Funk Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976946115493774
+        },
+        {
+          "a": "Reggae Skank Tropical",
+          "b": "Urban Cowboy",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9973673820495605
+        },
+        {
+          "a": "Reggae Skank Tropical",
+          "b": "Cool Jazz Crescendo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976611733436584
+        },
+        {
+          "a": "Amapiano Log Drum",
+          "b": "Acid Jazz Funk Smoky",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.995708167552948
+        },
+        {
+          "a": "Amapiano Log Drum",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9972139596939087
+        },
+        {
+          "a": "Amapiano Log Drum",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9985153675079346
+        },
+        {
+          "a": "Amapiano Log Drum",
+          "b": "Complex Jazz Fusion Groove",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9983188509941101
+        },
+        {
+          "a": "Amapiano Log Drum",
+          "b": "Cool Jazz Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9962404370307922
+        },
+        {
+          "a": "Amapiano Log Drum",
+          "b": "Acid Jazz Funk Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9971773624420166
+        },
+        {
+          "a": "Amapiano Log Drum",
+          "b": "Cool Jazz Crescendo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976399540901184
+        },
+        {
+          "a": "Dark Ambient Drone Glitch",
+          "b": "Analog Warm Bass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9958105087280273
+        },
+        {
+          "a": "Infinite Sustain",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Infinite Sustain - Ethereal Wash Mix",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Infinite Sustain - Cloud Reverb Pass",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Infinite Sustain - Wide Bloom Take",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Infinite Sustain - Floating Texture Edit",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Infinite Sustain - Halo Sustain Version",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Infinite Sustain - Cinematic Drift Cut",
+          "b": "Infinite Sustain Lead",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 1.0000001192092896
+        },
+        {
+          "a": "Soulful Crooner",
+          "b": "Acid Jazz Funk Smoky",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9975564479827881
+        },
+        {
+          "a": "Soulful Crooner",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9982213377952576
+        },
+        {
+          "a": "Soulful Crooner",
+          "b": "Cool Jazz Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9959449172019958
+        },
+        {
+          "a": "Soulful Crooner",
+          "b": "Urban Cowboy",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9960920214653015
+        },
+        {
+          "a": "Soulful Crooner",
+          "b": "Deep House Beat",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976279735565186
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9952484369277954
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Flamenco Fusion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9973770976066589
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Overtone Drone Glitch",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9959667921066284
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Deathcore Breakdown Venom",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.996111273765564
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Neo-Soul Clean",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976064562797546
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Neo-Soul Clean - Pocket Groove Cut",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976064562797546
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Neo-Soul Clean - Sync Pulse Mix",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976064562797546
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Neo-Soul Clean - Muted Snap Take",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976064562797546
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Neo-Soul Clean - Chic Rhythm Pass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976064562797546
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Neo-Soul Clean - Tight Jam Edit",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976064562797546
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Neo-Soul Clean - Velvet Groove Version",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9976064562797546
+        },
+        {
+          "a": "Cool Jazz Vibe",
+          "b": "Analog Warm Bass",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9982766509056091
+        },
+        {
+          "a": "Complex Jazz Fusion Vibe",
+          "b": "Acid Jazz Funk Crescendo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9970805644989014
+        },
+        {
+          "a": "German Schlager",
+          "b": "Samba Percussion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9972661733627319
+        },
+        {
+          "a": "German Schlager",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9973803758621216
+        },
+        {
+          "a": "German Schlager",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9967114925384521
+        },
+        {
+          "a": "German Schlager",
+          "b": "Complex Jazz Fusion Groove",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9967882633209229
+        },
+        {
+          "a": "German Schlager",
+          "b": "Cool Jazz Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9983888268470764
+        },
+        {
+          "a": "German Schlager",
+          "b": "Acid Jazz Funk Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9978229999542236
+        },
+        {
+          "a": "German Schlager",
+          "b": "Cool Jazz Crescendo",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9989240169525146
+        },
+        {
+          "a": "Riot Grrrl Raw",
+          "b": "Samba Percussion",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9952067136764526
+        },
+        {
+          "a": "Deep Dub",
+          "b": "Free Jazz Avantgarde Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9968117475509644
+        },
+        {
+          "a": "Deep Dub",
+          "b": "Sega Mauritian",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.99767005443573
+        },
+        {
+          "a": "Deep Dub",
+          "b": "Complex Jazz Fusion Groove",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.998317539691925
+        },
+        {
+          "a": "Deep Dub",
+          "b": "Acid Jazz Funk Blue",
+          "split_a": "train",
+          "split_b": "test",
+          "cos": 0.9965746402740479
+        }
+      ],
+      "n_exact_cross_split_pairs": 14,
+      "n_near_cross_split_pairs": 200
+    }
+  }
+}

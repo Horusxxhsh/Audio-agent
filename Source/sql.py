@@ -766,7 +766,7 @@ def update_parameters_to_database(parameters):
                                         '''
 
         print(f"system_prompt3:{system_prompt3}")
-        client = OpenAI(api_key="sk-0705951d960041ed96c607ab69724d0d",
+        client = OpenAI(api_key=os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", ""),
                         base_url="https://api.deepseek.com")
         user_prompt3 = f''
         response3 = client.chat.completions.create(

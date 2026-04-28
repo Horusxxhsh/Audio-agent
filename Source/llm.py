@@ -265,7 +265,7 @@ CREATE TABLE IF NOT EXISTS audio_vector (
 ''')
 audio_conn.commit()
 
-client = OpenAI(api_key="sk-0705951d960041ed96c607ab69724d0d", base_url="https://api.deepseek.com")
+client = OpenAI(api_key=os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY", ""), base_url="https://api.deepseek.com")
 
 import platform
 

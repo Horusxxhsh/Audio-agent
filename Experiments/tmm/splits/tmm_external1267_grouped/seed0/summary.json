@@ -1,0 +1,9 @@
+{
+  "seed": 0,
+  "n_total": 1267,
+  "n_train": 1056,
+  "n_val": 0,
+  "n_test": 211,
+  "dataset_json": "/Users/xyh/Code/Audio-agent/Data/External_1267_211/dataset/dataset_full_vectors_1267.json",
+  "group_mode": "base_name"
+}

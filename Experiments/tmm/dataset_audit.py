@@ -22,6 +22,43 @@ def _resolve_audio_path(repo_root: Path, p: Optional[str]) -> Optional[Path]:
     return path
 
 
+def resolve_audio_path_for_item(repo_root: Path, item: Dict) -> Optional[Path]:
+    song_name = str(item.get("SongName", "")).strip()
+    cur = item.get("AudioPath")
+    base_audio_dir = repo_root / "Data" / "Audio_Synthetic"
+
+    candidates: List[Path] = []
+    resolved_raw = _resolve_audio_path(repo_root, cur)
+    if resolved_raw is not None:
+        candidates.append(resolved_raw)
+
+    if isinstance(cur, str) and cur:
+        base = cur.replace("\\", "/").split("/")[-1]
+        if base.lower().endswith(".wav"):
+            candidates.append((base_audio_dir / base).resolve())
+
+    def _sanitize(name: str) -> str:
+        return "".join([c for c in name if c.isalpha() or c.isdigit() or c in (" ", "-", "_")]).strip()
+
+    if song_name:
+        candidates.append((base_audio_dir / f"{_sanitize(song_name)}.wav").resolve())
+        candidates.append((base_audio_dir / f"{song_name}.wav").resolve())
+        if " - " in song_name:
+            base_name = song_name.split(" - ", 1)[0].strip()
+            candidates.append((base_audio_dir / f"{_sanitize(base_name)}.wav").resolve())
+            candidates.append((base_audio_dir / f"{base_name}.wav").resolve())
+
+    seen = set()
+    for candidate in candidates:
+        key = str(candidate)
+        if key in seen:
+            continue
+        seen.add(key)
+        if candidate.exists():
+            return candidate
+    return None
+
+
 @dataclass(frozen=True)
 class AudioInfo:
     sr: int
@@ -109,7 +146,7 @@ def audit_dataset(dataset_json: Path, split_root: Optional[Path]) -> Dict:
         name = str(item.get("SongName", ""))
         if name:
             names.append(name)
-        apath = _resolve_audio_path(repo_root, item.get("AudioPath"))
+        apath = resolve_audio_path_for_item(repo_root, item)
         if name and apath and apath.exists():
             audio_paths.append((name, apath))
 
@@ -145,7 +182,7 @@ def audit_dataset(dataset_json: Path, split_root: Optional[Path]) -> Dict:
         if not isinstance(item, dict):
             continue
         name = str(item.get("SongName", ""))
-        apath = _resolve_audio_path(repo_root, item.get("AudioPath"))
+        apath = resolve_audio_path_for_item(repo_root, item)
         if not name:
             continue
         if apath is None or not apath.exists():

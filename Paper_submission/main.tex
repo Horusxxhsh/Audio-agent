@@ -1,0 +1,41 @@
+\documentclass[journal,10pt]{IEEEtran}
+
+\makeatletter
+\def\input@path{{./}{Paper/}}
+\makeatother
+
+% Optional math commands
+\input{math_commands.tex}
+
+\usepackage{times}
+\usepackage[hypertexnames=false]{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{color}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,fit,calc,shadows,shapes.geometric,backgrounds,decorations.pathmorphing,arrows.meta}
+
+\usepackage[numbers,sort&compress]{natbib}
+
+% Suppress non-actionable underfull box warnings in two-column layout
+\hbadness=10000
+\vbadness=10000
+
+% Path to figures (supports compiling from Paper/ or repo root)
+\graphicspath{{./figures/}{Paper/figures/}}
+
+\title{TimberAgent: Gram-Guided Retrieval for Executable Music Effect Control}
+\author{Taotao Wang, Yihan Xia, Shihao He, Fang Liu, and Shengli Zhang\\
+\textit{College of Electronics and Information Engineering}\\
+\textit{Shenzhen University}\\
+ttwang@szu.edu.cn, xiayihan2023@szu.edu.cn, 2410044045@mails.szu.edu.cn, liuf@szu.edu.cn, zsl@szu.edu.cn}
+
+\begin{document}
+\newcommand{\paperbibliostyle}{IEEEtranN}
+\input{content.tex}
+\end{document}

@@ -30,6 +30,7 @@ sys.path.append(common_dir)
 from dataset_loader import load_and_merge_data
 from evaluate import Evaluator
 from embedding_knn_retriever import CLAPRetriever, PaSSTRetriever, PANNsRetriever
+from query_splits import select_query_indices
 
 try:
     from openai import OpenAI
@@ -291,6 +292,7 @@ TEST_SAMPLES.extend([
 
 TEST_SAMPLE_SET = set(TEST_SAMPLES)
 TEST_SAMPLE_PREFIXES = tuple(f"{name} - " for name in TEST_SAMPLES)
+HARD_SUBSET_MODES = ("none", "same_base_exclude_self")
 
 
 def is_test_sample_name(song_name):
@@ -298,6 +300,63 @@ def is_test_sample_name(song_name):
     if not song_name:
         return False
     return song_name in TEST_SAMPLE_SET or song_name.startswith(TEST_SAMPLE_PREFIXES)
+
+
+def base_name_for_song(song_name):
+    name = str(song_name or "").strip()
+    if " - " in name:
+        return name.split(" - ", 1)[0].strip()
+    return name
+
+
+def select_same_base_hard_subset_queries(dataset, min_family_size=3):
+    families = {}
+    for item in dataset:
+        song_name = str(item.get("SongName") or "").strip()
+        if not song_name:
+            continue
+        base_name = base_name_for_song(song_name)
+        families.setdefault(base_name, []).append(item)
+
+    selected = []
+    for item in dataset:
+        song_name = str(item.get("SongName") or "").strip()
+        if not song_name:
+            continue
+        base_name = base_name_for_song(song_name)
+        if len(families.get(base_name, [])) >= int(min_family_size):
+            selected.append(item)
+    return selected
+
+
+def candidate_pool_size_for_query(query_item, kb_items, hard_subset_mode="none"):
+    if hard_subset_mode != "same_base_exclude_self":
+        return len(kb_items)
+
+    query_name = str(query_item.get("SongName") or "").strip()
+    query_base = base_name_for_song(query_name)
+    return sum(
+        1
+        for item in kb_items
+        if base_name_for_song(item.get("SongName")) == query_base
+        and str(item.get("SongName") or "").strip() != query_name
+    )
+
+
+def filter_ranked_results_for_query(query_item, ranked_results, hard_subset_mode="none"):
+    if hard_subset_mode == "none":
+        return list(ranked_results or [])
+    if hard_subset_mode != "same_base_exclude_self":
+        raise ValueError(f"Unsupported hard_subset_mode: {hard_subset_mode}")
+
+    query_name = str(query_item.get("SongName") or "").strip()
+    query_base = base_name_for_song(query_name)
+    return [
+        item
+        for item in (ranked_results or [])
+        if base_name_for_song(item.get("SongName")) == query_base
+        and str(item.get("SongName") or "").strip() != query_name
+    ]
 
 
 # 定义效果器
@@ -692,7 +751,26 @@ def main():
         "--test_list",
         type=str,
         default="",
-        help="Optional newline-separated SongName list for the held-out queries (overrides built-in TEST_SAMPLES).",
+        help="Legacy alias for an explicit held-out SongName list file. Prefer --query_split file:/path/to/test.txt.",
+    )
+    ap.add_argument(
+        "--query_split",
+        type=str,
+        default="",
+        help="Optional query split selector. Supports built-in aliases (5/30/31) or file:/path/to/test.txt.",
+    )
+    ap.add_argument(
+        "--hard_subset_mode",
+        type=str,
+        default="none",
+        choices=HARD_SUBSET_MODES,
+        help="Optional diagnostic protocol. 'same_base_exclude_self' evaluates retrieval only within the same base_name family and excludes the query itself.",
+    )
+    ap.add_argument(
+        "--hard_subset_min_family_size",
+        type=int,
+        default=3,
+        help="Minimum family size for hard-subset eligibility (default: 3).",
     )
     ap.add_argument(
         "--with_pure_llm",
@@ -710,26 +788,41 @@ def main():
     data = load_and_merge_data()
 
     # 分离测试集和知识库
-    test_name_set = TEST_SAMPLE_SET
-    if args.test_list:
-        test_list_path = Path(args.test_list)
-        if not test_list_path.exists():
-            raise FileNotFoundError(f"--test_list not found: {test_list_path}")
-        names = []
-        for line in test_list_path.read_text(encoding="utf-8").splitlines():
-            s = line.strip()
-            if not s or s.startswith("#"):
-                continue
-            names.append(s)
-        test_name_set = set(names)
-        print(f"[Split] Loaded held-out query list from {test_list_path} (n={len(test_name_set)})")
-
-    test_items = [d for d in data if d.get('SongName') in test_name_set]
-    kb_items = [d for d in data if d.get('SongName') not in test_name_set]
+    if args.hard_subset_mode != "none":
+        if args.query_split or args.test_list:
+            print("[HardSubset] Ignoring --query_split/--test_list and building a standalone same-base diagnostic protocol.")
+        test_items = select_same_base_hard_subset_queries(data, min_family_size=args.hard_subset_min_family_size)
+        kb_items = list(data)
+        print(
+            f"[HardSubset] mode={args.hard_subset_mode} min_family_size={args.hard_subset_min_family_size} "
+            f"eligible_queries={len(test_items)}"
+        )
+    else:
+        split_selector = args.query_split or (f"file:{args.test_list}" if args.test_list else "")
+        if split_selector:
+            selection = select_query_indices(data, split_selector, default_split="30")
+            test_index_set = set(selection.test_indices)
+            test_items = [data[i] for i in selection.test_indices]
+            kb_items = [item for i, item in enumerate(data) if i not in test_index_set]
+            print(f"[Split] Selector={selection.split} matched {len(selection.found_names)}/{len(selection.requested_names)} names")
+            if selection.missing_names:
+                preview = ", ".join(selection.missing_names[:5])
+                print(f"[Split] Missing {len(selection.missing_names)} requested names: {preview}")
+            if selection.used_random_fallback:
+                print(f"[Split] WARNING: selector {selection.split} had no matches; used deterministic random fallback.")
+        else:
+            test_name_set = TEST_SAMPLE_SET
+            test_items = [d for d in data if d.get('SongName') in test_name_set]
+            kb_items = [d for d in data if d.get('SongName') not in test_name_set]
+            print(f"[Split] Using built-in held-out pool (n={len(test_items)})")
 
     print(f"总数据: {len(data)} 样本")
     print(f"测试集: {len(test_items)} 样本")
     print(f"知识库: {len(kb_items)} 样本")
+    if not test_items:
+        raise SystemExit("No held-out queries found. Check your dataset JSON and/or --query_split/--test_list.")
+    if not kb_items:
+        raise SystemExit("Knowledge base is empty after split selection. Check your --query_split/--test_list.")
 
     # 2. 初始化检索器
     print("\n[2] 初始化检索器...")
@@ -741,7 +834,11 @@ def main():
     panns_retrieval = PANNsRetriever(kb_items)
     trr_retrieval = TRRRetrieval(kb_items)
     include_pure_llm = bool(args.with_pure_llm)
+    if include_pure_llm and args.hard_subset_mode != "none":
+        print(">> [HardSubset] PureLLM baseline disabled for same-base retrieval diagnostics.")
+        include_pure_llm = False
     pure_llm = PureLLMGeneration() if include_pure_llm else None
+    retrieve_k = len(kb_items) if args.hard_subset_mode != "none" else 1
 
     print(">> 所有检索器初始化完成")
     if not clap_retrieval.is_available:
@@ -776,6 +873,7 @@ def main():
         results['PureLLM'] = {'l2': [], 'acc': [], 'recall': [], 'cosine': [], 'style': [], 'module': []}
 
     per_query_rows = []
+    current_candidate_pool_size = ""
 
     def record_row(
         query_idx: int,
@@ -801,6 +899,8 @@ def main():
                 "cosine": cosine,
                 "module": module,
                 "missing": missing,
+                "hard_subset_mode": args.hard_subset_mode,
+                "candidate_pool_size": current_candidate_pool_size,
             }
         )
 
@@ -813,8 +913,15 @@ def main():
         name = test_item['SongName']
         gt_params = test_item['Parameters']
         gt_style = test_item.get('Style', [])
+        current_candidate_pool_size = candidate_pool_size_for_query(
+            test_item,
+            kb_items,
+            hard_subset_mode=args.hard_subset_mode,
+        )
 
         print(f"\n[{idx}/{len(test_items)}] {name}")
+        if args.hard_subset_mode != "none":
+            print(f"  [HardSubset] candidate_pool={current_candidate_pool_size}")
 
         # 纯LLM直接生成 (不使用检索) - optional (slow / network)
         if include_pure_llm:
@@ -865,7 +972,11 @@ def main():
                     print(f"  Pure LLM:   L2={l2:.4f} Acc={acc:.4f} Recall={recall:.4f} Cos={cosine:.4f} Style={style:.4f} Module={module:.4f} | Fallback")
 
         # 纯文本检索
-        text_results = text_retrieval.retrieve(test_item, k=1)
+        text_results = filter_ranked_results_for_query(
+            test_item,
+            text_retrieval.retrieve(test_item, k=retrieve_k),
+            hard_subset_mode=args.hard_subset_mode,
+        )
         if text_results:
             retrieved_params = text_results[0].get('Parameters', {})
             l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
@@ -889,7 +1000,11 @@ def main():
             record_row(idx, name, "Text-RAG", "", "", "", "", "", "", 1)
 
         # Wav2Vec检索
-        w2v_results = wav2vec_retrieval.retrieve(test_item, k=1)
+        w2v_results = filter_ranked_results_for_query(
+            test_item,
+            wav2vec_retrieval.retrieve(test_item, k=retrieve_k),
+            hard_subset_mode=args.hard_subset_mode,
+        )
         if w2v_results:
             retrieved_params = w2v_results[0].get('Parameters', {})
             l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
@@ -913,7 +1028,11 @@ def main():
             record_row(idx, name, "Wav2Vec-RAG", "", "", "", "", "", "", 1)
 
         # FeatureNN检索
-        fnn_results = featurenn_retrieval.retrieve(test_item, k=1)
+        fnn_results = filter_ranked_results_for_query(
+            test_item,
+            featurenn_retrieval.retrieve(test_item, k=retrieve_k),
+            hard_subset_mode=args.hard_subset_mode,
+        )
         if fnn_results:
             retrieved_params = fnn_results[0].get('Parameters', {})
             l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
@@ -937,7 +1056,11 @@ def main():
             record_row(idx, name, "FeatureNN-RAG", "", "", "", "", "", "", 1)
 
         # CLAP检索
-        clap_results = clap_retrieval.retrieve(test_item, k=1)
+        clap_results = filter_ranked_results_for_query(
+            test_item,
+            clap_retrieval.retrieve(test_item, k=retrieve_k),
+            hard_subset_mode=args.hard_subset_mode,
+        )
         if clap_results:
             retrieved_params = clap_results[0].get('Parameters', {})
             l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
@@ -961,7 +1084,11 @@ def main():
             record_row(idx, name, "CLAP", "", "", "", "", "", "", 1)
 
         # PaSST检索
-        passt_results = passt_retrieval.retrieve(test_item, k=1)
+        passt_results = filter_ranked_results_for_query(
+            test_item,
+            passt_retrieval.retrieve(test_item, k=retrieve_k),
+            hard_subset_mode=args.hard_subset_mode,
+        )
         if passt_results:
             retrieved_params = passt_results[0].get('Parameters', {})
             l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
@@ -985,7 +1112,11 @@ def main():
             record_row(idx, name, "PaSST", "", "", "", "", "", "", 1)
 
         # PANNs检索
-        panns_results = panns_retrieval.retrieve(test_item, k=1)
+        panns_results = filter_ranked_results_for_query(
+            test_item,
+            panns_retrieval.retrieve(test_item, k=retrieve_k),
+            hard_subset_mode=args.hard_subset_mode,
+        )
         if panns_results:
             retrieved_params = panns_results[0].get('Parameters', {})
             l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
@@ -1009,7 +1140,11 @@ def main():
             record_row(idx, name, "PANNs", "", "", "", "", "", "", 1)
 
         # TRR检索
-        trr_results = trr_retrieval.retrieve(test_item, k=1)
+        trr_results = filter_ranked_results_for_query(
+            test_item,
+            trr_retrieval.retrieve(test_item, k=retrieve_k),
+            hard_subset_mode=args.hard_subset_mode,
+        )
         if trr_results:
             retrieved_params = trr_results[0].get('Parameters', {})
             l2 = evaluator.compute_parameter_distance(retrieved_params, gt_params)
@@ -1127,6 +1262,8 @@ def main():
             "cosine",
             "module",
             "missing",
+            "hard_subset_mode",
+            "candidate_pool_size",
         ]
         with out_path.open("w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=fieldnames)

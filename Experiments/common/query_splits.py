@@ -5,6 +5,7 @@ Shared query split definitions for reproducible experiment scripts.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
 import numpy as np
@@ -87,6 +88,55 @@ class QuerySplitSelection:
     used_random_fallback: bool
 
 
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[2]
+
+
+def _read_query_name_file(path: Path) -> List[str]:
+    names: List[str] = []
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        name = raw.strip()
+        if not name or name.startswith("#"):
+            continue
+        names.append(name)
+    return names
+
+
+def _resolve_existing_path(path_str: str) -> Optional[Path]:
+    raw_path = Path(path_str).expanduser()
+    candidates = [raw_path]
+    if not raw_path.is_absolute():
+        candidates.append(_repo_root() / raw_path)
+    for candidate in candidates:
+        if candidate.exists() and candidate.is_file():
+            return candidate.resolve()
+    return None
+
+
+def resolve_query_selector_file(split_selector: Optional[str]) -> Optional[Path]:
+    """
+    Resolve explicit file-based selectors.
+
+    Supported forms:
+    - ``file:/abs/or/relative/path.txt``
+    - plain existing file path (best-effort convenience)
+    """
+    raw = (split_selector or "").strip()
+    if not raw:
+        return None
+
+    if raw.lower().startswith("file:"):
+        target = raw[5:].strip()
+        if not target:
+            raise ValueError("Empty file selector. Use file:/path/to/test.txt")
+        resolved = _resolve_existing_path(target)
+        if resolved is None:
+            raise FileNotFoundError(f"Query split file not found: {target}")
+        return resolved
+
+    return _resolve_existing_path(raw)
+
+
 def normalize_query_split(split_selector: Optional[str], default_split: str = "30") -> str:
     """
     Normalize user/environment split selectors to canonical split labels.
@@ -122,8 +172,15 @@ def select_query_indices(
     """
     Resolve query indices by SongName, with deterministic random fallback.
     """
-    split = normalize_query_split(split_selector, default_split=default_split)
-    requested_names = get_query_names(split)
+    selector_file = resolve_query_selector_file(split_selector)
+    if selector_file is not None:
+        split = f"file:{selector_file}"
+        requested_names = _read_query_name_file(selector_file)
+        allow_random_fallback = False
+    else:
+        split = normalize_query_split(split_selector, default_split=default_split)
+        requested_names = get_query_names(split)
+        allow_random_fallback = True
 
     name_to_idx = {item.get("SongName"): i for i, item in enumerate(dataset)}
     found_names = [name for name in requested_names if name in name_to_idx]
@@ -137,6 +194,16 @@ def select_query_indices(
             found_names=found_names,
             missing_names=missing_names,
             test_indices=test_indices,
+            used_random_fallback=False,
+        )
+
+    if not allow_random_fallback:
+        return QuerySplitSelection(
+            split=split,
+            requested_names=requested_names,
+            found_names=[],
+            missing_names=missing_names,
+            test_indices=[],
             used_random_fallback=False,
         )
 

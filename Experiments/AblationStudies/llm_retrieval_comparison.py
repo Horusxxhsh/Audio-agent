@@ -28,6 +28,7 @@ sys.path.append(common_dir)
 
 from dataset_loader import load_and_merge_data
 from evaluate import Evaluator
+from query_splits import select_query_indices
 
 try:
     from openai import OpenAI
@@ -464,7 +465,8 @@ def copy_params_with_onoff(reference_params, onoff_pattern):
 def main() -> None:
     ap = argparse.ArgumentParser(description="Protocol-B: Retrieval + LLM ablations (cache-first, no network by default).")
     ap.add_argument("--dump_csv", type=str, default="", help="Optional path to write per-query metrics CSV.")
-    ap.add_argument("--test_list", type=str, default="", help="Optional newline-separated SongName list for held-out queries.")
+    ap.add_argument("--test_list", type=str, default="", help="Legacy alias for an explicit held-out SongName list file. Prefer --query_split file:/path/to/test.txt.")
+    ap.add_argument("--query_split", type=str, default="", help="Optional query split selector. Supports built-in aliases (5/30/31) or file:/path/to/test.txt.")
     ap.add_argument("--k", type=int, default=5, help="Top-K for TRR aggregation baselines (default: 5).")
     ap.add_argument(
         "--llm_cache_dir",
@@ -490,26 +492,31 @@ def main() -> None:
     data = load_and_merge_data()
 
     # 2) Split held-out vs KB
-    test_name_set = DEFAULT_TEST_NAME_SET
-    if args.test_list:
-        test_list_path = Path(args.test_list)
-        if not test_list_path.exists():
-            raise FileNotFoundError(f"--test_list not found: {test_list_path}")
-        names = []
-        for line in test_list_path.read_text(encoding="utf-8").splitlines():
-            s = line.strip()
-            if not s or s.startswith("#"):
-                continue
-            names.append(s)
-        test_name_set = set(names)
-        print(f"[Split] Loaded held-out query list from {test_list_path} (n={len(test_name_set)})")
-
-    test_items = [d for d in data if d.get("SongName") in test_name_set]
-    kb_items = [d for d in data if d.get("SongName") not in test_name_set]
+    split_selector = args.query_split or (f"file:{args.test_list}" if args.test_list else "")
+    if split_selector:
+        selection = select_query_indices(data, split_selector, default_split="30")
+        test_index_set = set(selection.test_indices)
+        test_items = [data[i] for i in selection.test_indices]
+        kb_items = [item for i, item in enumerate(data) if i not in test_index_set]
+        print(f"[Split] Selector={selection.split} matched {len(selection.found_names)}/{len(selection.requested_names)} names")
+        if selection.missing_names:
+            preview = ", ".join(selection.missing_names[:5])
+            print(f"[Split] Missing {len(selection.missing_names)} requested names: {preview}")
+        if selection.used_random_fallback:
+            print(f"[Split] WARNING: selector {selection.split} had no matches; used deterministic random fallback.")
+    else:
+        test_name_set = DEFAULT_TEST_NAME_SET
+        test_items = [d for d in data if d.get("SongName") in test_name_set]
+        kb_items = [d for d in data if d.get("SongName") not in test_name_set]
+        print(f"[Split] Using built-in held-out pool (n={len(test_items)})")
 
     print(f"总数据: {len(data)} 样本")
     print(f"测试集: {len(test_items)} 样本")
     print(f"知识库: {len(kb_items)} 样本")
+    if not test_items:
+        raise SystemExit("No held-out queries found. Check your dataset JSON and/or --query_split/--test_list.")
+    if not kb_items:
+        raise SystemExit("Knowledge base is empty after split selection. Check your --query_split/--test_list.")
 
     # 3) Init retrievers + projection ranges
     print("\n[2] 初始化检索器...")
