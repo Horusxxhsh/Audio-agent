@@ -1,0 +1,30 @@
+\chapter{证据资产与归档结构}
+
+本次报告生成前，实验材料已经被整理到 \texttt{Experiments/AblationStudies/organized\_experiment\_data/}。该目录承担当前工作区可见材料的证据快照角色，不承担新的实验运行职责。它包含 \texttt{MANIFEST.csv}、\texttt{checksums.sha256}、P0 报告与脚本、Protocol A/B/C 结果、fusion beta sweep 以及 legacy retrieval report。所有归档文件都有 checksum，便于后续判断内容是否被改动。
+
+证据资产评价的关键是文件能够支持什么强度的结论。Protocol-A audio-grouped 的 CSV、JSON 和 Markdown 统计报告能够支撑当前主结果；Protocol-C 的 CSV/JSON/MD 能支撑 fallback 与 conflict failure 诊断；listening test 的统计报告能支撑主观补充分析；P0 报告缺少原始 outputs，只能作为复现入口；Protocol-B 和 legacy report 明确不应进入主证据链。
+
+\begin{table}[H]
+	\centering
+	\caption{主要证据资产、来源状态与论文用途。}
+	\label{tab:artifact-inventory}
+	\small
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{lll}
+		\toprule
+			资产组 & 来源状态 & 论文用途 \\
+		\midrule
+		\texttt{protocolA\_audio\_grouped\_*} & workspace untracked & 主证据；严格切分下 TRR 对比。 \\
+		\texttt{protocolA\_*\_with\_clap*} & workspace untracked & 诊断或补充；211-query 口径不得混入主表。 \\
+		\texttt{protocolC\_*} & workspace ignored & 辅助诊断；说明 fusion fallback 与 conflict failure。 \\
+		\texttt{results\_report.md} & workspace file & 听测补充；说明主观评分与统计限制。 \\
+		\texttt{P0\_Experiments\_Report.md} & \texttt{origin/master} snapshot & 复现入口；缺少原始 outputs 前不能正式引用。 \\
+		\texttt{protocolB\_*} & workspace ignored & deprecated 历史材料。 \\
+		\texttt{retrieval\_comparison\_report.md} & tracked legacy & 追溯早期叙事，不作为 TMM 主证据。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+表~\ref{tab:artifact-inventory} 也解释了为什么本报告没有直接采用 P0 E2/E3 中 PaSST 与 PANNs 的数值。虽然 P0 报告给出了这些方法的 204-query 汇总，但 \texttt{missing\_outputs.md} 已确认对应的 \texttt{e2\_summary.csv}、\texttt{e2\_stats.json}、\texttt{e3\_overall\_summary.csv} 等原始文件缺失。学术论文可以引用报告作为待复现线索，却不能把缺少原始产物的结果写成主表事实。
+
+为了让后续写作不再次漂移，建议将证据资产冻结为三个目录层级。第一层是主证据目录，只包含 204 条 audio-grouped Protocol-A 结果和 split audit。第二层是诊断目录，包含 Protocol-C 和 listening test。第三层是历史与待补目录，包含 P0、Protocol-B 和 legacy retrieval report。这个结构有助于在写作中持续区分 repo-observed fact 与 design intent。

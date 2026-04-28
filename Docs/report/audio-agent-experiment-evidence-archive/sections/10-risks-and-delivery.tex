@@ -1,0 +1,58 @@
+\chapter{KaiMing Gate：风险、验收与论文写作前置条件}
+\label{chap:risks}
+
+本文的主要结论是保守的。TRR 在当前 guitar-effects、resolved-audio-grouped、retrieval-only benchmark 上，是已评估检索表示中参数对齐最强的 retrieval prior。该结论由 204 条测试查询、1063 条知识库记录、CLAP 共享查询、bootstrap confidence intervals 和 paired permutation tests 支撑。它足以构成一篇围绕 retrieval-grounded editable audio effect control 的方法与实验证据报告，但不足以支撑通用音频表示、端到端主观质量或完整自动化音频系统的强 claim。
+
+KaiMing gate 用于防止论文在证据尚未闭合时提前固化。当前阶段允许撰写 abstract sketch、method skeleton、experiment checklist 和 appendix template；不允许锁定 NeurIPS 主表、正式 conclusion 或强 novelty claim。主论文启动条件应由表~\ref{tab:kaiming-gates} 控制。
+
+\begin{table}[H]
+	\centering
+	\caption{KaiMing gate 与论文写作前置条件。}
+	\label{tab:kaiming-gates}
+	\scriptsize
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{p{0.17\textwidth}p{0.31\textwidth}p{0.26\textwidth}p{0.18\textwidth}}
+		\toprule
+		Gate & 必须通过的证据 & 失败时的论文处理 & 状态 \\
+		\midrule
+		Formulation gate & 任务、输入、输出、risk、指标和 executable constraint 已在报告中冻结 & 回到问题定义，不写 introduction claim & 已写入本报告，待审阅。 \\
+		Baseline gate & PaSST、PANNs、direct regression、Text2FX-style baseline 与 TRR 同口径比较 & 主表不能声称 SOTA-level superiority & 待实验。 \\
+		Ablation gate & 二阶纹理统计、层选择、归一化和 top-k 设计有可解释贡献 & 方法贡献降级为经验性检索特征 & 待实验。 \\
+		Leakage gate & exact duplicate、near duplicate 和 family split 风险已审计 & 降低 claim 或更换主协议 & 部分完成。 \\
+		Robustness gate & 真实音频退化与 conflict 场景均披露正负结果 & 鲁棒性只写为边界诊断 & 待实验。 \\
+		Perception gate & 参数指标与听感评分关系已估计，或明确证明相关性不足 & 参数指标限定为 controllability proxy & 待实验。 \\
+		Reproducibility gate & logger、checksum、run scripts、anonymous package 和 checklist 对齐 & 只能作为内部报告或 workshop draft & 待实现。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+第一个局限是数据域。当前 benchmark 主要围绕吉他效果预设展开，参数结构也绑定于特定效果链。TRR 对该域有效，并不自动意味着它对鼓组、人声、混音母带或开放世界音频编辑同样有效。第二个局限是指标。Param. Dist.、Acc@0.1、Recall、Cosine 和 Module 都是参数空间指标，不能完全替代听感距离。第三个局限是协议。严格 split 已消除 exact resolved-audio reuse，但 near-duplicate 风险仍需更强审计。第四个局限是工程证据。产品链路存在，但主实验没有直接评价完整插件输出音频。
+
+第二个需要明确的风险是融合边界。Protocol-C 说明 fusion 可以在单模态退化时退回到较可信模态，但 conflict 场景中的 Fusion L2=4.5259 远高于 TRR-only 的 0.2970，说明当前融合规则仍无法可靠处理相互矛盾的文本与音频输入。若后续要扩展融合主张，必须新增独立协议，定义冲突输入、真实退化、失败类型和统计检验。
+
+\begin{table}[H]
+	\centering
+	\caption{主张、证据与允许措辞矩阵。}
+	\label{tab:claim-matrix}
+	\small
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{lll}
+		\toprule
+			主张 & 证据状态 & 允许措辞 \\
+		\midrule
+		TRR 优于当前已评估检索基线 & 204 audio-grouped Protocol-A 支撑 & 可以作为主结论。 \\
+		TRR 是通用最优音频表示 & 无跨域证据 & 不应声称。 \\
+		Fusion 具备 fallback 行为 & Protocol-C 支撑 & 可作为诊断结论。 \\
+		Fusion 全面优于 TRR-only & conflict 场景反证 & 不应声称。 \\
+		TRR-based system 有主观感知价值 & 听测补充支持 & 可保守表述为主观背景。 \\
+		系统严格优于人工调参或 MusicGen & 元数据与统计边界不足 & 不应声称。 \\
+		P0 PaSST/PANNs 已正式验证 & 原始 outputs 缺失 & 只能作为待复现线索。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+表~\ref{tab:claim-matrix} 是本文最终结论的约束条件。后续交付应按三个优先级推进。首先，冻结主证据：将 204 条 audio-grouped Protocol-A、Protocol-C 和 listening test 作为 canonical artifacts，明确路径、命令和 checksum。其次，补齐 P0：找回或复现 P0 E2/E3 outputs，若无法补齐，则不要把 P0 数值并入主文。最后，扩展实验：若要主张真实鲁棒性或端到端听感优势，需要新增真实音频退化和插件输出音频的独立协议。
+
+在当前证据条件下，最合适的论文式结论是：TRR 将深层音频特征的二阶纹理统计用于可执行音频效果参数检索，在当前严格 guitar-effects 检索基准中，相比文本、Wav2Vec、FeatureNN 和 CLAP 等已评估基线表现出更好的参数对齐。该结论窄而可审计，是继续推进正式论文、复现实验和后续系统验证的合理基础。
+
+因此，本报告对下一阶段的监督结论是：先执行 E0--E6，边做实验边更新本报告；当表~\ref{tab:kaiming-gates} 至少通过 formulation、baseline、ablation、leakage 和 reproducibility 五项后，再启动正式 NeurIPS manuscript drafting。若 4--6 周内无法通过 baseline 或 leakage gate，项目仍然可以形成严谨的 technical report，但不应以 NeurIPS main-track 强贡献论文为目标提交。
