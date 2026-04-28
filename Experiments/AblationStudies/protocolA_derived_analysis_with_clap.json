@@ -1,0 +1,647 @@
+{
+  "input_csv": "/Users/xyh/Code/Audio-agent/Experiments/AblationStudies/protocolA_per_query_metrics_with_strong_baselines.csv",
+  "query_count": 211,
+  "unique_query_names": 210,
+  "baselines": [
+    {
+      "baseline": "CLAP",
+      "n_shared_queries": 211,
+      "metric_summaries": {
+        "l2": {
+          "n": 211,
+          "wins": 92,
+          "losses": 14,
+          "ties": 105,
+          "mean": 11.3425784353541,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.4711773015492057,
+          "min": -0.2810142764031621,
+          "max": 71.7172389230164
+        },
+        "acc@0.1": {
+          "n": 211,
+          "wins": 92,
+          "losses": 14,
+          "ties": 105,
+          "mean": 0.14148355405393195,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.33333333333333337,
+          "min": -0.23076923076923073,
+          "max": 0.6346153846153846
+        },
+        "recall": {
+          "n": 211,
+          "wins": 84,
+          "losses": 7,
+          "ties": 120,
+          "mean": 0.21454169842795434,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.5454545454545454,
+          "min": -0.2142857142857143,
+          "max": 0.9166666666666666
+        },
+        "cosine": {
+          "n": 211,
+          "wins": 92,
+          "losses": 14,
+          "ties": 105,
+          "mean": 0.24431935701802782,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.41696391092080665,
+          "min": -0.13353144684510576,
+          "max": 0.999098184965331
+        },
+        "module": {
+          "n": 211,
+          "wins": 70,
+          "losses": 7,
+          "ties": 134,
+          "mean": 0.15650342285413388,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.4166666666666667,
+          "min": -0.16666666666666663,
+          "max": 0.8
+        }
+      },
+      "top_gains_l2": [
+        {
+          "query_idx": 8,
+          "query_name": "Math Rock Crystal",
+          "trr_retrieved": "Math Rock Crystal Cleans",
+          "baseline_retrieved": "Heavy Reverb Vox",
+          "delta_l2": 71.7172389230164,
+          "trr_l2": 0.1944605218279546,
+          "baseline_l2": 71.91169944484434
+        },
+        {
+          "query_idx": 35,
+          "query_name": "Math Rock Crystal - Alt Take",
+          "trr_retrieved": "Math Rock Crystal Cleans",
+          "baseline_retrieved": "Heavy Reverb Vox",
+          "delta_l2": 71.7172389230164,
+          "trr_l2": 0.1944605218279546,
+          "baseline_l2": 71.91169944484434
+        },
+        {
+          "query_idx": 65,
+          "query_name": "Math Rock Crystal - Studio Mix",
+          "trr_retrieved": "Math Rock Crystal Cleans",
+          "baseline_retrieved": "Heavy Reverb Vox",
+          "delta_l2": 71.7172389230164,
+          "trr_l2": 0.1944605218279546,
+          "baseline_l2": 71.91169944484434
+        },
+        {
+          "query_idx": 95,
+          "query_name": "Math Rock Crystal - Session Pass",
+          "trr_retrieved": "Math Rock Crystal Cleans",
+          "baseline_retrieved": "Heavy Reverb Vox",
+          "delta_l2": 71.7172389230164,
+          "trr_l2": 0.1944605218279546,
+          "baseline_l2": 71.91169944484434
+        },
+        {
+          "query_idx": 125,
+          "query_name": "Math Rock Crystal - Extended Edit",
+          "trr_retrieved": "Math Rock Crystal Cleans",
+          "baseline_retrieved": "Heavy Reverb Vox",
+          "delta_l2": 71.7172389230164,
+          "trr_l2": 0.1944605218279546,
+          "baseline_l2": 71.91169944484434
+        }
+      ],
+      "top_failures_l2": [
+        {
+          "query_idx": 21,
+          "query_name": "80s Hair Metal",
+          "trr_retrieved": "80s Hair Metal Arena",
+          "baseline_retrieved": "80s Hair Metal Arena",
+          "delta_l2": -0.2810142764031621,
+          "trr_l2": 0.2908200831600713,
+          "baseline_l2": 0.009805806756909202
+        },
+        {
+          "query_idx": 37,
+          "query_name": "80s Hair Metal - High Gain Forge",
+          "trr_retrieved": "80s Hair Metal Arena",
+          "baseline_retrieved": "80s Hair Metal Arena",
+          "delta_l2": -0.2810142764031621,
+          "trr_l2": 0.2908200831600713,
+          "baseline_l2": 0.009805806756909202
+        },
+        {
+          "query_idx": 67,
+          "query_name": "80s Hair Metal - Steel Edge Mix",
+          "trr_retrieved": "80s Hair Metal Arena",
+          "baseline_retrieved": "80s Hair Metal Arena",
+          "delta_l2": -0.2810142764031621,
+          "trr_l2": 0.2908200831600713,
+          "baseline_l2": 0.009805806756909202
+        },
+        {
+          "query_idx": 97,
+          "query_name": "80s Hair Metal - Palm Mute Crush",
+          "trr_retrieved": "80s Hair Metal Arena",
+          "baseline_retrieved": "80s Hair Metal Arena",
+          "delta_l2": -0.2810142764031621,
+          "trr_l2": 0.2908200831600713,
+          "baseline_l2": 0.009805806756909202
+        },
+        {
+          "query_idx": 127,
+          "query_name": "80s Hair Metal - Heavy Riff Pass",
+          "trr_retrieved": "80s Hair Metal Arena",
+          "baseline_retrieved": "80s Hair Metal Arena",
+          "delta_l2": -0.2810142764031621,
+          "trr_l2": 0.2908200831600713,
+          "baseline_l2": 0.009805806756909202
+        }
+      ]
+    },
+    {
+      "baseline": "FeatureNN-RAG",
+      "n_shared_queries": 211,
+      "metric_summaries": {
+        "l2": {
+          "n": 211,
+          "wins": 43,
+          "losses": 14,
+          "ties": 154,
+          "mean": 0.8665604731892322,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.34406448468674555,
+          "max": 20.84204270373435
+        },
+        "acc@0.1": {
+          "n": 211,
+          "wins": 49,
+          "losses": 8,
+          "ties": 154,
+          "mean": 0.04888537627043616,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.23809523809523808,
+          "max": 0.6470588235294117
+        },
+        "recall": {
+          "n": 211,
+          "wins": 28,
+          "losses": 22,
+          "ties": 161,
+          "mean": 0.05050210453054055,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.4,
+          "max": 1.0
+        },
+        "cosine": {
+          "n": 211,
+          "wins": 43,
+          "losses": 14,
+          "ties": 154,
+          "mean": 0.061959544080371874,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.4584146821163301,
+          "max": 0.9953972347669282
+        },
+        "module": {
+          "n": 211,
+          "wins": 14,
+          "losses": 21,
+          "ties": 176,
+          "mean": -0.002764612954186419,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.6666666666666667,
+          "max": 0.8333333333333334
+        }
+      },
+      "top_gains_l2": [
+        {
+          "query_idx": 19,
+          "query_name": "Hard Rock Crunch",
+          "trr_retrieved": "Studio Clean",
+          "baseline_retrieved": "Auto-Tune Pop",
+          "delta_l2": 20.84204270373435,
+          "trr_l2": 0.15757856241676194,
+          "baseline_l2": 20.999621266151113
+        },
+        {
+          "query_idx": 52,
+          "query_name": "Hard Rock Crunch - Vintage Drive Mix",
+          "trr_retrieved": "Studio Clean",
+          "baseline_retrieved": "Auto-Tune Pop",
+          "delta_l2": 20.84204270373435,
+          "trr_l2": 0.15757856241676194,
+          "baseline_l2": 20.999621266151113
+        },
+        {
+          "query_idx": 82,
+          "query_name": "Hard Rock Crunch - Raw Amp Pass",
+          "trr_retrieved": "Studio Clean",
+          "baseline_retrieved": "Auto-Tune Pop",
+          "delta_l2": 20.84204270373435,
+          "trr_l2": 0.15757856241676194,
+          "baseline_l2": 20.999621266151113
+        },
+        {
+          "query_idx": 112,
+          "query_name": "Hard Rock Crunch - Grit Stack Take",
+          "trr_retrieved": "Studio Clean",
+          "baseline_retrieved": "Auto-Tune Pop",
+          "delta_l2": 20.84204270373435,
+          "trr_l2": 0.15757856241676194,
+          "baseline_l2": 20.999621266151113
+        },
+        {
+          "query_idx": 142,
+          "query_name": "Hard Rock Crunch - Classic Crunch Edit",
+          "trr_retrieved": "Studio Clean",
+          "baseline_retrieved": "Auto-Tune Pop",
+          "delta_l2": 20.84204270373435,
+          "trr_l2": 0.15757856241676194,
+          "baseline_l2": 20.999621266151113
+        }
+      ],
+      "top_failures_l2": [
+        {
+          "query_idx": 9,
+          "query_name": "Tweed Breakup",
+          "trr_retrieved": "Vintage Tweed Breakup",
+          "baseline_retrieved": "Piano House",
+          "delta_l2": -0.34406448468674555,
+          "trr_l2": 0.4935295397999726,
+          "baseline_l2": 0.14946505511322708
+        },
+        {
+          "query_idx": 33,
+          "query_name": "Tweed Breakup - Vintage Drive Mix",
+          "trr_retrieved": "Vintage Tweed Breakup",
+          "baseline_retrieved": "Piano House",
+          "delta_l2": -0.34406448468674555,
+          "trr_l2": 0.4935295397999726,
+          "baseline_l2": 0.14946505511322708
+        },
+        {
+          "query_idx": 63,
+          "query_name": "Tweed Breakup - Raw Amp Pass",
+          "trr_retrieved": "Vintage Tweed Breakup",
+          "baseline_retrieved": "Piano House",
+          "delta_l2": -0.34406448468674555,
+          "trr_l2": 0.4935295397999726,
+          "baseline_l2": 0.14946505511322708
+        },
+        {
+          "query_idx": 93,
+          "query_name": "Tweed Breakup - Grit Stack Take",
+          "trr_retrieved": "Vintage Tweed Breakup",
+          "baseline_retrieved": "Piano House",
+          "delta_l2": -0.34406448468674555,
+          "trr_l2": 0.4935295397999726,
+          "baseline_l2": 0.14946505511322708
+        },
+        {
+          "query_idx": 123,
+          "query_name": "Tweed Breakup - Classic Crunch Edit",
+          "trr_retrieved": "Vintage Tweed Breakup",
+          "baseline_retrieved": "Piano House",
+          "delta_l2": -0.34406448468674555,
+          "trr_l2": 0.4935295397999726,
+          "baseline_l2": 0.14946505511322708
+        }
+      ]
+    },
+    {
+      "baseline": "Text-RAG",
+      "n_shared_queries": 211,
+      "metric_summaries": {
+        "l2": {
+          "n": 211,
+          "wins": 43,
+          "losses": 14,
+          "ties": 154,
+          "mean": 0.15091726656872123,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.3379453977924725,
+          "max": 3.8829767110158944
+        },
+        "acc@0.1": {
+          "n": 211,
+          "wins": 35,
+          "losses": 22,
+          "ties": 154,
+          "mean": 0.021951610979588816,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.38095238095238093,
+          "max": 0.47058823529411764
+        },
+        "recall": {
+          "n": 211,
+          "wins": 28,
+          "losses": 14,
+          "ties": 169,
+          "mean": 0.05829715308388294,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.36363636363636365,
+          "max": 1.0
+        },
+        "cosine": {
+          "n": 211,
+          "wins": 43,
+          "losses": 14,
+          "ties": 154,
+          "mean": 0.09723692673954748,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.13353144684510576,
+          "max": 0.9970699242001179
+        },
+        "module": {
+          "n": 211,
+          "wins": 36,
+          "losses": 7,
+          "ties": 168,
+          "mean": 0.09494470774091629,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.19999999999999996,
+          "max": 0.8
+        }
+      },
+      "top_gains_l2": [
+        {
+          "query_idx": 15,
+          "query_name": "Brown Sound",
+          "trr_retrieved": "Brown Sound Modern",
+          "baseline_retrieved": "Saturated Drive Rhythm",
+          "delta_l2": 3.8829767110158944,
+          "trr_l2": 0.10533554047403243,
+          "baseline_l2": 3.9883122514899267
+        },
+        {
+          "query_idx": 46,
+          "query_name": "Brown Sound - Vintage Drive Mix",
+          "trr_retrieved": "Brown Sound Modern",
+          "baseline_retrieved": "Saturated Drive Rhythm",
+          "delta_l2": 3.8829767110158944,
+          "trr_l2": 0.10533554047403243,
+          "baseline_l2": 3.9883122514899267
+        },
+        {
+          "query_idx": 76,
+          "query_name": "Brown Sound - Raw Amp Pass",
+          "trr_retrieved": "Brown Sound Modern",
+          "baseline_retrieved": "Saturated Drive Rhythm",
+          "delta_l2": 3.8829767110158944,
+          "trr_l2": 0.10533554047403243,
+          "baseline_l2": 3.9883122514899267
+        },
+        {
+          "query_idx": 106,
+          "query_name": "Brown Sound - Grit Stack Take",
+          "trr_retrieved": "Brown Sound Modern",
+          "baseline_retrieved": "Saturated Drive Rhythm",
+          "delta_l2": 3.8829767110158944,
+          "trr_l2": 0.10533554047403243,
+          "baseline_l2": 3.9883122514899267
+        },
+        {
+          "query_idx": 136,
+          "query_name": "Brown Sound - Classic Crunch Edit",
+          "trr_retrieved": "Brown Sound Modern",
+          "baseline_retrieved": "Saturated Drive Rhythm",
+          "delta_l2": 3.8829767110158944,
+          "trr_l2": 0.10533554047403243,
+          "baseline_l2": 3.9883122514899267
+        }
+      ],
+      "top_failures_l2": [
+        {
+          "query_idx": 6,
+          "query_name": "Acoustic Sim",
+          "trr_retrieved": "Acoustic Sim Natural",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": -0.3379453977924725,
+          "trr_l2": 0.3594509563208867,
+          "baseline_l2": 0.02150555852841417
+        },
+        {
+          "query_idx": 39,
+          "query_name": "Acoustic Sim - Warm Room Take",
+          "trr_retrieved": "Acoustic Sim Natural",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": -0.3379453977924725,
+          "trr_l2": 0.3594509563208867,
+          "baseline_l2": 0.02150555852841417
+        },
+        {
+          "query_idx": 69,
+          "query_name": "Acoustic Sim - Open Chord Mix",
+          "trr_retrieved": "Acoustic Sim Natural",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": -0.3379453977924725,
+          "trr_l2": 0.3594509563208867,
+          "baseline_l2": 0.02150555852841417
+        },
+        {
+          "query_idx": 99,
+          "query_name": "Acoustic Sim - Glass Tone Pass",
+          "trr_retrieved": "Acoustic Sim Natural",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": -0.3379453977924725,
+          "trr_l2": 0.3594509563208867,
+          "baseline_l2": 0.02150555852841417
+        },
+        {
+          "query_idx": 129,
+          "query_name": "Acoustic Sim - Natural Body Edit",
+          "trr_retrieved": "Acoustic Sim Natural",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": -0.3379453977924725,
+          "trr_l2": 0.3594509563208867,
+          "baseline_l2": 0.02150555852841417
+        }
+      ]
+    },
+    {
+      "baseline": "Wav2Vec-RAG",
+      "n_shared_queries": 211,
+      "metric_summaries": {
+        "l2": {
+          "n": 211,
+          "wins": 43,
+          "losses": 14,
+          "ties": 154,
+          "mean": 0.05611598718873192,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.33171605010919325,
+          "max": 0.5281979537166575
+        },
+        "acc@0.1": {
+          "n": 211,
+          "wins": 49,
+          "losses": 8,
+          "ties": 154,
+          "mean": 0.0819433949255991,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.23076923076923073,
+          "max": 0.6438923395445134
+        },
+        "recall": {
+          "n": 211,
+          "wins": 50,
+          "losses": 7,
+          "ties": 154,
+          "mean": 0.12416951137330283,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.2142857142857143,
+          "max": 0.8333333333333334
+        },
+        "cosine": {
+          "n": 211,
+          "wins": 43,
+          "losses": 14,
+          "ties": 154,
+          "mean": 0.10117815104824089,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.13353144684510576,
+          "max": 0.8987356533226637
+        },
+        "module": {
+          "n": 211,
+          "wins": 22,
+          "losses": 14,
+          "ties": 175,
+          "mean": 0.04581358609794628,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "min": -0.6666666666666667,
+          "max": 0.8
+        }
+      },
+      "top_gains_l2": [
+        {
+          "query_idx": 8,
+          "query_name": "Math Rock Crystal",
+          "trr_retrieved": "Math Rock Crystal Cleans",
+          "baseline_retrieved": "Telephone EQ",
+          "delta_l2": 0.5281979537166575,
+          "trr_l2": 0.1944605218279546,
+          "baseline_l2": 0.722658475544612
+        },
+        {
+          "query_idx": 35,
+          "query_name": "Math Rock Crystal - Alt Take",
+          "trr_retrieved": "Math Rock Crystal Cleans",
+          "baseline_retrieved": "Telephone EQ",
+          "delta_l2": 0.5281979537166575,
+          "trr_l2": 0.1944605218279546,
+          "baseline_l2": 0.722658475544612
+        },
+        {
+          "query_idx": 65,
+          "query_name": "Math Rock Crystal - Studio Mix",
+          "trr_retrieved": "Math Rock Crystal Cleans",
+          "baseline_retrieved": "Telephone EQ",
+          "delta_l2": 0.5281979537166575,
+          "trr_l2": 0.1944605218279546,
+          "baseline_l2": 0.722658475544612
+        },
+        {
+          "query_idx": 95,
+          "query_name": "Math Rock Crystal - Session Pass",
+          "trr_retrieved": "Math Rock Crystal Cleans",
+          "baseline_retrieved": "Telephone EQ",
+          "delta_l2": 0.5281979537166575,
+          "trr_l2": 0.1944605218279546,
+          "baseline_l2": 0.722658475544612
+        },
+        {
+          "query_idx": 125,
+          "query_name": "Math Rock Crystal - Extended Edit",
+          "trr_retrieved": "Math Rock Crystal Cleans",
+          "baseline_retrieved": "Telephone EQ",
+          "delta_l2": 0.5281979537166575,
+          "trr_l2": 0.1944605218279546,
+          "baseline_l2": 0.722658475544612
+        }
+      ],
+      "top_failures_l2": [
+        {
+          "query_idx": 18,
+          "query_name": "Saturated Rhythm",
+          "trr_retrieved": "Saturated Drive Rhythm",
+          "baseline_retrieved": "Texas Blues",
+          "delta_l2": -0.33171605010919325,
+          "trr_l2": 0.6068249459275715,
+          "baseline_l2": 0.2751088958183783
+        },
+        {
+          "query_idx": 36,
+          "query_name": "Saturated Rhythm - Alt Take",
+          "trr_retrieved": "Saturated Drive Rhythm",
+          "baseline_retrieved": "Texas Blues",
+          "delta_l2": -0.33171605010919325,
+          "trr_l2": 0.6068249459275715,
+          "baseline_l2": 0.2751088958183783
+        },
+        {
+          "query_idx": 66,
+          "query_name": "Saturated Rhythm - Studio Mix",
+          "trr_retrieved": "Saturated Drive Rhythm",
+          "baseline_retrieved": "Texas Blues",
+          "delta_l2": -0.33171605010919325,
+          "trr_l2": 0.6068249459275715,
+          "baseline_l2": 0.2751088958183783
+        },
+        {
+          "query_idx": 96,
+          "query_name": "Saturated Rhythm - Session Pass",
+          "trr_retrieved": "Saturated Drive Rhythm",
+          "baseline_retrieved": "Texas Blues",
+          "delta_l2": -0.33171605010919325,
+          "trr_l2": 0.6068249459275715,
+          "baseline_l2": 0.2751088958183783
+        },
+        {
+          "query_idx": 126,
+          "query_name": "Saturated Rhythm - Extended Edit",
+          "trr_retrieved": "Saturated Drive Rhythm",
+          "baseline_retrieved": "Texas Blues",
+          "delta_l2": -0.33171605010919325,
+          "trr_l2": 0.6068249459275715,
+          "baseline_l2": 0.2751088958183783
+        }
+      ]
+    }
+  ]
+}

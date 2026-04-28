@@ -1,0 +1,76 @@
+{
+  "dataset_json": "/Users/xyh/Code/Audio-agent/Experiments/dataset_full_vectors.json",
+  "n_total_items": 220,
+  "n_unique_song_names": 220,
+  "n_duplicate_song_names": 0,
+  "missing_field_counts": {
+    "SongName": 0,
+    "Parameters": 0,
+    "Style": 0,
+    "Feature": 0
+  },
+  "n_items_with_existing_audio": 0,
+  "n_items_missing_audio": 220,
+  "n_unreadable_audio": 0,
+  "audio_seconds_summary": {
+    "count": 0
+  },
+  "audio_sample_rate_summary": {
+    "count": 0
+  },
+  "audio_missing_examples": [
+    "TMM_Synth_00000",
+    "TMM_Synth_00001",
+    "TMM_Synth_00002",
+    "TMM_Synth_00003",
+    "TMM_Synth_00004",
+    "TMM_Synth_00005",
+    "TMM_Synth_00006",
+    "TMM_Synth_00007",
+    "TMM_Synth_00008",
+    "TMM_Synth_00009",
+    "TMM_Synth_00010",
+    "TMM_Synth_00011",
+    "TMM_Synth_00012",
+    "TMM_Synth_00013",
+    "TMM_Synth_00014",
+    "TMM_Synth_00015",
+    "TMM_Synth_00016",
+    "TMM_Synth_00017",
+    "TMM_Synth_00018",
+    "TMM_Synth_00019"
+  ],
+  "audio_unreadable_examples": [],
+  "splits": {
+    "seed0": {
+      "n_train": 176,
+      "n_val": 22,
+      "n_test": 22,
+      "overlap_train_val": [],
+      "overlap_train_test": [],
+      "overlap_val_test": [],
+      "n_unknown_names": 0,
+      "unknown_name_examples": []
+    },
+    "seed1": {
+      "n_train": 176,
+      "n_val": 22,
+      "n_test": 22,
+      "overlap_train_val": [],
+      "overlap_train_test": [],
+      "overlap_val_test": [],
+      "n_unknown_names": 0,
+      "unknown_name_examples": []
+    },
+    "seed2": {
+      "n_train": 176,
+      "n_val": 22,
+      "n_test": 22,
+      "overlap_train_val": [],
+      "overlap_train_test": [],
+      "overlap_val_test": [],
+      "n_unknown_names": 0,
+      "unknown_name_examples": []
+    }
+  }
+}

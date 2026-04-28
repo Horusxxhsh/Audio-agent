@@ -1,0 +1,35 @@
+group,filename,source_path,git_state,source_commit,role,notes
+p0_e2_e3_report,P0_Experiments_Report.md,Experiments/AblationStudies/P0_Experiments_Report.md,origin/master snapshot,80836fd,report,P0 E2/E3 summary report; referenced raw outputs are missing from Git
+p0_e2_e3_report,P0_RUNBOOK.md,Experiments/AblationStudies/P0_RUNBOOK.md,origin/master snapshot,80836fd,runbook,P0 reproduction commands and expected outputs
+p0_e2_e3_script,fill_clap_vectors.py,Experiments/AblationStudies/fill_clap_vectors.py,origin/master snapshot,80836fd,script,CLAP vector filling helper for P0 baselines
+p0_e2_e3_script,fill_passt_panns_vectors.py,Experiments/AblationStudies/fill_passt_panns_vectors.py,origin/master snapshot,80836fd,script,PaSST and PANNs vector filling helper for P0 baselines
+p0_e2_e3_script,inspect_e3_noise_embedding.py,Experiments/AblationStudies/inspect_e3_noise_embedding.py,origin/master snapshot,80836fd,script,E3 degraded-audio embedding inspection helper
+p0_e2_e3_script,p0_e2_sota_benchmark.py,Experiments/AblationStudies/p0_e2_sota_benchmark.py,origin/master snapshot,80836fd,script,P0 E2 SOTA baseline benchmark runner
+p0_e2_e3_script,p0_e3_protocol_c.py,Experiments/AblationStudies/p0_e3_protocol_c.py,origin/master snapshot,80836fd,script,P0 E3 Protocol-C robustness runner
+p0_e2_e3_script,stats_utils.py,Experiments/AblationStudies/stats_utils.py,origin/master snapshot,80836fd,script,Statistical testing utilities for P0 outputs
+p0_e2_e3_dependency,hybrid_fusion_retriever.origin-master.py,Experiments/common/hybrid_fusion_retriever.py,origin/master snapshot,80836fd,dependency snapshot,P0 script dependency snapshot from origin/master
+protocolA,protocolA_objective_stats.json,Experiments/AblationStudies/protocolA_objective_stats.json,workspace ignored,workspace,result-json,Protocol-A objective metrics JSON from local workspace
+protocolA,protocolA_objective_stats.md,Experiments/AblationStudies/protocolA_objective_stats.md,workspace ignored,workspace,result-report,Protocol-A objective metrics Markdown summary from local workspace
+protocolA,protocolA_per_query_metrics.csv,Experiments/AblationStudies/protocolA_per_query_metrics.csv,workspace ignored,workspace,per-query-data,Protocol-A per-query metrics from local workspace
+protocolA_strong_baselines,protocolA_derived_analysis.json,Experiments/AblationStudies/protocolA_derived_analysis.json,workspace untracked,workspace,derived-json,Protocol-A derived analysis without CLAP extension
+protocolA_strong_baselines,protocolA_derived_analysis.md,Experiments/AblationStudies/protocolA_derived_analysis.md,workspace untracked,workspace,derived-report,Protocol-A derived analysis summary without CLAP extension
+protocolA_strong_baselines,protocolA_derived_analysis.py,Experiments/AblationStudies/protocolA_derived_analysis.py,workspace untracked,workspace,analysis-script,Script used for Protocol-A derived analysis
+protocolA_strong_baselines,protocolA_derived_analysis_with_clap.json,Experiments/AblationStudies/protocolA_derived_analysis_with_clap.json,workspace untracked,workspace,derived-json,Protocol-A derived analysis with CLAP and strong baselines
+protocolA_strong_baselines,protocolA_derived_analysis_with_clap.md,Experiments/AblationStudies/protocolA_derived_analysis_with_clap.md,workspace untracked,workspace,derived-report,Protocol-A derived analysis report with CLAP and strong baselines
+protocolA_strong_baselines,protocolA_objective_stats_with_clap.json,Experiments/AblationStudies/protocolA_objective_stats_with_clap.json,workspace untracked,workspace,result-json,Protocol-A objective metrics with CLAP and strong baselines
+protocolA_strong_baselines,protocolA_objective_stats_with_clap.md,Experiments/AblationStudies/protocolA_objective_stats_with_clap.md,workspace untracked,workspace,result-report,Protocol-A objective metrics report with CLAP and strong baselines
+protocolA_strong_baselines,protocolA_per_query_metrics_with_strong_baselines.csv,Experiments/AblationStudies/protocolA_per_query_metrics_with_strong_baselines.csv,workspace untracked,workspace,per-query-data,Protocol-A per-query metrics with strong baselines
+protocolA_audio_grouped,protocolA_audio_grouped_derived_analysis.json,Experiments/AblationStudies/protocolA_audio_grouped_derived_analysis.json,workspace untracked,workspace,derived-json,Protocol-A audio-grouped derived analysis JSON
+protocolA_audio_grouped,protocolA_audio_grouped_derived_analysis.md,Experiments/AblationStudies/protocolA_audio_grouped_derived_analysis.md,workspace untracked,workspace,derived-report,Protocol-A audio-grouped derived analysis summary
+protocolA_audio_grouped,protocolA_audio_grouped_objective_stats.json,Experiments/AblationStudies/protocolA_audio_grouped_objective_stats.json,workspace untracked,workspace,result-json,Protocol-A audio-grouped objective metrics JSON
+protocolA_audio_grouped,protocolA_audio_grouped_objective_stats.md,Experiments/AblationStudies/protocolA_audio_grouped_objective_stats.md,workspace untracked,workspace,result-report,Protocol-A audio-grouped objective metrics Markdown summary
+protocolA_audio_grouped,protocolA_audio_grouped_per_query_metrics.csv,Experiments/AblationStudies/protocolA_audio_grouped_per_query_metrics.csv,workspace untracked,workspace,per-query-data,Protocol-A audio-grouped per-query metrics
+protocolB,protocolB_objective_stats.json,Experiments/AblationStudies/protocolB_objective_stats.json,workspace ignored,workspace,result-json,Protocol-B objective metrics JSON from local workspace
+protocolB,protocolB_objective_stats.md,Experiments/AblationStudies/protocolB_objective_stats.md,workspace ignored,workspace,result-report,Protocol-B objective metrics Markdown summary from local workspace
+protocolB,protocolB_per_query_metrics.csv,Experiments/AblationStudies/protocolB_per_query_metrics.csv,workspace ignored,workspace,per-query-data,Protocol-B per-query metrics from local workspace
+protocolC,protocolC_objective_stats.json,Experiments/AblationStudies/protocolC_objective_stats.json,workspace ignored,workspace,result-json,Protocol-C objective metrics JSON from local workspace
+protocolC,protocolC_objective_stats.md,Experiments/AblationStudies/protocolC_objective_stats.md,workspace ignored,workspace,result-report,Protocol-C objective metrics Markdown summary from local workspace
+protocolC,protocolC_per_query_metrics.csv,Experiments/AblationStudies/protocolC_per_query_metrics.csv,workspace ignored,workspace,per-query-data,Protocol-C per-query metrics from local workspace
+protocolC,protocolC_beta_sweep.csv,Experiments/AblationStudies/protocolC_beta_sweep.csv,workspace ignored,workspace,sweep-data,Protocol-C beta sweep data from local workspace
+fusion_beta,fusion_beta_sweep_new.csv,Experiments/AblationStudies/fusion_beta_sweep_new.csv,tracked at HEAD,07df66c,sweep-data,Fusion beta sweep committed in current branch history
+retrieval_legacy_report,retrieval_comparison_report.md,Experiments/AblationStudies/retrieval_comparison_report.md,tracked at HEAD,5bea484,legacy-report,Legacy retrieval comparison note; not canonical TMM revision evidence

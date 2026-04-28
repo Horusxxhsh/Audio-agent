@@ -1,0 +1,109 @@
+{
+  "_doc": "DSP parameter physical ranges extracted from Source/PluginAudioParameters.h. Used for min-max normalization in evaluation metrics.",
+  "CompressorOn": {
+    "Threshold": {"min": -100.0, "max": 0.0, "unit": "dB", "source": "Ctagdrc::thresholdStart/End"},
+    "Ratio":     {"min": 2.0,    "max": 12.0, "unit": "ratio", "source": "Ctagdrc::ratioStart/End"},
+    "Attack":    {"min": 0.0,    "max": 1.0,  "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Release":   {"min": 0.0,    "max": 1.0,  "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Makeup":    {"min": 0.0,    "max": 24.0, "unit": "dB", "source": "Ctagdrc::makeupStart/End"},
+    "Mix":       {"min": 0.0,    "max": 1.0,  "unit": "normalized", "source": "Ctagdrc::mixStart/End"}
+  },
+  "DriverOn": {
+    "Distortion": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Volume":     {"min": -128.0, "max": 64.0, "unit": "dB", "source": "gainDecibelsNormalisableRange"}
+  },
+  "DriverOff": {
+    "Distortion": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Volume":     {"min": -128.0, "max": 64.0, "unit": "dB", "source": "gainDecibelsNormalisableRange"}
+  },
+  "ScreamerOn": {
+    "Drive": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Tone":  {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Level": {"min": -128.0, "max": 64.0, "unit": "dB", "source": "gainDecibelsNormalisableRange"}
+  },
+  "ScreamerOff": {
+    "Drive": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Tone":  {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Level": {"min": -128.0, "max": 64.0, "unit": "dB", "source": "gainDecibelsNormalisableRange"}
+  },
+  "ReverbOn": {
+    "Size":    {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Damping": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Width":   {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Mix":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"}
+  },
+  "ReverbOff": {
+    "Size":    {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Damping": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Width":   {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Mix":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"}
+  },
+  "DelayOn": {
+    "Feedback": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Delay":    {"min": 1.0, "max": 10000.0, "unit": "ms", "source": "delayTimeMsNormalisableRange"},
+    "Mix":      {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"}
+  },
+  "DelayOff": {
+    "Feedback": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Delay":    {"min": 1.0, "max": 10000.0, "unit": "ms", "source": "delayTimeMsNormalisableRange"},
+    "Mix":      {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"}
+  },
+  "ChorusOn": {
+    "Delay":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Depth":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Frequency": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Width":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"}
+  },
+  "ChorusOff": {
+    "Delay":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Depth":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Frequency": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Width":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"}
+  },
+  "FlangerOn": {
+    "Delay":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Depth":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Feedback":  {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Frequency": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Width":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"}
+  },
+  "FlangerOff": {
+    "Delay":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Depth":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Feedback":  {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Frequency": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Width":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"}
+  },
+  "PhaserOn": {
+    "Depth":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Feedback":  {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Frequency": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Width":     {"min": 0.0, "max": 100.0, "unit": "normalized", "source": "phaser width range"}
+  },
+  "PhaserOff": {
+    "Depth":     {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Feedback":  {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Frequency": {"min": 0.0, "max": 1.0, "unit": "normalized", "source": "zeroToOneLinearNormalisableRange"},
+    "Width":     {"min": 0.0, "max": 100.0, "unit": "normalized", "source": "phaser width range"}
+  },
+  "EqualiserOn": {
+    "100hz":  {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "200hz":  {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "400hz":  {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "800hz":  {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "1600hz": {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "3200hz": {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "6400hz": {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "Level":  {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"}
+  },
+  "EqualiserOff": {
+    "100hz":  {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "200hz":  {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "400hz":  {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "800hz":  {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "1600hz": {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "3200hz": {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "6400hz": {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"},
+    "Level":  {"min": -12.0, "max": 12.0, "unit": "dB", "source": "GraphicEqualiser::sDecibelGainNormalisableRange"}
+  }
+}

@@ -1,0 +1,198 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\definecolor{reviewercolor}{RGB}{0,0,180}
+\definecolor{responsecolor}{RGB}{0,100,0}
+
+\newcommand{\reviewer}[1]{\textcolor{reviewercolor}{\textbf{Reviewer Comment:} #1}}
+\newcommand{\response}[1]{\textcolor{responsecolor}{\textbf{Our Response:} #1}}
+\newcommand{\change}[1]{\textit{Change in manuscript:} #1}
+
+\title{Response to Reviewers\\
+\large Texture Resonance Retrieval for Retrieval-Grounded\\Editable Audio Effect Preset Selection\\
+\large IEEE Transactions on Multimedia --- Major Revision}
+\author{Anonymous Authors}
+\date{}
+
+\begin{document}
+\maketitle
+
+We sincerely thank the reviewers for their detailed and constructive feedback. Below we address each concern point by point, organized by the major (M1--M5) and minor (m1--m8) issues identified in the review. All referenced section, table, and figure numbers refer to the revised manuscript.
+
+\section*{Major Issues}
+
+\subsection*{M1: Limited Dataset Scale and Near-Duplicate Risk}
+
+\reviewer{The benchmark comprises only 1,267 guitar presets (204 test queries), which is small by retrieval standards. After removing exact audio reuse, 200 near-duplicate pairs remain. This raises the concern that strong retrieval performance may be inflated by trivially close knowledge-base items.}
+
+\response{We agree that dataset scale is a genuine limitation and have taken concrete steps to quantify its impact on the reported results:}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Near-duplicate sensitivity analysis} (new Section 4.1, paragraph ``Near-duplicate sensitivity analysis''): We progressively remove near-duplicates from the knowledge base at four L2 thresholds ($\tau \in \{0.005, 0.01, 0.02, 0.05\}$) and re-evaluate all methods. TRR retains its relative advantage across all thresholds, though absolute performance degrades gracefully as the KB shrinks. Full results appear in Supplementary Table~S8.
+\item \textbf{Near-duplicate detection infrastructure}: We provide a reusable \texttt{near\_dup\_filter.py} script and \texttt{near\_dup\_sensitivity.py} experiment, enabling reviewers to reproduce the analysis at arbitrary thresholds.
+\item \textbf{Explicit scope acknowledgment}: We clearly state in Section 4.1 and the Discussion that this is a pilot benchmark on guitar effects, not a claim of universal scale.
+\end{enumerate}
+
+\change{Section 4.1 ``Near-duplicate sensitivity analysis'' paragraph (new); Supplementary Section S8 with Table~S8 (new); Abstract revised to mention near-duplicate sensitivity.}
+
+\subsection*{M2: Weak Baseline Coverage}
+
+\reviewer{The paper compares TRR only against text-RAG, FeatureNN-RAG, Wav2Vec-RAG, and CLAP. Strong audio representation baselines such as PANNs and PaSST, and a direct regression baseline (MLP), are absent.}
+
+\response{We have added three new baselines:}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{PANNs (CNN14)}: Large-scale pretrained audio pattern recognition network [Kong et al., 2020]. We use the CNN14 variant with AudioSet-pretrained embeddings for retrieval.
+\item \textbf{PaSST}: Efficient audio transformer with Patchout [Koutini et al., 2022]. Retrieval uses the AudioSet-pretrained embedding space.
+\item \textbf{MLP-Regressor}: A three-layer MLP trained on mean-pooled Wav2Vec2 features to directly predict flattened parameter vectors, establishing a supervised regression baseline.
+\end{enumerate}
+
+All baselines are evaluated under Protocol-A with the same split and metrics. Results are reported in Table~3 (main paper) and Supplementary Table~S10 (confidence intervals).
+
+\change{Table~3 expanded with PANNs, PaSST, MLP-Regressor rows; Section 4.2 baseline descriptions updated; Supplementary Tables S10--S11 (new); three baseline scripts provided.}
+
+\subsection*{M3: No Ablation Studies}
+
+\reviewer{There are no ablation studies validating the core design choices of TRR: projection dimensionality, layer selection, and projection type (PCA vs.\ random).}
+
+\response{We have added a full ablation subsection (Section 4.X ``TRR Ablation Studies'') with three controlled experiments:}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Projection dimensionality} (Table~4): $d \in \{32, 64, 128, 256\}$. The default $d{=}32$ achieves a good balance of performance and compactness.
+\item \textbf{Layer selection} (Table~5): Six combinations of Wav2Vec2 layers, including single-layer (\{4\}, \{5\}, \{6\}), the default \{4,5,6\}, broader range \{3,...,7\}, and all 12 layers. Mid-layer fusion at \{4,5,6\} performs best.
+\item \textbf{Projection type} (Table~6): Frozen random projection (Xavier-initialized) vs.\ PCA-fitted projection. Both yield comparable results, validating the practical choice of a training-free random projection.
+\end{enumerate}
+
+\change{Section 4.X ``TRR Ablation Studies'' (new subsection with Tables 4--6); Algorithm 1 updated to specify ``frozen random linear projection'' and correct dimension to 32; Abstract mentions ablation studies.}
+
+\subsection*{M4: Unnormalized Metrics}
+
+\reviewer{All L2 error metrics operate on raw parameter values with heterogeneous physical scales. A compressor threshold in dB and a delay time in ms have very different magnitudes, making raw L2 hard to interpret and potentially dominated by large-scale parameters.}
+
+\response{We now report a \textbf{Normalized L2} (Norm.\,L2) metric alongside the original raw L2:}
+
+\begin{enumerate}[leftmargin=*]
+\item Each parameter leaf is min-max normalized to $[0,1]$ using the physical DSP parameter ranges defined in the plugin source code (\texttt{PluginAudioParameters.h}).
+\item The ranges are documented in a shareable \texttt{param\_ranges.json} file for reproducibility.
+\item The evaluation pipeline (\texttt{evaluate.py}) supports both modes: \texttt{Evaluator(normalize=False)} for backward compatibility and \texttt{Evaluator(normalize=True)} for the new normalized metrics.
+\end{enumerate}
+
+\change{Section 4.2 ``Normalized L2'' paragraph (new); Table~3 adds a Norm.\,L2 column; \texttt{param\_ranges.json} and updated \texttt{evaluate.py} provided.}
+
+\subsection*{M5: Listening Test Methodological Weaknesses}
+
+\reviewer{Trials 2--5 compare the system against a ``manual'' baseline with unknown provenance and time budget. There are also no demographic details about participant expertise.}
+
+\response{We have addressed this in several ways:}
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Condensed Trials 2--5}: The detailed per-trial table and figure have been moved to Supplementary Material. The main text now provides only the aggregate summary with explicit caveats about manual-baseline provenance.
+\item \textbf{Participant demographics}: We report the distribution of musical experience: 12 participants with $\geq$3 years of instrument training, 8 casual musicians, and 6 with no formal training (Section 4.5).
+\item \textbf{Interpretation guardrails}: We explicitly state that Trials 2--5 provide ``supportive perceptual context rather than a definitive human-vs-system optimization benchmark.''
+\end{enumerate}
+
+\change{Section 4.5 condensed; participant experience distribution added; Supplementary Section S12 with Trials 2--5 detailed results (new).}
+
+\section*{Minor Issues}
+
+\subsection*{m1: Unclear Algorithm 1 Projection Description}
+
+\reviewer{Algorithm 1 describes a ``linear projection $P: \mathbb{R}^{768} \to \mathbb{R}^{64}$'' but the code uses $d{=}32$.}
+
+\response{Fixed. Algorithm 1 now correctly states ``frozen random linear projection $P: \mathbb{R}^{768} \to \mathbb{R}^{32}$'' with Xavier initialization and no gradient updates. All downstream dimension references (Gram matrix $32 \times 32$, embedding 1024-dimensional) are consistent.}
+
+\change{Algorithm 1 corrected; prose in Section 3.2 updated.}
+
+\subsection*{m2: Over-Hedging}
+
+\reviewer{Phrases like ``currently evaluated,'' ``we therefore interpret,'' and ``on the current benchmark'' appear excessively, reducing readability.}
+
+\response{We conducted a systematic pass to reduce redundant qualifiers while preserving scientific rigor. Key reductions include removing ``currently'' from most occurrences, simplifying ``We therefore interpret X as...'' constructions, and cutting unnecessary scope modifiers.}
+
+\change{Throughout the manuscript; over 15 instances reduced.}
+
+\subsection*{m3: Section 3.3 (Preliminary Personalization Extension) is Unreferenced}
+
+\reviewer{Section 3.3 describes a personalization system but no results support it, and it contributes to page bloat.}
+
+\response{Deleted entirely. The Discussion now explicitly excludes personalization from validated claims.}
+
+\change{Section 3.3 removed.}
+
+\subsection*{m4: Table 1 (Parameter--Waveform Duality) Lacks Data}
+
+\reviewer{Table 1 contains only a conceptual comparison with no empirical data and consumes valuable page budget.}
+
+\response{Table 1 has been removed. The Parameter--Waveform Duality concept is retained as a brief inline paragraph in Section 2.}
+
+\change{Table 1 removed; inline description preserved.}
+
+\subsection*{m5: Missing Visualization}
+
+\reviewer{No visualizations of the TRR embedding space or Gram matrix structure are provided.}
+
+\response{We have added two figures:}
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Figure~\ref{fig:tsne\_comparison}}: t-SNE comparison of TRR vs.\ Wav2Vec2 mean-pooled embeddings, colored by style label. Shows tighter within-style clustering for TRR.
+\item \textbf{Figure in Section 3.2}: Gram matrix heatmap for a representative preset, showing the second-order correlation structure captured by TRR.
+\end{enumerate}
+
+\change{Two new figures added with generation scripts (\texttt{trr\_tsne\_visualization.py}, \texttt{gram\_matrix\_heatmap.py}).}
+
+\subsection*{m6: BibTeX Errors}
+
+\reviewer{Several BibTeX entries have wrong types (e.g., \texttt{@inproceedings} for journal articles like Neuron), incomplete author lists (``and others''), and missing metadata.}
+
+\response{Comprehensive BibTeX cleanup performed: entry types corrected (e.g., \texttt{mcdermott2011sound} to \texttt{@article}), author lists expanded for key references, DOIs and page numbers added where available, and spelling errors fixed (e.g., ``Reprsentations'' $\to$ ``Representations'').}
+
+\change{\texttt{reference.bib}: 12+ entries corrected.}
+
+\subsection*{m7: Figure 1 Caption is Vague}
+
+\reviewer{The system diagram caption does not specify the DSP effect chain topology.}
+
+\response{Updated to explicitly list the nine-module topology: Compressor $\to$ Driver $\to$ Screamer $\to$ Equaliser $\to$ Chorus $\to$ Flanger $\to$ Phaser $\to$ Delay $\to$ Reverb, with each module switchable on/off.}
+
+\change{Figure 1 caption rewritten.}
+
+\subsection*{m8: Missing Fusion Score Formula}
+
+\reviewer{The fusion mechanism is described only verbally; no equation is provided.}
+
+\response{Added explicit formula: $s_{\text{fused}}(z_i) = w_{\text{text}} \cdot s_{\text{text}}(z_i) + w_{\text{audio}} \cdot s_{\text{audio}}(z_i)$ where weights are determined by modality-confidence thresholds (Section 4.6).}
+
+\change{Fusion formula added in Section 4.6.}
+
+\section*{Summary of Changes}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Issue} & \textbf{Type} & \textbf{Action Taken} \\
+\midrule
+M1 Dataset scale & Major & Near-dup sensitivity analysis + supplementary table \\
+M2 Weak baselines & Major & PANNs, PaSST, MLP-Regressor added \\
+M3 No ablations & Major & 3 ablation experiments + subsection \\
+M4 Unnormalized metrics & Major & Norm.\,L2 column + param\_ranges.json \\
+M5 Listening test issues & Major & Condensed Trials 2--5 + demographics \\
+m1 Algorithm dim error & Minor & Algorithm 1 corrected to $d{=}32$ \\
+m2 Over-hedging & Minor & 15+ instances reduced \\
+m3 Unreferenced Sec 3.3 & Minor & Section deleted \\
+m4 Table 1 no data & Minor & Table removed \\
+m5 Missing visualization & Minor & t-SNE + Gram heatmap figures added \\
+m6 BibTeX errors & Minor & 12+ entries corrected \\
+m7 Vague Fig 1 caption & Minor & Caption rewritten with topology \\
+m8 Missing fusion formula & Minor & Formula added \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We believe these revisions substantially strengthen the paper and address all reviewer concerns. We remain happy to provide further clarification or additional experiments if needed.
+
+\end{document}

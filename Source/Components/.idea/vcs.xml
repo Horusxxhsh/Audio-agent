@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/../.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../Modules/JUCE" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../Modules/audio_fft" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../Modules/audio_fft/AudioFFT" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../Modules/chowdsp_wdf" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../Modules/ff_meters" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../Modules/math_approx" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../Modules/pitch_detector" vcs="Git" />
+  </component>
+</project>

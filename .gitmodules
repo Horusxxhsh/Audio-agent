@@ -1,0 +1,18 @@
+[submodule "Modules/JUCE"]
+	path = Modules/JUCE
+	url = https://github.com/juce-framework/JUCE
+[submodule "Modules/math_approx"]
+	path = Modules/math_approx
+	url = https://github.com/Chowdhury-DSP/math_approx/
+[submodule "Modules/chowdsp_wdf"]
+	path = Modules/chowdsp_wdf
+	url = https://github.com/Chowdhury-DSP/chowdsp_wdf
+[submodule "Modules/ff_meters"]
+	path = Modules/ff_meters
+	url = git@github.com:ffAudio/ff_meters.git
+[submodule "Modules/pitch_detector"]
+	path = Modules/pitch_detector
+	url = git@github.com:adamski/pitch_detector.git
+[submodule "Modules/audio_fft"]
+	path = Modules/audio_fft
+	url = git@github.com:adamski/audio_fft.git

@@ -1,0 +1,35 @@
+\chapter{摘要与监督结论}
+
+本报告将 Audio-Agent 当前代码库中的实验材料整理为一份学术论文式证据报告。报告的核心问题是：在可编辑音频效果参数控制任务中，基于二阶纹理统计的 Texture Resonance Retrieval（TRR）是否比当前已评估的文本检索与音频嵌入检索基线更能找到参数空间上接近目标的可执行预设。本文结论限定于当前 guitar-effects 检索基准、当前数据切分和当前仓库产物下的检索式参数对齐证据；通用音频理解模型优越性和完整自动化音频系统端到端效果均不在本报告的证据范围内。
+
+KaiMing 的当前监督判断是：本项目可以按照 NeurIPS main track 的方法论文路线继续推进，但目前还不能进入正式论文定稿阶段。可投叙事应收敛为“TRR 是一种面向可执行音频效果参数控制的 texture-aware second-order retrieval prior”，并避免扩展为通用音频表示学习、完整自动混音系统或端到端音频生成系统。论文写作必须等待三个前置项完成：formulation 冻结、4--6 周补实验完成、logger/evidence schema 能够把每一项主张映射到可复核 run artifact。
+
+当前最强的主证据来自 resolved-audio-grouped Protocol-A。该协议在外部 1267 条 guitar-effects 数据集上，以 204 条测试查询和 1063 条知识库记录构成更严格的反泄漏切分，并以 top-1 检索输出的参数 JSON 作为评价对象。在该协议下，TRR 的平均参数距离为 8.0467，优于 Text-RAG 的 24.1705、Wav2Vec-RAG 的 23.8197、FeatureNN-RAG 的 19.2613，以及覆盖 201 条查询的 CLAP 基线 22.3102。TRR 同时在 Acc@0.1、Recall、Cosine 和 Module 指标上取得当前表格中的最好均值；bootstrap confidence intervals 与 Holm-corrected paired permutation tests 进一步支持这些比较。该结果支持的最强表述是：在当前已评估检索表示与当前严格切分下，TRR 是参数对齐最强的 retrieval prior。
+
+报告同时纳入两个辅助证据层。Protocol-C 说明质量感知融合在 vague text 与 noisy audio 等单模态退化场景下可以退回到较可信模态；在 modality conflict 场景中，它仍显著弱于 TRR-only，因此该协议应被解释为边界条件诊断，而非现实鲁棒性证明。
+
+Multiple-stimulus listening test 提供主观感知背景：26 名参与者产生 910 条评分，TRR-based system 在 Trials 2--5 中高于 manual baseline。该实验没有显式低质量 anchor，也缺少设备、专业程度与人工基线时间预算等元数据，因此不能被解释为严格的人机公平比较。
+
+证据边界必须被显式保留。P0 E2/E3 报告与脚本来自 \texttt{origin/master} 的 80836fd 快照，但报告引用的 \texttt{outputs/p0\_e2} 与 \texttt{outputs/p0\_e3\_shared\_e2\_test} 原始 CSV/JSON 当前不在 Git 文件树中，也不在本地 outputs 目录中。Protocol-B 已被标注为 deprecated，legacy retrieval report 也明确写有 do not cite in the TMM revision。因此，本报告将 P0 和 Protocol-B 视为历史线索或复现入口，而非正式主证据。
+
+\begin{table}[H]
+	\centering
+	\caption{本文证据层级与允许使用方式。}
+	\label{tab:evidence-boundary-overview}
+	\small
+	\begin{tabularx}{\textwidth}{p{0.22\textwidth}p{0.25\textwidth}p{0.43\textwidth}}
+		\toprule
+			证据层 & 代表材料 & 允许结论 \\
+		\midrule
+		主证据 & Protocol-A audio-grouped 统计与 per-query CSV & TRR 在当前严格检索基准中优于已评估检索基线。 \\
+		辅助诊断 & Protocol-C objective stats & Fusion 具有单模态 fallback 行为，但 conflict 失败必须披露。 \\
+		主观背景 & Listening test report & TRR-based system 具有一定主观感知参考价值，但不是严格人机公平胜负证据。 \\
+		待补证据 & P0 E2/E3 report and runbook & 可作为复现入口；缺少原始 outputs 前不能作为正式结果引用。 \\
+		历史材料 & Protocol-B 与 legacy retrieval report & 只能用于追溯叙事来源，不进入主结论。 \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+表~\ref{tab:evidence-boundary-overview} 是阅读本文的主要导航。后文首先定义任务和术语，再给出 TRR 方法、实验协议、实现路径、结果解释和风险边界。若读者只关心论文可写结论，应重点阅读第~\ref{chap:results} 章和第~\ref{chap:risks} 章；若读者需要复核代码与数据，应重点阅读第~\ref{chap:workflow} 章和第~\ref{chap:progress} 章。
+
+本轮更新之后，本文还承担一个监督台账功能：第~\ref{chap:formulation} 章冻结问题定义，第~\ref{chap:experiment-design} 章定义 NeurIPS 补实验矩阵，第~\ref{chap:workflow} 章定义 logger 与证据字段，第~\ref{chap:progress} 章安排 4--6 周执行节奏，第~\ref{chap:risks} 章给出 KaiMing gate。后续正式论文应从这些 gate 通过后的证据表中抽取结果，而不应从未审计的中间输出中直接写 claim。

@@ -1,87 +1,114 @@
 # Response to Reviewers (IEEE TMM)
 
-**Manuscript ID**: #8159
-**Title**: Audio-Agent: Bridging the Semantic Gap in Neural Audio Effects via Multi-Modal Retrieval-Augmented Generation
+**Manuscript ID**: #8159  
+**Title**: Texture Resonance Retrieval for Retrieval-Grounded Editable Audio Effect Preset Selection  
 **Authors**: Anonymous Authors
 
----
+Dear Editor and Reviewers,
 
-Dear Dr. [Editor Name] and the Review Team,
+Thank you for the detailed feedback. We used the revision to narrow the manuscript to the claims that are directly supported by reproducible repository artifacts. The revised evidence chain now relies on an audited split definition plus six canonical sources:
 
-Thank you for the opportunity to revise our manuscript titled "Audio-Agent: Bridging the Semantic Gap in Neural Audio Effects via Multi-Modal Retrieval-Augmented Generation" (Manuscript ID: #8159). We appreciate the constructive and detailed feedback provided by the reviewers, which has significantly improved the technical depth and empirical grounding of our work.
+- `Experiments/tmm/protocolA_split_audit.md`
+- `Experiments/tmm/protocolA_audio_grouped_leakage_report.json`
+- `Experiments/AblationStudies/protocolA_audio_grouped_objective_stats.md`
+- `Experiments/AblationStudies/protocolA_audio_grouped_per_query_metrics.csv`
+- `Experiments/AblationStudies/protocolC_objective_stats.md`
+- `Experiments/mushura/results_report.md`
 
-We have carefully addressed all reviewer comments in this revision. The most significant changes include:
+We no longer treat the legacy retrieval comparison report, the deprecated Protocol-B outputs, or the repository's exploratory personalization/memory code as primary evidence.
 
-1. **Substantial Dataset Expansion**: We have expanded the evaluation test set from the initial $N=30$ queries to a more statistically robust pool of $N=211$ held-out queries. This represents a 703% increase in sample size, providing much stronger empirical support for our comparative results.
-2. **Rigorous Statistical Evaluation**: We now report 95% bootstrap confidence intervals (CIs) and paired permutation tests for all primary objective metrics. This addressing the reviewers' concerns regarding the statistical significance of our findings.
-3. **Narrative Convergence**: We have streamlined the paper's narrative to focus on the Texture Resonance Retrieval (TRR) evidence chain as the primary contribution, while moving auxiliary fusion results to a secondary role to maintain a clear and reproducible "single source of truth."
-4. **Mechanical Interpretability of TRR**: We have added a comprehensive layer-sweep analysis across all 12 layers of the Wav2Vec2 backbone, confirming that layer 10 provides the optimal balance for audio texture retrieval.
-5. **Refinement of Experimental Setup**: We have cleaned the manuscript of all internal engineering script names and temporary implementation details, ensuring the methodology is described in professional academic terms.
+## Summary of Implemented Changes
 
-Below we provide point-by-point responses to each reviewer comment. Changes in the manuscript are highlighted in blue in the revised version.
+1. **Scope narrowed to retrieval-grounded editable control.**  
+   The manuscript now centers on TRR as a retrieval representation for executable preset control. Personalization, AEM memory, and other exploratory system extensions are explicitly excluded from the paper's primary validated claims.
 
----
+2. **Objective evidence re-anchored to an audited Protocol-A split.**  
+   A post-hoc audit of the legacy song-name-based Protocol-A list found `16` cross-split shared resolved audio paths. We therefore moved the main comparison to a stricter resolved-audio-grouped split (`N_total=1267`, `N_test=204`, `N_kb=1063`) with zero exact shared audio paths under the current audit. We report mean metrics, 95% bootstrap confidence intervals, and Holm-corrected paired permutation tests from the canonical Protocol-A artifacts for this stricter split.
 
-## Reviewer 1 (General Feedback)
+3. **Per-query diagnostics added for Protocol-A.**  
+   We added a repository-backed derived analysis from `protocolA_audio_grouped_per_query_metrics.csv` to show where the gains come from. This includes win/loss/tie counts, signed-delta summaries, and representative success/failure cases. These diagnostics are now referenced in the supplementary material so that the main results are not supported by mean values alone.
 
-### Comment 1.1: Technical Correctness and Terminology
-> **Quote**: "Observation 3 (Section 4.2) is stated as a 'Theorem' but is actually a basic property of Gram matrices. Suggest changing to 'Property' or 'Remark'."
+4. **CLAP added as a verified stronger baseline.**  
+   We now include a CLAP retrieval baseline in the verified evidence chain on the stricter Protocol-A split. TRR remains stronger than CLAP on the 201 shared queries with cached CLAP embeddings. We do **not** claim that PaSST, PANNs, or direct parameter regressors have been completed.
 
-**Response**: We agree with the reviewer's observation. The formal properties of the Gram matrix, while foundational to our TRR encoding, do not constitute a new mathematical theorem in the context of linear algebra. We have accordingly relabeled this section as "Property 1" and clarified its role as a conceptual justification for the translation invariance of texture descriptors in the audio domain.
+5. **Protocol-C repositioned as boundary-condition analysis.**  
+   We removed any claim that the current Protocol-C is a realistic robustness benchmark. The revised paper explicitly states that the audio branch still uses synthetic embedding-space degradation. The reported result is therefore limited to diagnosing the current fusion heuristic: successful fallback under single-modality degradation and a clear failure mode under modality conflict.
 
-**Changes in manuscript**: Section 4.2 has been updated; "Theorem 1" is now "Property 1: Translation Invariance of Texture Priors."
+6. **Listening study terminology and statistics corrected.**  
+   We consistently describe the study as a multiple-stimulus listening test with a hidden reference and no explicit low-quality anchor, rather than as standard MUSHRA. We now report the canonical nonparametric statistics from the listening-study report, including Friedman omnibus tests, Holm-corrected Wilcoxon signed-rank post-hoc tests, and rank-biserial effect sizes.
 
----
+7. **Submission package synchronized.**  
+   The paper, supplementary material, response documents, and revision checklist were revised to remove stale claims about larger datasets, stronger baselines, real-audio Protocol-C, normalized metrics, and AEM learning curves that are not part of the current verified evidence chain.
 
-## Reviewer 2 (Experimental Design and Scale)
+## Point-by-Point Alignment With the Main Reviewer Concerns
 
-### Comment 2.1: Sample size and Statistical Power
-> **Quote**: "The current evaluation with N=30 is insufficient for parameter space evaluation. A larger test set is required to draw reliable conclusions."
+### 1. Novelty and scope
 
-**Response**: We appreciate the reviewer's concern regarding the statistical power of our initial evaluation. To address this, we have substantially expanded our evaluation protocol (Protocol-A). The knowledge base has been increased to 1,056 items, and the held-out test set has been expanded to $N=211$ queries. This larger scale allows for more reliable performance estimates and ensures that our reported improvements are not due to sampling noise.
+We agree that the strongest supported contribution is not a full personalized agent system, but a retrieval-grounded parameter-control formulation centered on TRR. The manuscript now presents TRR as the core method and avoids claims that would require additional evidence beyond the current benchmark.
 
-**Changes in manuscript**: Table 4 (tab:main_results) now reports results for $N=211$ queries. Corresponding text in Section 5.1 has been updated to reflect this larger evaluation scale.
+### 2. Benchmark scale, split transparency, and statistical reporting
 
-### Comment 2.2: Statistical Significance
-> **Quote**: "The paper lacks reporting of confidence intervals or p-values. Statistical significance testing is required."
+We now anchor the objective results to the stricter resolved-audio-grouped Protocol-A benchmark with `N_test=204` and `N_kb=1063`. The revised manuscript and supplementary material report:
 
-**Response**: We agree that statistical reporting is critical for a journal of TMM's caliber. In this revision, we have included 95% bootstrap confidence intervals for all mean metric values (L2, Acc@0.1, Recall, Cosine, and Module consistency). Furthermore, we performed paired permutation tests (5,000 samples) to compare TRR against baseline methods (Text-RAG, Wav2Vec-RAG, and FeatureNN-RAG), reporting Holm-corrected $p$-values to control for multiple comparisons.
+- the legacy split audit (`16` shared resolved audio paths across split);
+- the stricter anti-leakage split with zero exact shared resolved audio paths under the current audit;
+- method means with 95% bootstrap confidence intervals;
+- paired permutation tests for TRR versus each retrieval baseline;
+- Holm-corrected `p` values;
+- per-query derived diagnostics from the canonical CSV.
 
-**Changes in manuscript**: Table S2 and Table S3 have been added to the Supplementary Material to provide full statistical transparency. Summary significance statements have been integrated into the Results section (Section 5.2).
+### 3. Stronger baselines
 
----
+We now include **CLAP** as a verified stronger retrieval baseline on the stricter Protocol-A split. The revised manuscript therefore frames the current result as:
 
-## Reviewer 3 (Writing and Presentation)
+> TRR is the strongest among the currently evaluated retrieval baselines on the audited Protocol-A benchmark, including CLAP on the 201 shared queries with cached CLAP embeddings.
 
-### Comment 3.1: Abstract Length and Content
-> **Quote**: "The abstract is too long (approx. 280 words) and contains too many specific numbers. Suggest condensing it to 150-250 words."
+This remains narrower than a best-in-class claim. We still do **not** claim to have completed PaSST, PANNs, or direct parameter-regression baselines.
 
-**Response**: We have revised the abstract to meet the IEEE TMM length requirements while maintaining focus on the core contributions. We removed exhaustive numerical lists, instead highlighting the most significant relative improvements (e.g., the 97.8% reduction in L2 error compared to pure LLM generation) to emphasize the necessity of the RAG framework.
+### 4. Metric limitations
 
-**Changes in manuscript**: The abstract has been condensed to approximately 210 words.
+We did **not** replace the metric system with a new normalized suite in this revision. Instead, we clarified the exact operational definitions and their limitations:
 
-### Comment 3.2: Numerical Discrepancy (Reviewer Tables 3/4, current Tables 4/5)
-> **Quote**: "Table 3 and Table 4 report L2 values that differ by orders of magnitude (e.g., 0.08 vs 13.3). This requires explanation."
+- flattened numeric leaves only;
+- missing numeric keys treated as zero;
+- no per-parameter normalization;
+- within-protocol interpretation only.
 
-**Response**: We thank the reviewer for pointing out this potential source of confusion. The discrepancy arises from the use of different query subsets and candidate pools. Current Table 4 (tab:main_results) evaluates the full benchmark ($N=211$) using the primary knowledge base. In contrast, current Table 5 (tab:trr_texture_baselines) is a diagnostic comparison against classical texture baselines (MFCC, Modulation Spectrogram) conducted on a small, audio-available subset ($N=5$) where the absolute parameter scale and candidate pool density are different, naturally leading to a higher baseline L2 magnitude. We have added a clarifying note to the Table 5 caption to explicitly state that absolute magnitudes are not comparable across these two separate protocols.
+This limitation is now stated explicitly in both the main paper and the supplementary material.
 
-**Changes in manuscript**: A clarifying statement was added to the caption of Table 5 in Section 5.3.
+### 5. Protocol-C realism
 
----
+We agree with the reviewers that synthetic embedding-space degradation is not equivalent to real audio corruption. Accordingly, Protocol-C is no longer framed as a realistic robustness benchmark. The revision uses it only to characterize the current fusion heuristic:
 
-## Reviewer 4 (Reproducibility and Formatting)
+- `vague_text`: fusion falls back to audio;
+- `noisy_audio`: fusion falls back to text;
+- `conflict`: fusion becomes substantially worse than TRR-only.
 
-### Comment 4.1: Implementation Details and Reproducibility
-> **Quote**: "The paper should clarify key hyperparameters and provide a commitment to reproducibility (e.g., code and dataset availability)."
+### 6. Listening test rigor
 
-**Response**: We are committed to open science and reproducibility. We have now specified the exact Wav2Vec2 layer used for TRR encoding (Layer 10) in the main text and provided a complete layer-sweep analysis in the Supplementary Material. Upon acceptance, we will release a curated version of our dataset and an anonymized repository containing the full inference pipeline and evaluation scripts.
+The revised paper now exposes the canonical statistics already present in the repository:
 
-**Changes in manuscript**: Section 4.4 and Section 6 (Reproducibility) have been updated with these commitments and hyperparameter details.
+- `26` participants and `910` ratings;
+- Friedman omnibus tests for Trials 2--5 and Trials 6--10;
+- Holm-corrected Wilcoxon signed-rank post-hoc tests;
+- rank-biserial correlation (`rbc`);
+- explicit statement that the HCAP label in the raw logs corresponds to the TRR-based system discussed in the paper.
+- explicit limitation that the logs do not preserve device metadata, participant expertise, or the provenance/time budget of the manual baseline.
 
----
+We also make clear that the TRR-based system and MusicGen are statistically indistinguishable in Trials 6--10 under the reported post-hoc test.
 
-We hope that these extensive revisions fully address the reviewers' concerns and that the manuscript is now suitable for publication in IEEE Transactions on Multimedia.
+### 7. Scope mismatch between paper and repository
 
-Sincerely,
+This concern was valid in earlier drafts. The revision addresses it by making the repository's exploratory modules non-central:
 
+- AEM / personalization is described as exploratory only;
+- deprecated Protocol-B results are removed from the primary evidence path;
+- legacy reports are no longer used as formal evidence;
+- the main architecture figure now depicts only the verified retrieval-grounded pipeline.
+
+## Closing Statement
+
+We appreciate the reviewers' insistence on a tighter evidence chain. The revised package is intentionally more conservative than earlier drafts: it makes fewer claims, but each retained claim is now tied to a canonical repository artifact and presented with clearer statistical support and clearer scope boundaries.
+
+Sincerely,  
 The Authors

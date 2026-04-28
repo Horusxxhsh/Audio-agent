@@ -1,45 +1,52 @@
-# TMM Major Revision Checklist (Executable)
+# TMM Revision Checklist (Evidence-Hardening)
 
-This document serves as the authoritative tracking log for the IEEE Transactions on Multimedia (TMM) major revision of the Audio-Agent manuscript. The primary objective of this revision cycle is to strengthen the empirical evidence chain by expanding the evaluation scale, introducing rigorous statistical testing, and ensuring absolute consistency between the reported values in the manuscript and the reproducible experimental artifacts in the repository.
+This checklist tracks the submission-facing fixes needed to keep the paper package aligned with the repository's verified evidence chain.
 
-## P0: Must-Hold Consistency (Current Draft)
+## P0: Canonical Evidence Sources
 
-| ID | Item | Target Section/File | Acceptance Criterion | Status |
-|---|---|---|---|---|
-| P0-1 | Objective main table aligned with report values | `Paper/content.tex` Table `tab:main_results`; `Experiments/AblationStudies/retrieval_comparison_report.md` | Five methods and all five metrics are numerically identical | Done |
-| P0-2 | Single-protocol statement for objective comparison | `Paper/content.tex` Experimental Setup + RQ1 text | Main objective comparison explicitly states Protocol-A retrieval-only | Done |
-| P0-3 | Remove fusion-centered claims/tables from core narrative | `Paper/content.tex`, `Paper/supplementary.tex` | No fusion result table is used as main evidence | Done |
-| P0-4 | Restore non-fusion experimental figures and text | `Paper/content.tex` (TRR layer figure + listening figures/tables) | Historical valid figures are present with matching descriptions | Done |
-| P0-5 | No setup script filename in experiment setup | `Paper/content.tex` | Setup paragraph contains no `profile.py` or report filename reference | Done |
+| ID | Item | Acceptance Criterion | Status |
+| --- | --- | --- | --- |
+| P0-1 | Main objective evidence anchored to audited Protocol-A | `Paper/content.tex` and `Paper/supplementary.tex` cite the split audit plus `protocolA_audio_grouped_objective_stats.*` and `protocolA_audio_grouped_per_query_metrics.csv` for the main objective comparison | Done |
+| P0-2 | Protocol-C positioned as diagnostic only | No submission-facing document describes Protocol-C as a real-audio robustness benchmark | Done |
+| P0-3 | Listening study anchored to canonical report | Submission-facing docs use `Experiments/mushura/results_report.md` for participants, ratings, and nonparametric tests | Done |
+| P0-4 | Deprecated / legacy artifacts removed from main evidence chain | No submission-facing document uses `retrieval_comparison_report.md` or `protocolB_objective_stats.*` as formal evidence | Done |
 
-## P1: Reviewer Major-Revision Actions (Need to Complete Before Resubmission)
+## P1: Derived Protocol-A Diagnostics
 
-| ID | Reviewer Concern | Required Action | Target Section/File | Deliverable | Status |
-|---|---|---|---|---|---|
-| P1-A | Generalization beyond guitar benchmark | Add at least one non-guitar dataset/domain and cross-domain evaluation | `Paper/content.tex` Experiments + Discussion | New table with per-domain metrics and split details | Planned |
-| P1-B | Stronger baselines | Add CLAP/PaSST retrieval baselines and at least one learned regressor/reranker | `Paper/content.tex` RQ1 + Supplementary | Expanded baseline table and significance test | Planned |
-| P1-C | Subjective protocol standardization | Add participant expertise metadata, loudness matching, time budget, and explicit production-utility score | `Paper/content.tex` Listening subsection + Supplementary protocol appendix | Protocol checklist + updated subjective results | Planned |
-| P1-D | TRR layer-10 mechanism depth | Add acoustic probing analysis for layer behavior (transient/modulation sensitivity) | `Paper/content.tex` TRR subsection + appendix | Probe figure/table + explanatory paragraph | In Progress |
-| P1-E | Deterministic repair detail | Add explicit repair/projection pseudo-code and one discrete-constraint repair case | `Paper/content.tex` Method + appendix | Algorithm block + worked example | Planned |
+| ID | Item | Acceptance Criterion | Status |
+| --- | --- | --- | --- |
+| P1-1 | Per-query diagnostics generated from canonical CSV | `Experiments/AblationStudies/protocolA_audio_grouped_derived_analysis.md` and `.json` exist and are reproducible from `protocolA_audio_grouped_per_query_metrics.csv` | Done |
+| P1-2 | Win/loss/tie summary added to supplementary | Supplementary reports per-baseline TRR diagnostics beyond mean-only tables | Done |
+| P1-3 | Representative success/failure cases added | Supplementary includes case-level evidence derived from the canonical per-query CSV | Done |
+| P1-4 | Bookkeeping note added for query pairing | Supplementary explains the `204` paired rows vs `203` unique `query_name` labels and clarifies that pairing uses `query_idx` | Done |
 
-## P2: Format and Submission Hygiene
+## P2: Listening and Protocol-C Reporting
 
-| ID | Item | Target | Acceptance Criterion | Status |
-|---|---|---|---|---|
-| P2-1 | Acronym completeness | `Paper/content.tex` + figures | All abbreviations are defined at first appearance | In progress |
-| P2-2 | Final language/typography sweep | Full manuscript | No inconsistent capitalization/punctuation in technical terms | In progress |
-| P2-3 | Reproducibility package link finalization | Reproducibility paragraph | Public anonymized repo URL + scripts + splits + environment spec | Planned |
+| ID | Item | Acceptance Criterion | Status |
+| --- | --- | --- | --- |
+| P2-1 | Protocol-C boundary-condition table added | Supplementary reports scenario-level fallback behavior and conflict degradation | Done |
+| P2-2 | Protocol-C paired L2 tests added | Supplementary includes Holm-corrected L2 comparisons for the diagnostic scenarios | Done |
+| P2-3 | Listening-study repeated-measures stats added | Supplementary includes Friedman and Wilcoxon/Holm tables with `rbc` | Done |
+| P2-4 | Non-standard MUSHRA wording avoided | Submission-facing docs consistently describe the study as multiple-stimulus with hidden reference and no explicit anchor | Done |
+| P2-5 | Listening-study caveats surfaced in support docs | Submission-facing docs state that `HCAP` is only a raw-log label and that manual-baseline provenance/time-budget metadata are incomplete | Done |
 
-## Verified Numeric Match Snapshot (Current)
+## P3: Scope Hygiene
 
-The following rows in `Paper/content.tex` and `Paper/supplementary.tex` have been audited and are currently identical to the canonical experimental outputs (Protocol-A, $N=211$):
+| ID | Item | Acceptance Criterion | Status |
+| --- | --- | --- | --- |
+| P3-1 | Architecture figure matches verified pipeline | Main paper figure no longer shows AEM, episodic memory, or unsupported system modules | Done |
+| P3-2 | AEM / personalization downgraded to exploratory | No submission-facing document treats memory/personalization as a verified main contribution | Done |
+| P3-3 | Only verified strong-baseline claims remain | Submission-facing docs include CLAP only where backed by canonical artifacts, and do not claim PaSST / PANNs / direct regressors are completed | Done |
+| P3-4 | Metric redesign claims removed unless verified | No submission-facing document claims normalized metrics or categorical-metric reform has been completed | Done |
 
-- **TRR**: `0.3064 / 0.7253 / 0.6990 / 0.8376 / 0.9574`
-- **Wav2Vec-RAG**: `0.3625 / 0.6434 / 0.5748 / 0.7364 / 0.9116`
-- **Text-RAG**: `0.4573 / 0.7034 / 0.6407 / 0.7404 / 0.8625`
-- **FeatureNN-RAG**: `1.1729 / 0.6765 / 0.6485 / 0.7757 / 0.9602`
-- **Pure LLM**: `13.6520 / 0.4361 / 0.2127 / 0.3779 / 0.7053`
+## Final Verification Targets
 
-## Operational Notes
-
-The `retrieval_comparison_report.md` file is currently utilized as a legacy bridge for consistency checking. Prior to final resubmission, all objective claims must be cross-verified against the canonical protocol outputs, specifically `protocolA_objective_stats.md` and the raw per-query metrics CSV, to eliminate any potential source-of-truth ambiguity. All statistical significance markers (confidence intervals and $p$-values) must follow the bootstrap-corrected results reported in the Supplementary Material.
+- Main paper compiles cleanly with the revised architecture figure and updated result text.
+- Submission-facing docs are numerically consistent on:
+  - `N_total=1267`
+  - legacy split audit: `N_test=211`, `N_kb=1056`, `16` shared resolved audio paths
+  - stricter Protocol-A: `N_test=204`, `N_kb=1063`
+  - TRR on stricter Protocol-A: `8.0467 / 0.5169 / 0.4595 / 0.8247 / 0.8051`
+  - CLAP coverage on stricter Protocol-A: `201` queries
+  - Listening study `26 participants / 910 ratings`
+- Repository-backed response docs no longer contain stale claims about larger datasets, stronger baselines, real-audio Protocol-C, normalized metrics, or AEM learning curves.

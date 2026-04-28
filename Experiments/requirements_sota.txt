@@ -1,0 +1,26 @@
+# Optional dependencies for SOTA retrieval baselines (CLAP / PaSST / PANNs) and stats.
+#
+# Install (recommended in a venv):
+#   python -m pip install -r Experiments/requirements_sota.txt
+#
+# Notes:
+# - CLAP in this repo can run from precomputed `Data/Audio_Synthetic/*.wav.clap.npy` without installing laion-clap.
+# - PaSST/PANNs embeddings are computed offline and cached as `*.wav.passt.npy` / `*.wav.panns.npy`.
+
+numpy
+scipy
+pandas
+matplotlib
+seaborn
+soundfile
+
+# Deep learning
+torch
+torchaudio
+timm
+
+# Baselines
+hear21passt
+panns-inference
+laion-clap
+

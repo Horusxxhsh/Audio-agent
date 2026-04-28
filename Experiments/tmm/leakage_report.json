@@ -1,0 +1,10 @@
+{
+  "dataset_json": "/Users/xyh/Code/Audio-agent/Experiments/dataset_full_vectors.json",
+  "n_items_with_audio": 0,
+  "exact_duplicate_groups": [],
+  "n_exact_duplicate_groups": 0,
+  "near_duplicate_threshold": 0.995,
+  "near_duplicate_pairs": [],
+  "n_near_duplicate_pairs": 0,
+  "note": "Near-duplicate scan uses a cheap log-STFT fingerprint; upgrade to TRR/CLAP-based scan for stricter auditing."
+}

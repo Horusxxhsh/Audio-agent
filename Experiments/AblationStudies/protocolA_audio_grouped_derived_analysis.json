@@ -1,0 +1,647 @@
+{
+  "input_csv": "Experiments/AblationStudies/protocolA_audio_grouped_per_query_metrics.csv",
+  "query_count": 204,
+  "unique_query_names": 203,
+  "baselines": [
+    {
+      "baseline": "CLAP",
+      "n_shared_queries": 201,
+      "metric_summaries": {
+        "l2": {
+          "n": 201,
+          "wins": 130,
+          "losses": 54,
+          "ties": 17,
+          "mean": 14.146006582466942,
+          "median": 0.06580264787781254,
+          "p25": -0.003795744801505213,
+          "p75": 36.07742558617027,
+          "min": -57.31979412804105,
+          "max": 71.68208620334504
+        },
+        "acc@0.1": {
+          "n": 201,
+          "wins": 104,
+          "losses": 66,
+          "ties": 31,
+          "mean": 0.06395046389720031,
+          "median": 0.009852216748768461,
+          "p25": -0.047619047619047616,
+          "p75": 0.19047619047619052,
+          "min": -0.7355769230769231,
+          "max": 0.8125
+        },
+        "recall": {
+          "n": 201,
+          "wins": 103,
+          "losses": 58,
+          "ties": 40,
+          "mean": 0.0600301853973728,
+          "median": 0.038461538461538464,
+          "p25": -0.05882352941176472,
+          "p75": 0.2222222222222222,
+          "min": -0.9285714285714286,
+          "max": 0.8888888888888888
+        },
+        "cosine": {
+          "n": 201,
+          "wins": 124,
+          "losses": 60,
+          "ties": 17,
+          "mean": 0.25029470629421274,
+          "median": 0.008180280735955114,
+          "p25": -0.0010963134069892355,
+          "p75": 0.8535036250932089,
+          "min": -0.9361751916211281,
+          "max": 1.076460627573452
+        },
+        "module": {
+          "n": 201,
+          "wins": 79,
+          "losses": 39,
+          "ties": 83,
+          "mean": 0.07812327252625763,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.4,
+          "min": -0.7142857142857143,
+          "max": 0.75
+        }
+      },
+      "top_gains_l2": [
+        {
+          "query_idx": 132,
+          "query_name": "Modular Hybrid Drift",
+          "trr_retrieved": "Prepared Guitar Static",
+          "baseline_retrieved": "Ethereal Wave",
+          "delta_l2": 71.68208620334504,
+          "trr_l2": 0.11780904646321277,
+          "baseline_l2": 71.79989524980824
+        },
+        {
+          "query_idx": 29,
+          "query_name": "Smooth Jazz Lead Velvet",
+          "trr_retrieved": "Middle Eastern Sahara",
+          "baseline_retrieved": "Japanese Ambient",
+          "delta_l2": 71.46976273720149,
+          "trr_l2": 0.0,
+          "baseline_l2": 71.46976273720149
+        },
+        {
+          "query_idx": 88,
+          "query_name": "Overtone Drone Glitch",
+          "trr_retrieved": "Latin Rock Fusion Moonrise",
+          "baseline_retrieved": "Japanese Ambient",
+          "delta_l2": 69.76211500590007,
+          "trr_l2": 1.708211387471034,
+          "baseline_l2": 71.47032639337111
+        },
+        {
+          "query_idx": 195,
+          "query_name": "Shoegaze Wall Static",
+          "trr_retrieved": "Nashville Session Sunrise",
+          "baseline_retrieved": "Post-Britpop",
+          "delta_l2": 69.67228592690246,
+          "trr_l2": 1.7100548128224262,
+          "baseline_l2": 71.38234073972488
+        },
+        {
+          "query_idx": 182,
+          "query_name": "Bluegrass Flatpick Rambler",
+          "trr_retrieved": "Raw Black Metal Onslaught",
+          "baseline_retrieved": "Cinematic Trailer",
+          "delta_l2": 69.03815152256043,
+          "trr_l2": 0.4728563598988325,
+          "baseline_l2": 69.51100788245925
+        }
+      ],
+      "top_failures_l2": [
+        {
+          "query_idx": 48,
+          "query_name": "Talk Box Funk",
+          "trr_retrieved": "Schlager Pop",
+          "baseline_retrieved": "Drum and Bass Synth",
+          "delta_l2": -57.31979412804105,
+          "trr_l2": 61.16057782666082,
+          "baseline_l2": 3.8407836986197665
+        },
+        {
+          "query_idx": 110,
+          "query_name": "Berlin Techno",
+          "trr_retrieved": "Chromatic Jazz",
+          "baseline_retrieved": "Multicultural Fusion",
+          "delta_l2": -55.263362424378464,
+          "trr_l2": 60.13873004365364,
+          "baseline_l2": 4.875367619275177
+        },
+        {
+          "query_idx": 185,
+          "query_name": "Qawwali Devotional",
+          "trr_retrieved": "French Touch",
+          "baseline_retrieved": "Queercore DIY",
+          "delta_l2": -50.91219024889439,
+          "trr_l2": 51.43301751244877,
+          "baseline_l2": 0.5208272635543794
+        },
+        {
+          "query_idx": 94,
+          "query_name": "Lo-Fi House",
+          "trr_retrieved": "Soft Grunge",
+          "baseline_retrieved": "Reverse Ambient Drift",
+          "delta_l2": -50.78641798303454,
+          "trr_l2": 54.841294537413226,
+          "baseline_l2": 4.054876554378691
+        },
+        {
+          "query_idx": 13,
+          "query_name": "Wah-Wah Rock",
+          "trr_retrieved": "Shimmer Reverb",
+          "baseline_retrieved": "Auto-Wah Funk - Velvet Groove Version",
+          "delta_l2": -49.49017032053831,
+          "trr_l2": 105.68092169670751,
+          "baseline_l2": 56.1907513761692
+        }
+      ]
+    },
+    {
+      "baseline": "FeatureNN-RAG",
+      "n_shared_queries": 204,
+      "metric_summaries": {
+        "l2": {
+          "n": 204,
+          "wins": 130,
+          "losses": 49,
+          "ties": 25,
+          "mean": 11.214615925346498,
+          "median": 0.22063813349550654,
+          "p25": 0.0,
+          "p75": 26.69796634947298,
+          "min": -56.38593097947506,
+          "max": 72.13685419248255
+        },
+        "acc@0.1": {
+          "n": 204,
+          "wins": 114,
+          "losses": 57,
+          "ties": 33,
+          "mean": 0.09713115875612964,
+          "median": 0.047619047619047616,
+          "p25": -0.02557194960212203,
+          "p75": 0.2394218684541265,
+          "min": -0.6363636363636364,
+          "max": 0.7916666666666666
+        },
+        "recall": {
+          "n": 204,
+          "wins": 103,
+          "losses": 57,
+          "ties": 44,
+          "mean": 0.0995048998941386,
+          "median": 0.03846153846153845,
+          "p25": -0.05555555555555554,
+          "p75": 0.27999999999999997,
+          "min": -0.9285714285714286,
+          "max": 1.0
+        },
+        "cosine": {
+          "n": 204,
+          "wins": 122,
+          "losses": 57,
+          "ties": 25,
+          "mean": 0.27686071633506715,
+          "median": 0.008135703285436502,
+          "p25": -0.0007219628448918158,
+          "p75": 0.8408530532835182,
+          "min": -0.9359366791639548,
+          "max": 1.0718991977052257
+        },
+        "module": {
+          "n": 204,
+          "wins": 86,
+          "losses": 40,
+          "ties": 78,
+          "mean": 0.0916880641145347,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.33333333333333337,
+          "min": -0.7142857142857143,
+          "max": 0.8888888888888888
+        }
+      },
+      "top_gains_l2": [
+        {
+          "query_idx": 65,
+          "query_name": "Sub-Bass Drone",
+          "trr_retrieved": "Hauntology Library",
+          "baseline_retrieved": "Dark Ambient Drone Prism",
+          "delta_l2": 72.13685419248255,
+          "trr_l2": 0.6873685608620301,
+          "baseline_l2": 72.82422275334457
+        },
+        {
+          "query_idx": 101,
+          "query_name": "Shoegaze Drone",
+          "trr_retrieved": "Floating Synth",
+          "baseline_retrieved": "Modular Hybrid Flux",
+          "delta_l2": 70.30572166153624,
+          "trr_l2": 1.2173820113417384,
+          "baseline_l2": 71.52310367287798
+        },
+        {
+          "query_idx": 195,
+          "query_name": "Shoegaze Wall Static",
+          "trr_retrieved": "Nashville Session Sunrise",
+          "baseline_retrieved": "Ethereal Wave",
+          "delta_l2": 70.07797853266933,
+          "trr_l2": 1.7100548128224262,
+          "baseline_l2": 71.78803334549175
+        },
+        {
+          "query_idx": 192,
+          "query_name": "Ambient Guitar Loop",
+          "trr_retrieved": "Post-Britpop",
+          "baseline_retrieved": "Lo-Fi Bedroom Pop Dream",
+          "delta_l2": 67.86646552849669,
+          "trr_l2": 1.8635751310936646,
+          "baseline_l2": 69.73004065959036
+        },
+        {
+          "query_idx": 84,
+          "query_name": "Spectral Freeze Drift",
+          "trr_retrieved": "Celtic Folk Sahara",
+          "baseline_retrieved": "Ritual Ambient",
+          "delta_l2": 67.21646244208176,
+          "trr_l2": 1.7965728049075367,
+          "baseline_l2": 69.0130352469893
+        }
+      ],
+      "top_failures_l2": [
+        {
+          "query_idx": 181,
+          "query_name": "Rave Hardcore",
+          "trr_retrieved": "Dark Ambient",
+          "baseline_retrieved": "Melodic Death Metal",
+          "delta_l2": -56.38593097947506,
+          "trr_l2": 56.63678689889434,
+          "baseline_l2": 0.2508559194192778
+        },
+        {
+          "query_idx": 102,
+          "query_name": "Urban Cowboy",
+          "trr_retrieved": "Fender Rhodes Jazz",
+          "baseline_retrieved": "Sonic Youth Noise",
+          "delta_l2": -53.09480453997894,
+          "trr_l2": 56.79179551497885,
+          "baseline_l2": 3.6969909749999115
+        },
+        {
+          "query_idx": 76,
+          "query_name": "Stripped Acoustic",
+          "trr_retrieved": "Piano Ballad",
+          "baseline_retrieved": "Country Telecaster Outlaw",
+          "delta_l2": -52.82451717900228,
+          "trr_l2": 56.47816982316081,
+          "baseline_l2": 3.653652644158537
+        },
+        {
+          "query_idx": 110,
+          "query_name": "Berlin Techno",
+          "trr_retrieved": "Chromatic Jazz",
+          "baseline_retrieved": "West Coast Hip Hop",
+          "delta_l2": -52.51439176215214,
+          "trr_l2": 60.13873004365364,
+          "baseline_l2": 7.624338281501499
+        },
+        {
+          "query_idx": 148,
+          "query_name": "Phased Synth",
+          "trr_retrieved": "London Jazz",
+          "baseline_retrieved": "Nightcore Speed",
+          "delta_l2": -51.68784671674459,
+          "trr_l2": 59.176121546308266,
+          "baseline_l2": 7.4882748295636805
+        }
+      ]
+    },
+    {
+      "baseline": "Text-RAG",
+      "n_shared_queries": 204,
+      "metric_summaries": {
+        "l2": {
+          "n": 204,
+          "wins": 117,
+          "losses": 69,
+          "ties": 18,
+          "mean": 16.123786902101937,
+          "median": 0.12475745838246227,
+          "p25": -0.14821150105762412,
+          "p75": 47.19445933087486,
+          "min": -57.36230267722347,
+          "max": 72.20398412522054
+        },
+        "acc@0.1": {
+          "n": 204,
+          "wins": 97,
+          "losses": 80,
+          "ties": 27,
+          "mean": 0.04525635190628857,
+          "median": 0.0,
+          "p25": -0.09523809523809523,
+          "p75": 0.16545092838196288,
+          "min": -0.6666666666666667,
+          "max": 0.7692307692307692
+        },
+        "recall": {
+          "n": 204,
+          "wins": 97,
+          "losses": 68,
+          "ties": 39,
+          "mean": 0.06283970844621965,
+          "median": 0.0,
+          "p25": -0.07999999999999999,
+          "p75": 0.16666666666666669,
+          "min": -0.7222222222222222,
+          "max": 0.8181818181818182
+        },
+        "cosine": {
+          "n": 204,
+          "wins": 117,
+          "losses": 69,
+          "ties": 18,
+          "mean": 0.33043105988118526,
+          "median": 0.031099150746750404,
+          "p25": -0.01676012588736986,
+          "p75": 0.9567205404721345,
+          "min": -0.7852786979757859,
+          "max": 0.9971661154241328
+        },
+        "module": {
+          "n": 204,
+          "wins": 73,
+          "losses": 56,
+          "ties": 75,
+          "mean": 0.05948685029567378,
+          "median": 0.0,
+          "p25": -0.11111111111111116,
+          "p75": 0.4444444444444444,
+          "min": -0.7142857142857143,
+          "max": 0.8571428571428572
+        }
+      },
+      "top_gains_l2": [
+        {
+          "query_idx": 65,
+          "query_name": "Sub-Bass Drone",
+          "trr_retrieved": "Hauntology Library",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": 72.20398412522054,
+          "trr_l2": 0.6873685608620301,
+          "baseline_l2": 72.89135268608257
+        },
+        {
+          "query_idx": 59,
+          "query_name": "Ghostly Pad",
+          "trr_retrieved": "Rainforest Ambient",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": 70.64857234899301,
+          "trr_l2": 0.12505106649192424,
+          "baseline_l2": 70.77362341548493
+        },
+        {
+          "query_idx": 101,
+          "query_name": "Shoegaze Drone",
+          "trr_retrieved": "Floating Synth",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": 70.35056135613686,
+          "trr_l2": 1.2173820113417384,
+          "baseline_l2": 71.5679433674786
+        },
+        {
+          "query_idx": 195,
+          "query_name": "Shoegaze Wall Static",
+          "trr_retrieved": "Nashville Session Sunrise",
+          "baseline_retrieved": "Shoegaze Wall",
+          "delta_l2": 70.27201048755076,
+          "trr_l2": 1.7100548128224262,
+          "baseline_l2": 71.98206530037318
+        },
+        {
+          "query_idx": 142,
+          "query_name": "Chamber Pop Dream",
+          "trr_retrieved": "Motown Soul Philly",
+          "baseline_retrieved": "Dream Pop Wash",
+          "delta_l2": 68.76426302077438,
+          "trr_l2": 0.15427785385620385,
+          "baseline_l2": 68.91854087463058
+        }
+      ],
+      "top_failures_l2": [
+        {
+          "query_idx": 48,
+          "query_name": "Talk Box Funk",
+          "trr_retrieved": "Schlager Pop",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": -57.36230267722347,
+          "trr_l2": 61.16057782666082,
+          "baseline_l2": 3.7982751494373512
+        },
+        {
+          "query_idx": 76,
+          "query_name": "Stripped Acoustic",
+          "trr_retrieved": "Piano Ballad",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": -52.860693975164956,
+          "trr_l2": 56.47816982316081,
+          "baseline_l2": 3.617475847995856
+        },
+        {
+          "query_idx": 94,
+          "query_name": "Lo-Fi House",
+          "trr_retrieved": "Soft Grunge",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": -51.14353035674495,
+          "trr_l2": 54.841294537413226,
+          "baseline_l2": 3.697764180668276
+        },
+        {
+          "query_idx": 13,
+          "query_name": "Wah-Wah Rock",
+          "trr_retrieved": "Shimmer Reverb",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": -43.648742107645134,
+          "trr_l2": 105.68092169670751,
+          "baseline_l2": 62.03217958906238
+        },
+        {
+          "query_idx": 181,
+          "query_name": "Rave Hardcore",
+          "trr_retrieved": "Dark Ambient",
+          "baseline_retrieved": "Studio Clean",
+          "delta_l2": -34.70797016880435,
+          "trr_l2": 56.63678689889434,
+          "baseline_l2": 21.928816730089995
+        }
+      ]
+    },
+    {
+      "baseline": "Wav2Vec-RAG",
+      "n_shared_queries": 204,
+      "metric_summaries": {
+        "l2": {
+          "n": 204,
+          "wins": 125,
+          "losses": 40,
+          "ties": 39,
+          "mean": 15.77300108654269,
+          "median": 0.12383579002789841,
+          "p25": 0.0,
+          "p75": 38.36347427680157,
+          "min": -51.68784671674459,
+          "max": 76.26705555217869
+        },
+        "acc@0.1": {
+          "n": 204,
+          "wins": 107,
+          "losses": 46,
+          "ties": 51,
+          "mean": 0.09178223978100739,
+          "median": 0.03125,
+          "p25": 0.0,
+          "p75": 0.23888888888888887,
+          "min": -0.7355769230769231,
+          "max": 0.7692307692307692
+        },
+        "recall": {
+          "n": 204,
+          "wins": 102,
+          "losses": 49,
+          "ties": 53,
+          "mean": 0.10905570690841354,
+          "median": 0.019230769230769218,
+          "p25": 0.0,
+          "p75": 0.25,
+          "min": -0.9285714285714286,
+          "max": 0.9090909090909091
+        },
+        "cosine": {
+          "n": 204,
+          "wins": 121,
+          "losses": 44,
+          "ties": 39,
+          "mean": 0.29555904675323363,
+          "median": 0.014211752831683688,
+          "p25": 0.0,
+          "p75": 0.8384538392151404,
+          "min": -0.9318198162283031,
+          "max": 1.0693482967794823
+        },
+        "module": {
+          "n": 204,
+          "wins": 84,
+          "losses": 43,
+          "ties": 77,
+          "mean": 0.10076641767818238,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 0.35,
+          "min": -0.7142857142857143,
+          "max": 0.8
+        }
+      },
+      "top_gains_l2": [
+        {
+          "query_idx": 79,
+          "query_name": "3-Chord Punk",
+          "trr_retrieved": "Distorted Cassette",
+          "baseline_retrieved": "Britpop Jangle",
+          "delta_l2": 76.26705555217869,
+          "trr_l2": 3.94963983265466,
+          "baseline_l2": 80.21669538483334
+        },
+        {
+          "query_idx": 65,
+          "query_name": "Sub-Bass Drone",
+          "trr_retrieved": "Hauntology Library",
+          "baseline_retrieved": "Dark Ambient Drone Flux",
+          "delta_l2": 72.15874888450188,
+          "trr_l2": 0.6873685608620301,
+          "baseline_l2": 72.8461174453639
+        },
+        {
+          "query_idx": 191,
+          "query_name": "Japanese Enka Sunset",
+          "trr_retrieved": "Middle Eastern Andean",
+          "baseline_retrieved": "Tangerine Dream Style",
+          "delta_l2": 71.92050554143425,
+          "trr_l2": 0.13847748484690142,
+          "baseline_l2": 72.05898302628115
+        },
+        {
+          "query_idx": 84,
+          "query_name": "Spectral Freeze Drift",
+          "trr_retrieved": "Celtic Folk Sahara",
+          "baseline_retrieved": "Space Ambient",
+          "delta_l2": 70.81482925037189,
+          "trr_l2": 1.7965728049075367,
+          "baseline_l2": 72.61140205527943
+        },
+        {
+          "query_idx": 101,
+          "query_name": "Shoegaze Drone",
+          "trr_retrieved": "Floating Synth",
+          "baseline_retrieved": "Modular Hybrid Flux",
+          "delta_l2": 70.30572166153624,
+          "trr_l2": 1.2173820113417384,
+          "baseline_l2": 71.52310367287798
+        }
+      ],
+      "top_failures_l2": [
+        {
+          "query_idx": 148,
+          "query_name": "Phased Synth",
+          "trr_retrieved": "London Jazz",
+          "baseline_retrieved": "Nightcore Speed",
+          "delta_l2": -51.68784671674459,
+          "trr_l2": 59.176121546308266,
+          "baseline_l2": 7.4882748295636805
+        },
+        {
+          "query_idx": 13,
+          "query_name": "Wah-Wah Rock",
+          "trr_retrieved": "Shimmer Reverb",
+          "baseline_retrieved": "Auto-Wah Funk Rhythm",
+          "delta_l2": -49.490314995729314,
+          "trr_l2": 105.68092169670751,
+          "baseline_l2": 56.1906067009782
+        },
+        {
+          "query_idx": 181,
+          "query_name": "Rave Hardcore",
+          "trr_retrieved": "Dark Ambient",
+          "baseline_retrieved": "Drum and Bass Beat",
+          "delta_l2": -34.73698814149277,
+          "trr_l2": 56.63678689889434,
+          "baseline_l2": 21.89979875740157
+        },
+        {
+          "query_idx": 102,
+          "query_name": "Urban Cowboy",
+          "trr_retrieved": "Fender Rhodes Jazz",
+          "baseline_retrieved": "Reggae Dubplate",
+          "delta_l2": -30.95808672721923,
+          "trr_l2": 56.79179551497885,
+          "baseline_l2": 25.833708787759623
+        },
+        {
+          "query_idx": 202,
+          "query_name": "Chinese Guzheng Ambient",
+          "trr_retrieved": "Horror Movie Score",
+          "baseline_retrieved": "Bell Choir Ambient",
+          "delta_l2": -20.557268287557232,
+          "trr_l2": 21.577759063153426,
+          "baseline_l2": 1.0204907755961925
+        }
+      ]
+    }
+  ]
+}
