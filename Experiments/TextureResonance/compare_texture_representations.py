@@ -355,6 +355,17 @@ def evaluate_retrieval_method(
     if not candidate_embeddings:
         return {"param_distance": 0.0, "cosine": 0.0, "acc_01": 0.0, "n_samples": 0}
 
+    dim_counts: Dict[int, int] = {}
+    for emb in candidate_embeddings:
+        dim_counts[int(np.asarray(emb).shape[0])] = dim_counts.get(int(np.asarray(emb).shape[0]), 0) + 1
+    dominant_dim = max(dim_counts.items(), key=lambda kv: kv[1])[0]
+    filtered = [
+        (np.asarray(emb), idx)
+        for emb, idx in zip(candidate_embeddings, candidate_ids)
+        if int(np.asarray(emb).shape[0]) == int(dominant_dim)
+    ]
+    candidate_embeddings = [emb for emb, _idx in filtered]
+    candidate_ids = [idx for _emb, idx in filtered]
     candidate_embeddings_arr = np.array(candidate_embeddings)
 
     param_distances = []
@@ -368,6 +379,8 @@ def evaluate_retrieval_method(
 
         query_emb = method.get_embedding(audio_path)
         if query_emb is None:
+            continue
+        if int(np.asarray(query_emb).shape[0]) != int(dominant_dim):
             continue
 
         similarities = cosine_similarity_batch(query_emb, candidate_embeddings_arr).flatten()

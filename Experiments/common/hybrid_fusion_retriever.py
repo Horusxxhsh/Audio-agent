@@ -68,13 +68,10 @@ class HybridFusionRetriever:
         print(f"  >> Text Retriever Ready ({len(self.dataset)} items)")
 
     def _build_text(self, item):
-        """构建文本表示（参考RAGRetriever，使用Style字段）"""
+        """构建文本表示：Protocol-C 使用 Style + Feature，不使用 SongName。"""
         style = " ".join(item.get('Style', []))
         feature = " ".join(item.get('Feature', []))
-        song_name = item.get('SongName', '').replace('_', ' ')  # 将下划线替换为空格，提高匹配度
-        # 只使用SongName和Style，不使用Feature（Feature包含过多无关描述）
-        # 这样可以更好地匹配Base样本
-        return f"{song_name} {style}"
+        return f"{style} {feature}".strip()
 
     def _init_audio_retriever(self):
         """初始化 TRR 音频检索器"""
@@ -162,7 +159,14 @@ class HybridFusionRetriever:
 
     def retrieve_top_k_weighted(self, query_text: str, query_audio_path: Optional[str] = None,
                                query_trr_vector: Optional[List[float]] = None,
-                               alpha: float = 0.5, k: int = 5) -> List[Dict]:
+                               alpha: float = 0.5, k: int = 5,
+                               score_norm: str = "none",
+                               text_scale: float = 1.0,
+                               audio_scale: float = 1.0,
+                               adaptive_alpha_mode: str = "none",
+                               alpha_min: float = 0.3,
+                               alpha_max: float = 0.8,
+                               confidence_temperature: float = 8.0) -> List[Dict]:
         """
         加权融合模式
 
@@ -175,6 +179,7 @@ class HybridFusionRetriever:
             query_trr_vector: 查询TRR向量（可选，直接使用JSON中的向量）
             alpha: 融合权重
             k: 返回结果数量
+            score_norm: 分数归一化方式（none/zscore/minmax）
         """
         # 1. 文本检索分数
         query_vec = self.vectorizer.transform([query_text])
@@ -218,17 +223,35 @@ class HybridFusionRetriever:
         else:
             audio_scores = np.zeros(len(self.dataset))
 
-        # 3. 分数缩放（不使用min-max归一化，以保留噪声对排名的影响）
+        def normalize(scores: np.ndarray, mode: str) -> np.ndarray:
+            if mode == "none":
+                return scores
+            if mode == "zscore":
+                sigma = float(np.std(scores))
+                if sigma < 1e-12:
+                    return np.zeros_like(scores)
+                return (scores - float(np.mean(scores))) / sigma
+            if mode == "minmax":
+                lo = float(np.min(scores))
+                hi = float(np.max(scores))
+                if hi - lo < 1e-12:
+                    return np.zeros_like(scores)
+                return (scores - lo) / (hi - lo)
+            raise ValueError(f"Unknown score_norm: {score_norm}")
 
-        # 文本分数：TF-IDF余弦相似度，保持在[0, 1]范围
-        text_scores_scaled = text_scores
+        def top_margin(scores: np.ndarray) -> float:
+            if len(scores) < 2:
+                return 0.0
+            top2 = np.sort(scores)[-2:]
+            return float(top2[-1] - top2[-2])
 
-        # 音频分数：TRR点积
-        # 调试发现原始点积在0.5-1.0范围（可能TRR向量已归一化）
-        # 使用缩放因子1.0（不缩放），让audio分数与text分数在相似范围
-        # 或者使用乘数放大audio分数的影响
-        TRR_SCALE_FACTOR = 1.0  # 不缩放
-        audio_scores_scaled = audio_scores / TRR_SCALE_FACTOR
+        text_scores_scaled = normalize(text_scores, score_norm) * float(text_scale)
+        audio_scores_scaled = normalize(audio_scores, score_norm) * float(audio_scale)
+
+        if adaptive_alpha_mode == "confidence":
+            margin_delta = top_margin(text_scores_scaled) - top_margin(audio_scores_scaled)
+            conf = 1.0 / (1.0 + np.exp(-float(confidence_temperature) * margin_delta))
+            alpha = float(alpha_min) + (float(alpha_max) - float(alpha_min)) * float(conf)
 
         # 4. 加权融合
         # 现在两个分数的量纲相似，可以直接加权
@@ -358,7 +381,14 @@ class HybridFusionRetriever:
 
     def retrieve_top_k(self, query_text: str, query_audio_path: Optional[str] = None,
                      query_trr_vector: Optional[List[float]] = None,
-                     alpha: float = 0.5, k: int = 5) -> List[Dict]:
+                     alpha: float = 0.5, k: int = 5,
+                     score_norm: str = "none",
+                     text_scale: float = 1.0,
+                     audio_scale: float = 1.0,
+                     adaptive_alpha_mode: str = "none",
+                     alpha_min: float = 0.3,
+                     alpha_max: float = 0.8,
+                     confidence_temperature: float = 8.0) -> List[Dict]:
         """
         检索最相关的 k 个项目（统一接口）
 
@@ -370,7 +400,20 @@ class HybridFusionRetriever:
             k: 返回结果数量
         """
         if self.fusion_mode == 'weighted':
-            return self.retrieve_top_k_weighted(query_text, query_audio_path, query_trr_vector, alpha, k)
+            return self.retrieve_top_k_weighted(
+                query_text,
+                query_audio_path,
+                query_trr_vector,
+                alpha,
+                k,
+                score_norm,
+                text_scale,
+                audio_scale,
+                adaptive_alpha_mode,
+                alpha_min,
+                alpha_max,
+                confidence_temperature,
+            )
         elif self.fusion_mode == 'voting':
             return self.retrieve_top_k_voting(query_text, query_audio_path, k)
         elif self.fusion_mode == 'cascade':

@@ -4,6 +4,8 @@
 \usepackage{enumitem}
 \usepackage{booktabs}
 \usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
 
 \definecolor{reviewercolor}{RGB}{0,0,180}
 \definecolor{responsecolor}{RGB}{0,100,0}
@@ -19,6 +21,7 @@
 \date{}
 
 \begin{document}
+\sloppy
 \maketitle
 
 We sincerely thank the reviewers for their detailed and constructive feedback. Below we address each concern point by point, organized by the major (M1--M5) and minor (m1--m8) issues identified in the review. All referenced section, table, and figure numbers refer to the revised manuscript.
@@ -32,12 +35,12 @@ We sincerely thank the reviewers for their detailed and constructive feedback. B
 \response{We agree that dataset scale is a genuine limitation and have taken concrete steps to quantify its impact on the reported results:}
 
 \begin{enumerate}[leftmargin=*]
-\item \textbf{Near-duplicate sensitivity analysis} (new Section 4.1, paragraph ``Near-duplicate sensitivity analysis''): We progressively remove near-duplicates from the knowledge base at four L2 thresholds ($\tau \in \{0.005, 0.01, 0.02, 0.05\}$) and re-evaluate all methods. TRR retains its relative advantage across all thresholds, though absolute performance degrades gracefully as the KB shrinks. Full results appear in Supplementary Table~S8.
+\item \textbf{Near-duplicate sensitivity analysis} (new Protocol-A paragraph ``Near-duplicate sensitivity''): We progressively remove near-duplicates from the knowledge base at four L2 thresholds ($\tau \in \{0.005, 0.01, 0.02, 0.05\}$) and re-evaluate TRR. The normalized L2 degrades as the KB shrinks from 1,063 to 83 candidates, so the revised paper treats database density as a real boundary condition rather than as a solved issue. Full details appear in the supplementary sensitivity subsection.
 \item \textbf{Near-duplicate detection infrastructure}: We provide a reusable \texttt{near\_dup\_filter.py} script and \texttt{near\_dup\_sensitivity.py} experiment, enabling reviewers to reproduce the analysis at arbitrary thresholds.
-\item \textbf{Explicit scope acknowledgment}: We clearly state in Section 4.1 and the Discussion that this is a pilot benchmark on guitar effects, not a claim of universal scale.
+\item \textbf{Explicit scope acknowledgment}: We clearly state in the experimental setup, Discussion, and Limitations that this is a pilot benchmark on guitar effects, not a claim of universal scale.
 \end{enumerate}
 
-\change{Section 4.1 ``Near-duplicate sensitivity analysis'' paragraph (new); Supplementary Section S8 with Table~S8 (new); Abstract revised to mention near-duplicate sensitivity.}
+\change{Protocol-A near-duplicate sensitivity paragraph and table added; supplementary sensitivity analysis retained; Abstract revised to mention near-duplicate sensitivity.}
 
 \subsection*{M2: Weak Baseline Coverage}
 
@@ -48,26 +51,26 @@ We sincerely thank the reviewers for their detailed and constructive feedback. B
 \begin{enumerate}[leftmargin=*]
 \item \textbf{PANNs (CNN14)}: Large-scale pretrained audio pattern recognition network [Kong et al., 2020]. We use the CNN14 variant with AudioSet-pretrained embeddings for retrieval.
 \item \textbf{PaSST}: Efficient audio transformer with Patchout [Koutini et al., 2022]. Retrieval uses the AudioSet-pretrained embedding space.
-\item \textbf{MLP-Regressor}: A three-layer MLP trained on mean-pooled Wav2Vec2 features to directly predict flattened parameter vectors, establishing a supervised regression baseline.
+\item \textbf{MLP-Regressor}: A two-layer MLP with 256 hidden units trained on mean-pooled Wav2Vec2 features to directly predict flattened parameter vectors, establishing a supervised regression boundary.
 \end{enumerate}
 
-All baselines are evaluated under Protocol-A with the same split and metrics. Results are reported in Table~3 (main paper) and Supplementary Table~S10 (confidence intervals).
+All retrieval baselines are evaluated under Protocol-A with the same split and metrics. Results are reported in Table~3 of the main paper, while the MLP boundary is reported separately because it predicts dense parameter leaves rather than retrieving executable presets.
 
-\change{Table~3 expanded with PANNs, PaSST, MLP-Regressor rows; Section 4.2 baseline descriptions updated; Supplementary Tables S10--S11 (new); three baseline scripts provided.}
+\change{Table~3 expanded with PANNs and PaSST retrieval rows; direct-regression boundary table added; baseline descriptions updated.}
 
 \subsection*{M3: No Ablation Studies}
 
 \reviewer{There are no ablation studies validating the core design choices of TRR: projection dimensionality, layer selection, and projection type (PCA vs.\ random).}
 
-\response{We have added a full ablation subsection (Section 4.X ``TRR Ablation Studies'') with three controlled experiments:}
+\response{We have added a controlled supplementary mechanism-ablation subsection with three diagnostic comparisons:}
 
 \begin{enumerate}[leftmargin=*]
-\item \textbf{Projection dimensionality} (Table~4): $d \in \{32, 64, 128, 256\}$. The default $d{=}32$ achieves a good balance of performance and compactness.
-\item \textbf{Layer selection} (Table~5): Six combinations of Wav2Vec2 layers, including single-layer (\{4\}, \{5\}, \{6\}), the default \{4,5,6\}, broader range \{3,...,7\}, and all 12 layers. Mid-layer fusion at \{4,5,6\} performs best.
-\item \textbf{Projection type} (Table~6): Frozen random projection (Xavier-initialized) vs.\ PCA-fitted projection. Both yield comparable results, validating the practical choice of a training-free random projection.
+\item \textbf{Projection dimensionality and layer selection}: Supplementary Table~S2 reports controlled mechanism rows including $d{=}32$ and $d{=}64$ projected multi-layer variants, layer~5 Gram aggregation, and the full unprojected Gram boundary.
+\item \textbf{Aggregation and normalization}: Supplementary Table~S2 compares same-backbone mean pooling, Gram aggregation, and a no-normalization variant. This isolates the contribution of second-order aggregation without claiming global architectural optimality.
+\item \textbf{Interpretation guardrail}: The main paper now cites the ablation only as mechanism support for TRR as a retrieval prior, not as proof that the chosen layer set and projection dimension are globally optimal.
 \end{enumerate}
 
-\change{Section 4.X ``TRR Ablation Studies'' (new subsection with Tables 4--6); Algorithm 1 updated to specify ``frozen random linear projection'' and correct dimension to 32; Abstract mentions ablation studies.}
+\change{Supplementary mechanism-ablation subsection and Table~S2 added; Algorithm 1 updated to specify ``frozen random linear projection'' and correct dimension to 32; Abstract mentions mechanism ablations.}
 
 \subsection*{M4: Unnormalized Metrics}
 
@@ -90,12 +93,13 @@ All baselines are evaluated under Protocol-A with the same split and metrics. Re
 \response{We have addressed this in several ways:}
 
 \begin{enumerate}[leftmargin=*]
-\item \textbf{Condensed Trials 2--5}: The detailed per-trial table and figure have been moved to Supplementary Material. The main text now provides only the aggregate summary with explicit caveats about manual-baseline provenance.
-\item \textbf{Participant demographics}: We report the distribution of musical experience: 12 participants with $\geq$3 years of instrument training, 8 casual musicians, and 6 with no formal training (Section 4.5).
-\item \textbf{Interpretation guardrails}: We explicitly state that Trials 2--5 provide ``supportive perceptual context rather than a definitive human-vs-system optimization benchmark.''
+\item \textbf{Condensed Trials 2--5}: The main text now reports aggregate trial-block summaries with explicit caveats about manual-baseline provenance, rather than treating the manual comparison as a fairness-critical optimization benchmark.
+\item \textbf{Participant metadata boundary}: We report the available age and gender metadata and explicitly state that the logs do not preserve device metadata, expertise, or manual-baseline time budget.
+\item \textbf{Local vLLM diagnostic}: Following the revision request to add evidence where feasible, we added a conservative local qwen3.5-9b vLLM diagnostic that compares text-side perceptual-recognizability scores with Trial-1 human ratings. The result is negative and is reported as a boundary condition rather than as supportive perceptual evidence.
+\item \textbf{Interpretation guardrails}: We explicitly frame the listening test as exploratory perceptual context, not as validation of the objective metrics or proof of superiority over MusicGen.
 \end{enumerate}
 
-\change{Section 4.5 condensed; participant experience distribution added; Supplementary Section S12 with Trials 2--5 detailed results (new).}
+\change{Section 4.5 condensed and reframed; local vLLM diagnostic added; missing participant-expertise and manual-baseline provenance now stated as limitations.}
 
 \section*{Minor Issues}
 
@@ -111,9 +115,9 @@ All baselines are evaluated under Protocol-A with the same split and metrics. Re
 
 \reviewer{Phrases like ``currently evaluated,'' ``we therefore interpret,'' and ``on the current benchmark'' appear excessively, reducing readability.}
 
-\response{We conducted a systematic pass to reduce redundant qualifiers while preserving scientific rigor. Key reductions include removing ``currently'' from most occurrences, simplifying ``We therefore interpret X as...'' constructions, and cutting unnecessary scope modifiers.}
+\response{We conducted a systematic pass to reduce redundant qualifiers while preserving scientific rigor. Key reductions include removing unnecessary scope modifiers, simplifying ``We therefore interpret X as...'' constructions, and keeping only the qualifiers needed to state the benchmark boundary honestly.}
 
-\change{Throughout the manuscript; over 15 instances reduced.}
+\change{Throughout the manuscript; redundant hedging reduced while retaining necessary scope boundaries.}
 
 \subsection*{m3: Section 3.3 (Preliminary Personalization Extension) is Unreferenced}
 
@@ -137,19 +141,19 @@ All baselines are evaluated under Protocol-A with the same split and metrics. Re
 
 \response{We have added two figures:}
 \begin{enumerate}[leftmargin=*]
-\item \textbf{Figure~\ref{fig:tsne\_comparison}}: t-SNE comparison of TRR vs.\ Wav2Vec2 mean-pooled embeddings, colored by style label. Shows tighter within-style clustering for TRR.
-\item \textbf{Figure in Section 3.2}: Gram matrix heatmap for a representative preset, showing the second-order correlation structure captured by TRR.
+\item \textbf{t-SNE diagnostic}: comparison of TRR vs.\ Wav2Vec2 mean-pooled embeddings, colored by style label.
+\item \textbf{Gram-matrix diagnostic}: representative Gram-matrix examples showing the second-order correlation structure captured by TRR.
 \end{enumerate}
 
-\change{Two new figures added with generation scripts (\texttt{trr\_tsne\_visualization.py}, \texttt{gram\_matrix\_heatmap.py}).}
+\change{Two vector diagnostic figures added and referenced in Section 3.2.}
 
 \subsection*{m6: BibTeX Errors}
 
 \reviewer{Several BibTeX entries have wrong types (e.g., \texttt{@inproceedings} for journal articles like Neuron), incomplete author lists (``and others''), and missing metadata.}
 
-\response{Comprehensive BibTeX cleanup performed: entry types corrected (e.g., \texttt{mcdermott2011sound} to \texttt{@article}), author lists expanded for key references, DOIs and page numbers added where available, and spelling errors fixed (e.g., ``Reprsentations'' $\to$ ``Representations'').}
+\response{Targeted BibTeX cleanup performed for the entries most likely to affect reviewer trust: \texttt{LLM2Fx} is no longer represented as an arXiv ``proceedings'' item, its author list and arXiv DOI are expanded, \texttt{AudioLDM} is represented as an ICML 2023 paper, and \texttt{MusicLM}'s arXiv entry now uses the full arXiv author list rather than ``and others.'' We also corrected the previously noted journal-entry type issue for \texttt{mcdermott2011sound}.}
 
-\change{\texttt{reference.bib}: 12+ entries corrected.}
+\change{\texttt{reference.bib}: high-risk bibliographic entries corrected; remaining venue metadata should be checked again before final camera-ready submission.}
 
 \subsection*{m7: Figure 1 Caption is Vague}
 
@@ -163,9 +167,9 @@ All baselines are evaluated under Protocol-A with the same split and metrics. Re
 
 \reviewer{The fusion mechanism is described only verbally; no equation is provided.}
 
-\response{Added explicit formula: $s_{\text{fused}}(z_i) = w_{\text{text}} \cdot s_{\text{text}}(z_i) + w_{\text{audio}} \cdot s_{\text{audio}}(z_i)$ where weights are determined by modality-confidence thresholds (Section 4.6).}
+\response{Added explicit formula: $s_{\mathrm{fused}}(z_i)=\alpha s_{\mathrm{text}}(z_i)+(1-\alpha)s_{\mathrm{audio}}(z_i)$, where $\alpha$ is the text-side weight after score normalization. The manuscript now states that the adaptive profile is evaluated only as a robustness diagnostic.}
 
-\change{Fusion formula added in Section 4.6.}
+\change{Fusion formula added in the ``Multimodal Fusion as a Supplementary Diagnostic Extension'' subsection.}
 
 \section*{Summary of Changes}
 
@@ -180,13 +184,13 @@ M1 Dataset scale & Major & Near-dup sensitivity analysis + supplementary table \
 M2 Weak baselines & Major & PANNs, PaSST, MLP-Regressor added \\
 M3 No ablations & Major & 3 ablation experiments + subsection \\
 M4 Unnormalized metrics & Major & Norm.\,L2 column + param\_ranges.json \\
-M5 Listening test issues & Major & Condensed Trials 2--5 + demographics \\
+M5 Listening test issues & Major & Condensed and reframed as exploratory perceptual context \\
 m1 Algorithm dim error & Minor & Algorithm 1 corrected to $d{=}32$ \\
 m2 Over-hedging & Minor & 15+ instances reduced \\
 m3 Unreferenced Sec 3.3 & Minor & Section deleted \\
 m4 Table 1 no data & Minor & Table removed \\
 m5 Missing visualization & Minor & t-SNE + Gram heatmap figures added \\
-m6 BibTeX errors & Minor & 12+ entries corrected \\
+m6 BibTeX errors & Minor & High-risk entries corrected \\
 m7 Vague Fig 1 caption & Minor & Caption rewritten with topology \\
 m8 Missing fusion formula & Minor & Formula added \\
 \bottomrule

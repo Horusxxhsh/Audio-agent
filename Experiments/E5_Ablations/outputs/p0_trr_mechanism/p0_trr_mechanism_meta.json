@@ -1,0 +1,120 @@
+{
+  "dataset": "/home/xyh/code/Audio-agent/Experiments/dataset_full_vectors.json",
+  "seed": 42,
+  "test_size_requested": 204,
+  "test_size_actual": 204,
+  "valid_test_audio": 204,
+  "kb_size_actual": 1063,
+  "variants": [
+    {
+      "name": "mean_pool_l5",
+      "family": "mean_pool",
+      "layers": [
+        5
+      ],
+      "project_dim": 0,
+      "l2_normalize": true,
+      "similarity": "cosine"
+    },
+    {
+      "name": "gram_no_projection_l5",
+      "family": "gram_full",
+      "layers": [
+        5
+      ],
+      "project_dim": 768,
+      "l2_normalize": true,
+      "similarity": "cosine"
+    },
+    {
+      "name": "gram_l4_d64",
+      "family": "gram_projected",
+      "layers": [
+        4
+      ],
+      "project_dim": 64,
+      "l2_normalize": true,
+      "similarity": "cosine"
+    },
+    {
+      "name": "gram_l5_d64",
+      "family": "gram_projected",
+      "layers": [
+        5
+      ],
+      "project_dim": 64,
+      "l2_normalize": true,
+      "similarity": "cosine"
+    },
+    {
+      "name": "gram_l6_d64",
+      "family": "gram_projected",
+      "layers": [
+        6
+      ],
+      "project_dim": 64,
+      "l2_normalize": true,
+      "similarity": "cosine"
+    },
+    {
+      "name": "gram_l456_d16",
+      "family": "gram_projected",
+      "layers": [
+        4,
+        5,
+        6
+      ],
+      "project_dim": 16,
+      "l2_normalize": true,
+      "similarity": "cosine"
+    },
+    {
+      "name": "gram_l456_d32",
+      "family": "gram_projected",
+      "layers": [
+        4,
+        5,
+        6
+      ],
+      "project_dim": 32,
+      "l2_normalize": true,
+      "similarity": "cosine"
+    },
+    {
+      "name": "gram_l456_d64",
+      "family": "gram_projected",
+      "layers": [
+        4,
+        5,
+        6
+      ],
+      "project_dim": 64,
+      "l2_normalize": true,
+      "similarity": "cosine"
+    },
+    {
+      "name": "gram_l456_d128",
+      "family": "gram_projected",
+      "layers": [
+        4,
+        5,
+        6
+      ],
+      "project_dim": 128,
+      "l2_normalize": true,
+      "similarity": "cosine"
+    },
+    {
+      "name": "gram_l456_d64_no_l2",
+      "family": "gram_projected",
+      "layers": [
+        4,
+        5,
+        6
+      ],
+      "project_dim": 64,
+      "l2_normalize": false,
+      "similarity": "dot"
+    }
+  ]
+}

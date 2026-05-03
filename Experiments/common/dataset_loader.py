@@ -1,6 +1,7 @@
 import sqlite3
 import json
 import os
+import unicodedata
 
 # Paths to databases (Relative to this script)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,6 +33,14 @@ def _resolve_local_audio_paths(dataset):
             # Match the synthetic audio generator's filename logic (remove slashes, punctuation, etc.).
             return "".join([c for c in name if c.isalpha() or c.isdigit() or c in (" ", "-", "_")]).strip()
 
+        def add_unicode_forms(paths, filename: str) -> None:
+            for form in {
+                filename,
+                unicodedata.normalize("NFC", filename),
+                unicodedata.normalize("NFD", filename),
+            }:
+                paths.append(os.path.join(base_audio_dir, form))
+
         candidates = []
 
         # 1) If AudioPath is a Windows-like absolute path, map by basename.
@@ -39,16 +48,19 @@ def _resolve_local_audio_paths(dataset):
         if isinstance(cur, str) and cur:
             base = cur.replace("\\", "/").split("/")[-1]
             if base.lower().endswith(".wav"):
-                candidates.append(os.path.join(base_audio_dir, base))
+                add_unicode_forms(candidates, base)
 
         # 2) Map by SongName.
         safe_name = sanitize(str(song_name))
-        candidates.extend(
-            [
-                os.path.join(base_audio_dir, f"{safe_name}.wav"),
-                os.path.join(base_audio_dir, f"{song_name}.wav"),
-            ]
-        )
+        add_unicode_forms(candidates, f"{safe_name}.wav")
+        add_unicode_forms(candidates, f"{song_name}.wav")
+
+        manual_aliases = {
+            "Brown Sound Modern": ["Brown Sound.wav"],
+            "Rotary Speaker Fast": ["Rotary Speaker.wav"],
+        }
+        for alias in manual_aliases.get(str(song_name), []):
+            add_unicode_forms(candidates, alias)
 
         # 3) Many held-out queries are deterministic name variants ("<Base> - <Suffix>") that reuse the same audio.
         if " - " in str(song_name):

@@ -26,20 +26,27 @@
 
 \medskip
 
-We thank the reviewers for the detailed critiques. The central lesson from the reviews was that our earlier package mixed a verified retrieval benchmark with broader system claims that were not supported to the same standard. In the revision, we therefore prioritized \emph{evidence hardening} over scope expansion. The revised manuscript now makes fewer claims, but each retained claim is tied to a canonical repository artifact.
+We thank the reviewers for the detailed critiques. The central lesson from the reviews was that our earlier package mixed a verified retrieval benchmark with broader system claims that were not supported to the same standard. In the revision, we therefore prioritized \emph{evidence hardening} over scope expansion. The revised manuscript now makes fewer claims, but each retained claim is tied to the verified P0 experiment package or a canonical repository artifact.
 
 \section*{Canonical Evidence Sources}
 
 The revised submission uses the following repository artifacts as the sole experimental sources of truth:
 
+{\footnotesize
 \begin{itemize}[leftmargin=2em]
-    \item \texttt{Experiments/tmm/protocolA\_split\_audit.md}
-    \item \texttt{Experiments/tmm/protocolA\_audio\_grouped\_leakage\_report.json}
-    \item \texttt{Experiments/AblationStudies/protocolA\_audio\_grouped\_objective\_stats.md}
-    \item \texttt{Experiments/AblationStudies/protocolA\_audio\_grouped\_per\_query\_metrics.csv}
-    \item \texttt{Experiments/AblationStudies/protocolC\_objective\_stats.md}
-    \item \texttt{Experiments/mushura/results\_report.md}
+    \item \path{Experiments/tmm/protocolA_split_audit.md}
+    \item \path{Experiments/tmm/protocolA_audio_grouped_leakage_report.json}
+    \item \path{Experiments/AblationStudies/protocolA_audio_grouped_objective_stats.md}
+    \item \path{Experiments/AblationStudies/protocolA_audio_grouped_per_query_metrics.csv}
+    \item \path{Experiments/AblationStudies/outputs/p0_e2/e2_summary.csv}
+    \item \path{Experiments/AblationStudies/outputs/p0_e2/e2_stats.json}
+    \item \path{Experiments/AblationStudies/outputs/p0_e3_shared_e2_test/e3_overall_summary.csv}
+    \item \path{Experiments/AblationStudies/outputs/p0_e3_shared_e2_test/e3_summary.csv}
+    \item \path{Experiments/E5_Ablations/outputs/p0_near_dup/p0_near_dup_sensitivity.csv}
+    \item \path{Experiments/E2_SOTABaselines/outputs/p0_mlp_regressor/mlp_regressor_results.json}
+    \item \path{Experiments/mushura/results_report.md}
 \end{itemize}
+}
 
 We do not use the legacy retrieval report, the deprecated Protocol-B outputs, or the repository's exploratory personalization/memory code as formal evidence in this revision.
 
@@ -48,17 +55,19 @@ We do not use the legacy retrieval report, the deprecated Protocol-B outputs, or
 \begin{enumerate}[leftmargin=2em]
     \item \textbf{Scope narrowed to retrieval-grounded editable control.} The manuscript now centers on Texture Resonance Retrieval (TRR) as a retrieval representation for executable preset control. Personalization, AEM memory, and related extensions are explicitly presented as exploratory rather than validated core contributions.
 
-    \item \textbf{Objective claims re-anchored to an audited Protocol-A split.} A post-hoc audit of the legacy song-name-based Protocol-A list found 16 cross-split shared resolved audio paths. We therefore moved the main objective comparison to a stricter resolved-audio-grouped split with 1267 total records, 204 held-out queries, and a 1063-item retrieval knowledge base. We report means, 95\% bootstrap confidence intervals, and Holm-corrected paired permutation tests from the canonical Protocol-A artifacts for this stricter split.
+    \item \textbf{Objective claims upgraded to the P0 Protocol-A baseline matrix.} A post-hoc audit of the legacy song-name-based Protocol-A list found 16 cross-split shared resolved audio paths. We retain this audit for split transparency and now use the P0 204-query Protocol-A package as the main baseline matrix. The revised comparison includes TRR, Wav2Vec, FeatureNN, CLAP, PaSST, and PANNs on the shared 204-query / 1063-KB setup.
 
     \item \textbf{Per-query diagnostics added.} We generated a derived analysis directly from the canonical Protocol-A per-query CSV for the stricter split, including win/loss/tie summaries, signed-delta diagnostics, and representative success/failure cases. These diagnostics are now cited in the supplementary material so that the main result is not supported by mean values alone.
 
-    \item \textbf{CLAP added as a verified stronger baseline.} We now include a CLAP retrieval baseline in the verified evidence chain on the stricter Protocol-A split. TRR remains stronger than CLAP on the 201 shared queries with cached CLAP embeddings. We do not claim that PaSST, PANNs, or direct parameter regressors have been completed.
+    \item \textbf{TRR mechanism ablations added.} We added a controlled same-backbone ablation on the P0 split comparing Wav2Vec2 mean pooling, full unprojected Gram aggregation, single-layer projected Gram, projection dimensions, and with/without L2 normalization. The result supports a bounded mechanism claim: second-order Gram aggregation improves over same-backbone mean pooling and L2 normalization is important, while layer and projection choices remain meaningful hyperparameters.
 
-    \item \textbf{Protocol-C repositioned as boundary-condition analysis.} We removed any claim that the current Protocol-C is a realistic real-audio robustness benchmark. The revised paper explicitly states that the audio degradation branch remains a synthetic embedding-space perturbation, and we use the resulting evidence only to characterize the current fusion heuristic under single-modality degradation and modality conflict.
+    \item \textbf{Stronger baselines and boundary baselines added.} We now include CLAP, PaSST, and PANNs in the P0 Protocol-A evidence chain. TRR remains strongest on normalized L2, Acc@0.1, Recall, Cosine, and Module among retrieval methods. We also add a diagnostic direct-regression boundary baseline using mean-pooled Wav2Vec2 features and a two-layer MLP trained only on the P0 knowledge base. Because that regressor predicts dense continuous parameter leaves rather than retrieved executable presets, we report it as a boundary condition rather than as a replacement for the retrieval leaderboard. Learned reranking remains future work.
+
+    \item \textbf{Protocol-C repositioned as diagnostic robustness evidence.} The older Protocol-C diagnostic used synthetic embedding-space degradation and remains only a boundary-condition artifact. The P0 Protocol-C result applies AWGN, MP3, reverb, and truncation to raw audio before TRR re-encoding, reuses the same 204-query split as E2, and compares fixed fusion against adaptive fusion. We additionally report current-code audio-only, pure-text, and parameter-oracle upper-bound rows as an execution-path audit. The revised manuscript no longer treats adaptive fusion as proof of a standalone main contribution or superiority over a pure-text boundary.
 
     \item \textbf{Listening-study terminology and statistics corrected.} The study is consistently described as a multiple-stimulus listening test with a hidden reference and no explicit low-quality anchor. The revision reports the canonical nonparametric statistics already present in the repository: Friedman omnibus tests, Holm-corrected Wilcoxon signed-rank post-hoc tests, and rank-biserial effect sizes, together with an explicit limitation that the logs do not preserve device metadata, participant expertise, or the provenance/time budget of the manual baseline.
 
-    \item \textbf{Submission package synchronized.} The manuscript, supplementary material, response documents, and revision checklist were edited to remove stale claims about larger datasets, stronger baselines, normalized metrics, real-audio Protocol-C, and AEM learning curves that are not part of the current verified evidence chain.
+    \item \textbf{Submission package synchronized.} The manuscript, supplement, response documents, and checklist were edited to remove stale claims about PaSST/PANNs, real-audio Protocol-C, near-duplicate placeholders, normalized metrics, and AEM learning curves.
 \end{enumerate}
 
 \section*{Responses to the Main Reviewer Themes}
@@ -69,20 +78,24 @@ We agree that the strongest supported contribution is not a full personalized ag
 
 \subsection*{2. Benchmark scale, split transparency, and statistical reporting}
 
-The objective results are now anchored to the stricter resolved-audio-grouped Protocol-A benchmark with $N_{\mathrm{test}}=204$ and $N_{\mathrm{kb}}=1063$. The revised manuscript and supplementary material report:
+The objective results are now anchored to the shared P0 Protocol-A benchmark with $N_{\mathrm{test}}=204$ and $N_{\mathrm{kb}}=1063$. The revised manuscript and supplementary material report:
 
 \begin{itemize}[leftmargin=2em]
     \item the legacy split audit (16 shared resolved audio paths across split);
-    \item the stricter anti-leakage split with zero exact shared resolved audio paths under the current audit;
-    \item method means with 95\% bootstrap confidence intervals;
-    \item paired permutation tests for TRR versus each retrieval baseline;
-    \item Holm-corrected $p$ values;
-    \item per-query diagnostics derived directly from the canonical Protocol-A CSV.
+    \item the stricter anti-leakage split as audit context;
+    \item the P0 baseline matrix including Wav2Vec, FeatureNN, CLAP, PaSST, and PANNs;
+    \item method means including L2, Norm.L2, Acc@0.1, Recall, Cosine, and Module;
+    \item Wilcoxon tests on per-query Norm.L2 for TRR versus each retrieval baseline;
+    \item Holm-corrected decisions and effect-size caveats.
 \end{itemize}
 
 \subsection*{3. Stronger baselines}
 
-We now include \emph{CLAP} as a verified stronger retrieval baseline on the stricter Protocol-A split. The revised manuscript therefore makes the narrower and better-supported statement that TRR is the strongest among the currently evaluated retrieval baselines on the audited Protocol-A benchmark, including CLAP on the 201 shared queries with cached CLAP embeddings. We still do not claim to have completed PaSST, PANNs, or direct parameter-regression baselines.
+We now include \emph{CLAP, PaSST, and PANNs} as stronger retrieval baselines in the P0 Protocol-A package. The revised manuscript therefore makes the narrower and better-supported statement that TRR is the strongest among the currently evaluated retrieval baselines on the shared P0 benchmark, including Wav2Vec, FeatureNN, CLAP, PaSST, and PANNs. We also include a diagnostic direct-regression MLP boundary baseline, but we do not claim to have completed an executable direct-parameter controller or learned reranking baseline.
+
+\subsection*{3a. TRR mechanism evidence}
+
+We agree that the previous version did not sufficiently isolate why TRR works. We therefore added a controlled same-backbone mechanism ablation. The new supplementary table compares Wav2Vec2 mean pooling, full unprojected Gram aggregation, single-layer Gram variants for layers 4/5/6, projected multi-layer Gram variants with dimensions 16/32/64/128, and the same multi-layer setting without L2 normalization. The result supports a narrower mechanism claim: second-order Gram aggregation improves over same-backbone mean pooling, and L2 normalization is important. It also shows that the exact layer and projection choice matters, so the revised paper frames TRR as an effective texture-aware retrieval prior rather than a fully optimized universal representation.
 
 \subsection*{4. Metric limitations}
 
@@ -99,13 +112,16 @@ These limitations are now stated explicitly in both the main paper and the suppl
 
 \subsection*{5. Protocol-C realism}
 
-We agree with the reviewers that synthetic embedding-space degradation is not equivalent to real audio corruption. Accordingly, Protocol-C is no longer framed as a realistic robustness benchmark. The revision uses it only to characterize fallback behavior of the current score-level fusion heuristic:
+We agree with the reviewers that synthetic embedding-space degradation is not equivalent to real audio corruption. The earlier diagnostic Protocol-C remains limited for that reason. The P0 Protocol-C package addresses this gap by applying real degradations to raw audio before re-encoding:
 
 \begin{itemize}[leftmargin=2em]
-    \item under \textit{vague text}, fusion falls back to audio;
-    \item under \textit{noisy audio}, fusion falls back to text;
-    \item under \textit{modality conflict}, fusion becomes substantially worse than TRR-only.
+    \item AWGN at 20/10/5 dB;
+    \item MP3 at 128/64/32 kbps;
+    \item reverb with RT60 0.6/1.0;
+    \item truncation to 50\%/30\%.
 \end{itemize}
+
+The retained claim is not that adaptive fusion dominates every condition or improves over a pure-text boundary. We added a boundary audit with audio-only, pure-text, and parameter-oracle upper-bound rows and revised the manuscript to treat Protocol-C as a diagnostic robustness analysis. The supported claim is narrower: audio-heavy fusion is fragile under realistic degradation, and retrieval stability depends strongly on modality weighting.
 
 \subsection*{6. Listening-study rigor}
 

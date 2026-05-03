@@ -331,7 +331,8 @@ def predict_onoff_with_llm_cached(
     cache_dir: Path,
     allow_network: bool,
     with_fewshot: bool,
-    model: str = "deepseek-chat",
+    model: str = "qwen3.6:latest",
+    max_tokens: int = 2048,
 ) -> Optional[Dict[str, str]]:
     """
     Cache-first LLM prediction. Default behavior is offline (no network).
@@ -358,11 +359,18 @@ def predict_onoff_with_llm_cached(
     if not HAS_OPENAI:
         return None
 
-    api_key = os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY")
-    base_url = os.environ.get("DEEPSEEK_BASE_URL") or os.environ.get("OPENAI_BASE_URL") or "https://api.deepseek.com"
-    if not api_key:
-        print("  LLM未配置：请设置环境变量 DEEPSEEK_API_KEY（或 OPENAI_API_KEY）。")
-        return None
+    api_key = (
+        os.environ.get("OPENAI_API_KEY")
+        or os.environ.get("DEEPSEEK_API_KEY")
+        or os.environ.get("OLLAMA_API_KEY")
+        or "ollama"
+    )
+    base_url = (
+        os.environ.get("OPENAI_BASE_URL")
+        or os.environ.get("DEEPSEEK_BASE_URL")
+        or os.environ.get("OLLAMA_BASE_URL")
+        or "http://localhost:11434/v1"
+    )
 
     # Conservative defaults: deterministic decoding + finite timeout to avoid hanging runs.
     client = OpenAI(api_key=api_key, base_url=base_url, timeout=60, max_retries=0)
@@ -373,7 +381,7 @@ def predict_onoff_with_llm_cached(
             messages=[{"role": "user", "content": prompt}],
             temperature=0,
             top_p=1,
-            max_tokens=128,
+            max_tokens=int(max_tokens),
             stream=False,
         )
         content = resp.choices[0].message.content.strip()
@@ -473,6 +481,18 @@ def main() -> None:
         type=str,
         default=str(Path("Experiments") / "llm_cache" / "protocolB_onoff"),
         help="LLM cache directory (JSON files, gitignored).",
+    )
+    ap.add_argument(
+        "--llm_model",
+        type=str,
+        default=os.environ.get("AUDIO_AGENT_LLM_MODEL") or os.environ.get("OLLAMA_MODEL") or "qwen3.6:latest",
+        help="Chat-completion model name for live LLM calls. Defaults to the local Ollama qwen3.6 model.",
+    )
+    ap.add_argument(
+        "--llm_max_tokens",
+        type=int,
+        default=int(os.environ.get("AUDIO_AGENT_LLM_MAX_TOKENS", "2048")),
+        help="Maximum completion tokens for live LLM calls. qwen3.6 may need a larger budget because reasoning tokens precede JSON content.",
     )
     ap.add_argument("--allow_network_llm", action="store_true", help="Allow live LLM calls on cache miss (disabled by default).")
     ap.add_argument("--with_no_fewshot", action="store_true", help="Also run w/o few-shot LLM variants (extra cache key).")
@@ -659,6 +679,8 @@ def main() -> None:
                 cache_dir=llm_cache_dir,
                 allow_network=bool(args.allow_network_llm),
                 with_fewshot=True,
+                model=str(args.llm_model),
+                max_tokens=int(args.llm_max_tokens),
             )
             if pattern:
                 pred = copy_params_with_onoff(trr_topk_params[0], pattern)
@@ -674,6 +696,8 @@ def main() -> None:
                     cache_dir=llm_cache_dir,
                     allow_network=bool(args.allow_network_llm),
                     with_fewshot=False,
+                    model=str(args.llm_model),
+                    max_tokens=int(args.llm_max_tokens),
                 )
                 if pattern_nf:
                     pred = copy_params_with_onoff(trr_topk_params[0], pattern_nf)
@@ -697,6 +721,8 @@ def main() -> None:
                 cache_dir=llm_cache_dir,
                 allow_network=bool(args.allow_network_llm),
                 with_fewshot=True,
+                model=str(args.llm_model),
+                max_tokens=int(args.llm_max_tokens),
             )
             if pattern:
                 pred = copy_params_with_onoff(text_ref_params, pattern)
@@ -712,6 +738,8 @@ def main() -> None:
                     cache_dir=llm_cache_dir,
                     allow_network=bool(args.allow_network_llm),
                     with_fewshot=False,
+                    model=str(args.llm_model),
+                    max_tokens=int(args.llm_max_tokens),
                 )
                 if pattern_nf:
                     pred = copy_params_with_onoff(text_ref_params, pattern_nf)

@@ -12,6 +12,7 @@ Usage:
 import json
 import sys
 import logging
+import hashlib
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -24,6 +25,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 logger = logging.getLogger(__name__)
 
 PROTOCOL_A_TEST_SIZE = 204
+PROTOCOL_A_SEED = 42
 
 
 def flatten_params(params: Dict, prefix: str = "") -> Dict[str, float]:
@@ -45,6 +47,8 @@ def flatten_params(params: Dict, prefix: str = "") -> Dict[str, float]:
 
 def prepare_data(
     dataset: List[Dict],
+    test_size: int = PROTOCOL_A_TEST_SIZE,
+    seed: int = PROTOCOL_A_SEED,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, List[str]]:
     """Prepare train/test data from dataset.
 
@@ -63,28 +67,52 @@ def prepare_data(
 
     X_list = []
     y_list = []
+    vector_dims: Dict[int, int] = {}
     for item in dataset:
         vec = item.get("Vectors", {}).get("Wav2Vec")
-        if vec is None:
+        if not isinstance(vec, list) or not vec:
             X_list.append(None)
             y_list.append(None)
             continue
-        X_list.append(np.array(vec, dtype=np.float32))
+        arr = np.array(vec, dtype=np.float32)
+        vector_dims[int(arr.shape[0])] = vector_dims.get(int(arr.shape[0]), 0) + 1
+        X_list.append(arr)
         flat = flatten_params(item.get("Parameters", {}))
         y_vec = np.array([flat.get(k, 0.0) for k in param_keys], dtype=np.float32)
         y_list.append(y_vec)
 
-    # Split Protocol-A
-    test_indices = list(range(PROTOCOL_A_TEST_SIZE))
-    train_indices = list(range(PROTOCOL_A_TEST_SIZE, len(dataset)))
+    # Split Protocol-A using the same deterministic hash split as P0 E2.
+    indexed = []
+    for idx, item in enumerate(dataset):
+        name = str(item.get("SongName", ""))
+        h = hashlib.sha1(f"{int(seed)}:{name}".encode("utf-8")).hexdigest()
+        indexed.append((h, idx))
+    indexed.sort(key=lambda x: x[0])
+    n = len(indexed)
+    ts = min(max(1, int(test_size)), max(1, n // 3), n - 1) if n > 1 else 1
+    test_indices = [idx for _, idx in indexed[:ts]]
+    train_indices = [idx for _, idx in indexed[ts:]]
 
-    # Filter out None entries
-    X_train = np.stack([X_list[i] for i in train_indices if X_list[i] is not None])
-    y_train = np.stack([y_list[i] for i in train_indices if y_list[i] is not None])
-    X_test = np.stack([X_list[i] for i in test_indices if X_list[i] is not None])
-    y_test = np.stack([y_list[i] for i in test_indices if y_list[i] is not None])
+    if not vector_dims:
+        raise ValueError("No non-empty Wav2Vec vectors found.")
+    dominant_dim = max(vector_dims.items(), key=lambda kv: kv[1])[0]
+
+    def usable(i: int) -> bool:
+        return (
+            X_list[i] is not None
+            and y_list[i] is not None
+            and int(X_list[i].shape[0]) == int(dominant_dim)
+        )
+
+    train_usable = [i for i in train_indices if usable(i)]
+    test_usable = [i for i in test_indices if usable(i)]
+    X_train = np.stack([X_list[i] for i in train_usable])
+    y_train = np.stack([y_list[i] for i in train_usable])
+    X_test = np.stack([X_list[i] for i in test_usable])
+    y_test = np.stack([y_list[i] for i in test_usable])
 
     logger.info(f"Train: {X_train.shape}, Test: {X_test.shape}")
+    logger.info(f"Dominant Wav2Vec dim: {dominant_dim}; vector dim counts: {vector_dims}")
     logger.info(f"Parameter dimension: {len(param_keys)}")
 
     return X_train, y_train, X_test, y_test, param_keys
@@ -170,7 +198,7 @@ def unflatten_params(values: np.ndarray, keys: List[str]) -> Dict:
     return result
 
 
-def run_mlp_baseline(dataset_path: str, output_dir: str) -> Dict:
+def run_mlp_baseline(dataset_path: str, output_dir: str, test_size: int, seed: int) -> Dict:
     """Run MLP regressor baseline experiment.
 
     Args:
@@ -183,38 +211,58 @@ def run_mlp_baseline(dataset_path: str, output_dir: str) -> Dict:
     with open(dataset_path, "r") as f:
         dataset = json.load(f)
 
-    X_train, y_train, X_test, y_test, param_keys = prepare_data(dataset)
+    np.random.seed(int(seed))
+    X_train, y_train, X_test, y_test, param_keys = prepare_data(dataset, test_size=test_size, seed=seed)
+    x_mean = X_train.mean(axis=0, keepdims=True)
+    x_std = X_train.std(axis=0, keepdims=True) + 1e-6
+    y_mean = y_train.mean(axis=0, keepdims=True)
+    y_std = y_train.std(axis=0, keepdims=True) + 1e-6
+    X_train_s = (X_train - x_mean) / x_std
+    X_test_s = (X_test - x_mean) / x_std
+    y_train_s = (y_train - y_mean) / y_std
 
     # Train MLP
-    input_dim = X_train.shape[1]
+    input_dim = X_train_s.shape[1]
     output_dim = y_train.shape[1]
     hidden_dim = 256
 
     logger.info(f"Training MLP: {input_dim} -> {hidden_dim} -> {output_dim}")
     mlp = SimpleMLPRegressor(input_dim, hidden_dim, output_dim, lr=0.0005)
-    mlp.train(X_train, y_train, epochs=200, batch_size=32)
+    mlp.train(X_train_s, y_train_s, epochs=200, batch_size=32)
 
-    # Evaluate
-    y_pred = mlp.predict(X_test)
+    # Evaluate direct predictions and a minimal validity-projected variant.
+    # The projection clamps each numeric parameter to the train-set observed range.
+    y_pred_s = mlp.predict(X_test_s)
+    y_pred = y_pred_s * y_std + y_mean
+    y_min = y_train.min(axis=0, keepdims=True)
+    y_max = y_train.max(axis=0, keepdims=True)
+    y_pred_projected = np.clip(y_pred, y_min, y_max)
 
     evaluator_raw = Evaluator(normalize=False)
     evaluator_norm = Evaluator(normalize=True)
 
-    metrics = {"l2_raw": [], "l2_norm": [], "acc_at_01": [], "cosine": [], "recall": []}
-    test_items = dataset[:PROTOCOL_A_TEST_SIZE]
+    def evaluate_array(pred_array: np.ndarray) -> Dict[str, List[float]]:
+        metrics = {"l2_raw": [], "l2_norm": [], "acc_at_01": [], "cosine": [], "recall": [], "module": []}
 
-    for i in range(len(y_pred)):
-        pred_dict = unflatten_params(y_pred[i], param_keys)
-        gt_dict = unflatten_params(y_test[i], param_keys)
+        for i in range(len(pred_array)):
+            pred_dict = unflatten_params(pred_array[i], param_keys)
+            gt_dict = unflatten_params(y_test[i], param_keys)
 
-        metrics["l2_raw"].append(evaluator_raw.compute_parameter_distance(pred_dict, gt_dict))
-        metrics["l2_norm"].append(evaluator_norm.compute_parameter_distance(pred_dict, gt_dict))
-        metrics["acc_at_01"].append(evaluator_norm.compute_accuracy_tolerance(pred_dict, gt_dict))
-        metrics["cosine"].append(evaluator_raw.compute_cosine_similarity(pred_dict, gt_dict))
-        metrics["recall"].append(evaluator_raw.compute_parameter_recall(pred_dict, gt_dict))
+            metrics["l2_raw"].append(evaluator_raw.compute_parameter_distance(pred_dict, gt_dict))
+            metrics["l2_norm"].append(evaluator_norm.compute_parameter_distance(pred_dict, gt_dict))
+            metrics["acc_at_01"].append(evaluator_norm.compute_accuracy_tolerance(pred_dict, gt_dict))
+            metrics["cosine"].append(evaluator_raw.compute_cosine_similarity(pred_dict, gt_dict))
+            metrics["recall"].append(evaluator_raw.compute_parameter_recall(pred_dict, gt_dict))
+            metrics["module"].append(evaluator_raw.compute_module_consistency(pred_dict, gt_dict))
+        return metrics
+
+    metrics = evaluate_array(y_pred)
+    projected_metrics = evaluate_array(y_pred_projected)
 
     avg_metrics = {k: float(np.mean(v)) for k, v in metrics.items()}
     std_metrics = {f"{k}_std": float(np.std(v)) for k, v in metrics.items()}
+    projected_avg_metrics = {k: float(np.mean(v)) for k, v in projected_metrics.items()}
+    projected_std_metrics = {f"{k}_std": float(np.std(v)) for k, v in projected_metrics.items()}
 
     results = {
         "method": "MLP-Regressor",
@@ -222,7 +270,12 @@ def run_mlp_baseline(dataset_path: str, output_dir: str) -> Dict:
         "train_size": int(X_train.shape[0]),
         "test_size": int(X_test.shape[0]),
         "hidden_dim": hidden_dim,
+        "seed": int(seed),
+        "split": {"test_size_requested": int(test_size), "protocol": "P0 deterministic hash split"},
         "metrics": {**avg_metrics, **std_metrics},
+        "projected_method": "MLP-Regressor+RangeProjection",
+        "projection": "Per-parameter clipping to the train-set observed numeric range.",
+        "projected_metrics": {**projected_avg_metrics, **projected_std_metrics},
     }
 
     # Save
@@ -232,6 +285,7 @@ def run_mlp_baseline(dataset_path: str, output_dir: str) -> Dict:
         json.dump(results, f, indent=2)
 
     logger.info(f"MLP-Regressor results: {avg_metrics}")
+    logger.info(f"MLP-Regressor+RangeProjection results: {projected_avg_metrics}")
     return results
 
 
@@ -243,9 +297,11 @@ def main() -> None:
                         default=str(Path(__file__).parent.parent / "dataset_full_vectors.json"))
     parser.add_argument("--output-dir", type=str,
                         default=str(Path(__file__).parent / "results"))
+    parser.add_argument("--test-size", type=int, default=PROTOCOL_A_TEST_SIZE)
+    parser.add_argument("--seed", type=int, default=PROTOCOL_A_SEED)
     args = parser.parse_args()
 
-    run_mlp_baseline(args.dataset, args.output_dir)
+    run_mlp_baseline(args.dataset, args.output_dir, test_size=args.test_size, seed=args.seed)
 
 
 if __name__ == "__main__":

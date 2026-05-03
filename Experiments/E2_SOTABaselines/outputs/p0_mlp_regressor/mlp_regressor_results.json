@@ -1,0 +1,42 @@
+{
+  "method": "MLP-Regressor",
+  "description": "Wav2Vec2 mean-pooled -> 2-layer MLP -> direct parameter regression",
+  "train_size": 1058,
+  "test_size": 204,
+  "hidden_dim": 256,
+  "seed": 42,
+  "split": {
+    "test_size_requested": 204,
+    "protocol": "P0 deterministic hash split"
+  },
+  "metrics": {
+    "l2_raw": 62.0612465628121,
+    "l2_norm": 0.16068371985906685,
+    "acc_at_01": 0.7883986928104574,
+    "cosine": 0.496367411566825,
+    "recall": 0.32092382136762776,
+    "module": 1.0,
+    "l2_raw_std": 54.12612117572126,
+    "l2_norm_std": 0.05495991321673279,
+    "acc_at_01_std": 0.08734584677565274,
+    "cosine_std": 0.42762312507892997,
+    "recall_std": 0.1584276011776088,
+    "module_std": 0.0
+  },
+  "projected_method": "MLP-Regressor+RangeProjection",
+  "projection": "Per-parameter clipping to the train-set observed numeric range.",
+  "projected_metrics": {
+    "l2_raw": 57.62393340473094,
+    "l2_norm": 0.160304520369698,
+    "acc_at_01": 0.7894042232277527,
+    "cosine": 0.5941334131032501,
+    "recall": 0.3468410827453127,
+    "module": 1.0,
+    "l2_raw_std": 53.959214981718944,
+    "l2_norm_std": 0.0549081683853713,
+    "acc_at_01_std": 0.08795668166584263,
+    "cosine_std": 0.3902804505215236,
+    "recall_std": 0.1754361615003892,
+    "module_std": 0.0
+  }
+}

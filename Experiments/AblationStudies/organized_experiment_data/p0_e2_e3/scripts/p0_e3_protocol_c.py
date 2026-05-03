@@ -22,6 +22,10 @@ sys.path.append(ROOT_DIR)
 from evaluate import Evaluator  # noqa: E402
 from Experiments.TextureResonance.texture_encoder import TextureEncoder  # noqa: E402
 from Experiments.common.hybrid_fusion_retriever import HybridFusionRetriever  # noqa: E402
+try:
+    from Experiments.common.dataset_loader import _resolve_local_audio_paths  # noqa: E402
+except Exception:  # pragma: no cover - fallback for archived script execution
+    _resolve_local_audio_paths = None
 
 
 @dataclass
@@ -99,7 +103,10 @@ def parse_args() -> argparse.Namespace:
 
 def load_dataset(path: str) -> List[Dict[str, Any]]:
     with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        data = json.load(f)
+    if _resolve_local_audio_paths is not None:
+        data = _resolve_local_audio_paths(data)
+    return data
 
 
 def deterministic_split(data: Sequence[Dict[str, Any]], test_size: int, seed: int) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -592,6 +599,34 @@ def main() -> None:
             writer.writeheader()
             writer.writerows(summary_rows)
 
+    # Overall summary by method across all degradation conditions.
+    method_grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for r in rows:
+        method_grouped.setdefault(r["method"], []).append(r)
+
+    overall_rows: List[Dict[str, Any]] = []
+    for method, vals in sorted(method_grouped.items()):
+        overall_rows.append({
+            "method": method,
+            "n": len(vals),
+            "alpha_mean": mean([v["alpha"] for v in vals]),
+            "l2_mean": mean([v["l2"] for v in vals]),
+            "acc_mean": mean([v["acc@0.1"] for v in vals]),
+            "recall_mean": mean([v["recall"] for v in vals]),
+            "cosine_mean": mean([v["cosine"] for v in vals]),
+            "module_mean": mean([v["module"] for v in vals]),
+            "recall@k_mean": mean([v["recall@k"] for v in vals]),
+            "mrr_mean": mean([v["mrr"] for v in vals]),
+            "ndcg@k_mean": mean([v["ndcg@k"] for v in vals]),
+        })
+
+    overall_csv = os.path.join(args.out_dir, "e3_overall_summary.csv")
+    with open(overall_csv, "w", newline="", encoding="utf-8") as f:
+        if overall_rows:
+            writer = csv.DictWriter(f, fieldnames=list(overall_rows[0].keys()))
+            writer.writeheader()
+            writer.writerows(overall_rows)
+
     # Adaptive vs fixed delta summary by condition
     delta_rows: List[Dict[str, Any]] = []
     cond_set = sorted({r["condition"] for r in rows})
@@ -652,6 +687,7 @@ def main() -> None:
     print("E3 done.")
     print(f"- per-query: {per_query_csv}")
     print(f"- summary:   {summary_csv}")
+    print(f"- overall:   {overall_csv}")
     print(f"- deltas:    {delta_csv}")
     print(f"- meta:      {meta_json}")
 

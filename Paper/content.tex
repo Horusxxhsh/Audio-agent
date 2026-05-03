@@ -1,11 +1,11 @@
 \maketitle
 
 \begin{abstract}
-Digital audio workstations expose rich effect chains, yet a semantic gap remains between perceptual user intent and low-level signal-processing parameters. Waveform-generative models can synthesize realistic audio, but the resulting samples are difficult to edit within workstation-centered production workflows. We study retrieval-grounded audio effect control, where the output is an editable plugin configuration rather than a finalized waveform. Our focus is Texture Resonance Retrieval (TRR), an audio representation built from Gram matrices of projected mid-level Wav2Vec2 activations to preserve texture-relevant co-activation structure. Auditing the original server-side held-out list revealed exact cross-split audio reuse, so our main objective evidence is reported on a stricter resolved-audio-grouped guitar-effects benchmark with 1,063 candidate presets and 204 queries. On this benchmark, TRR achieves the lowest mean parameter error among the evaluated retrieval baselines, reducing root-mean-squared parameter error from 23.8197 to 8.0467 relative to mean-pooled Wav2Vec2 retrieval; on the 201 queries with available cached CLAP embeddings, it also substantially outperforms a CLAP retrieval baseline. A multiple-stimulus listening study with 26 participants provides complementary perceptual evidence for workflow relevance. We interpret these results as benchmark evidence that texture-aware retrieval is useful for editable audio effect control, while broader personalization and real-audio robustness claims remain outside the verified evidence presented here.
+Digital audio workstations expose rich effect chains, but mapping perceptual intent to editable low-level parameters remains ill-posed. We study retrieval-grounded guitar-effect preset selection, where the system returns an executable plugin configuration rather than a finalized waveform. Our method, Texture Resonance Retrieval (TRR), represents audio with Gram matrices of projected mid-level Wav2Vec2 activations to capture texture-relevant co-activation structure. On an audited 204-query guitar-effect benchmark with 1,063 candidate presets, TRR improves retrieval over selected audio embedding baselines, while mechanism ablations and near-duplicate sensitivity analyses define the robustness boundary of this result. A supervised regression boundary, listening study, and local vLLM diagnostic further show that parameter-space alignment should not be treated as a direct proxy for human perceptual preference.
 \end{abstract}
 
 \begin{IEEEkeywords}
-audio effect control, audio retrieval, digital audio workstations, multimodal music production, interpretable audio systems
+guitar-effect preset retrieval, audio retrieval, digital audio workstations, texture representation, interpretable audio systems
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -17,9 +17,9 @@ This tension motivates the development of retrieval-based audio control systems 
 
 The key challenge is grounding perceptual descriptions in parameter space via retrieval. Standard audio representations (e.g., CLAP-style embeddings or mean-pooled Wav2Vec2 features) summarize an audio segment into a single vector; while effective for coarse semantics, such pooling can discard temporal co-activation patterns that are critical for texture-dominant effects (e.g., tremolo modulation or signal-dependent distortion).
 
-To bridge these gaps, we present a retrieval-grounded framework for parameter control and focus on its core retrieval component: \textbf{Texture Resonance Retrieval (TRR)}. TRR models audio style using Gram matrices of deep feature activations, explicitly capturing the \textit{second-order correlations} that define temporal texture. We use this representation as a texture-aware retrieval prior: its role is to bias search toward executable presets that preserve effect-relevant structure, not to claim a universal metric of timbral or parameter-space similarity. While the framework targets audio effect parameter control in general, the empirical evaluation in this paper is conducted on a held-out guitar-effect benchmark.
+To bridge these gaps, we study a retrieval-grounded preset-selection setting and focus on its core retrieval component: \textbf{Texture Resonance Retrieval (TRR)}. TRR models audio style using Gram matrices of deep feature activations, explicitly capturing the \textit{second-order correlations} that define temporal texture. We use this representation as a texture-aware retrieval prior: its role is to bias search toward executable presets that preserve effect-relevant structure, not to claim a universal metric of timbral or parameter-space similarity. The empirical evaluation in this paper is limited to a held-out guitar-effect benchmark.
 
-Concretely, this paper makes three evidence-backed contributions. First, we formulate editable audio effect control as a retrieval-grounded preset selection problem in which outputs remain executable and inspectable inside DAW workflows. Second, we introduce \textbf{Texture Resonance Retrieval (TRR)} as a texture-aware retrieval prior, showing that second-order statistics (Gram matrices) improve retrieval for texture-dominant effects on the current benchmark and yield the strongest parameter alignment among the currently evaluated retrieval baselines, including a CLAP retrieval baseline. Third, we report an audited held-out evaluation with confidence intervals, paired permutation testing, and a multiple-stimulus listening study, while explicitly separating these validated results from the repository's still-preliminary personalization and synthetic stress-test extensions.
+Concretely, this paper makes two main evidence-backed contributions and several explicitly bounded diagnostics. First, we formulate editable guitar-effect preset selection as a retrieval-grounded problem in which outputs remain executable and inspectable inside DAW workflows. Second, we introduce \textbf{Texture Resonance Retrieval (TRR)} as a texture-aware retrieval prior, showing that second-order statistics (Gram matrices) improve retrieval over selected audio embedding baselines on the audited P0 Protocol-A guitar-effect benchmark and that controlled mechanism ablations favor Gram-style aggregation over same-backbone mean pooling. We further report near-duplicate sensitivity, a supervised direct-regression boundary, perception-alignment diagnostics, and real-degradation fusion stress tests as scope checks. These diagnostics are not used to claim that broad audio effect control has been solved; they define the boundary under which TRR is currently supported.
 
 \section{Related Work}
 \label{sec:related_work}
@@ -32,7 +32,7 @@ The challenge of translating perceptual descriptions into technical parameters w
 
 Early work in interactive control focused on learning intuitive mappings for synthesizers. \citet{kuli2014active} proposed active learning with Gaussian processes to discover perceptual control knobs, while more recently, \citet{bryan2024synthscribe} introduced SynthScribe, a multimodal tool for synthesizer sound retrieval. While these works advance interface design, they primarily target synthesis parameters (e.g., oscillator shape) rather than the complex signal chains of audio effects.
 
-\textbf{Audio Analysis Approaches}. Subsequent work pursued automation via audio content analysis and differentiable mixing systems \citep{martinez2020deep,steinmetz2022automix,moliner2025megami}. While effective when a target mix or reference audio already exists, this direction implicitly assumes the target audio is given. It therefore struggles to support creative timbre design from a purely conceptual request (``make it more vintage breakup'') and often suffers from an \textbf{opacity problem}: users see outputs but lack interpretable, editable rationale.
+\textbf{Audio Analysis Approaches}. Subsequent work pursued automation via audio content analysis and differentiable mixing systems \citep{steinmetz2022automix}. While effective when a target mix or reference audio already exists, this direction implicitly assumes the target audio is given. It therefore struggles to support creative timbre design from a purely conceptual request (``make it more vintage breakup'') and often suffers from an \textbf{opacity problem}: users see outputs but lack interpretable, editable rationale.
 
 Recent advances in differentiable DSP have enabled neural approaches to audio effect modeling. \citet{peladeau2024blind} proposes blind estimation of audio effect parameters using auto-encoder architectures, addressing the inverse problem of parameter recovery. \citet{liu2024ddspSFX} introduces DDSP-SFX, which leverages differentiable digital signal processing for acoustically-guided sound effects generation, combining neural networks with traditional DSP modules for controllable synthesis. \citet{deemanat2025latent} explores generative latent spaces for neural audio synthesis, bridging DSP-informed and data-driven approaches. In parallel, style transfer methods have been applied to audio effects, with \citet{benetos2024stito} introducing ST-ITO for controlling audio effects via inference-time optimization using pretrained audio representations.
 
@@ -42,26 +42,7 @@ Recent advances in differentiable DSP have enabled neural approaches to audio ef
 
 Neural audio synthesis has advanced rapidly, enabling high-fidelity text-to-audio generation \citep{liu2023audioldm,liu2024audioldm2,agostinelli2023musiclm,vyas2023audiobox}. Diffusion models have emerged as the dominant paradigm, with \citet{huang2022makeanaudio} introducing prompt-enhanced text-to-audio generation, \citet{wang2023audiolcm} achieving efficient high-quality synthesis via latent consistency models, and \citet{liang2024instruction} exploring instruction-guided latent diffusion for better controllability. However, these models primarily output \textit{finalized waveforms}, which are difficult to edit within professional workflows.
 
-Accordingly, we view parameter-level generation as a \textbf{complement to, not a replacement for}, waveform-level synthesis: it targets controllable editing and iterative refinement inside DAWs.
-
-This motivates what we call \textbf{Parameter--Waveform Duality}: waveform-level generation offers maximal expressivity but limited editability, whereas parameter-level control preserves transparency and iterative refinement at the cost of requiring domain knowledge.
-
-\begin{table}[t]
-			\centering
-			\caption{Comparison of waveform-level and parameter-level approaches in neural audio workflows. Each paradigm offers complementary strengths for different production contexts.}
-			\label{tab:param_waveform_duality}
-		\small
-		\resizebox{\columnwidth}{!}{%
-		\begin{tabular}{lcc}
-		\toprule
-		\textbf{Level} & \textbf{Primary Strength} & \textbf{Primary Limitation} \\
-		\midrule
-		Waveform-level                  & High-fidelity synthesis                    & Hard to edit in DAWs                         \\
-			Parameter-level                 & Fully editable control                     & Requires expert priors                       \\
-			\bottomrule
-		\end{tabular}
-		}
-\end{table}
+Accordingly, we view parameter-level generation as a \textbf{complement to, not a replacement for}, waveform-level synthesis: waveform-level generation offers broad expressivity but limited DAW editability, whereas parameter-level control preserves transparency and iterative refinement at the cost of requiring executable effect-chain priors.
 
 In parallel, differentiable DSP (DDSP) \citep{engel2020ddsp} demonstrates that learned models can control interpretable synthesis parameters, and self-supervised audio representation learning (e.g., Wav2Vec 2.0 \citep{baevski2020wav2vec}) provides strong acoustic embeddings. Our retrieval-grounded formulation leverages these representations for similarity grounding, but targets editable parameter outputs compatible with DAW-centric workflows.
 
@@ -82,7 +63,7 @@ In contrast to prior uses primarily for texture synthesis or style transfer, we 
 
 In semantic audio retrieval, the WikiMuTe dataset \citep{weck2023wikimute} provides a rich resource for connecting natural language descriptions with music audio, while retrieval-guided approaches \citep{srivatsan2024retrieval} demonstrate the value of combining retrieval with generation for music captioning. Retrieval-augmented text-to-music generation \citep{gonzales2024rag} further validates the effectiveness of RAG approaches in audio tasks.
 
-Our Texture Resonance Retrieval (TRR) builds upon these insights by using Gram matrices to capture audio texture through second-order statistics, thereby providing a more texture-sensitive retrieval prior for parameter inference on the current benchmark.
+Our Texture Resonance Retrieval (TRR) builds upon these insights by using Gram matrices to capture audio texture through second-order statistics, thereby providing a more texture-sensitive retrieval prior for parameter inference on the current benchmark. The novelty claimed here is therefore not the Gram matrix itself, which is an established texture statistic, but its task-specific use as an executable preset-retrieval prior whose value is tested against audio embedding baselines, leakage audits, and mechanism ablations in a parameter-control benchmark.
 
 \begin{table*}[t]
 			\centering
@@ -155,7 +136,7 @@ The system realizes the operator $\Phi(\mathbf{x}_{\text{in}}; \theta)$ through 
 \begin{figure*}[t]
 \centering
 \resizebox{\textwidth}{!}{\input{figures/retrieval_grounded_pipeline.tex}}
-\caption[System overview]{System overview of the retrieval-grounded audio effect control pipeline.}
+\caption[System overview]{System overview of the retrieval-grounded guitar-effect preset-selection pipeline over a switchable nine-module topology: Compressor $\to$ Driver $\to$ Screamer $\to$ Equaliser $\to$ Chorus $\to$ Flanger $\to$ Phaser $\to$ Delay $\to$ Reverb.}
 \label{fig:architecture}
 \end{figure*}
 
@@ -172,17 +153,17 @@ The core challenge in texture-aware retrieval lies in computing a similarity met
 To address this, we introduce \textbf{Texture Resonance Retrieval (TRR)}. Drawing on the hypothesis that audio texture is encoded in second-order feature statistics \citep{mcdermott2011sound}, we compute the Gram matrix of deep activations.
 
 \begin{algorithm}[ht]
-		\caption{Benchmarked Texture Resonance Retrieval (TRR) Encoding}
+		\caption{TRR Encoding}
 		\label{alg:trr_encoding}
 		\begin{algorithmic}
-			\REQUIRE Audio sample $a$, Wav2Vec2 model $\mathcal{W}$, layer set $\mathcal{L}=\{4,5,6\}$, linear projection $P:\mathbb{R}^{768}\rightarrow\mathbb{R}^{64}$
+			\REQUIRE Audio sample $a$, Wav2Vec2 model $\mathcal{W}$, layer set $\mathcal{L}=\{4,5,6\}$, frozen random linear projection $P:\mathbb{R}^{768}\rightarrow\mathbb{R}^{32}$
 			\ENSURE Texture embedding $\mathbf{g}_{\text{norm}}$
 
 			\STATE \textbf{1. Preprocessing}: Normalize $a$ and pad to minimum length.
 			\FOR{each $\ell \in \mathcal{L}$}
 			\STATE $\mathbf{H}_{\ell} \leftarrow \mathcal{W}_{\text{layer }\ell}(a) \in \mathbb{R}^{T_{\text{frm}} \times 768}$
-			\STATE $\widehat{\mathbf{H}}_{\ell} \leftarrow P(\mathbf{H}_{\ell}) \in \mathbb{R}^{T_{\text{frm}} \times 64}$
-			\STATE $\mathbf{G}_{\ell} \leftarrow \frac{1}{T_{\text{frm}}}\widehat{\mathbf{H}}_{\ell}^{\top}\widehat{\mathbf{H}}_{\ell} \in \mathbb{R}^{64 \times 64}$
+			\STATE $\widehat{\mathbf{H}}_{\ell} \leftarrow P(\mathbf{H}_{\ell}) \in \mathbb{R}^{T_{\text{frm}} \times 32}$
+			\STATE $\mathbf{G}_{\ell} \leftarrow \frac{1}{T_{\text{frm}}}\widehat{\mathbf{H}}_{\ell}^{\top}\widehat{\mathbf{H}}_{\ell} \in \mathbb{R}^{32 \times 32}$
 			\ENDFOR
 			\STATE $\bar{\mathbf{G}} \leftarrow \frac{1}{|\mathcal{L}|}\sum_{\ell\in\mathcal{L}}\mathbf{G}_{\ell}$
 			\STATE $\mathbf{g}_{\text{norm}} \leftarrow \mathrm{vec}(\bar{\mathbf{G}}) / \|\mathrm{vec}(\bar{\mathbf{G}})\|_2$
@@ -190,35 +171,45 @@ To address this, we introduce \textbf{Texture Resonance Retrieval (TRR)}. Drawin
 	\end{algorithmic}
 \end{algorithm}
 
-Let $\mathbf{H}_{\ell} \in \mathbb{R}^{T_{\text{frm}} \times 768}$ be the frame-level activation map from layer $\ell$ of a pre-trained Wav2Vec2 Base model. In the benchmarked implementation we use the mid-level layer set $\mathcal{L}=\{4,5,6\}$, linearly project each frame to 64 dimensions, compute a Gram matrix per layer, average the resulting $64\times 64$ matrices, flatten the result into a 4096-dimensional vector, and L2-normalize it. The averaged texture descriptor can be written as
+Let $\mathbf{H}_{\ell} \in \mathbb{R}^{T_{\text{frm}} \times 768}$ be the frame-level activation map from layer $\ell$ of a pre-trained Wav2Vec2 Base model. In the benchmarked implementation we use the mid-level layer set $\mathcal{L}=\{4,5,6\}$, apply a frozen Xavier-initialized random projection to 32 dimensions, compute a Gram matrix per layer, average the resulting $32\times 32$ matrices, flatten the result into a 1024-dimensional vector, and L2-normalize it. The averaged texture descriptor can be written as
 \begin{equation}
 		\bar{\mathbf{G}} = \frac{1}{|\mathcal{L}|}\sum_{\ell\in\mathcal{L}} \frac{1}{T_{\text{frm}}}\widehat{\mathbf{H}}_{\ell}^{\top}\widehat{\mathbf{H}}_{\ell},
 \end{equation}
-where $\widehat{\mathbf{H}}_{\ell}$ denotes the projected feature map. The entry $\bar{\mathbf{G}}_{ij}$ captures the co-activation of projected channels $i$ and $j$ irrespective of their absolute temporal position. This time-invariance allows TRR to match textures (e.g., ``fast tremolo'') even if the reference and database entries are not phase-aligned. L2 normalization of $\mathrm{vec}(\bar{\mathbf{G}})$ is equivalent to Frobenius normalization of the matrix representation, and similarity is then computed as cosine similarity between the flattened descriptors. Computationally, Gram-matrix construction scales as $O(D^2 \cdot T_{\text{frm}})$ after projection, which is more expensive than mean pooling but remains tractable for short cached snippets.
+where $\widehat{\mathbf{H}}_{\ell}$ denotes the projected feature map. The entry $\bar{\mathbf{G}}_{ij}$ captures the co-activation of projected channels $i$ and $j$ irrespective of their absolute temporal position. This time-invariance allows TRR to match textures (e.g., ``fast tremolo'') even if the reference and database entries are not phase-aligned. L2 normalization of $\mathrm{vec}(\bar{\mathbf{G}})$ is equivalent to Frobenius normalization of the matrix representation, and similarity is then computed as cosine similarity between the flattened descriptors. Computationally, Gram-matrix construction scales as $O(D^2 \cdot T_{\text{frm}})$ after projection, where $D=32$ in the reported implementation. This bound covers only the post-Wav2Vec2 Gram construction; the Wav2Vec2 forward pass is a separate feature-extraction cost and dominates when features are not cached.
 
 \paragraph{Properties and limitations.}
 TRR can be viewed as a second-order summary of deep features: it retains cross-channel correlation structure while discarding absolute temporal alignment. This is desirable for retrieval in effect spaces where perceptual ``style'' is often expressed through repeated modulation patterns or stationary texture rather than a single time-locked event. The Frobenius normalization further reduces sensitivity to global scale changes in feature activations, making cosine similarity comparisons less dominated by magnitude.
 However, TRR is not a universal representation: by aggregating over time, it intentionally discards fine-grained ordering and can under-represent transient-dominant effects. Moreover, as with other deep representations, retrieval behavior can depend on the chosen backbone layer and the upstream feature extractor.
 
-\paragraph{Property 3 (Alignment-insensitive texture statistics).}
-Let $\mathbf{H}\in\mathbb{R}^{C\times T_{\text{frm}}}$ be the frame-level feature matrix and let $\mathbf{P}\in\mathbb{R}^{T_{\text{frm}}\times T_{\text{frm}}}$ be any permutation matrix over frames. Then the TRR Gram matrix satisfies $\frac{1}{T_{\text{frm}}}\mathbf{H}\mathbf{H}^\top=\frac{1}{T_{\text{frm}}}(\mathbf{H}\mathbf{P})(\mathbf{H}\mathbf{P})^\top$. Therefore, TRR depends on time-aggregated co-activations and is insensitive to the absolute alignment of frames, which motivates its use as a texture-oriented retrieval signal.
+The alignment-insensitivity statement is a direct consequence of Gram aggregation: for a frame permutation matrix $\mathbf{P}$, $\frac{1}{T_{\text{frm}}}\mathbf{H}\mathbf{H}^\top=\frac{1}{T_{\text{frm}}}(\mathbf{H}\mathbf{P})(\mathbf{H}\mathbf{P})^\top$. We use this as an implementation motivation rather than as an independent theoretical contribution.
 
-\subsection{Preliminary Personalization Extension}
-\label{ssec:memory}
+Figure~\ref{fig:gram_matrix_examples} visualizes representative TRR Gram matrices, and Figure~\ref{fig:tsne_comparison} compares the resulting TRR embedding geometry with mean-pooled Wav2Vec2 features. These figures are diagnostic visualizations of the representation, not separate quantitative evidence.
 
-The repository also contains a preliminary memory mechanism for storing user-corrected parameter examples. Conceptually, this extension augments the static preset database with user-specific entries and allows future retrieval to prioritize past corrections when a new query is sufficiently similar to earlier interactions. We report this module only as exploratory system context rather than as a primary validated contribution of the paper, because the current manuscript's main benchmark and statistical analysis center on retrieval over the static knowledge base.
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=\linewidth]{gram_matrix_examples.pdf}
+	\caption{Representative TRR Gram-matrix examples illustrating the second-order co-activation structure used by the retrieval descriptor.}
+	\label{fig:gram_matrix_examples}
+\end{figure}
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=\linewidth]{trr_vs_wav2vec_tsne.pdf}
+	\caption{t-SNE visualization comparing TRR and mean-pooled Wav2Vec2 embeddings on the benchmark presets. The plot is used only as a qualitative representation diagnostic.}
+	\label{fig:tsne_comparison}
+\end{figure}
 
 \subsection{Complexity and Latency Considerations}
 \label{ssec:complexity_latency}
 Journal readers often care not only about conceptual correctness but also about operational constraints. Our design separates (a) \textit{real-time execution}, which must remain deterministic and low-latency, from (b) \textit{asynchronous inference}, which can be slower and is not executed on the audio callback.
-On the inference side, TRR encoding dominates the audio-retrieval cost with $O(C^2 T_{\text{frm}})$ Gram construction (Section \ref{ssec:rag}), followed by standard top-$K$ nearest-neighbor search. The retrieval system operates asynchronously from the real-time audio path, ensuring that audio processing latency is not affected by retrieval operations.
+On the inference side, TRR encoding includes Wav2Vec2 feature extraction, then $O(D^2 T_{\text{frm}})$ Gram construction after projection with $D=32$ (Section \ref{ssec:rag}), followed by standard top-$K$ nearest-neighbor search. The retrieval system operates asynchronously from the real-time audio path, ensuring that audio processing latency is not affected by retrieval operations.
 
 \paragraph{Latency measurement protocol.}
 We report a reproducible \emph{offline} latency breakdown for the local retrieval path under a cache-only profiling setup. Measurements were collected on an Apple Silicon machine (arm64 CPU, 10 cores; macOS; Python 3.12) over the original 211-query profiling pool, with 5 warm-up iterations and 3 repeats per query. We report median and p95 over the resulting 633 timed query runs. These measurements exclude live network LLM latency and should therefore be interpreted as local retrieval-path timing rather than an end-to-end cloud deployment budget.
 
 \begin{table}[t]
 	\centering
-\caption{Per-query local retrieval-path latency breakdown (cache-only). We report median and p95 over 633 runs from the original 211-query profiling pool ($211\times 3$ repeats).}
+\caption{Per-query cached retrieval-scoring latency breakdown. We report median and p95 over 633 runs from the original 211-query profiling pool ($211\times 3$ repeats). These numbers exclude feature extraction, live LLM calls, plugin rendering, and user-interface overhead, and should not be interpreted as end-to-end DAW real-time latency.}
 	\label{tab:latency_breakdown}
 	\begin{tabular}{lcc}
 		\toprule
@@ -235,10 +226,15 @@ We report a reproducible \emph{offline} latency breakdown for the local retrieva
 
 The retrieval system operates asynchronously from the real-time audio callback, ensuring that audio processing latency is not affected by retrieval operations.
 
-\subsection{Multimodal Fusion as a Diagnostic Extension}
+\subsection{Multimodal Fusion as a Supplementary Diagnostic Extension}
 \label{ssec:fusion}
 
-Beyond the core retrieval benchmark, the repository contains an experimental fusion mechanism that combines text-side and audio-side scores under degraded-input conditions. In the current codebase this mechanism is implemented as a practical quality-aware fallback rule rather than a single clean probabilistic model, so we treat its results as a diagnostic stress test rather than as one of the paper's main validated contributions. The central evidence chain of the manuscript therefore remains the retrieval-only benchmark in Protocol-A.
+Beyond the core retrieval benchmark, the repository contains an experimental fusion mechanism that combines text-side and audio-side scores under degraded-input conditions. In the current codebase this mechanism is implemented as a practical quality-aware fallback rule rather than a single clean probabilistic model, so we treat its results as a supplementary diagnostic stress test rather than as one of the paper's main validated contributions. The central evidence chain of the manuscript therefore remains the retrieval-only benchmark in Protocol-A.
+For candidate preset $z_i$, the fixed-weight diagnostic uses
+\begin{equation}
+	s_{\mathrm{fused}}(z_i)=\alpha\,s_{\mathrm{text}}(z_i)+(1-\alpha)\,s_{\mathrm{audio}}(z_i),
+\end{equation}
+where $\alpha$ denotes the text-side weight after score normalization. The adaptive profile changes $\alpha$ according to degradation metadata and is evaluated only as a robustness diagnostic.
 
 \section{Experiments}
 \label{sec:experiments}
@@ -251,21 +247,21 @@ We validate the proposed framework by answering one core research question: does
 Our full server-side corpus contains 1267 paired records (audio--text--parameter triplets) collected from guitar effect presets. A post-hoc audit of the original song-name-based held-out list (211 test queries, 1056 knowledge-base items) revealed 16 cross-split shared resolved audio paths and 48 near-duplicate cross-split pairs under a cheap fingerprint. To remove exact audio reuse from the main objective benchmark, we regroup records by resolved local audio path before sampling the held-out set. The resulting stricter Protocol-A split contains 204 test queries and 1063 knowledge-base items, with zero exact shared resolved audio paths across split under the current audit. We retain this as a pilot benchmark because cheap near-duplicate pairs remain and the corpus is still guitar-only.
 
 \paragraph{Provenance notes.}
-The dataset JSON exposes \texttt{SongName}, \texttt{Style}, \texttt{Feature}, \texttt{Parameters}, and \texttt{Vectors}, but it does not include a separate auditable text-source field. We therefore treat \texttt{Style} and \texttt{Feature} as the only explicit text-side provenance available in-repo, and use the stored \texttt{Parameters} field as the operational ground truth.
+The dataset JSON exposes song name, style tags, feature tags, parameters, and stored vectors, but it does not include a separate auditable text-source field. We therefore treat the style and feature fields as the only explicit text-side provenance available in-repo, and use the stored parameters as the operational ground truth.
 
 \paragraph{Scope and protocol.}
-Unless otherwise stated, objective results in this section use \textbf{Protocol-A} (retrieval-only) on the stricter resolved-audio-grouped split and use top-1 retrieval for all retrieval methods. Protocol-C and the latency profile are reported on their own protocol-specific pools and are labeled explicitly.
+Unless otherwise stated, objective results in this section use \textbf{P0 Protocol-A} (retrieval-only) on the shared 204-query split and use top-1 retrieval for all retrieval methods. Protocol-C, listening tests, and latency measurements are reported on their own protocol-specific pools and are labeled explicitly.
 
 \paragraph{Resources and reproducibility.}
 \label{sec:repro}
 To facilitate reproducibility, we provide an anonymized supplementary package for review containing preprocessing details, embedding computation steps, retrieval-index construction, prompt templates, evaluation scripts, and split specifications for all reported tables. The cleaned repository and artifacts will be released publicly upon acceptance.
 
 \paragraph{Baselines.}
-We compare our proposed \textbf{TRR} (Section \ref{ssec:rag}) against four retrieval baselines. \textbf{Text-RAG} performs sparse lexical retrieval over metadata fields. \textbf{FeatureNN-RAG} uses the released \texttt{FeatureNN} vectors from the benchmark package and should therefore be interpreted as a fixed internal dense-retrieval reference rather than as a separately reimplemented external model family. \textbf{Wav2Vec-RAG} uses the mean-pooled activation of the final Wav2Vec2 transformer layer. \textbf{CLAP} performs dense retrieval using cached CLAP audio embeddings when those embeddings are available in the verified artifact set.
+We compare our proposed \textbf{TRR} (Section \ref{ssec:rag}) against five retrieval baselines in the P0 benchmark. \textbf{Wav2Vec} uses mean-pooled Wav2Vec2 activations. \textbf{FeatureNN} uses the released benchmark feature vectors and should therefore be interpreted as a fixed dense-retrieval reference. \textbf{CLAP}, \textbf{PaSST}, and \textbf{PANNs} use pretrained audio representations as stronger external embedding baselines for retrieval. Earlier Text-RAG and resolved-audio-grouped diagnostic rows are retained only in the supplementary audit trail and are not the main P0 baseline matrix.
 
 \subsection{Metrics}
 \label{ssec:metrics}
-We evaluate alignment in parameter space $\Theta$ using five operational metrics computed on flattened numeric parameter leaves. Concretely, given a nested parameter dictionary, we recursively flatten numeric leaves into a sparse vector indexed by dot-separated keys (e.g., \texttt{DelayOn.Mix}) and ignore non-numeric leaves (e.g., strings). Unless otherwise stated, we form the union of keys between prediction and ground truth, and treat missing numeric keys as zeros for metric computation. Importantly, we do not apply per-parameter normalization; thus L2 magnitudes can be dominated by a small number of large-scale parameters and should be interpreted within each protocol rather than across protocols.
+We evaluate alignment in parameter space $\Theta$ using operational metrics computed on flattened numeric parameter leaves. Concretely, given a nested parameter dictionary, we recursively flatten numeric leaves into a sparse vector indexed by dot-separated keys (e.g., \texttt{DelayOn.Mix}) and ignore non-numeric leaves (e.g., strings). Unless otherwise stated, we form the union of keys between prediction and ground truth, and treat missing numeric keys as zeros for metric computation. The main P0 table reports raw L2, normalized L2, Acc@0.1, Recall, Cosine, and Module consistency; the paired significance tests use per-query normalized L2. Raw L2 magnitudes can be dominated by a small number of large-scale parameters and should be interpreted within each protocol rather than across protocols. Normalized L2 uses plugin-defined min--max ranges for comparability, but this is still an engineering normalization rather than a perceptual scale: logarithmic, dB, and nonlinear control laws can make equal normalized parameter differences perceptually unequal.
 
 \paragraph{L2 Error (RMSE).}
 Given flattened vectors $v(\theta_{\text{gt}})$ and $v(\tilde{\theta})$ over the union key set of size $d$, we report the root mean squared error
@@ -297,64 +293,110 @@ We compute module-level consistency as Jaccard similarity over active module set
 \subsection{Protocol-A: Comparative Retrieval Evaluation}
 \label{ssec:protocolA}
 
-\textbf{Purpose.} Benchmark TRR against the currently evaluated retrieval baselines for executable parameter control under the stricter anti-leakage split.
+\textbf{Purpose.} Benchmark TRR against the P0 retrieval baselines for executable parameter control under the shared 204-query Protocol-A split.
 
-\textbf{Protocol.} All results in this subsection follow Protocol-A (retrieval-only) on the resolved-audio-grouped split ($N_{\text{test}}=204$, $N_{\text{kb}}=1063$) using top-1 retrieval for all methods. The CLAP row uses 201 queries because three query-side cached embeddings are unavailable in the current verified artifact set.
+\textbf{Protocol.} All results in this subsection follow P0 Protocol-A (retrieval-only) on a deterministic 204-query test split and 1,063-record retrieval database. All methods use top-1 retrieval. In addition to Wav2Vec, FeatureNN, and CLAP, this P0 evidence package adds PaSST and PANNs as stronger acoustic baselines. We report both raw L2 and normalized L2, but use normalized L2 for the paired significance tests because the P0 statistical report defines the test on per-query normalized parameter distance.
 
 Table~\ref{tab:main_results} reports the main comparison across the current retrieval baselines.
 
 \begin{table}[t]
 \centering
-\caption{Protocol-A: Direct retrieval comparison on the resolved-audio-grouped split ($N_{\text{test}}=204$, $N_{\text{kb}}=1063$). Lower is better for L2; higher is better for all other metrics. TRR achieves the best mean performance in every reported row; the CLAP row uses the 201 shared queries with cached CLAP embeddings.}
+\caption{P0 Protocol-A: direct retrieval comparison on the shared 204-query benchmark. Lower is better for L2 and Norm.L2; higher is better for all other metrics. TRR achieves the best mean performance on the normalized distance and all reported alignment scores.}
 \label{tab:main_results}
 \small
 \setlength{\tabcolsep}{4pt}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{lcccccc}
+\begin{tabular}{lccccccc}
 \toprule
-\textbf{Method} & \textbf{$n$} & \textbf{L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cos} $\uparrow$ & \textbf{Module} $\uparrow$ \\
+\textbf{Method} & \textbf{$n$} & \textbf{L2} $\downarrow$ & \textbf{Norm.L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cos} $\uparrow$ & \textbf{Module} $\uparrow$ \\
 \midrule
-\textbf{TRR (Ours)} & 204 & \textbf{8.0467} & \textbf{0.5169} & \textbf{0.4595} & \textbf{0.8247} & \textbf{0.8051} \\
-Wav2Vec-RAG & 204 & 23.8197 & 0.4251 & 0.3505 & 0.5292 & 0.7043 \\
-Text-RAG & 204 & 24.1705 & 0.4717 & 0.3967 & 0.4943 & 0.7456 \\
-FeatureNN-RAG & 204 & 19.2613 & 0.4198 & 0.3600 & 0.5479 & 0.7134 \\
-CLAP & 201 & 22.3102 & 0.4492 & 0.3971 & 0.5725 & 0.7240 \\
+\textbf{TRR (Ours)} & 204 & \textbf{8.7287} & \textbf{0.1881} & \textbf{0.5766} & \textbf{0.5404} & \textbf{0.8415} & \textbf{0.8297} \\
+Wav2Vec & 204 & 22.5174 & 0.2400 & 0.5015 & 0.4648 & 0.5642 & 0.7423 \\
+FeatureNN & 204 & 17.9391 & 0.2236 & 0.5264 & 0.4779 & 0.6030 & 0.7544 \\
+CLAP & 204 & 16.1257 & 0.2298 & 0.5389 & 0.4922 & 0.6531 & 0.7837 \\
+PaSST & 204 & 18.2860 & 0.2132 & 0.5422 & 0.5001 & 0.6192 & 0.7960 \\
+PANNs & 204 & 21.0269 & 0.2260 & 0.5090 & 0.4759 & 0.5826 & 0.7606 \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 
-\textbf{Result.} On the stricter split, TRR is best in every fully paired row of Table~\ref{tab:main_results}. Relative to Wav2Vec-RAG, TRR reduces mean L2 by 15.7730 with a 95\% bootstrap interval of [12.2807, 19.3414] and improves cosine by 0.2956 [0.2305, 0.3630]; all five paired comparisons remain significant after Holm correction ($p_{\mathrm{Holm}}=0.001$ for each metric). Relative to CLAP on the 201 shared queries, TRR reduces mean L2 by 14.1460 [10.3041, 18.0624] and improves cosine by 0.2503 [0.1833, 0.3183], again with Holm-corrected significance (Supplementary Material).
+\textbf{Result.} On the P0 split, TRR is best on Norm.L2, Acc@0.1, Recall, Cosine, and Module in Table~\ref{tab:main_results}. The strongest non-TRR rows are CLAP and PaSST, but neither surpasses TRR on the principal normalized and alignment metrics. Paired Wilcoxon tests on per-query Norm.L2 reject the TRR-vs-baseline null hypothesis after Holm correction for Wav2Vec ($p=1.564\times10^{-7}$), FeatureNN ($p=9.523\times10^{-5}$), CLAP ($p=4.476\times10^{-4}$), PaSST ($p=1.254\times10^{-3}$), and PANNs ($p=2.122\times10^{-5}$). The corresponding effect sizes are small, so we interpret the result as statistically reliable but moderate in magnitude rather than as a universal dominance claim.
 
-The per-query view makes this result more specific. Against Wav2Vec-RAG, TRR improves L2 on 125 of 204 paired queries, loses on 40, and ties on 39. Yet the median signed improvement is only 0.1238, far smaller than the mean improvement of 15.7730; the same long-tailed pattern appears against CLAP (median 0.0658 vs mean 14.1460). The aggregate gain in Table~\ref{tab:main_results} therefore does not reflect a uniform re-ordering of the entire benchmark. Instead, it is concentrated in a subset of difficult cases where second-order structure changes the retrieved neighborhood and avoids semantically plausible but parameter-misaligned presets, while a non-trivial failure set remains. We therefore interpret TRR as the strongest \emph{currently evaluated} retrieval prior on this benchmark, not as a universal best-method claim beyond the present protocol.
+The practical interpretation is deliberately narrow. TRR is the strongest \emph{currently evaluated} retrieval prior on this benchmark because its second-order texture statistics better align with executable parameter neighborhoods than first-order or classification-oriented embeddings. The small effect sizes in the normalized-distance tests also matter: they indicate that the gain is not a uniform re-ordering of every query, but a consistent shift toward better parameter alignment across paired examples. We therefore treat TRR as a stronger retrieval prior for texture-sensitive control, not as a universal best-method claim beyond the present protocol.
 
-\subsection{Diagnostic Stress Test Under Modality Degradation}
-\label{ssec:protocolC}
-
-\textbf{Purpose.} Examine whether the repository's current fusion heuristic can recover performance when one modality is intentionally degraded.
-
-\textbf{Protocol.} For continuity with the repository's existing diagnostic artifacts, we test two degradation scenarios on the original 211-query pool rather than on the stricter Protocol-A split: (1) \textit{Vague Text}: replacing accurate descriptions with the generic query ``warm guitar tone''; (2) \textit{Synthetic Audio Degradation}: perturbing the audio-side retrieval representation. We compare single-modal systems (Text-only, TRR-only) against the fusion heuristic. These experiments are useful for stress testing, but they are not a substitute for a fully realistic real-audio degradation benchmark.
+\paragraph{Near-duplicate sensitivity.}
+Because retrieval benchmarks are especially sensitive to near-duplicate leakage, we additionally stress-test the result by filtering cheap-fingerprint near-duplicate pairs between the held-out queries and the retrieval database. Table~\ref{tab:near_dup_sensitivity} reports the TRR row as progressively stricter thresholds remove more candidate items from the database. We report only normalized and directional metrics in this table because the sensitivity script recomputes candidate filtering with a script-local raw parameter pass; retaining raw L2 there would invite an invalid comparison with the main Protocol-A table. TRR remains stronger than the evaluated non-TRR retrieval baselines in the corresponding sensitivity report, but its normalized L2 degrades as the candidate pool becomes very small. We therefore interpret the main result as robust to the removal of many cheap near duplicates, but not as evidence that the current benchmark is free of all duplicate-family risk.
 
 \begin{table}[t]
 \centering
-\caption{Selected Protocol-C boundary cases ($N=211$). The current fusion heuristic mainly acts as a fallback rule: it collapses onto the intact modality under single-modality degradation, but degrades substantially under explicit modality conflict.}
+\caption{Near-duplicate sensitivity for TRR on the audited Protocol-A split. The threshold controls cheap-fingerprint filtering between held-out queries and the retrieval database. Lower Norm.L2 is better.}
+\label{tab:near_dup_sensitivity}
+\small
+\setlength{\tabcolsep}{4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Threshold} & \textbf{Removed} & \textbf{KB size} & \textbf{Norm.L2} $\downarrow$ & \textbf{Cos} $\uparrow$ \\
+\midrule
+0.000 & 0 & 1063 & 0.1879 & 0.8149 \\
+0.005 & 594 & 469 & 0.2026 & 0.8169 \\
+0.010 & 654 & 409 & 0.1993 & 0.8442 \\
+0.020 & 903 & 160 & 0.2265 & 0.7758 \\
+0.050 & 980 & 83 & 0.2493 & 0.7024 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\paragraph{Direct-regression boundary.}
+To test whether retrieval is merely hiding an easier supervised parameter-estimation problem, we also run an MLP regressor trained on the P0 knowledge-base items using mean-pooled Wav2Vec2 vectors as inputs, followed by a minimal validity projection that clips each numeric parameter to the training-set observed range. The model is a two-layer MLP with 256 hidden units trained on 1,058 usable records and evaluated on the same 204 held-out queries. As shown in Table~\ref{tab:supervised_boundary}, this projected supervised boundary improves normalized L2 and Acc@0.1, but has substantially weaker cosine and recall than TRR and does not return a retrieved exemplar. Thus, if the sole objective is normalized numeric parameter error, the simple supervised regressor is the stronger boundary. Our claim is correspondingly narrower: TRR provides retrieved exemplars with a moderate parameter-space trade-off and better neighborhood semantics than the evaluated retrieval baselines, not a dominance result over direct regression.
+
+\begin{table}[t]
+\centering
+\caption{Supervised range-projected regression boundary on the P0 split. The MLP is stronger on normalized numeric error and Acc@0.1, while TRR preserves retrieved-exemplar semantics and is stronger on recall and cosine.}
+\label{tab:supervised_boundary}
+\small
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Method} & \textbf{$n$} & \textbf{L2} $\downarrow$ & \textbf{Norm.L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cos} $\uparrow$ \\
+\midrule
+TRR retrieval & 204 & 8.7287 & 0.1881 & 0.5766 & 0.5404 & 0.8415 \\
+MLP + range projection & 204 & 57.6239 & \textbf{0.1603} & \textbf{0.7894} & 0.3468 & 0.5941 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{Diagnostic: Degraded-Input Fusion}
+\label{ssec:protocolC}
+
+\textbf{Purpose.} Evaluate whether multimodal retrieval remains stable when the audio reference is realistically degraded before representation extraction.
+
+\textbf{Protocol.} P0 Protocol-C reuses the same 204-query split as Protocol-A. The audio branch is degraded in waveform space and then re-encoded into TRR embeddings. The degradation set includes AWGN at 20/10/5 dB, MP3 at 128/64/32 kbps, reverb with RT60 0.6/1.0, and truncation to 50\%/30\% of the signal. The text branch uses \texttt{Style}+\texttt{Feature}, and ranking metrics use an oracle relevance set defined by the nearest 10\% of knowledge-base items in parameter space, with a minimum of five relevant items per query. We compare fixed fusion weights against an adaptive fusion profile; the pure-text boundary is retained only as an auxiliary diagnostic and is not part of the main multimodal comparison.
+
+\begin{table}[t]
+\centering
+\caption{P0 Protocol-C: real-degradation fusion robustness on the shared 204-query split. Lower is better for L2; higher is better for all other metrics.}
 \label{tab:robustness}
 \small
 \setlength{\tabcolsep}{3pt}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{lccc}
+\begin{tabular}{lccccc}
 \toprule
-\textbf{Scenario} & \textbf{Reference branch} & \textbf{Fusion (Ours)} & \textbf{Interpretation} \\
+\textbf{Method} & $\boldsymbol{\alpha}$ & \textbf{L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{MRR} $\uparrow$ & \textbf{NDCG@5} $\uparrow$ \\
 \midrule
-\textit{Vague Text} & Text-only: 12.6517 & \textbf{0.2970} & fallback to audio \\
-\textit{Noisy Audio} & TRR-only: 33.8549 & \textbf{1.5148} & fallback to text \\
-\textit{Conflict} & TRR-only: 0.2970 & 4.5259 & failure mode \\
+fixed fusion 0.30 & 0.3000 & 29.2322 & 0.4846 & 0.4095 & 0.3723 \\
+fixed fusion 0.50 & 0.5000 & 20.5551 & 0.6085 & 0.5607 & 0.5528 \\
+fixed fusion 0.70 & 0.7000 & 20.1868 & 0.6104 & 0.5652 & 0.5551 \\
+\textbf{adaptive fusion} & \textbf{0.5980} & \textbf{20.1491} & \textbf{0.6121} & \textbf{0.5654} & \textbf{0.5566} \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-\textbf{Result.} Under vague text, Text-only degrades sharply (L2=12.65) while the fusion heuristic falls back entirely to audio ($w_{\text{audio}}=1.0$) and matches TRR-only (L2=0.30). Under synthetic audio degradation, TRR-only degrades sharply (L2=33.85) while the fusion heuristic falls back to text ($w_{\text{text}}=1.0$) and matches Text-only (L2=1.51). In both settings, the current fusion rule is useful mainly because it collapses onto the intact modality; the evidence does not support a stronger claim of robust cross-modal integration. The same heuristic fails under explicit modality conflict: fusion rises to L2=4.53 while TRR-only remains at 0.30. We therefore treat Protocol-C as boundary-condition analysis for the current fusion rule rather than as a realistic robustness benchmark.
+\textbf{Diagnostic result.} Table~\ref{tab:robustness} shows that audio-heavy fusion is the least stable operating point under realistic degradations: fixed fusion with $\alpha=0.30$ yields L2=29.2322 and the weakest ranking scores. Mid-to-high text-weight fusion is substantially more robust. Adaptive fusion obtains the best aggregate L2, Acc@0.1, MRR, and NDCG@5 among the reported multimodal settings, but the margin over fixed $\alpha=0.50$ and $\alpha=0.70$ is small. We therefore move Protocol-C outside the main evidence chain: it is useful for showing that degraded-input retrieval is a modality-weighting problem, but it does not establish adaptive fusion as a generally superior multimodal method.
 
 \subsection{Perceptual Listening Test (Multiple-Stimulus with Hidden Reference)}
 \label{ssec:mushra}
@@ -386,7 +428,7 @@ The per-query view makes this result more specific. Against Wav2Vec-RAG, TRR imp
 
 \begin{figure*}[t]
 	\centering
-	\includegraphics[width=0.98\textwidth]{system_boxplot_Trial_1.png}
+	\includegraphics[width=0.98\textwidth]{system_boxplot_Trial_1.pdf}
 	\caption{Trial 1: condition-level score distributions (boxplot) for style matching.}
 	\label{fig:mushra_trial1_boxplot}
 \end{figure*}
@@ -411,7 +453,7 @@ The per-query view makes this result more specific. Against Wav2Vec-RAG, TRR imp
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[width=\linewidth]{system_boxplot_Trial_2_5.png}
+	\includegraphics[width=\linewidth]{system_boxplot_Trial_2_5.pdf}
 	\caption{Trials 2--5: condition-level score distributions.}
 	\label{fig:mushra_trial2_5_boxplot}
 \end{figure}
@@ -436,13 +478,16 @@ The per-query view makes this result more specific. Against Wav2Vec-RAG, TRR imp
 
 \begin{figure}[t]
 	\centering
-	\includegraphics[width=\linewidth]{system_boxplot_Trial_6_10.png}
+	\includegraphics[width=\linewidth]{system_boxplot_Trial_6_10.pdf}
 	\caption{Trials 6--10: condition-level score distributions.}
 	\label{fig:mushra_trial6_10_boxplot}
 \end{figure}
 
 \paragraph{Interpretation.}
-These listening-test results complement the parameter-space metrics, but they should not be read as a one-to-one validation of any single objective metric. Rather, they indicate that retrieval-grounded control can produce perceptually plausible and editable starting points in DAW workflows. Because the manual-baseline provenance is incomplete, Trials~2--5 are best interpreted as supportive perceptual context rather than as a definitive human-vs-system optimization benchmark; Trials~6--10 likewise support parity with MusicGen on this similarity task, not superiority.
+These listening-test results are exploratory perceptual context and should not be read as validation of any single objective metric. Trial~1 shows that the best non-reference condition remains below the hidden reference, Trials~2--5 are limited by incomplete manual-baseline provenance, and Trials~6--10 show no significant TRR advantage over MusicGen on this similarity task. The listening study therefore motivates future query-aligned perceptual evaluation rather than proving perceptual superiority of the retrieval system.
+
+\paragraph{Metric--perception alignment diagnostic.}
+We additionally ran a conservative alignment diagnostic linking Trial-1 style labels to Protocol-A TRR rows through an explicit alias table and querying a local qwen3.5-9b vLLM server for text-side perceptual-recognizability scores. This analysis is intentionally weak: only four of the seven Trial-1 non-reference labels matched Protocol-A query names, and the local model scores are text-label judgments rather than audio judgments. Under this restricted setting, human mean ratings did not significantly correlate with TRR objective metrics: for human rating versus negative TRR L2, Spearman $\rho=0.40$ with $n=4$ and $p=0.60$; for human rating versus TRR Acc@0.1, $\rho=0.00$ with $n=4$ and $p=1.00$; for human rating versus TRR cosine, $\rho=0.00$ with $n=4$ and $p=1.00$. The local vLLM score also failed to provide a reliable positive bridge to human ratings (human-vs-qwen3.5-9b score: Spearman $\rho=-0.18$, $n=7$, $p=0.7005$). We therefore use this diagnostic as a negative control: parameter-space alignment is the primary audited objective in this paper, while perceptual alignment remains unvalidated by the current evidence.
 
 \section{Discussion}
 \label{sec:discussion}
@@ -450,15 +495,17 @@ These listening-test results complement the parameter-space metrics, but they sh
 \subsection{Scope of the Current Evidence}
 \label{ssec:memory_exp}
 
-The strongest evidence in the current manuscript is the retrieval benchmark in Protocol-A. The listening study provides complementary subjective context, while the modality-degradation experiment provides only boundary-condition diagnostics for the current fusion heuristic. By contrast, the repository's personalization and memory components are presently supported only by preliminary pseudo-user simulations rather than by the same large-scale held-out protocol used for the main benchmark. We therefore exclude personalization from the paper's primary validated claims.
+The strongest evidence in the current manuscript is the P0 Protocol-A retrieval benchmark, supplemented by near-duplicate sensitivity, mechanism ablations, and the supervised direct-regression boundary. Protocol-C and the listening/local-vLLM diagnostics provide useful stress tests, but they are not treated as primary evidence for broad audio-effect control. Personalization and memory components are outside the paper's validated claims because they are not evaluated under the same held-out protocol.
 
 \subsection{Implications for Audio Effect Control}
 
-The current results suggest a practical pattern for retrieval-based audio control: use retrieval over real presets to provide feasibility constraints and stylistic priors, and then expose the retrieved configuration for direct user editing. In our benchmark, TRR achieves the strongest parameter alignment in the reported comparisons while preserving editability and traceability in DAW workflows, but the evidence supports this as a stronger prior for neighborhood selection rather than as a universally correct notion of parameter similarity. Whether the same gains hold across other sources, effect families, and production stages requires dedicated evaluation.
+The current results suggest a practical pattern for retrieval-based audio control: use retrieval over real presets to provide feasibility constraints and stylistic priors, and then expose the retrieved configuration for direct user editing. In Protocol-A, TRR achieves the strongest parameter alignment in the reported retrieval comparisons while preserving editability and traceability in DAW workflows. The supervised MLP boundary with range projection is stronger on normalized L2 and Acc@0.1, so direct regression is a serious boundary rather than a weak baseline. Together, these results support TRR as a retrieved-exemplar prior with moderate parameter-space trade-offs, not a universally superior parameter estimator or a proof of full autonomous production.
 
 \subsection{Revisiting the Texture Hypothesis}
 
-Across the reported held-out setup (Table \ref{tab:main_results}), TRR improves parameter-space alignment over text-only retrieval, supporting the hypothesis that second-order correlation structure can be useful as a texture descriptor for retrieval. The derived per-query analysis sharpens this claim: because many queries tie across methods, second-order structure should not be read as uniformly re-ordering the benchmark. Rather, it appears to matter most on a smaller subset of cases where coarse semantic similarity is insufficient and the retrieval decision depends on texture-specific co-activation patterns. At the same time, we do not claim that TRR defines a globally calibrated distance in parameter space. We therefore interpret TRR as a \textit{retrieval prior} that can be beneficial for texture-sensitive control, rather than a universal metric for parameter transfer.
+In Protocol-A, TRR improves parameter-space alignment over the mean-pooled Wav2Vec baseline. This comparison controls for the acoustic backbone and changes the aggregation operator from first-order pooling to second-order Gram statistics. The supplementary mechanism ablation reinforces this interpretation: on the same P0 split, a same-layer Gram representation improves normalized L2 over mean pooling, the full unprojected Gram boundary also improves over mean pooling, and removing L2 normalization degrades retrieval quality. It therefore supports the hypothesis that correlation structure can be useful as a texture descriptor for retrieval.
+
+The derived per-query analysis sharpens this claim: because many queries tie across methods, second-order structure should not be read as uniformly re-ordering the benchmark. Rather, it appears to matter most when coarse semantic similarity is insufficient and retrieval depends on texture-specific co-activation patterns. The ablation also shows that layer selection and projection dimension are not cosmetic details; the reported implementation is a practical operating point, not a proof of a globally optimal TRR architecture. We therefore interpret TRR as a \textit{retrieval prior} that can be beneficial for texture-sensitive control, rather than a universal metric for parameter transfer.
 
 An open direction is whether analogous second-order representations transfer to other audio-effect settings beyond the current benchmark, including additional instruments, effect families, and mix-stage tasks. Future work can validate this through controlled cross-domain protocols and human preference judgments.
 
@@ -469,45 +516,33 @@ The current retrieval-grounded system is intended to augment user creativity rat
 \section{Limitations}
 \label{sec:limitations}
 
-Our approach has several limitations that matter directly for how the present evidence should be interpreted.
+Our approach has several limitations that matter directly for how the present evidence should be interpreted:
+\begin{itemize}
+	\item \textbf{Scale and coverage.} The objective benchmark is a 204-query, guitar-only split with a single effect-chain topology. Resolved-audio grouping removes exact cross-split reuse, but cheap near-duplicate risk and database-density dependence remain. Larger multi-instrument and multi-effect benchmarks are required before making general retrieval-framework claims.
+	\item \textbf{Metric semantics.} Normalized L2 improves comparability across heterogeneous parameter ranges, but it is not a perceptual normalization. Logarithmic, dB, and plugin-specific nonlinear controls can make equal normalized errors sound unequal, and the current metric--perception diagnostic does not validate the objective metrics as human-rating proxies.
+	\item \textbf{Baseline boundary.} CLAP, PaSST, PANNs, and same-backbone ablations strengthen the retrieval comparison, but the range-projected MLP is stronger on normalized L2 and Acc@0.1. TRR should therefore be read as a retrieved-exemplar prior with editability and traceability benefits, not as a universally superior parameter estimator.
+	\item \textbf{Listening.} The study lacks device metadata, participant-expertise labels, a documented manual-baseline time budget, and query-aligned ratings for the Protocol-A retrieval rows. It is exploratory perceptual context rather than a fairness-critical human-vs-system benchmark or a validation of the objective metrics.
+	\item \textbf{System scope.} Personalization, memory, and adaptive fusion are not validated under the same standard as Protocol-A. Protocol-C shows that degraded-input robustness depends on modality weighting, but the adaptive margin over strong fixed weights is small and should remain diagnostic.
+	\item \textbf{Deployment cost and database dependence.} TRR adds Wav2Vec2 feature extraction and $O(D^2T_{\text{frm}})$ Gram construction after projection. Caching and approximate indexing can reduce this cost, but live deployment and out-of-distribution database expansion require separate evaluation.
+\end{itemize}
 
-\textbf{Statistical Power.}
-We report uncertainty estimates (95\% bootstrap confidence intervals) and paired permutation tests for objective metrics, but the current evaluation remains limited in scale and diversity. This constrains statistical power for fine-grained subgroup analysis (e.g., per-effect-family or per-style breakdowns) and limits how confidently the present gains can be extrapolated beyond the current benchmark.
-\textit{Mitigation}: Expand evaluation to larger, more diverse datasets (additional instruments and effect families) and report subgroup-aware analyses.
-
-\textbf{Baseline Strength.}
-We now include CLAP as a stronger external retrieval baseline in Protocol-A (Table~\ref{tab:main_results}), which makes the comparison more informative than an internal-only benchmark. However, PaSST, PANNs, and direct parameter-estimation baselines are still absent from the verified evidence chain, so our claim remains intentionally narrower than a broad best-in-class statement.
-\textit{Mitigation}: Evaluate additional strong learned retrievers, rerankers, and direct parameter-estimation baselines under the same audited split before making broader benchmark claims.
-
-\textbf{Dataset Coverage and Split Transparency.} Our objective benchmark uses a guitar-only held-out subset with ground-truth parameters. The stricter resolved-audio grouping removes exact audio reuse across split, but cheap near-duplicate pairs remain and the dataset lacks a separate auditable text-source field beyond the stored \texttt{Style}/\texttt{Feature} metadata. \textit{Mitigation}: Future work should expand to larger, more diverse datasets, record stronger provenance metadata, and evaluate across instruments and effect families.
-
-\textbf{Parameter Identifiability.} The many-to-one nature of timbre---where multiple distinct parameter configurations yield perceptually similar sounds---poses a fundamental challenge. Our objective metrics evaluate alignment in $\Theta$ but may not perfectly align with perceptual similarity: small parameter-space differences can be perceptually negligible, while perceptually salient changes can occur in narrow regions of the space. This identifiability problem affects all parameter-based evaluation metrics (L2, Acc@0.1, Cosine Similarity) and is one reason we interpret TRR as a stronger retrieval prior rather than as a universal parameter-space metric. \textit{Mitigation}: Controlled human listening studies are needed to calibrate objective metrics against perceptual judgments.
-
-\textbf{Computational Cost.} TRR requires Wav2Vec2 feature extraction and Gram matrix computation ($O(C^2 \cdot T_{\text{frm}})$ where $C$ is the feature dimension and $T_{\text{frm}}$ is the number of frames), which is more expensive than mean-pooling baselines. The reported latency table measures only the local retrieval path under an offline cache-only setup and should not be read as a full live deployment budget. \textit{Mitigation}: Feature caching, dimensionality reduction, and approximate nearest neighbor indexing can reduce computational overhead, while live deployment requires a separate end-to-end latency study.
-
-\textbf{Personalization and Robustness Evidence.} The repository contains preliminary memory-based personalization logic and a diagnostic modality-degradation stress test, but these components are not yet validated under the same standard as the main retrieval benchmark. In particular, Protocol-C should be read only as a boundary-condition analysis for the current fusion heuristic, not as evidence of general cross-modal robustness. \textit{Mitigation}: Future revisions should evaluate personalization over a larger held-out protocol and replace synthetic stress tests with real-audio degradation experiments.
-
-\textbf{Subjectivity of Tone Quality.} What constitutes a ``good'' guitar tone depends heavily on musical context, genre conventions, and personal preference. Our objective metrics evaluate parameter alignment to ground-truth presets but cannot capture subjective quality attributes like ``musicality,'' ``expressiveness,'' or ``appropriateness for the mix.'' Two systems with identical L2 error may differ significantly in perceived quality. \textit{Mitigation}: Our current listening study provides initial perceptual evidence; larger and more controlled listening studies with diverse participants (producers, guitarists, mix engineers) are still needed.
-
-\textbf{Listening-Protocol Completeness.} The current listening-study logs preserve ratings and participant IDs, but they do not preserve device metadata, participant expertise labels, or the provenance and time budget of the manual baseline. This limits how strongly Trials~2--5 can be interpreted as a fairness-critical comparison between human tuning and system retrieval. \textit{Mitigation}: Future listening studies should preregister device requirements, collect expertise metadata, and log manual-baseline procedures with explicit budgets and operators.
-
-\textbf{Editability--Synthesis Trade-off.} By constraining outputs to editable presets, we improve workflow integration but limit the reachable sound space. Direct waveform synthesis (e.g., AudioLDM, MusicLM) can generate novel sounds that may not exist in any preset database, whereas the current retrieval-grounded system is bounded by the diversity of retrieved examples. This trade-off is fundamental: increased editability necessarily constrains novelty, and our experiments do not attempt to prove that editable retrieval dominates waveform generation on all perceptual dimensions. \textit{Mitigation}: Hybrid approaches that combine retrieval-based generation with targeted parameter optimization (e.g., gradient-based refinement toward specific goals) could expand the reachable space while preserving editability.
-
-\textbf{Database Dependence.} Retrieval quality fundamentally depends on the diversity and quality of the preset database. Out-of-distribution queries (e.g., ``make it sound like a modular synth from 1975'') will fail to retrieve relevant exemplars, leading to degraded control quality. Database sparsity for under-represented effect families (e.g., reverse reverbs, granular synthesis) exacerbates this issue. \textit{Mitigation}: Active learning strategies that identify gaps in the database and prioritize acquiring presets for under-covered regions; cross-domain retrieval that transfers knowledge from related but distinct effect types; and user feedback loops that refine retrieval based on explicit corrections.
-
-These limitations do not invalidate the present benchmark results, but they do define the boundary conditions under which our claims should be read. The current evidence is strongest for the narrower statement that texture-aware second-order structure can provide a useful retrieval prior for editable preset selection on this benchmark; broader claims about universal similarity metrics, large-scale personalization, or robust deployment still require additional evidence.
+These limitations do not invalidate the present benchmark results, but they do define the boundary conditions under which our claims should be read. The current evidence is strongest for the narrower statement that texture-aware second-order structure can provide a useful retrieval prior for editable preset selection on this benchmark. Protocol-C further shows that degradation robustness is sensitive to fusion design, but it does not establish adaptive fusion as a generally superior multimodal method beyond the tested setting. Broader claims about universal similarity metrics, large-scale personalization, or robust deployment still require additional evidence.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented a retrieval-grounded approach to editable audio effect control and identified Texture Resonance Retrieval (TRR) as the strongest retrieval representation in the reported comparisons on our audited held-out benchmark. Across objective metrics on the stricter resolved-audio-grouped split (Table~\ref{tab:main_results}), TRR consistently improves parameter alignment over first-order retrieval baselines, including the available CLAP comparison subset, and we interpret this advantage as evidence for a more useful retrieval prior rather than for a universal distance metric or a closed-form solution to inverse parameter estimation.
+We presented a retrieval-grounded approach to editable guitar-effect preset selection and identified Texture Resonance Retrieval (TRR) as the strongest retrieval representation in the reported P0 comparisons. Across objective metrics in Protocol-A (Table~\ref{tab:main_results}), TRR improves parameter alignment over Wav2Vec, FeatureNN, CLAP, PaSST, and PANNs baselines, and we interpret this advantage as evidence for a more useful texture-aware retrieval prior rather than for a universal distance metric or a closed-form solution to inverse parameter estimation.
 
-Taken together, the audited objective benchmark provides the main support for a narrow but practically relevant conclusion: retrieval over executable presets can provide editable starting points for DAW workflows, and second-order texture structure improves that retrieval in a subset of hard cases where coarse semantic similarity is insufficient. The listening study provides complementary subjective context, while Protocol-C only clarifies the current fusion heuristic's fallback behavior and failure mode.
+Taken together, the P0 evidence supports a narrow but practically relevant conclusion: retrieval over executable presets can provide editable starting points for DAW workflows, and second-order texture structure improves retrieval over selected audio embedding baselines on the audited guitar-effect preset benchmark. The degradation, listening, local-LLM, and supervised-regression diagnostics provide complementary boundary evidence, but they are not used to claim general system superiority.
 
-Looking forward, the most important next steps are to evaluate stronger modern baselines, validate robustness under real audio degradation, and test whether the same retrieval advantages transfer beyond guitar effects to broader production parameter spaces such as mixing and mastering workflows.
+Looking forward, the most important next steps are to evaluate executable direct parameter-regression and reranking baselines, expand the degradation and listening protocols, and test whether the same retrieval and fusion advantages transfer beyond guitar effects to broader production parameter spaces such as mixing and mastering workflows.
 
-Overall, the present evidence supports texture-aware retrieval as a promising benchmark-backed foundation for editable audio effect control, while leaving broader claims about universality, robustness, and personalization to future work.
+Overall, the present evidence supports texture-aware retrieval as a promising benchmark-backed foundation for editable guitar-effect preset selection, while leaving broader claims about universality, robustness, and personalization to future work.
 
 
+\begingroup
+\sloppy
+\raggedright
 \IfFileExists{./reference.bib}{\bibliography{reference}}{\bibliography{Paper/reference}}
 \bibliographystyle{\paperbibliostyle}
+\endgroup

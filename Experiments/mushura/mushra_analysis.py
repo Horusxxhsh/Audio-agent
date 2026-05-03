@@ -267,6 +267,8 @@ def _maybe_plot_boxplot(
         plt.title(title)
         plt.tight_layout()
         plt.savefig(out_path, dpi=200)
+        if out_path.suffix.lower() != ".pdf":
+            plt.savefig(out_path.with_suffix(".pdf"))
         plt.close()
         return None
     except Exception as exc:

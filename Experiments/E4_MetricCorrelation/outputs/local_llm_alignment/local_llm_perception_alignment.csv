@@ -1,0 +1,641 @@
+stimulus,human_mean,human_median,human_std,human_n,matched_queries,matched_rows,trr_l2_mean,trr_acc_mean,trr_recall_mean,trr_cosine_mean,trr_module_mean,llm_score,llm_rationale,llm_raw
+Ambient Guitar,72.34615384615384,73.5,18.447638998402606,26,1,1,1.8635751310936648,0.8846153846153846,0.8695652173913043,0.9999987863549864,1.0,90.0,"The label clearly identifies the instrument (Guitar) and the sonic style (Ambient), making it easily recognizable to listeners familiar with music genres. It suggests specific effects like reverb and delay without being overly technical.","Thinking Process:
+
+1.  **Analyze the Request:**
+    *   Task: Score a retrieved editable guitar-effect preset label for perceptual clarity and recognizability.
+    *   Input Label: 'Ambient Guitar'.
+    *   Output Format: Strict JSON only (no markdown, no extra text).
+    *   Keys: `score` (number 0-100), `rationale` (string).
+    *   Constraint: `/no_think` (This usually means I should not output my internal thought process, but the system instruction says ""think silently if needed"". However, the user prompt explicitly says `/no_think` which often implies ""don't show reasoning"". But the system instruction says ""think silently if needed"". I need to follow the system instruction for safety, but the user prompt says ""Return strict JSON only. No markdown."" and includes `/no_think`. I will generate the JSON directly without any markdown code blocks or extra text.)
+    *   Wait, the user prompt says `/no_think`. This is a directive to not output the thinking process. I must ensure the final output is *only* the JSON.
+
+2.  **Evaluate the Label ('Ambient Guitar'):**
+    *   Clarity: ""Ambient"" is a well-known genre/style descriptor. ""Guitar"" is the instrument.
+    *   Recognizability: Listeners generally understand what ""Ambient Guitar"" implies (drones, reverb, delay, clean tones, atmospheric).
+    *   Specificity: It's somewhat generic but clear enough for a preset library. It's not overly technical (like ""Clean Chorus 120Hz"") nor too vague (like ""Guitar"").
+    *   Score: High. It's descriptive and evocative. Maybe 85-95. Let's go with 90.
+
+3.  **Draft the JSON:**
+    *   `score`: 90
+    *   `rationale`: ""The label clearly identifies the instrument (Guitar) and the sonic style (Ambient), making it easily recognizable to listeners familiar with music genres. It suggests specific effects like reverb and delay without being overly technical.""
+
+4.  **Format Check:**
+    *   Strict JSON.
+    *   No markdown (no ```json ... ```).
+    *   No extra text.
+
+5.  **Final Review:**
+    *   Does it meet the `/no_think` constraint? Yes, I will not output any thought trace in the final response.
+    *   Is it valid JSON? Yes.
+    *   Are keys correct? Yes (`score`, `rationale`).
+    *   Is score 0-100? Yes.
+
+6.  **Construct Output:**
+    {
+      ""score"": 90,
+      ""rationale"": ""The label clearly identifies the instrument (Guitar) and the sonic style (Ambient), making it easily recognizable to listeners familiar with music genres. It suggests specific effects like reverb and delay without being overly technical.""
+    }
+
+    Wait, I need to make sure I don't use markdown code blocks. Just raw JSON text.
+
+    Refining rationale for brevity and precision: ""The label effectively combines the instrument name with a widely understood genre descriptor, ensuring listeners can immediately visualize the intended sound character and effect chain.""
+
+    Let's finalize the JSON string.
+
+    {
+    ""score"": 90,
+    ""rationale"": ""The label effectively combines the instrument name with a widely understood genre descriptor, ensuring listeners can immediately visualize the intended sound character and effect chain.""
+    }
+
+    Wait, I need to check if there are any specific constraints on the JSON structure beyond the keys. ""Return strict JSON only with keys score and rationale."" Okay.
+
+    One more check on `/no_think`. Usually, this is a system instruction override. I will proceed with generating the JSON directly.
+
+    Wait, I am an AI model. I need to make sure I don't accidentally include markdown.
+    So, just:
+    {
+      ""score"": 90,
+      ""rationale"": ""...""
+    }
+
+    Let's write it.
+
+    Wait, I should check if the score should be an integer or float. ""number from 0 to 100"". Integer is fine.
+
+    Rationale needs to explain *why* it is clear/recognizable.
+    ""Ambient"" implies atmosphere, space, reverb, delay. ""Guitar"" implies the source. Together they are very clear.
+
+    Final check on constraints:
+    - Strict JSON only.
+    - No markdown.
+    - Keys: score, rationale.
+    - Score: 0-100.
+
+    Okay, ready.
+
+    One thing: The prompt says `/no_think`. This is often used to prevent the model from outputting its Chain of Thought. I will comply by outputting only the JSON.
+
+    Wait, I need to be careful about newlines in JSON. It should be valid JSON. I will format it nicely but without markdown blocks.
+
+    Actually, standard JSON allows whitespace. I will output it as a single block.
+
+    {
+      ""score"": 90,
+      ""rationale"": ""The label clearly identifies the instrument and the sonic atmosphere, making it immediately recognizable to users familiar with music production terminology.""
+    }
+
+    Let's go.cw
+</think>
+
+{
+  ""score"": 90,
+  ""rationale"": ""The label clearly identifies the instrument (Guitar) and the sonic style (Ambient), making it easily recognizable to listeners familiar with music genres. It suggests specific effects like reverb and delay without being overly technical.""
+}"
+Blues Solo,72.96153846153847,69.5,21.193358901751782,26,0,0,,,,,,90.0,"The label 'Blues Solo' effectively communicates the genre style and intended playing context, allowing users to instantly recognize the tonal character (warmth, bends) and usage (lead lines). It uses standard musical terminology that is both concise and descriptive.","Thinking Process:
+
+1.  **Analyze the Request:**
+    *   Task: Score a retrieved editable guitar-effect preset label for perceptual clarity and recognizability.
+    *   Input Preset Label: 'Blues Solo'.
+    *   Output Format: Strict JSON only (no markdown, no extra text).
+    *   Keys: `score` (number 0-100), `rationale` (string).
+    *   Constraint: `/no_think` (This usually means I should not output my internal thought process, but the system instruction says ""think silently if needed"". However, the user prompt explicitly says `/no_think` which often implies ""don't show reasoning"". But the system instruction says ""think silently if needed"". I will follow the standard protocol of thinking silently internally and then outputting the JSON.)
+    *   Wait, the user prompt says `/no_think`. This is a directive to not output the thinking process. I need to ensure the final output is *only* the JSON.
+
+2.  **Evaluate the Preset Label ('Blues Solo'):**
+    *   **Clarity:** Is it clear what the sound is? Yes, ""Blues"" implies a specific genre/style (bending, vibrato, specific tonal warmth), and ""Solo"" implies it's meant for lead playing rather than rhythm.
+    *   **Recognizability:** Is it a common term? Yes, ""Blues"" and ""Solo"" are very common descriptors in guitar presets.
+    *   **Ambiguity:** Low. It's not overly technical (like ""Tube Screamer 1982"") nor too vague (like ""Clean""). It describes the *usage* and *style* effectively.
+    *   **Score:** High. It's concise, descriptive, and evokes a specific sonic expectation.
+
+3.  **Determine the Score:**
+    *   90-100 range seems appropriate. It's very clear.
+    *   Let's go with 95.
+
+4.  **Draft the Rationale:**
+    *   The label clearly indicates the genre (Blues) and the playing context (Solo).
+    *   It sets immediate expectations for tone (warmth, bends) and usage (lead lines).
+    *   It is concise and industry-standard terminology.
+
+5.  **Format Output:**
+    *   JSON structure: `{""score"": 95, ""rationale"": ""...""}`
+    *   No markdown code blocks (```json ... ```).
+    *   No extra text.
+
+6.  **Final Check:**
+    *   Strict JSON? Yes.
+    *   Keys present? Yes.
+    *   Score 0-100? Yes.
+    *   No markdown? Yes.
+
+    *Self-Correction on `/no_think`:* The user instruction `/no_think` usually means ""do not output the thinking trace"". I will comply by outputting only the JSON.
+
+    *Wait, one more check:* The system instruction says ""think silently if needed"". The user prompt says `/no_think`. I will ensure the final response contains *only* the JSON string.
+
+    *Refining Rationale:* ""The label 'Blues Solo' is highly descriptive, immediately conveying the genre style and intended playing context. It uses common musical terminology that listeners can easily associate with specific tonal characteristics (e.g., warmth, bending) and usage (lead lines), ensuring high recognizability and clarity.""
+
+    *Final JSON construction:*
+    ```json
+    {
+      ""score"": 95,
+      ""rationale"": ""The label 'Blues Solo' is highly descriptive, immediately conveying the genre style and intended playing context. It uses common musical terminology that listeners can easily associate with specific tonal characteristics (e.g., warmth, bending) and usage (lead lines), ensuring high recognizability and clarity.""
+    }
+    ```
+    Wait, I need to make sure there are no markdown ticks. Just the raw JSON.
+
+    *Wait, checking constraints again:* ""Return strict JSON only. No markdown.""
+    Okay, I will output raw text that is valid JSON.
+
+    *Wait, checking `/no_think` again:* This is a directive to the model to not emit the thought process. I am doing that.
+
+    *Final Plan:* Output the JSON string directly.
+
+    *Wait, one nuance:* Is ""Blues Solo"" too generic? Some might argue it's vague compared to ""Overdrive Blues Lead"". But for a preset label, brevity is key. ""Blues Solo"" is standard. I'll stick with a high score.
+
+    *Revised Rationale:* ""The label effectively communicates the genre (Blues) and function (Solo), allowing users to instantly identify the tonal character and intended application. It avoids technical jargon while remaining specific enough to distinguish it from rhythm or clean presets.""
+
+    *Score:* 90.
+
+    *Final JSON:*
+    {""score"": 90, ""rationale"": ""The label effectively communicates the genre (Blues) and function (Solo), allowing users to instantly identify the tonal character and intended application. It avoids technical jargon while remaining specific enough to distinguish it from rhythm or clean presets.""}
+
+    Wait, I need to make sure I don't add newlines that break JSON validity if I'm not careful, but standard JSON allows whitespace. I'll keep it compact to be safe.
+
+    Actually, looking at the instruction ""Return strict JSON only. No markdown."" I should not wrap it in ```json.
+
+    Let's finalize the content.
+    Score: 90
+    Rationale: Clear genre and usage indication.
+
+    Ready.cw
+</think>
+
+{""score"": 90, ""rationale"": ""The label 'Blues Solo' effectively communicates the genre style and intended playing context, allowing users to instantly recognize the tonal character (warmth, bends) and usage (lead lines). It uses standard musical terminology that is both concise and descriptive.""}"
+Chorus,64.92307692307692,66.5,23.11522974477749,26,0,0,,,,,,95.0,"Chorus is a universally recognized term in guitar effects, ensuring immediate understanding of the modulation type. It is concise and standard industry terminology, making it highly perceptually clear to listeners and musicians.","Thinking Process:
+
+1.  **Analyze the Request:**
+    *   Task: Score a retrieved editable guitar-effect preset label for perceptual clarity and recognizability.
+    *   Input Preset Label: 'Chorus'.
+    *   Output Format: Strict JSON only (no markdown, no extra text).
+    *   Keys: `score` (number 0-100), `rationale` (string).
+    *   Constraint: `/no_think` (This usually means I should not output my internal thought process, but the system instruction says ""think silently if needed"". However, the user prompt explicitly says `/no_think` which often implies ""don't show reasoning"". But the system instruction says ""think silently if needed"". I will follow the standard protocol of thinking silently internally and then outputting the JSON.)
+    *   Wait, the user prompt says `/no_think`. This is a directive to not output the thinking process. I need to ensure the final output is *only* the JSON.
+
+2.  **Evaluate the Preset Label ('Chorus'):**
+    *   What is 'Chorus'? It's a very common, fundamental guitar effect.
+    *   Is it perceptually clear? Yes, it describes the sound effect directly.
+    *   Is it recognizable? Yes, almost every guitarist knows what a Chorus pedal does.
+    *   Is it specific enough? It's a bit generic (there are many types of chorus), but as a label for a preset, it indicates the primary effect.
+    *   Score estimation: High. It's a standard, well-understood term. Maybe 90-100 because it's the most recognizable effect name.
+
+3.  **Draft the JSON:**
+    *   `score`: 95 (High recognizability, clear meaning).
+    *   `rationale`: ""Chorus is a universally recognized guitar effect term that clearly describes the sonic characteristic of the preset. It is concise, standard industry terminology, and immediately conveys the primary modulation effect applied to the guitar signal.""
+
+4.  **Format Check:**
+    *   Strict JSON.
+    *   No markdown (no ```json ... ```).
+    *   Keys: `score`, `rationale`.
+    *   `score` must be a number.
+
+5.  **Final Review:**
+    *   Does it meet the `/no_think` constraint? Yes, I will not output any text outside the JSON block.
+    *   Is it valid JSON? Yes.
+
+6.  **Construct Output:**
+    ```json
+    {
+      ""score"": 95,
+      ""rationale"": ""Chorus is a universally recognized guitar effect term that clearly describes the sonic characteristic of the preset. It is concise, standard industry terminology, and immediately conveys the primary modulation effect applied to the guitar signal.""
+    }
+    ```
+    *Wait, I need to make sure I don't include markdown code blocks.*
+    *Just the raw JSON string.*
+
+    *Refining rationale for brevity and precision:*
+    ""Chorus is a standard, widely understood effect name that clearly indicates the primary modulation type. It is concise and immediately recognizable to musicians, ensuring high perceptual clarity.""
+
+    *Final JSON:*
+    {
+      ""score"": 95,
+      ""rationale"": ""Chorus is a standard, widely understood effect name that clearly indicates the primary modulation type. It is concise and immediately recognizable to musicians, ensuring high perceptual clarity.""
+    }
+
+    *Wait, one more check on constraints:* ""Return strict JSON only. No markdown.""
+    Okay, I will output the raw JSON text.
+
+    *Wait, checking the `/no_think` instruction again.*
+    Usually, `/no_think` is a user directive to suppress the model's internal monologue display. Since I am an AI, I process internally anyway. The output must be the JSON.
+
+    *Wait, checking the system instruction:* ""think silently if needed"".
+    Okay, I will proceed.
+
+    *Wait, checking the score range:* 0 to 100. 95 is valid.
+
+    *Wait, checking keys:* score and rationale.
+
+    *Wait, checking value types:* score is number, rationale is string.
+
+    *Final check on markdown:* Do not use ```json. Just { ... }.
+
+    *Wait, one nuance:* Is 'Chorus' too generic? A preset might be ""Clean Chorus"" or ""Heavy Chorus"". Just ""Chorus"" is very generic. However, the prompt asks if it is ""likely to be perceptually clear and recognizable"". Yes, it is recognizable. It might lack specificity, but clarity is high. I'll stick with a high score but acknowledge the generic nature in the rationale if needed, or just focus on recognizability. Let's keep it high because recognizability is the main metric.
+
+    Actually, 90 might be safer because it's very generic. But 95 is fine for ""recognizable"". Let's go with 90 to be slightly more conservative about specificity vs clarity. No, clarity is about understanding what it is. Chorus is perfectly clear. 95 is fine.
+
+    Let's finalize the JSON structure.
+
+    {
+    ""score"": 95,
+    ""rationale"": ""Chorus is a universally recognized term in guitar effects, ensuring immediate understanding of the modulation type. It is concise and standard industry terminology, making it highly perceptually clear to listeners and musicians.""
+    }
+
+    Wait, I need to ensure no newlines break the JSON validity if I were to paste it, but standard JSON allows whitespace. I will format it nicely for readability but ensure it's valid JSON.
+
+    Actually, to be safest with ""strict JSON only"", I should minimize whitespace or just use standard indentation. Standard indentation is fine.
+
+    Let's write it.
+</think>
+
+{
+  ""score"": 95,
+  ""rationale"": ""Chorus is a universally recognized term in guitar effects, ensuring immediate understanding of the modulation type. It is concise and standard industry terminology, making it highly perceptually clear to listeners and musicians.""
+}"
+Flanger,69.11538461538461,74.0,23.079561387646727,26,0,0,,,,,,98.0,"Flanger is a universally recognized standard term for a specific modulation effect in audio processing. It clearly communicates the sonic character to listeners and musicians without ambiguity, making it highly perceptually clear and recognizable.","Thinking Process:
+
+1.  **Analyze the Request:**
+    *   Task: Score a retrieved editable guitar-effect preset label for perceptual clarity and recognizability.
+    *   Input Preset Label: 'Flanger'.
+    *   Output Format: Strict JSON only (no markdown, no extra text).
+    *   Keys: `score` (number 0-100), `rationale` (string).
+    *   Constraint: `/no_think` (This usually means I should not output my internal thought process, but the system instruction says ""think silently if needed"". However, the user prompt explicitly says `/no_think`. I need to follow the system instruction to output JSON only, but I also need to ensure I don't violate the `/no_think` directive if it implies suppressing the reasoning block in the final output. Actually, `/no_think` is often a directive to the model to not output the chain of thought. I will generate the JSON directly based on my internal evaluation.)
+    *   Constraint: ""Return strict JSON only. No markdown.""
+
+2.  **Evaluate the Preset Label ('Flanger'):**
+    *   What is a Flanger? It's a well-known audio effect (modulation effect) that creates a sweeping, jet-plane-like sound.
+    *   Is it recognizable? Yes, ""Flanger"" is a standard term in music production and guitar effects.
+    *   Is it clear? Yes, it describes the specific sonic characteristic.
+    *   Context: Guitar-effect preset. Flangers are commonly used on guitars (e.g., in surf rock, funk, etc.).
+    *   Score: High. It's a standard, unambiguous name for a specific effect.
+
+3.  **Determine the Score:**
+    *   100 would be perfect.
+    *   'Flanger' is a standard industry term.
+    *   Score: 95-100. Let's go with 98.
+
+4.  **Draft the Rationale:**
+    *   The term ""Flanger"" is a universally recognized standard name for a specific modulation effect in audio processing.
+    *   It clearly describes the sonic character (sweeping, jet-like modulation).
+    *   It is concise and unambiguous for guitarists and producers.
+
+5.  **Format Output:**
+    *   JSON structure: `{""score"": 98, ""rationale"": ""...""}`
+    *   No markdown code blocks (```json ... ```).
+    *   No extra text.
+
+6.  **Final Check:**
+    *   Strict JSON? Yes.
+    *   No markdown? Yes.
+    *   Keys present? Yes.
+    *   Score range? Yes.
+
+7.  **Construct JSON:**
+    ```json
+    {
+      ""score"": 98,
+      ""rationale"": ""The label 'Flanger' is a standard, industry-wide term for a specific modulation effect. It is immediately recognizable to musicians and producers, clearly indicating the sonic character without ambiguity or need for further description.""
+    }
+    ```
+    *Wait, I need to make sure I don't include markdown formatting like ```json.*
+    *Just the raw JSON string.*
+
+    *Refining rationale for brevity and clarity:*
+    ""Flanger is a universally recognized standard term for a specific modulation effect in audio processing. It clearly communicates the sonic character to listeners and musicians without ambiguity, making it highly perceptually clear and recognizable.""
+
+    *Final JSON:*
+    {""score"": 98, ""rationale"": ""Flanger is a universally recognized standard term for a specific modulation effect in audio processing. It clearly communicates the sonic character to listeners and musicians without ambiguity, making it highly perceptually clear and recognizable.""}
+
+    *Double check constraints:* ""Return strict JSON only. No markdown.""
+    Okay, I will output just the JSON object.
+
+    *Wait, one more check on `/no_think`.*
+    Usually, this means I shouldn't output the thought trace. I am doing that by thinking silently and then outputting the final result. The prompt says ""Return strict JSON only."" so I must not output any conversational filler.
+
+    *Final Plan:* Output the JSON string directly.
+
+    *Wait, checking the score again.*
+    Is there any reason it wouldn't be 100? Maybe if it's too generic? But ""Flanger"" is specific enough. 98 is safe.
+
+    *Wait, checking the ""No markdown"" constraint.*
+    I must not wrap the JSON in triple backticks.
+
+    *Final JSON construction:*
+    {""score"": 98, ""rationale"": ""Flanger is a universally recognized standard term for a specific modulation effect in audio processing. It clearly communicates the sonic character to listeners and musicians without ambiguity, making it highly perceptually clear and recognizable.""}
+
+    *Wait, I need to ensure valid JSON escaping if there are quotes inside the rationale.*
+    There are no quotes inside the rationale.
+    Okay, ready.
+
+    *Wait, one more thing.* The prompt says ""Return strict JSON only. No markdown.""
+    I will ensure no newlines at the start or end if possible, though JSON allows whitespace. I'll keep it compact.
+
+    *Wait, I need to make sure I don't violate the system instruction about thinking.*
+    The system instruction says ""think silently if needed"". The user prompt says `/no_think`. This is a bit conflicting if interpreted as ""don't think at all"", but practically it means ""don't output the thought process"". I will proceed with generating the JSON.
+
+    *Wait, I need to check if the user wants me to simulate the `/no_think` command by not outputting anything else.*
+    Yes, just the JSON.
+
+    *Wait, I need to check the score range.* 0 to 100. 98 is fine.
+
+    *Wait, I need to check the keys.* score and rationale. Yes.
+
+    *Wait, I need to check the type of score.* Number. Yes.
+
+    *Wait, I need to check the type of rationale.* String. Yes.
+
+    *Wait, I need to check for markdown.* No ```json.
+
+    *Okay, final decision:*
+    {""score"": 98, ""rationale"": ""Flanger is a universally recognized standard term for a specific modulation effect in audio processing. It clearly communicates the sonic character to listeners and musicians without ambiguity, making it highly perceptually clear and recognizable.""}
+
+    *Wait, I should check if there are any special characters.* No.
+    *Wait, I should check if the JSON is valid.* Yes.
+
+    *Wait, I need to make sure I don't add a newline at the very end if possible, though usually it's fine.*
+    I'll output it cleanly.
+
+    *Wait, one last check on the `/no_think` instruction.*
+    Sometimes this means ""Do not output any reasoning"". I am not outputting reasoning outside the JSON. The rationale is inside the JSON. That is expected.
+
+    *Okay, proceeding.*
+</think>
+
+{""score"": 98, ""rationale"": ""Flanger is a universally recognized standard term for a specific modulation effect in audio processing. It clearly communicates the sonic character to listeners and musicians without ambiguity, making it highly perceptually clear and recognizable.""}"
+Jazz Clean,76.1923076923077,81.0,20.79619047954549,26,25,25,1.634146541003503,0.6183333333333333,0.6285940567860072,0.892141042797516,0.9833333333333334,95.0,"The label 'Jazz Clean' effectively communicates the intended sound through standard musical terminology. 'Jazz' implies a specific tonal palette (warm, articulate, mid-range focused), while 'Clean' explicitly denotes the absence of distortion. This clarity allows users to quickly identify the preset's utility without needing to audition it first.","Thinking Process:
+
+1.  **Analyze the Request:**
+    *   Task: Score a retrieved editable guitar-effect preset label for perceptual clarity and recognizability.
+    *   Input Preset Label: 'Jazz Clean'.
+    *   Output Format: Strict JSON only (no markdown, no extra text).
+    *   Keys: `score` (number 0-100), `rationale` (string).
+    *   Constraint: `/no_think` (This usually means I should not output my internal thought process, but the system instruction says ""think silently if needed"". However, the user prompt explicitly says `/no_think` which often implies ""don't show reasoning"". But the system instruction says ""think silently if needed"". I will follow the standard protocol of thinking silently internally and then outputting the JSON as requested, without showing the thought trace in the final output).
+    *   Constraint: ""Return strict JSON only. No markdown.""
+
+2.  **Evaluate the Preset Label ('Jazz Clean'):**
+    *   Clarity: ""Jazz"" implies a specific genre/style (warm, articulate, mid-focused). ""Clean"" implies no distortion/overdrive.
+    *   Recognizability: Guitarists immediately understand what tone this will produce. It's a common, descriptive naming convention.
+    *   Ambiguity: Low. It's not overly technical (like ""Fender Strat 50s Neck"") but it's specific enough to be useful.
+    *   Score: High. It's a very standard, clear label.
+
+3.  **Determine the Score:**
+    *   90-100 range. It's very clear. Let's go with 95.
+
+4.  **Draft the Rationale:**
+    *   The label uses genre-specific terminology (""Jazz"") and tone description (""Clean"").
+    *   It avoids overly technical jargon while remaining descriptive.
+    *   Listeners can easily anticipate the sound characteristics (warmth, articulation, lack of distortion).
+
+5.  **Format Output:**
+    *   JSON structure: `{""score"": 95, ""rationale"": ""...""}`
+    *   Ensure no markdown code blocks (```json ... ```).
+    *   Ensure no extra text.
+
+6.  **Final Review:**
+    *   Check constraints: Strict JSON? Yes. No markdown? Yes. Keys correct? Yes. Score 0-100? Yes.
+
+7.  **Construct JSON:**
+    ```json
+    {
+      ""score"": 95,
+      ""rationale"": ""The label 'Jazz Clean' is highly descriptive and immediately conveys the tonal style and distortion level to the user. 'Jazz' suggests a warm, articulate, and mid-focused tone typical of the genre, while 'Clean' clearly indicates the absence of overdrive or distortion. This combination is standard industry terminology that ensures quick recognition and accurate expectation setting for guitarists.""
+    }
+    ```
+    *Wait, I need to make sure there are no newlines that break JSON validity if I'm not careful, but standard JSON allows newlines in strings if escaped, or I can keep it single line. I'll keep it compact to be safe.*
+
+    *Revised JSON:*
+    `{""score"": 95, ""rationale"": ""The label 'Jazz Clean' is highly descriptive and immediately conveys the tonal style and distortion level to the user. 'Jazz' suggests a warm, articulate, and mid-focused tone typical of the genre, while 'Clean' clearly indicates the absence of overdrive or distortion. This combination is standard industry terminology that ensures quick recognition and accurate expectation setting for guitarists.""}`
+
+    *Wait, checking the `/no_think` instruction again.*
+    Usually, `/no_think` is a directive to the model to not output the thought process. Since I am an AI, I will output the final result directly. The system instruction says ""think silently if needed"". I will do that internally.
+
+    *Final check on JSON validity:*
+    Keys are quoted. Values are quoted. No trailing commas.
+
+    *Wait, one more check on the ""No markdown"" constraint.*
+    I must not wrap the JSON in ```json ... ```. Just the raw JSON string.
+
+    *Let's finalize the score.*
+    Is it perfect? Maybe 95 is good. 100 might be too high because some might argue ""Jazz"" is subjective. But for a preset label, it's very clear. 95 is safe.
+
+    *Rationale refinement:* Keep it concise.
+    ""The label combines genre context ('Jazz') with a specific tonal characteristic ('Clean'), making it immediately understandable. It avoids ambiguity regarding distortion levels and suggests the appropriate pickup voicing and EQ profile expected in that style.""
+
+    *Let's combine into the final JSON.*
+
+    ```json
+    {""score"": 95, ""rationale"": ""The label combines genre context ('Jazz') with a specific tonal characteristic ('Clean'), making it immediately understandable. It avoids ambiguity regarding distortion levels and suggests the appropriate pickup voicing and EQ profile expected in that style.""}
+    ```
+    Wait, I need to make sure I don't output markdown. Just the text.
+
+    Okay, ready.
+
+    Wait, I need to check if `/no_think` means I should not output *any* reasoning in the output, which I am not doing (only the JSON). It usually means ""don't show your chain of thought"". The prompt asks for `rationale` in the JSON, which is part of the output schema, not the model's internal thought trace. So I will include the `rationale` key in the JSON as requested.
+
+    Final check on constraints:
+    - Strict JSON only.
+    - No markdown.
+    - Keys: score, rationale.
+    - Score: 0-100 number.
+
+    Okay.
+    {""score"": 95, ""rationale"": ""The label 'Jazz Clean' effectively communicates the intended sound through standard musical terminology. 'Jazz' implies a specific tonal palette (warm, articulate, mid-range focused), while 'Clean' explicitly denotes the absence of distortion. This clarity allows users to quickly identify the preset's utility without needing to audition it first.""}
+
+    Looks good.
+    Wait, I need to ensure no newlines in the JSON string itself to be safe, though JSON allows them. I'll keep it single line for strictness.
+
+    Actually, looking at the instruction ""Return strict JSON only. No markdown.""
+    I will output the raw JSON text.
+
+    One more thing: The prompt says `/no_think`. This is often a system override to prevent CoT output. I will comply by not outputting any text before or after the JSON.
+
+    Wait, I need to make sure I don't accidentally add markdown formatting like ```json.
+    Okay.
+
+    Final check on score: 95.
+    Final check on rationale: Clear and concise.
+
+    Let's go.cw
+</think>
+
+{""score"": 95, ""rationale"": ""The label 'Jazz Clean' effectively communicates the intended sound through standard musical terminology. 'Jazz' implies a specific tonal palette (warm, articulate, mid-range focused), while 'Clean' explicitly denotes the absence of distortion. This clarity allows users to quickly identify the preset's utility without needing to audition it first.""}"
+Modern Metal,65.57692307692308,70.0,30.218104608890446,26,10,10,2.566379546715014,0.5289296053408956,0.4463354241666262,0.6957130373814011,0.7007936507936507,90.0,"The label uses widely recognized genre terminology that implies specific tonal characteristics (high gain, tight low end) familiar to guitarists. It is concise, descriptive, and allows for quick identification of the intended sound style.","Thinking Process:
+
+1.  **Analyze the Request:**
+    *   Task: Score a retrieved editable guitar-effect preset label for perceptual clarity and recognizability.
+    *   Input Label: 'Modern Metal'.
+    *   Output Format: Strict JSON only (no markdown, no extra text).
+    *   Keys: `score` (number 0-100), `rationale` (string).
+    *   Constraint: `/no_think` (This usually means I should not output my internal thought process, but the system instruction says ""think silently if needed"". However, the user prompt explicitly says `/no_think` which often implies ""don't show reasoning"". But the system instruction says ""think silently if needed"". I need to follow the system instruction for safety, but the user prompt says ""Return strict JSON only. No markdown."" and includes `/no_think`. I will generate the JSON directly without any markdown code blocks or explanatory text outside the JSON.)
+    *   Wait, the user prompt says `/no_think`. This is a directive to not output the thinking process. I must ensure the final output is *only* the JSON.
+
+2.  **Evaluate the Label ('Modern Metal'):**
+    *   Context: Guitar-effect preset (likely for a DAW, amp simulator, or plugin).
+    *   Clarity: ""Modern Metal"" is a very common and widely understood genre/style descriptor.
+    *   Recognizability: Listeners familiar with guitar tones will immediately associate this with high gain, tight low end, aggressive midrange, and specific distortion characteristics (e.g., high gain, tight low end, scooped mids or present mids depending on the sub-genre).
+    *   Ambiguity: It's slightly broad (could be thrash, death, djent, etc.), but as a preset label, it serves its purpose well for quick identification.
+    *   Score: High. It's descriptive and genre-specific.
+
+3.  **Determine the Score:**
+    *   0-100 scale.
+    *   90-100: Very clear, instantly recognizable, standard terminology.
+    *   80-89: Clear, but maybe slightly vague.
+    *   70-79: Understandable but could be better.
+    *   'Modern Metal' is a standard genre tag. It's not overly technical (like ""High Gain 4x12 Cab 1984"" which might be too specific) nor too vague (like ""Rock"").
+    *   I'd give it a 90. It's concise and evocative.
+
+4.  **Draft the Rationale:**
+    *   The label uses standard genre terminology.
+    *   It implies specific tonal characteristics (high gain, tight low end) familiar to guitarists.
+    *   It is concise and easy to scan.
+
+5.  **Format Output:**
+    *   JSON structure: `{""score"": 90, ""rationale"": ""...""}`
+    *   No markdown (no ```json ... ```).
+    *   No extra text.
+
+6.  **Final Check:**
+    *   Strict JSON? Yes.
+    *   Keys `score` and `rationale`? Yes.
+    *   `score` is a number? Yes.
+    *   `rationale` is a string? Yes.
+    *   No markdown? Yes.
+
+    *Self-Correction on `/no_think`:* The user instruction says `/no_think`. This is often a command to suppress the CoT (Chain of Thought) in the output. I will ensure the output contains *only* the JSON string.
+
+    *Wait, one more check:* The system instruction says ""Remember you have access to a search tool..."". But I don't need to search for this. It's a subjective scoring task.
+    *Constraint:* ""Return strict JSON only. No markdown.""
+    *Constraint:* ""score must be a number from 0 to 100.""
+
+    Let's refine the rationale to be concise.
+    ""The label uses widely recognized genre terminology that implies specific tonal characteristics (high gain, tight low end) familiar to guitarists. It is concise, descriptive, and allows for quick identification of the intended sound style.""
+
+    Score: 90.
+
+    Construct JSON.
+    {""score"": 90, ""rationale"": ""The label uses widely recognized genre terminology that implies specific tonal characteristics (high gain, tight low end) familiar to guitarists. It is concise, descriptive, and allows for quick identification of the intended sound style.""}
+
+    Wait, I need to make sure I don't output markdown code blocks. Just the raw JSON text.
+
+    Wait, looking at the system instruction again: ""Remember you have access to a search tool..."". This is irrelevant for this specific task.
+    ""You are scoring whether a retrieved editable guitar-effect preset label is likely to be perceptually clear and recognizable to listeners.""
+
+    Okay, ready to generate.
+
+    Wait, I need to be careful about the `/no_think` instruction. It usually means ""do not output your reasoning"". I will output only the JSON.
+
+    One more thing: The prompt says ""Return strict JSON only. No markdown.""
+    So I must not wrap it in ```json ... ```.
+
+    Final check on JSON validity.
+    {""score"": 90, ""rationale"": ""The label uses widely recognized genre terminology that implies specific tonal characteristics (high gain, tight low end) familiar to guitarists. It is concise, descriptive, and allows for quick identification of the intended sound style.""}
+
+    Looks good.
+
+    Wait, I should check if there are any specific constraints on the rationale length. No.
+    Is ""Modern Metal"" too generic? Some might argue it's too broad compared to ""Modern Metal Djent"". But as a top-level preset label, it's clear enough. 90 is fair.
+
+    Let's finalize.
+
+    {""score"": 90, ""rationale"": ""The label uses widely recognized genre terminology that implies specific tonal characteristics (high gain, tight low end) familiar to guitarists. It is concise, descriptive, and allows for quick identification of the intended sound style.""}
+
+    Wait, I need to ensure no newlines break the JSON if it's meant to be a single line, though JSON allows whitespace. I'll keep it compact to be safe.
+
+    Actually, looking at the instruction ""Return strict JSON only. No markdown.""
+    I will output the JSON string directly.
+
+    One more consideration: Is there any risk of the label being confusing? ""Modern Metal"" is very standard. It's not like ""Heavy"" which is vague, or ""Distortion"" which is a function not a style. It's a style. So high score.
+
+    Okay, proceeding.
+</think>
+
+{""score"": 90, ""rationale"": ""The label uses widely recognized genre terminology that implies specific tonal characteristics (high gain, tight low end) familiar to guitarists. It is concise, descriptive, and allows for quick identification of the intended sound style.""}"
+Phase,75.38461538461539,80.5,20.878844648259488,26,1,1,59.176121546308266,0.3448275862068966,0.2692307692307692,0.0672503530378615,0.3333333333333333,90.0,"Phase is a well-known and standard term in guitar effects, commonly associated with phase shifters or modulation effects. It is concise, unambiguous within the context of guitar pedals, and easily recognizable to musicians.","Thinking Process:
+
+1.  **Analyze the Request:**
+    *   Task: Score a retrieved editable guitar-effect preset label for perceptual clarity and recognizability.
+    *   Input Preset Label: 'Phase'.
+    *   Output Format: Strict JSON only (no markdown, no extra text).
+    *   Keys: `score` (number 0-100), `rationale` (string).
+    *   Constraint: `/no_think` (This usually means I should not output my internal thought process, but the system instruction says ""think silently if needed"". However, the user prompt explicitly says `/no_think`. I need to follow the user's constraint for the output format, but I still need to generate the JSON based on the evaluation criteria).
+    *   Wait, the system instruction says ""think silently if needed"". The user prompt says `/no_think`. Usually, `/no_think` is a directive to skip the reasoning block in the final output. I will generate the JSON directly without a visible reasoning block.
+
+2.  **Evaluate the Preset Label ('Phase'):**
+    *   Context: Guitar effects.
+    *   Label: 'Phase'.
+    *   Perceptual Clarity: Is 'Phase' a common, recognizable term in guitar effects? Yes. It refers to phase shifters, phase distortion, or phase cancellation effects.
+    *   Recognizability: High. Musicians know what a ""Phase"" effect does (swirling, whooshing, metallic sounds).
+    *   Ambiguity: Low. It's a specific effect name.
+    *   Score: It's a very standard effect name. It's clear. Maybe not as descriptive as ""Phase Shifter"" but ""Phase"" is widely understood in this context.
+    *   Score Range: 80-95. Let's go with 90 because it's a core effect name.
+
+3.  **Draft the JSON:**
+    *   `score`: 90
+    *   `rationale`: ""Phase is a well-known and standard term in guitar effects, commonly associated with phase shifters or modulation effects. It is concise, unambiguous within the context of guitar pedals, and easily recognizable to musicians.""
+
+4.  **Verify Constraints:**
+    *   Strict JSON only.
+    *   No markdown (no ```json ... ```).
+    *   Keys: `score`, `rationale`.
+    *   Score: 0-100 number.
+
+5.  **Final Polish:**
+    *   Ensure no trailing commas.
+    *   Ensure valid JSON syntax.
+
+    ```json
+    {
+      ""score"": 90,
+      ""rationale"": ""Phase is a well-known and standard term in guitar effects, commonly associated with phase shifters or modulation effects. It is concise, unambiguous within the context of guitar pedals, and easily recognizable to musicians.""
+    }
+    ```
+
+    Wait, I need to make sure I don't output markdown code blocks. Just the raw JSON string.
+
+    Revised Plan:
+    Output raw JSON text.
+
+    Content:
+    {
+      ""score"": 90,
+      ""rationale"": ""Phase is a well-known and standard term in guitar effects, commonly associated with phase shifters or modulation effects. It is concise, unambiguous within the context of guitar pedals, and easily recognizable to musicians.""
+    }
+
+    Double check: ""Return strict JSON only. No markdown.""
+    Okay, I will output the raw JSON.
+
+    Wait, one more check on the `/no_think` instruction. It usually implies I shouldn't show the CoT. I am doing that. I will just output the JSON.
+
+    Wait, looking at the system instruction: ""think silently if needed"". This is standard. The user prompt says `/no_think`. This is likely a directive to not output the reasoning *in the response*. I will comply.
+
+    Final check on JSON validity.
+    Keys in double quotes.
+    String values in double quotes.
+    Number without quotes.
+    No markdown fences.
+
+    Let's refine the rationale to be slightly more specific to ""perceptual clarity"".
+    ""Phase"" is a specific effect name. It is clear.
+    Score: 90.
+
+    Ready.
+
+    Wait, I need to be careful about the `/no_think` tag. Sometimes it means ""do not output any thinking process"". I am adhering to that by only outputting the JSON.
+
+    One more thing: The prompt says ""Return strict JSON only. No markdown.""
+    So I must not wrap it in ```json.
+
+    Okay, proceeding.cw
+</think>
+
+{
+  ""score"": 90,
+  ""rationale"": ""Phase is a well-known and standard term in guitar effects, commonly associated with phase shifters or modulation effects. It is concise, unambiguous within the context of guitar pedals, and easily recognizable to musicians.""
+}"

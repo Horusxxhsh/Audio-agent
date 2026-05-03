@@ -1,0 +1,56 @@
+{
+  "scope": "Trial-1 style-label diagnostic with explicit alias matching; not a primary query-level validation.",
+  "mushra_csv": "Experiments/mushura/mushra.csv",
+  "protocol_csv": "Experiments/AblationStudies/protocolA_audio_grouped_per_query_metrics.csv",
+  "local_llm": {
+    "base_url": "http://127.0.0.1:8000",
+    "model": "qwen3.5-9b",
+    "skipped": false
+  },
+  "n_stimuli": 7,
+  "n_stimuli_with_protocol_match": 4,
+  "correlations": {
+    "human_vs_trr_l2": {
+      "n": 4,
+      "spearman_r": 0.39999999999999997,
+      "spearman_p": 0.6,
+      "pearson_r": -0.40327136169575845,
+      "pearson_p": 0.5967286383042416
+    },
+    "human_vs_trr_acc": {
+      "n": 4,
+      "spearman_r": 0.0,
+      "spearman_p": 1.0,
+      "pearson_r": -0.06860027797518026,
+      "pearson_p": 0.9313997220248198
+    },
+    "human_vs_trr_cosine": {
+      "n": 4,
+      "spearman_r": 0.0,
+      "spearman_p": 1.0,
+      "pearson_r": -0.19050958237181528,
+      "pearson_p": 0.8094904176281847
+    },
+    "human_vs_llm_score": {
+      "n": 7,
+      "spearman_r": -0.17928429140015908,
+      "spearman_p": 0.7005053982407637,
+      "pearson_r": -0.20064466182825041,
+      "pearson_p": 0.6661899249657
+    },
+    "llm_vs_trr_l2": {
+      "n": 4,
+      "spearman_r": 0.7745966692414834,
+      "spearman_p": 0.22540333075851657,
+      "pearson_r": 0.34233363271082284,
+      "pearson_p": 0.6576663672891772
+    },
+    "llm_vs_trr_acc": {
+      "n": 4,
+      "spearman_r": 0.2581988897471611,
+      "spearman_p": 0.7418011102528389,
+      "pearson_r": 0.07169508600193794,
+      "pearson_p": 0.9283049139980621
+    }
+  }
+}

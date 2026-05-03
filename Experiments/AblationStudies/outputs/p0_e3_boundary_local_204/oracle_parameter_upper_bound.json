@@ -1,0 +1,11 @@
+{
+  "l2": 1.3283506593518302,
+  "norm_l2": 0.008335994533282369,
+  "acc@0.1": 0.9548294307214261,
+  "recall": 0.9405745329015065,
+  "cosine": 0.9951333607284076,
+  "module": 0.9963235294117647,
+  "method": "oracle_parameter_upper_bound",
+  "n_queries": 204,
+  "n_condition_expanded": 2040
+}

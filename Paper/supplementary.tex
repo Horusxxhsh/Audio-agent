@@ -3,6 +3,7 @@
 \usepackage{booktabs}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
+\usepackage{array}
 \usepackage[margin=1in]{geometry}
 
 \title{Supplementary Material for Texture Resonance Retrieval for Retrieval-Grounded Editable Audio Effect Preset Selection}
@@ -21,7 +22,7 @@
 
 \section{Canonical Evidence Sources and Metric Notes}
 
-This supplementary package is synchronized to the repository's canonical experimental artifacts. The primary objective evidence consists of the Protocol-A split audit together with the stricter resolved-audio-grouped Protocol-A stats and per-query CSV. We include the canonical Protocol-C report as diagnostic boundary-condition analysis and the canonical listening-study report as complementary subjective evidence. We do not use the legacy comparison report or the deprecated Protocol-B outputs as formal evidence in this revision.
+This supplementary package is synchronized to the repository's canonical experimental artifacts and the P0 experiment record. The primary objective evidence consists of the Protocol-A split audit, the earlier resolved-audio-grouped Protocol-A stats, and the P0 E2/E3 summaries that share a 204-query test split. We include the canonical listening-study report as complementary subjective evidence. We do not use the legacy comparison report or the deprecated Protocol-B outputs as formal evidence in this revision.
 
 All objective metrics follow the same operational definitions used in the main paper. \textbf{Param. Dist.} is RMSE over flattened numeric parameter leaves; \textbf{Acc@0.1} measures the fraction of numeric leaves within an absolute tolerance of 0.1; \textbf{Recall} measures retrieval over active numeric parameters; \textbf{Cosine} is cosine similarity in the flattened parameter space; and \textbf{Module} is a schema-level Jaccard index over active DSP modules inferred from keys ending with \texttt{On}. Missing numeric keys are treated as zeros, non-numeric leaves are ignored, and we do not apply per-parameter normalization. Accordingly, absolute magnitudes should be interpreted \emph{within} each stated protocol rather than across protocols.
 
@@ -29,7 +30,7 @@ All objective metrics follow the same operational definitions used in the main p
 
 The external benchmark drop-in contains 1267 total records. A post-hoc audit of the original song-name-based held-out list (used in earlier drafts) revealed exact cross-split audio reuse, so the manuscript now anchors its main objective evidence to a stricter resolved-audio-grouped split. Table~\ref{tab:protocolA_split_audit} summarizes both definitions.
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
 	\caption{Protocol-A split audit summary. ``Near-duplicate'' counts come from the repository's cheap fingerprint audit and therefore indicate a remaining risk surface rather than a formal perceptual-duplicate guarantee.}
 	\label{tab:protocolA_split_audit}
@@ -46,23 +47,122 @@ The external benchmark drop-in contains 1267 total records. A post-hoc audit of 
 
 The stricter split groups records by resolved local audio path before sampling the held-out set, thereby eliminating exact cross-split audio reuse under the current audit. At the same time, the benchmark remains a pilot setting: the cheap fingerprint still reports many near-duplicate pairs, and the corpus remains guitar-only. The dataset JSON exposes \texttt{SongName}, \texttt{Style}, \texttt{Feature}, \texttt{Parameters}, and \texttt{Vectors}, but it does not include a separate auditable text-source field; accordingly, \texttt{Style} and \texttt{Feature} are the only explicit text-side provenance fields available in-repo. The stricter split contains 204 paired TRR rows but only 203 unique \texttt{query\_name} labels because \texttt{Hard Rock Crunch} appears twice in the dataset; all pairing therefore uses \texttt{query\_idx}.
 
-\section{Protocol-A: Direct Retrieval Comparison}
+\section{P0 Protocol-A: Direct Retrieval Comparison}
 
-Protocol-A in the revised manuscript refers to the resolved-audio-grouped split. All methods use top-1 retrieval under the same candidate pool. The CLAP row uses 201 queries because three query-side cached embeddings are unavailable in the verified artifact set.
+P0 Protocol-A compares TRR with Wav2Vec, FeatureNN, CLAP, PaSST, and PANNs on a shared 204-query split and a 1,063-record retrieval database. All methods use top-1 retrieval. This is the main baseline matrix used by the revised manuscript. The earlier resolved-audio-grouped Protocol-A table is retained below as split-audit context, not as the only main result table.
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
-	\caption{Protocol-A direct retrieval comparison on the resolved-audio-grouped split. Lower is better for Param. Dist.; higher is better for the other metrics.}
+	\caption{P0 Protocol-A direct retrieval comparison. Lower is better for L2 and Norm.L2; higher is better for the other metrics.}
 	\label{tab:retrieval_methods_direct}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lccccccc}
+		\toprule
+		\textbf{Method} & \textbf{$n$} & \textbf{L2} $\downarrow$ & \textbf{Norm.L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
+		\midrule
+		TRR (Ours) & 204 & \textbf{8.7287} & \textbf{0.1881} & \textbf{0.5766} & \textbf{0.5404} & \textbf{0.8415} & \textbf{0.8297} \\
+		Wav2Vec & 204 & 22.5174 & 0.2400 & 0.5015 & 0.4648 & 0.5642 & 0.7423 \\
+		FeatureNN & 204 & 17.9391 & 0.2236 & 0.5264 & 0.4779 & 0.6030 & 0.7544 \\
+		CLAP & 204 & 16.1257 & 0.2298 & 0.5389 & 0.4922 & 0.6531 & 0.7837 \\
+		PaSST & 204 & 18.2860 & 0.2132 & 0.5422 & 0.5001 & 0.6192 & 0.7960 \\
+		PANNs & 204 & 21.0269 & 0.2260 & 0.5090 & 0.4759 & 0.5826 & 0.7606 \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\section{P0 Protocol-A: Statistical Reporting}
+
+The P0 statistical report tests TRR against each baseline on per-query Norm.L2 using Wilcoxon signed-rank tests with Holm correction. The tests consistently reject the null hypothesis, but the effect sizes are small; the correct interpretation is statistically reliable but moderate TRR advantage.
+
+\begin{table}[htbp]
+	\centering
+	\caption{P0 Protocol-A: TRR versus baseline statistical tests on per-query Norm.L2.}
+	\label{tab:protocolA_ci}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Pair} & \textbf{$n$} & \textbf{$p$-value} & \textbf{Test} & \textbf{Cohen's $d$} & \textbf{Holm reject} \\
+		\midrule
+		TRR vs Wav2Vec & 204 & $1.564\times10^{-7}$ & Wilcoxon & -0.2101 & Yes \\
+		TRR vs FeatureNN & 204 & $9.523\times10^{-5}$ & Wilcoxon & -0.1380 & Yes \\
+		TRR vs CLAP & 204 & $4.476\times10^{-4}$ & Wilcoxon & -0.2189 & Yes \\
+		TRR vs PaSST & 204 & $1.254\times10^{-3}$ & Wilcoxon & -0.0980 & Yes \\
+		TRR vs PANNs & 204 & $2.122\times10^{-5}$ & Wilcoxon & -0.1528 & Yes \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+\section{TRR Mechanism Ablations}
+
+The main P0 table includes one mechanism-relevant control: TRR and Wav2Vec use the same Wav2Vec2 acoustic backbone, but differ in the aggregation operator. Wav2Vec uses a first-order mean-pooled embedding, whereas TRR uses projected frame activations followed by Gram-matrix second-order statistics and L2 normalization. Table~\ref{tab:trr_backbone_control} isolates this comparison from the broader external-baseline matrix.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Backbone-controlled diagnostic from P0 Protocol-A. TRR and Wav2Vec share the Wav2Vec2 backbone but use different aggregation operators.}
+	\label{tab:trr_backbone_control}
 	\small
 	\resizebox{\linewidth}{!}{%
 	\begin{tabular}{lcccccc}
 		\toprule
-		\textbf{Method} & \textbf{$n$} & \textbf{Param. Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
+		\textbf{Method} & \textbf{Aggregation} & \textbf{Norm.L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
 		\midrule
-		TRR (Ours) & 204 & \textbf{8.0467} & \textbf{0.5169} & \textbf{0.4595} & \textbf{0.8247} & \textbf{0.8051} \\
-		Wav2Vec-RAG & 204 & 23.8197 & 0.4251 & 0.3505 & 0.5292 & 0.7043 \\
+		TRR & Gram second-order statistics & 0.1881 & 0.5766 & 0.5404 & 0.8415 & 0.8297 \\
+		Wav2Vec & Mean pooling & 0.2400 & 0.5015 & 0.4648 & 0.5642 & 0.7423 \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+To further test the mechanism rather than only the final leaderboard, we recomputed controlled Wav2Vec2 layer features on the same 204-query P0 split with a fixed random seed and compared same-backbone aggregation variants. This ablation is not a replacement for the user-verified P0 E2 leaderboard because it uses the current local execution path and deterministic projection matrices. Its role is narrower: it checks whether the second-order design choices are directionally supported.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Controlled TRR mechanism ablation on the P0 split using the current local execution path. Lower is better for Norm.L2; higher is better for all other metrics.}
+	\label{tab:trr_mechanism_ablation}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lcccccc}
+		\toprule
+		\textbf{Variant} & \textbf{Layers} & \textbf{Dim} & \textbf{Norm.L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ \\
+		\midrule
+		Mean pooling & 5 & 768 & 0.2582 & 0.6089 & 0.4623 & 0.5895 \\
+		Gram, no projection & 5 & 589824 & 0.2501 & 0.6103 & 0.4635 & 0.6092 \\
+		Gram, projected & 4 & 4096 & 0.2528 & 0.6017 & 0.4585 & 0.6191 \\
+		Gram, projected & 5 & 4096 & \textbf{0.2457} & \textbf{0.6104} & \textbf{0.4654} & 0.6224 \\
+		Gram, projected & 6 & 4096 & 0.2529 & 0.5985 & 0.4485 & 0.6317 \\
+		Gram, projected & 4+5+6, $d=16$ & 256 & 0.2501 & 0.6052 & 0.4449 & 0.6070 \\
+		Gram, projected & 4+5+6, $d=32$ & 1024 & 0.2480 & 0.6022 & 0.4640 & \textbf{0.6398} \\
+		Gram, projected & 4+5+6, $d=64$ & 4096 & 0.2546 & 0.5963 & 0.4487 & 0.6249 \\
+		Gram, projected & 4+5+6, $d=128$ & 16384 & 0.2576 & 0.6054 & 0.4538 & 0.6121 \\
+		Gram, no L2 norm & 4+5+6, $d=64$ & 4096 & 0.2849 & 0.5645 & 0.3944 & 0.5857 \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+The mechanism result supports three bounded claims. First, Gram aggregation is not merely a Wav2Vec2-backbone effect: the same-layer Gram variants improve normalized distance over same-backbone mean pooling. Second, normalization is important; removing L2 normalization produces the weakest row in the table. Third, architectural choices remain meaningful: layer~5 and $d=32$/$d=64$ projected multi-layer variants trade off different metrics, so the paper should not claim that the reported TRR configuration is globally optimal. The generated artifact also records top-3 and top-5 oracle-best normalized L2 within each retrieval list, which we use only as a top-$K$ sensitivity diagnostic rather than as the deployed top-1 metric. We therefore frame TRR as a useful texture-aware retrieval prior rather than as a fully optimized representation family.
+
+\section{Resolved-Audio-Grouped Protocol-A Audit Context}
+
+Before the P0 baseline matrix was added, the revision used a resolved-audio-grouped Protocol-A table to avoid exact cross-split audio reuse. That table remains useful as audit context because it documents the anti-leakage split behavior and the earlier CLAP-overlap comparison. It should not be mixed numerically with the P0 table because the reported L2 scale and baseline set differ.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Resolved-audio-grouped Protocol-A audit table retained for split transparency.}
+	\label{tab:protocolA_sig}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lcccccc}
+		\toprule
+		\textbf{Method} & \textbf{$n$} & \textbf{Param. Dist.} & \textbf{Acc@0.1} & \textbf{Recall} & \textbf{Cosine} & \textbf{Module} \\
+		\midrule
+		TRR (Ours) & 204 & 8.0467 & 0.5169 & 0.4595 & 0.8247 & 0.8051 \\
 		Text-RAG & 204 & 24.1705 & 0.4717 & 0.3967 & 0.4943 & 0.7456 \\
+		Wav2Vec-RAG & 204 & 23.8197 & 0.4251 & 0.3505 & 0.5292 & 0.7043 \\
 		FeatureNN-RAG & 204 & 19.2613 & 0.4198 & 0.3600 & 0.5479 & 0.7134 \\
 		CLAP & 201 & 22.3102 & 0.4492 & 0.3971 & 0.5725 & 0.7240 \\
 		\bottomrule
@@ -70,70 +170,13 @@ Protocol-A in the revised manuscript refers to the resolved-audio-grouped split.
 	}
 \end{table}
 
-\section{Protocol-A: Statistical Reporting}
-
-For objective metrics we report 95\% bootstrap confidence intervals over held-out queries and paired permutation tests for TRR versus each retrieval baseline. Holm correction is applied across the TRR-vs-baseline comparisons, and the paired sample count is reported explicitly whenever a baseline does not cover all 204 queries.
-
-\begin{table}[h]
-	\centering
-	\caption{Protocol-A: mean and 95\% bootstrap confidence intervals over held-out queries on the resolved-audio-grouped split.}
-	\label{tab:protocolA_ci}
-	\small
-	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{lcccccc}
-		\toprule
-		\textbf{Method} & \textbf{$n$} & \textbf{Param. Dist.} & \textbf{Acc@0.1} & \textbf{Recall} & \textbf{Cosine} & \textbf{Module} \\
-		\midrule
-		CLAP & 201 & 22.3102 [18.6405, 26.1201] & 0.4492 [0.4167, 0.4821] & 0.3971 [0.3615, 0.4329] & 0.5725 [0.5133, 0.6317] & 0.7240 [0.6884, 0.7591] \\
-		FeatureNN-RAG & 204 & 19.2613 [15.9103, 22.7101] & 0.4198 [0.3896, 0.4514] & 0.3600 [0.3269, 0.3948] & 0.5479 [0.4869, 0.6089] & 0.7134 [0.6773, 0.7497] \\
-		Text-RAG & 204 & 24.1705 [20.2018, 28.1073] & 0.4717 [0.4371, 0.5073] & 0.3967 [0.3592, 0.4353] & 0.4943 [0.4314, 0.5596] & 0.7456 [0.7108, 0.7809] \\
-		Wav2Vec-RAG & 204 & 23.8197 [20.1623, 27.5540] & 0.4251 [0.3925, 0.4596] & 0.3505 [0.3130, 0.3893] & 0.5292 [0.4663, 0.5902] & 0.7043 [0.6668, 0.7411] \\
-		TRR (Ours) & 204 & 8.0467 [5.7805, 10.4727] & 0.5169 [0.4860, 0.5495] & 0.4595 [0.4232, 0.4979] & 0.8247 [0.7820, 0.8646] & 0.8051 [0.7681, 0.8419] \\
-		\bottomrule
-	\end{tabular}
-	}
-\end{table}
-
-\begin{table}[h]
-	\centering
-	\caption{Protocol-A: TRR improvements vs.\ retrieval baselines with 95\% confidence intervals and Holm-corrected permutation $p$-values. Positive $\Delta$ indicates TRR is better (defined as \texttt{baseline - TRR} for Param. Dist., and \texttt{TRR - baseline} for the other metrics).}
-	\label{tab:protocolA_sig}
-	\small
-	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{llcccc}
-		\toprule
-		\textbf{Baseline} & \textbf{Metric} & \textbf{$n$} & \textbf{Mean $\Delta$} & \textbf{95\% CI} & \textbf{$p$ (Holm)} \\
-		\midrule
-		CLAP & Param. Dist. & 201 & 14.1460 & [10.3041, 18.0624] & 0.0010 \\
-		CLAP & Acc@0.1 & 201 & 0.0640 & [0.0257, 0.1020] & 0.0070 \\
-		CLAP & Recall & 201 & 0.0600 & [0.0189, 0.1007] & 0.0181 \\
-		CLAP & Cosine & 201 & 0.2503 & [0.1833, 0.3183] & 0.0010 \\
-		CLAP & Module & 201 & 0.0781 & [0.0361, 0.1200] & 0.0015 \\
-		FeatureNN-RAG & Param. Dist. & 204 & 11.2146 & [7.6011, 14.8710] & 0.0010 \\
-		FeatureNN-RAG & Acc@0.1 & 204 & 0.0971 & [0.0601, 0.1343] & 0.0010 \\
-		FeatureNN-RAG & Recall & 204 & 0.0995 & [0.0572, 0.1423] & 0.0010 \\
-		FeatureNN-RAG & Cosine & 204 & 0.2769 & [0.2087, 0.3435] & 0.0010 \\
-		FeatureNN-RAG & Module & 204 & 0.0917 & [0.0469, 0.1353] & 0.0011 \\
-		Text-RAG & Param. Dist. & 204 & 16.1238 & [12.3722, 19.8789] & 0.0010 \\
-		Text-RAG & Acc@0.1 & 204 & 0.0453 & [0.0084, 0.0818] & 0.0227 \\
-		Text-RAG & Recall & 204 & 0.0628 & [0.0224, 0.1032] & 0.0140 \\
-		Text-RAG & Cosine & 204 & 0.3304 & [0.2588, 0.4014] & 0.0010 \\
-		Text-RAG & Module & 204 & 0.0595 & [0.0135, 0.1050] & 0.0227 \\
-		Wav2Vec-RAG & Param. Dist. & 204 & 15.7730 & [12.2807, 19.3414] & 0.0010 \\
-		Wav2Vec-RAG & Acc@0.1 & 204 & 0.0918 & [0.0582, 0.1259] & 0.0010 \\
-		Wav2Vec-RAG & Recall & 204 & 0.1091 & [0.0664, 0.1528] & 0.0010 \\
-		Wav2Vec-RAG & Cosine & 204 & 0.2956 & [0.2305, 0.3630] & 0.0010 \\
-		Wav2Vec-RAG & Module & 204 & 0.1008 & [0.0576, 0.1440] & 0.0010 \\
-		\bottomrule
-	\end{tabular}
-	}
-\end{table}
-
 \section{Protocol-A: Per-Query Diagnostics}
 
-To make the main benchmark less dependent on mean-only reporting, we derive per-query diagnostics from the canonical Protocol-A CSV for the resolved-audio-grouped split (\texttt{protocolA\_audio\_grouped\_derived\_analysis.md/json}). These diagnostics are paired by \texttt{query\_idx}. The TRR rows contain 204 paired queries but only 203 unique \texttt{query\_name} labels because one label (\texttt{Hard Rock Crunch}) is reused in the CSV; we therefore treat \texttt{query\_idx} as the authoritative pairing key.
+To make the main benchmark less dependent on mean-only reporting, we derive per-query diagnostics from the canonical Protocol-A CSV for the resolved-audio-grouped split. The source artifact is the derived Protocol-A analysis file pair in Markdown and JSON form.
 
-\begin{table}[h]
+These diagnostics are paired by \texttt{query\_idx}. The TRR rows contain 204 paired queries but only 203 unique \texttt{query\_name} labels because one label (\texttt{Hard Rock Crunch}) is reused in the CSV; we therefore treat \texttt{query\_idx} as the authoritative pairing key.
+
+\begin{table}[htbp]
 	\centering
 	\caption{Per-query win/loss/tie summary for TRR under Protocol-A. The interquartile range collapses to zero in many rows because several queries retrieve the same preset under both methods.}
 	\label{tab:protocolA_pairwise_diagnostics}
@@ -160,13 +203,13 @@ To make the main benchmark less dependent on mean-only reporting, we derive per-
 	}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
 	\caption{Representative Protocol-A L2 cases from the derived per-query analysis. Positive $\Delta$ indicates TRR is better.}
 	\label{tab:protocolA_cases}
 	\small
 	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{lllp{3.5cm}p{3.5cm}c}
+		\begin{tabular}{lll>{\raggedright\arraybackslash}p{3.5cm}>{\raggedright\arraybackslash}p{3.5cm}c}
 		\toprule
 		\textbf{Type} & \textbf{Baseline} & \textbf{Query} & \textbf{TRR retrieved} & \textbf{Baseline retrieved} & \textbf{$\Delta$L2} \\
 		\midrule
@@ -183,53 +226,80 @@ To make the main benchmark less dependent on mean-only reporting, we derive per-
 	}
 \end{table}
 
-\section{Protocol-C: Boundary-Condition Analysis}
+\section{P0 Protocol-C: Real-Degradation Robustness}
 
-Protocol-C is retained as a diagnostic stress test for the repository's current score-level fusion heuristic. It is \emph{not} a realistic robustness benchmark: the audio degradation branch still uses embedding-space Gaussian noise, and we therefore interpret the results only as boundary-condition analysis for fallback behavior.
+P0 Protocol-C evaluates realistic audio degradations by corrupting raw audio first and then re-encoding the degraded signal into TRR embeddings. It reuses the P0 Protocol-A 204-query test split, uses \texttt{Style}+\texttt{Feature} as the text branch, and computes ranking relevance from parameter-space oracle neighbors rather than exact song-name matching.
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
-	\caption{Protocol-C scenario summary ($N=211$). Weight means are taken from the fusion branch and show which modality the heuristic trusts under each condition.}
+	\caption{P0 Protocol-C overall summary on the shared 204-query split. Lower is better for L2; higher is better for all other metrics.}
 	\label{tab:protocolC_summary}
 	\small
 	\resizebox{\linewidth}{!}{%
 	\begin{tabular}{lccccc}
 		\toprule
-		\textbf{Scenario} & $\mathbb{E}[w_{\text{text}}]$ & $\mathbb{E}[w_{\text{audio}}]$ & \textbf{Text-only L2} & \textbf{TRR-only L2} & \textbf{Fusion L2} \\
+		\textbf{Method} & $\boldsymbol{\alpha}$ & \textbf{L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{MRR} $\uparrow$ & \textbf{NDCG@5} $\uparrow$ \\
 		\midrule
-		Standard & 0.4716 & 0.5284 & 1.5148 & 0.2970 & 0.3056 \\
-		Vague text & 0.0000 & 1.0000 & 12.6517 & 0.2970 & 0.2970 \\
-		Noisy audio & 1.0000 & 0.0000 & 1.5148 & 33.8549 & 1.5148 \\
-		Conflict & 0.4123 & 0.5877 & 12.8572 & 0.2970 & 4.5259 \\
+		fixed fusion 0.30 & 0.3000 & 29.2322 & 0.4846 & 0.4095 & 0.3723 \\
+		fixed fusion 0.50 & 0.5000 & 20.5551 & 0.6085 & 0.5607 & 0.5528 \\
+		fixed fusion 0.70 & 0.7000 & 20.1868 & 0.6104 & 0.5652 & 0.5551 \\
+		adaptive fusion & 0.5980 & \textbf{20.1491} & \textbf{0.6121} & \textbf{0.5654} & \textbf{0.5566} \\
 		\bottomrule
 	\end{tabular}
 	}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
-	\caption{Protocol-C paired L2 comparisons (Holm-corrected). Positive $\Delta$ indicates the fusion branch is better; negative $\Delta$ indicates the baseline is better.}
+	\caption{P0 Protocol-C per-condition winners across the main multimodal comparison set.}
 	\label{tab:protocolC_l2tests}
 	\small
 	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{llccc}
+	\begin{tabular}{lcccc}
 		\toprule
-		\textbf{Scenario} & \textbf{Comparison} & \textbf{Mean $\Delta$L2} & \textbf{95\% CI} & \textbf{$p$ (Holm)} \\
+		\textbf{Condition} & \textbf{Best L2} & \textbf{Best Acc@0.1} & \textbf{Best MRR} & \textbf{Best NDCG@5} \\
 		\midrule
-		Standard & Fusion vs Text-only & 1.2092 & [0.2936, 2.4213] & 0.0153 \\
-		Standard & Fusion vs TRR-only & -0.0085 & [-0.0176, -0.0012] & 0.9127 \\
-		Vague text & Fusion vs Text-only & 12.3546 & [9.0728, 15.8110] & 0.0020 \\
-		Vague text & Fusion vs TRR-only & 0.0000 & [0.0000, 0.0000] & 1.0000 \\
-		Noisy audio & Fusion vs Text-only & 0.0000 & [0.0000, 0.0000] & 1.0000 \\
-		Noisy audio & Fusion vs TRR-only & 32.3401 & [27.9508, 36.7472] & 0.0020 \\
-		Conflict & Fusion vs Text-only & 8.3313 & [5.6384, 11.2942] & 0.0020 \\
-		Conflict & Fusion vs TRR-only & -4.2289 & [-6.3159, -2.2150] & 0.0020 \\
+		AWGN 20 dB & fixed 0.70 & adaptive & adaptive & adaptive \\
+		AWGN 10 dB & fixed 0.70 & adaptive & adaptive / fixed 0.50 & fixed 0.50 \\
+		AWGN 5 dB & fixed 0.70 & fixed 0.70 & fixed 0.70 & fixed 0.70 \\
+		MP3 128k & fixed 0.70 & fixed 0.50 & fixed 0.50 & fixed 0.50 \\
+		MP3 64k & fixed 0.70 & fixed 0.50 & fixed 0.50 & fixed 0.50 \\
+		MP3 32k & adaptive & fixed 0.50 & adaptive / fixed 0.50 & fixed 0.50 \\
+		Reverb 0.6 & adaptive & fixed 0.50 & adaptive / fixed 0.50 & adaptive \\
+		Reverb 1.0 & adaptive & fixed 0.50 & adaptive / fixed 0.50 & fixed 0.50 \\
+		Truncate 50\% & adaptive & adaptive & adaptive / fixed 0.70 & fixed 0.70 \\
+		Truncate 30\% & adaptive / fixed 0.70 & adaptive & adaptive / fixed 0.70 & adaptive / fixed 0.70 \\
 		\bottomrule
 	\end{tabular}
 	}
 \end{table}
 
-The canonical Protocol-C report also includes representative modality-conflict failures. The largest degradation relative to standard fusion occurs for \textit{Saturated Rhythm}, where contradictory clean-guitar text drives the fusion rule away from the otherwise lower-error audio-side neighborhood under this synthetic protocol.
+The per-condition view shows that adaptive fusion is not a trivial uniform winner; fixed 0.50 and fixed 0.70 remain competitive on several conditions. The stronger conclusion is that audio-heavy fusion is fragile, whereas adaptive fusion consistently moves the system toward the stable mid-to-high text-weight region while preserving multimodal behavior.
+
+\paragraph{Local boundary audit.}
+We additionally ran the current local Protocol-C script with explicit audio-only ($\alpha=0.0$), pure-text ($\alpha=1.0$), and parameter-oracle upper-bound rows. Because this run uses the current repository execution path rather than the server-side P0 artifact snapshot, we report it as an audit boundary rather than as a replacement for Table~\ref{tab:protocolC_summary}. The result in Table~\ref{tab:protocolC_boundary_audit} confirms the main qualitative interpretation: audio-only retrieval is weak under realistic degradation, mid/high text weights are stable, and the pure-text boundary remains a strong practical boundary. The oracle row is not a method; it selects the nearest KB item using ground-truth parameters and only quantifies remaining headroom. Thus, adaptive fusion should be read as a multimodal operating strategy near the stable region, not as proof of superiority over text-only retrieval.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Current-code Protocol-C boundary audit with audio-only and pure-text rows. This table is an execution-path audit artifact, not a replacement for the canonical P0 server summary.}
+	\label{tab:protocolC_boundary_audit}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Method} & $\boldsymbol{\alpha}$ & \textbf{L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{MRR} $\uparrow$ & \textbf{NDCG@5} $\uparrow$ \\
+		\midrule
+		audio-only & 0.0000 & 102.5577 & 0.4962 & 0.1184 & 0.0731 \\
+		fixed fusion 0.30 & 0.3000 & 81.0390 & 0.5980 & 0.3916 & 0.3588 \\
+		fixed fusion 0.50 & 0.5000 & 66.9431 & 0.6791 & 0.5633 & 0.5463 \\
+		fixed fusion 0.70 & 0.7000 & 63.9030 & 0.6832 & 0.5730 & 0.5528 \\
+		adaptive fusion & 0.5980 & 65.4614 & 0.6837 & 0.5719 & 0.5529 \\
+		pure text & 1.0000 & \textbf{61.5079} & \textbf{0.6872} & \textbf{0.5847} & \textbf{0.5586} \\
+		parameter oracle upper bound & oracle & 1.3284 & 0.9548 & 1.0000 & 1.0000 \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
 
 \section{Listening Study Statistics}
 
@@ -237,7 +307,7 @@ The listening study uses a multiple-stimulus protocol with a hidden reference an
 
 The current logs preserve repeated-measures structure and participant IDs, but they do not preserve device metadata, participant expertise labels, or the provenance and time budget of the manual baseline. We therefore interpret Trials~2--5 as perceptual context rather than as a fairness-critical human-vs-system optimization benchmark.
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
 	\caption{Study-level listening-test summary.}
 	\label{tab:listening_overview}
@@ -253,7 +323,7 @@ The current logs preserve repeated-measures structure and participant IDs, but t
 	\end{tabular}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
 	\caption{Repeated-measures nonparametric tests for the listening study.}
 	\label{tab:listening_tests}
@@ -263,11 +333,11 @@ The current logs preserve repeated-measures structure and participant IDs, but t
 		\toprule
 		\textbf{Block} & \textbf{Comparison} & \textbf{$n$} & \textbf{Mean(A-B)} & \textbf{Median(A-B)} & \textbf{rbc} & \textbf{$p$ (Holm)} \\
 		\midrule
-		Trials 2--5 & Friedman omnibus ($Q=41.6154$, $p_{\mathrm{perm}}=5\times10^{-5}$) & -- & -- & -- & -- & -- \\
+		Trials 2--5 & Friedman omnibus ($Q=41.6154$, $p_{\mathrm{perm}}=5\times10^{-5}$) & N/A & N/A & N/A & N/A & N/A \\
 		Trials 2--5 & reference vs TRR-based system & 26 & 13.78 & 8.38 & 0.860 & 0.00015 \\
 		Trials 2--5 & reference vs manual & 26 & 33.61 & 26.00 & 0.983 & 0.00015 \\
 		Trials 2--5 & TRR-based system vs manual & 26 & 19.83 & 17.25 & 1.000 & 0.00015 \\
-		Trials 6--10 & Friedman omnibus ($Q=36.2308$, $p_{\mathrm{perm}}=5\times10^{-5}$) & -- & -- & -- & -- & -- \\
+		Trials 6--10 & Friedman omnibus ($Q=36.2308$, $p_{\mathrm{perm}}=5\times10^{-5}$) & N/A & N/A & N/A & N/A & N/A \\
 		Trials 6--10 & reference vs MusicGen & 26 & 47.72 & 50.90 & 1.000 & 0.00015 \\
 		Trials 6--10 & reference vs TRR-based system & 26 & 46.71 & 51.30 & 0.994 & 0.00015 \\
 		Trials 6--10 & MusicGen vs TRR-based system & 24 & -1.10 & 0.80 & 0.067 & 0.7797 \\
@@ -276,7 +346,7 @@ The current logs preserve repeated-measures structure and participant IDs, but t
 	}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
 	\caption{Trial 1 style-matching stimulus labels used in the listening study.}
 	\label{tab:listening_style_labels}
@@ -298,11 +368,11 @@ The current logs preserve repeated-measures structure and participant IDs, but t
 
 \section{Near-Duplicate Sensitivity Analysis}
 
-To assess the impact of near-duplicate presets on retrieval metrics, we progressively remove near-duplicates from the knowledge base using parameter-space L2 distance thresholds and re-evaluate all retrieval methods under Protocol-A. Table~\ref{tab:near_dup_sensitivity} reports the results at four thresholds.
+To assess the impact of near-duplicate presets on retrieval metrics, we progressively remove near-duplicates from the knowledge base using normalized parameter-space RMSE thresholds and re-evaluate locally available stored-vector retrieval methods under the P0 deterministic split. This is a sensitivity analysis rather than the main P0 leaderboard, because the local JSON used for this run contains CLAP vectors for 166 of the 204 test queries and does not contain local PaSST/PANNs vectors. Table~\ref{tab:near_dup_sensitivity} reports the resulting robustness pattern.
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
-	\caption{Near-duplicate sensitivity analysis. KB size decreases as the L2 threshold $\tau$ for removing near-duplicates increases. Param.\,Dist.\,$\downarrow$; all other metrics $\uparrow$. Results with placeholder values (--) will be filled after running the sensitivity experiment.}
+	\caption{Near-duplicate sensitivity analysis under normalized parameter-space RMSE deduplication. KB size decreases as the threshold $\tau$ increases. Param.\,Dist.\,$\downarrow$; all other metrics $\uparrow$.}
 	\label{tab:near_dup_sensitivity}
 	\small
 	\resizebox{\linewidth}{!}{%
@@ -311,82 +381,68 @@ To assess the impact of near-duplicate presets on retrieval metrics, we progress
 		\textbf{Method} & $\tau$ & \textbf{KB size} & \textbf{Param.\,Dist.} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ & \textbf{Module} $\uparrow$ \\
 		\midrule
 		\multicolumn{8}{l}{\textit{$\tau = 0$ (full KB, baseline)}} \\
-		TRR & 0 & 1063 & 8.0467 & 0.5169 & 0.4595 & 0.8247 & 0.8051 \\
-		Wav2Vec-RAG & 0 & 1063 & 23.8197 & 0.4251 & 0.3505 & 0.5292 & 0.7043 \\
-		CLAP & 0 & 1063 & 22.3102 & 0.4492 & 0.3971 & 0.5725 & 0.7240 \\
+		TRR & 0 & 1063 & 37.9848 & 0.6605 & 0.5311 & 0.8149 & 0.8212 \\
+		Wav2Vec & 0 & 1063 & 74.2198 & 0.6012 & 0.4570 & 0.5895 & 0.7401 \\
+		FeatureNN & 0 & 1063 & 60.3766 & 0.6320 & 0.4861 & 0.6688 & 0.7582 \\
+		CLAP & 0 & 1063 & 69.1914 & 0.5654 & 0.3941 & 0.6276 & 0.7271 \\
 		\midrule
 		\multicolumn{8}{l}{\textit{$\tau = 0.005$}} \\
-		TRR & 0.005 & -- & -- & -- & -- & -- & -- \\
-		Wav2Vec-RAG & 0.005 & -- & -- & -- & -- & -- & -- \\
-		CLAP & 0.005 & -- & -- & -- & -- & -- & -- \\
+		TRR & 0.005 & 469 & 36.9790 & 0.6461 & 0.5103 & 0.8169 & 0.7866 \\
+		Wav2Vec & 0.005 & 469 & 98.7481 & 0.5616 & 0.4254 & 0.5060 & 0.7125 \\
+		FeatureNN & 0.005 & 469 & 86.6753 & 0.5838 & 0.4458 & 0.5414 & 0.7127 \\
+		CLAP & 0.005 & 469 & 109.5363 & 0.5036 & 0.3384 & 0.4435 & 0.6619 \\
 		\midrule
 		\multicolumn{8}{l}{\textit{$\tau = 0.01$}} \\
-		TRR & 0.01 & -- & -- & -- & -- & -- & -- \\
-		Wav2Vec-RAG & 0.01 & -- & -- & -- & -- & -- & -- \\
-		CLAP & 0.01 & -- & -- & -- & -- & -- & -- \\
+		TRR & 0.01 & 409 & 35.4043 & 0.6415 & 0.5142 & 0.8442 & 0.8040 \\
+		Wav2Vec & 0.01 & 409 & 103.6916 & 0.5562 & 0.4330 & 0.5113 & 0.7263 \\
+		FeatureNN & 0.01 & 409 & 96.9060 & 0.5698 & 0.4421 & 0.5180 & 0.7064 \\
+		CLAP & 0.01 & 409 & 123.1859 & 0.4854 & 0.3385 & 0.4094 & 0.6633 \\
 		\midrule
 		\multicolumn{8}{l}{\textit{$\tau = 0.02$}} \\
-		TRR & 0.02 & -- & -- & -- & -- & -- & -- \\
-		Wav2Vec-RAG & 0.02 & -- & -- & -- & -- & -- & -- \\
-		CLAP & 0.02 & -- & -- & -- & -- & -- & -- \\
+		TRR & 0.02 & 160 & 47.7463 & 0.6203 & 0.4753 & 0.7758 & 0.7612 \\
+		Wav2Vec & 0.02 & 160 & 100.7927 & 0.5352 & 0.3916 & 0.5277 & 0.6986 \\
+		FeatureNN & 0.02 & 160 & 102.8913 & 0.5261 & 0.3586 & 0.5082 & 0.6713 \\
+		CLAP & 0.02 & 160 & 125.3818 & 0.4887 & 0.3142 & 0.4414 & 0.6547 \\
 		\midrule
 		\multicolumn{8}{l}{\textit{$\tau = 0.05$}} \\
-		TRR & 0.05 & -- & -- & -- & -- & -- & -- \\
-		Wav2Vec-RAG & 0.05 & -- & -- & -- & -- & -- & -- \\
-		CLAP & 0.05 & -- & -- & -- & -- & -- & -- \\
+		TRR & 0.05 & 83 & 51.4764 & 0.6023 & 0.4405 & 0.7024 & 0.7136 \\
+		Wav2Vec & 0.05 & 83 & 71.8281 & 0.5425 & 0.3663 & 0.5711 & 0.6719 \\
+		FeatureNN & 0.05 & 83 & 60.3433 & 0.5470 & 0.3494 & 0.5722 & 0.6472 \\
+		CLAP & 0.05 & 83 & 70.0935 & 0.5346 & 0.3431 & 0.6039 & 0.6840 \\
 		\bottomrule
 	\end{tabular}
 	}
 \end{table}
 
-\section{Additional Baseline Confidence Intervals}
+\section{Additional Baseline Status}
 
-Table~\ref{tab:additional_baselines_ci} reports 95\% bootstrap confidence intervals for the additional baselines (PANNs, PaSST, MLP-Regressor) under Protocol-A.
+P0 closes the PaSST and PANNs retrieval-baseline gap for the shared Protocol-A benchmark. We also add a diagnostic direct-regression baseline using mean-pooled Wav2Vec2 features and a two-layer MLP trained only on the P0 knowledge base. This regressor is useful as a boundary condition, but it is not an executable-preset retriever: it predicts dense continuous parameter leaves and still requires constraint projection before deployment. Learned reranking remains future work.
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
-	\caption{Protocol-A: mean and 95\% bootstrap CI for additional baselines on the resolved-audio-grouped split. Values marked -- will be filled after running baseline experiments.}
+	\caption{P0 Protocol-A additional baseline status.}
 	\label{tab:additional_baselines_ci}
 	\small
 	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{lcccccc}
+	\begin{tabular}{lcccc}
 		\toprule
-		\textbf{Method} & \textbf{$n$} & \textbf{Param.\,Dist.} & \textbf{Acc@0.1} & \textbf{Recall} & \textbf{Cosine} & \textbf{Module} \\
+		\textbf{Method} & \textbf{$n$} & \textbf{Evidence status} & \textbf{Use in paper} & \textbf{Boundary} \\
 		\midrule
-		PANNs & 204 & -- & -- & -- & -- & -- \\
-		PaSST & 204 & -- & -- & -- & -- & -- \\
-		MLP-Regressor & 204 & -- & -- & -- & -- & -- \\
+		PaSST & 204 & P0 complete & Main baseline matrix & Small TRR effect size \\
+		PANNs & 204 & P0 complete & Main baseline matrix & Small TRR effect size \\
+		MLP-Regressor & 204 & Diagnostic complete & Boundary baseline & Dense non-executable output \\
 		\bottomrule
 	\end{tabular}
 	}
 \end{table}
 
-\begin{table}[h]
-	\centering
-	\caption{Protocol-A: TRR improvements vs.\ additional baselines with 95\% CI and Holm-corrected permutation $p$-values.}
-	\label{tab:additional_baselines_sig}
-	\small
-	\resizebox{\linewidth}{!}{%
-	\begin{tabular}{llcccc}
-		\toprule
-		\textbf{Baseline} & \textbf{Metric} & \textbf{$n$} & \textbf{Mean $\Delta$} & \textbf{95\% CI} & \textbf{$p$ (Holm)} \\
-		\midrule
-		PANNs & Param.\,Dist. & 204 & -- & -- & -- \\
-		PANNs & Cosine & 204 & -- & -- & -- \\
-		PaSST & Param.\,Dist. & 204 & -- & -- & -- \\
-		PaSST & Cosine & 204 & -- & -- & -- \\
-		MLP-Regressor & Param.\,Dist. & 204 & -- & -- & -- \\
-		MLP-Regressor & Cosine & 204 & -- & -- & -- \\
-		\bottomrule
-	\end{tabular}
-	}
-\end{table}
+The diagnostic MLP regressor obtains raw L2 62.0612, normalized L2 0.1607, Acc@0.1 0.7884, Recall 0.3209, and Cosine 0.4964 on 204 test queries. This mixed profile is informative: direct regression can reduce normalized numeric error by predicting dense average-like parameter leaves, but the low recall and cosine score indicate that it does not recover the same active parameter structure as retrieval. We therefore use it as a boundary condition and do not merge it into the main retrieval leaderboard.
 
 \section{Trials 2--5: Detailed Per-Trial Results}
 
 The main text reports only the aggregate Trials~2--5 results. Table~\ref{tab:trials2to5_detailed} provides per-trial stimulus labels and per-condition ratings for completeness.
 
-\begin{table}[h]
+\begin{table}[htbp]
 	\centering
 	\caption{Trials 2--5 per-trial breakdown. Ratings are raw means $\pm$ standard deviation across 26 participants.}
 	\label{tab:trials2to5_detailed}
@@ -395,10 +451,10 @@ The main text reports only the aggregate Trials~2--5 results. Table~\ref{tab:tri
 		\toprule
 		\textbf{Trial} & \textbf{Stimulus} & \textbf{Reference} & \textbf{TRR-based} & \textbf{Manual} \\
 		\midrule
-		Trial 2 & Jazz Clean & -- & -- & -- \\
-		Trial 3 & Blues Solo & -- & -- & -- \\
-		Trial 4 & Phase & -- & -- & -- \\
-		Trial 5 & Ambient Guitar & -- & -- & -- \\
+		Trial 2 & Jazz Clean & $91.19 \pm 10.52$ & $75.12 \pm 13.99$ & $53.88 \pm 22.90$ \\
+		Trial 3 & Blues Solo & $85.12 \pm 21.50$ & $70.04 \pm 17.28$ & $58.54 \pm 19.01$ \\
+		Trial 4 & Phase & $83.58 \pm 18.74$ & $66.88 \pm 18.94$ & $49.04 \pm 19.35$ \\
+		Trial 5 & Ambient Guitar & $81.42 \pm 19.66$ & $74.15 \pm 15.57$ & $45.42 \pm 25.44$ \\
 		\bottomrule
 	\end{tabular}
 \end{table}

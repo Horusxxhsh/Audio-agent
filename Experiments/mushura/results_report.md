@@ -3,7 +3,7 @@
 This report summarizes descriptive statistics and repeated-measures tests.
 Important: the study includes a hidden reference (`reference`) but no explicit low-quality anchor.
 
-- Input CSV: `/Users/xyh/Code/Audio-agent/Experiments/mushura/mushra.csv`
+- Input CSV: `/home/xyh/code/Audio-agent/Experiments/mushura/mushra.csv`
 - Participants (unique emails): 26
 - Total ratings: 910
 
