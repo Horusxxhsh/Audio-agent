@@ -10,8 +10,29 @@ def _distance(evaluator: Evaluator, left: Dict, right: Dict) -> float:
     return evaluator.compute_parameter_distance(left.get("Parameters", {}), right.get("Parameters", {}))
 
 
+def _normalized_flat_vectors(dataset: Sequence[Dict], evaluator: Evaluator) -> List[Dict[str, float]]:
+    vectors: List[Dict[str, float]] = []
+    for item in dataset:
+        flat = evaluator._flatten_params(item.get("Parameters", {}))
+        vectors.append({key: evaluator._normalize_value(key, value) for key, value in flat.items()})
+    return vectors
+
+
+def _normalized_distance(left: Dict[str, float], right: Dict[str, float], evaluator: Evaluator) -> float:
+    keys = set(left.keys()) | set(right.keys())
+    if not keys:
+        return 0.0
+    total = 0.0
+    for key in keys:
+        missing_value = evaluator._normalize_value(key, 0.0)
+        diff = left.get(key, missing_value) - right.get(key, missing_value)
+        total += diff * diff
+    return math.sqrt(total / len(keys))
+
+
 def _connected_components(dataset: Sequence[Dict], threshold: float) -> List[List[int]]:
     evaluator = Evaluator(normalize=True)
+    flat_vectors = _normalized_flat_vectors(dataset, evaluator)
     n = len(dataset)
     parent = list(range(n))
 
@@ -29,7 +50,7 @@ def _connected_components(dataset: Sequence[Dict], threshold: float) -> List[Lis
 
     for i in range(n):
         for j in range(i + 1, n):
-            dist = _distance(evaluator, dataset[i], dataset[j])
+            dist = _normalized_distance(flat_vectors[i], flat_vectors[j], evaluator)
             if dist <= threshold or math.isclose(dist, threshold, abs_tol=1e-12):
                 union(i, j)
 
