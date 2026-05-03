@@ -932,6 +932,10 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 ### 任务 7: 最终一致性、证据包与投稿前门禁
 
+**Status:** COMPLETE
+**Completed:** 2026-05-03
+**Commits:** chore: verify executable neighborhood evidence package
+
 **Harness（测试框架）:**
 
 - **范围：** 运行所有新增测试、关键旧测试、LaTeX 编译、证据文件存在性检查和 claim boundary 检查；更新 `Experiments/E8_ExecutableNeighborhood/README.md` 的最终命令记录。不新增方法。
@@ -944,9 +948,9 @@ HEAD_SHA=$(git rev-parse HEAD)
 **文件:**
 
 - 修改：`Experiments/E8_ExecutableNeighborhood/README.md`
-- 修改：`Paper_submission/main.pdf`
+- 本地生成但不纳入提交：`Paper_submission/main.pdf`（当前仓库未跟踪该 PDF）
 
-- [ ] **步骤 1：编写最终门禁脚本** (Red)
+- [x] **步骤 1：编写最终门禁脚本** (Red)
 
 在终端运行：
 
@@ -969,20 +973,19 @@ PY
 
 预期：如果前序任务未完整执行，失败并列出缺失文件。
 
-- [ ] **步骤 2：运行完整测试与编译** (Green)
+- [x] **步骤 2：运行完整测试与编译** (Green)
 
 运行：
 
 ```bash
 python3 -m pytest Experiments/common/tests/test_parameter_space.py Experiments/E8_ExecutableNeighborhood -v
-cd Paper_submission
-latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
-cd ..
+(cd Paper_submission && latexmk -g -pdf -interaction=nonstopmode -halt-on-error main.tex)
+(cd Paper_submission && latexmk -g -pdf -interaction=nonstopmode -halt-on-error supplementary.tex)
 ```
 
-预期：pytest 全部通过；LaTeX 输出 `Output written on main.pdf`。
+预期：pytest 全部通过；LaTeX 输出 `Output written on main.pdf` 与 `Output written on supplementary.pdf`。
 
-- [ ] **步骤 3：更新 README 的最终执行记录** (Green)
+- [x] **步骤 3：更新 README 的最终执行记录** (Green)
 
 在 `Experiments/E8_ExecutableNeighborhood/README.md` 中写入：
 
@@ -1003,7 +1006,7 @@ python3 Experiments/E8_ExecutableNeighborhood/summarize_e8.py --topk-json Experi
 ## Supported Claims
 - Retrieval can be evaluated as executable neighborhood discovery using PNR@K.
 - Exemplar-preserving projection can be compared against direct regression while retaining provenance metrics.
-- The MLP remains a numeric boundary when it wins Norm.L2.
+- MLP+RangeProjection remains the non-executable direct-regression boundary row; in the current E8 outputs, EPR-K5 is the primary hybrid result on Norm.L2 and Acc@0.1.
 
 ## Unsupported Claims
 - PC-TRR is not validated in this run.
@@ -1013,7 +1016,7 @@ python3 Experiments/E8_ExecutableNeighborhood/summarize_e8.py --topk-json Experi
 - Protocol-C adaptive fusion is diagnostic, not a main superiority claim.
 ````
 
-- [ ] **步骤 4：运行最终 artifact gate** (Green)
+- [x] **步骤 4：运行最终 artifact gate** (Green)
 
 运行：
 
@@ -1036,14 +1039,14 @@ PY
 
 预期：`artifact gate passed`
 
-- [ ] **步骤 5：提交代码**
+- [x] **步骤 5：提交代码**
 
 ```bash
-git add Experiments/E8_ExecutableNeighborhood/README.md Paper_submission/main.pdf
+git add Experiments/E8_ExecutableNeighborhood/README.md Docs/superpowers/plans/2026-05-03-executable-neighborhood-retrieval.md
 git commit -m "chore: verify executable neighborhood evidence package"
 ```
 
-- [ ] **步骤 6：请求代码审查** (必需)
+- [x] **步骤 6：请求代码审查** (必需)
 
 ```bash
 BASE_SHA=$(git rev-parse HEAD~1)
