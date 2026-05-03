@@ -414,12 +414,16 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 ### 任务 3: Exemplar-Preserving Parameter Projection
 
+**Status:** COMPLETE  
+**Completed:** 2026-05-03  
+**Commits:** Task 3 commit in this branch
+
 **Harness（测试框架）:**
 
 - **范围：** 新增 EPR/RCPP：对 top-K retrieved executable presets 做 softmax weighted blending，再按 KB observed range 投影；报告 Norm.L2、Acc@0.1、Recall、Cosine、Module、EditCost、Provenance。不训练新模型，不使用 query ground-truth 参与预测。
 - **前置条件：** 任务 1-2 已提交；Top-K JSON 可读取。
 - **测试入口：** `python3 -m pytest Experiments/E8_ExecutableNeighborhood/test_epr_projection.py -v`
-- **通过标准：** 4 个测试通过，0 失败；真实运行生成 `epr_projection_results.csv/json`。
+- **通过标准：** 10 个测试通过，0 失败；真实运行生成 `epr_projection_results.csv/json`。
 - **失败恢复：** `git reset --hard HEAD~1`
 - **依赖：** 任务 1、任务 2。
 
@@ -428,7 +432,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 - 创建：`Experiments/E8_ExecutableNeighborhood/epr_projection.py`
 - 创建：`Experiments/E8_ExecutableNeighborhood/test_epr_projection.py`
 
-- [ ] **步骤 1：编写失败的测试** (Red)
+- [x] **步骤 1：编写失败的测试** (Red)
 
 在 `Experiments/E8_ExecutableNeighborhood/test_epr_projection.py` 写入：
 
@@ -468,13 +472,13 @@ def test_weighted_projection_blends_then_projects():
     assert provenance["max_weight"] == 0.75
 ```
 
-- [ ] **步骤 2：运行测试确认失败** (Red)
+- [x] **步骤 2：运行测试确认失败** (Red)
 
 运行：`python3 -m pytest Experiments/E8_ExecutableNeighborhood/test_epr_projection.py -v`
 
 预期：FAIL with `ModuleNotFoundError`
 
-- [ ] **步骤 3：编写最小实现** (Green)
+- [x] **步骤 3：编写最小实现** (Green)
 
 实现：
 
@@ -490,7 +494,7 @@ def softmax_weights(scores: Sequence[float], temperature: float) -> List[float]:
 
 CLI 必须读取任务 2 的 Top-K JSON，按 `method=TRR` 生成 `EPR-K3` 与 `EPR-K5` 两组输出；若某 query 的 top-K 少于 K，则保留实际候选数并记录 `effective_k`。
 
-- [ ] **步骤 4：运行测试和真实导出** (Green)
+- [x] **步骤 4：运行测试和真实导出** (Green)
 
 运行：
 
@@ -513,7 +517,7 @@ wrote Experiments/E8_ExecutableNeighborhood/outputs/epr/epr_projection_results.c
 wrote Experiments/E8_ExecutableNeighborhood/outputs/epr/epr_projection_results.json
 ```
 
-- [ ] **步骤 5：提交代码**
+- [x] **步骤 5：提交代码**
 
 ```bash
 git add Experiments/E8_ExecutableNeighborhood/epr_projection.py \
@@ -523,7 +527,7 @@ git add Experiments/E8_ExecutableNeighborhood/epr_projection.py \
 git commit -m "feat: add exemplar-preserving parameter projection"
 ```
 
-- [ ] **步骤 6：请求代码审查** (必需)
+- [x] **步骤 6：请求代码审查** (必需)
 
 ```bash
 BASE_SHA=$(git rev-parse HEAD~1)
