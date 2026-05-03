@@ -808,6 +808,10 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 ### 任务 6: 论文正文重定位为 Parameter-Transferability-Aware Retrieval
 
+**Status:** COMPLETE  
+**Completed:** 2026-05-03  
+**Commits:** Task 6 commit in this branch
+
 **Harness（测试框架）:**
 
 - **范围：** 修改论文叙事与表述：abstract、introduction、contributions、method framing、direct-regression boundary、discussion、limitations、conclusion；新增 supplement 中的 E8 表。不得写入 E8 未支持的 claim。
@@ -822,7 +826,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 - 修改：`Paper_submission/content.tex`
 - 修改：`Paper_submission/supplementary.tex`
 
-- [ ] **步骤 1：编写失败的文本门禁** (Red)
+- [x] **步骤 1：编写失败的文本门禁** (Red)
 
 运行：
 
@@ -843,7 +847,7 @@ PY
 
 预期：失败并输出缺失 framing。
 
-- [ ] **步骤 2：改写 Abstract 和 Contributions** (Green)
+- [x] **步骤 2：改写 Abstract 和 Contributions** (Green)
 
 将 `Paper_submission/content.tex` abstract 替换为同等长度的证据约束版本：
 
@@ -859,7 +863,7 @@ Digital audio workstations expose editable effect chains, but mapping perceptual
 Concretely, this paper makes four evidence-bounded contributions. First, we formulate editable guitar-effect control as parameter-transferability-aware executable neighborhood retrieval, distinguishing it from waveform generation, general perceptual retrieval, and direct parameter regression. Second, we evaluate TRR as a second-order texture prior for retrieving parameter-transferable executable presets. Third, we add Top-K neighborhood and exemplar-preserving projection diagnostics to measure whether retrieval places a query in a useful editable preset neighborhood rather than only optimizing top-1 similarity. Fourth, we report an audited evaluation package including Protocol-A retrieval, near-duplicate filtering, parameter-cluster hard split, direct-regression boundary, multimodal degradation diagnostics, and exploratory listening evidence.
 ```
 
-- [ ] **步骤 3：改写 MLP boundary 与 E8 结果段落** (Green)
+- [x] **步骤 3：改写 MLP boundary 与 E8 结果段落** (Green)
 
 在 `Direct-regression boundary` 后新增 E8 结果段。段落必须按任务 5 的真实数字填写，模板如下：
 
@@ -874,7 +878,7 @@ Table~\ref{tab:executable_neighborhood} reports Top-K parameter-neighborhood rec
 Method & K & PNR@K & Norm.L2 & Acc@0.1 & EditCost & Provenance
 ```
 
-- [ ] **步骤 4：运行编译和 claim grep** (Green)
+- [x] **步骤 4：运行编译和 claim grep** (Green)
 
 运行：
 
@@ -901,14 +905,14 @@ Output written on main.pdf
 claim grep passed
 ```
 
-- [ ] **步骤 5：提交代码**
+- [x] **步骤 5：提交代码**
 
 ```bash
 git add Paper_submission/content.tex Paper_submission/supplementary.tex Paper_submission/main.pdf
 git commit -m "paper: reframe trr as executable neighborhood retrieval"
 ```
 
-- [ ] **步骤 6：请求代码审查** (必需)
+- [x] **步骤 6：请求代码审查** (必需)
 
 ```bash
 BASE_SHA=$(git rev-parse HEAD~1)

@@ -485,7 +485,34 @@ P0 closes the PaSST and PANNs retrieval-baseline gap for the shared Protocol-A b
 	}
 \end{table}
 
-The diagnostic MLP regressor obtains raw L2 62.0612, normalized L2 0.1607, Acc@0.1 0.7884, Recall 0.3209, and Cosine 0.4964 on 204 test queries. This mixed profile is informative: direct regression can reduce normalized numeric error by predicting dense average-like parameter leaves, but the low recall and cosine score indicate that it does not recover the same active parameter structure as retrieval. We therefore use it as a boundary condition and do not merge it into the main retrieval leaderboard.
+The diagnostic MLP regressor obtains raw L2 62.0612, normalized L2 0.1607, Acc@0.1 0.7884, Recall 0.3209, and Cosine 0.4964 on 204 test queries before range projection. This mixed profile is informative: the low recall and cosine score indicate that direct regression does not recover the same active parameter structure as retrieval. Under the current E8 diagnostic, the range-projected MLP is weaker than TRR top-1 and EPR-K5 on Norm.L2; its role is therefore boundary evidence for non-executable regression, not a stronger numeric method.
+
+\section{E8 Executable-Neighborhood Diagnostics}
+
+E8 evaluates whether retrieval produces a parameter-transferable executable neighborhood rather than only a single nearest preset. \textbf{PNR@K} is parameter-neighborhood recall at threshold 0.05 over the retrieved set. EPR denotes exemplar-preserving projection: a softmax-weighted blend over the retrieved executable presets followed by range projection, with provenance reported as effective exemplars and maximum exemplar weight. Module-aware reranking is included only as a diagnostic negative result because it worsens Norm.L2 and degrades recall, cosine, and module alignment in the current run.
+
+\begin{table}[htbp]
+	\centering
+	\caption{E8 executable-neighborhood diagnostics on the Protocol-A query list under the current E8 execution path. These rows are diagnostic and not a replacement for the P0 Protocol-A direct-retrieval table. For pure TRR rows, Norm.L2 and Acc@0.1 are top-1 retrieval metrics; TRR top-K reports only neighborhood recall. Provenance is reported as effective exemplars / max weight.}
+	\label{tab:executable_neighborhood_supp}
+	\small
+	\resizebox{\linewidth}{!}{%
+	\begin{tabular}{lcccccc}
+		\toprule
+		\textbf{Method} & \textbf{K} & \textbf{PNR@K} & \textbf{Norm.L2} & \textbf{Acc@0.1} & \textbf{EditCost} & \textbf{Provenance} \\
+		\midrule
+		TRR top-1 & 1 & 0.4608 & 0.1454 & 0.7863 & -- & -- \\
+		TRR top-K & 5 & 0.7500 & -- & -- & -- & -- \\
+		EPR-K3 & 3 & 0.6520 & 0.1356 & 0.7872 & 4.1972 & 2.6857 / 0.4664 \\
+		EPR-K5 & 5 & 0.7500 & 0.1334 & 0.7908 & 4.1359 & 4.2129 / 0.3438 \\
+		MLP + RangeProjection & -- & -- & 0.1603 & 0.7894 & -- & none \\
+		Module-aware rerank & 5 & -- & 0.1479 & 0.7870 & -- & diagnostic negative \\
+		\bottomrule
+	\end{tabular}
+	}
+\end{table}
+
+The primary hybrid row is EPR-K5, not the range-projected MLP. EPR-K5 gives the best normalized distance in this diagnostic table while retaining exemplar provenance. The range-projected MLP remains useful as a direct-regression boundary row, but it has no retrieved-exemplar provenance.
 
 \section{Trials 2--5: Detailed Per-Trial Results}
 
