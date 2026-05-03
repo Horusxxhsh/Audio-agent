@@ -280,12 +280,16 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 ### 任务 2: Protocol-A Top-K 可执行邻域导出
 
+**Status:** COMPLETE  
+**Completed:** 2026-05-03  
+**Commits:** Task 2 commit in this branch
+
 **Harness（测试框架）:**
 
 - **范围：** 新增 Top-K retrieval dump 脚本，输出每个 query 的 top-K 候选、相似度、PNR@K 与 top-1 指标。不改变现有 Protocol-A 主表生成脚本。
 - **前置条件：** 任务 1 已提交；真实数据路径 `Data/External_1267_211/dataset/dataset_full_vectors_1267.json` 存在。
 - **测试入口：** `python3 -m pytest Experiments/E8_ExecutableNeighborhood/test_topk_retrieval_dump.py -v`
-- **通过标准：** 3 个测试通过，0 失败；真实运行生成 `topk_retrieval_metrics.csv` 与 `topk_retrieval_metrics.json`。
+- **通过标准：** 7 个测试通过，0 失败；真实运行生成 `topk_retrieval_metrics.csv`、`topk_retrieval_metrics.json` 与 `topk_retrieval_audit.json`。
 - **失败恢复：** `git reset --hard HEAD~1`
 - **依赖：** 任务 1。
 
@@ -295,7 +299,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 - 创建：`Experiments/E8_ExecutableNeighborhood/topk_retrieval_dump.py`
 - 创建：`Experiments/E8_ExecutableNeighborhood/test_topk_retrieval_dump.py`
 
-- [ ] **步骤 1：编写失败的测试** (Red)
+- [x] **步骤 1：编写失败的测试** (Red)
 
 在 `Experiments/E8_ExecutableNeighborhood/test_topk_retrieval_dump.py` 写入：
 
@@ -330,13 +334,13 @@ def test_topk_record_contains_pnr_and_top1_fields():
     assert row["topk_names"] == ["A", "B"]
 ```
 
-- [ ] **步骤 2：运行测试确认失败** (Red)
+- [x] **步骤 2：运行测试确认失败** (Red)
 
 运行：`python3 -m pytest Experiments/E8_ExecutableNeighborhood/test_topk_retrieval_dump.py -v`
 
 预期：FAIL with `ModuleNotFoundError`
 
-- [ ] **步骤 3：编写最小实现** (Green)
+- [x] **步骤 3：编写最小实现** (Green)
 
 实现 `cosine_topk`、`topk_record`、CLI 参数：
 
@@ -357,7 +361,7 @@ DEFAULT_OUT = "Experiments/E8_ExecutableNeighborhood/outputs/topk"
 ]
 ```
 
-- [ ] **步骤 4：运行测试和真实导出** (Green)
+- [x] **步骤 4：运行测试和真实导出** (Green)
 
 运行：
 
@@ -379,7 +383,7 @@ wrote Experiments/E8_ExecutableNeighborhood/outputs/topk/topk_retrieval_metrics.
 wrote Experiments/E8_ExecutableNeighborhood/outputs/topk/topk_retrieval_metrics.json
 ```
 
-- [ ] **步骤 5：提交代码**
+- [x] **步骤 5：提交代码**
 
 ```bash
 git add Experiments/E8_ExecutableNeighborhood/__init__.py \
@@ -390,7 +394,7 @@ git add Experiments/E8_ExecutableNeighborhood/__init__.py \
 git commit -m "feat: add protocol-a top-k neighborhood retrieval dump"
 ```
 
-- [ ] **步骤 6：请求代码审查** (必需)
+- [x] **步骤 6：请求代码审查** (必需)
 
 ```bash
 BASE_SHA=$(git rev-parse HEAD~1)

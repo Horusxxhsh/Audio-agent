@@ -1,0 +1,68 @@
+{
+  "CLAP": {
+    "candidate_pool_size": 1063,
+    "dim_mismatch_query_vectors": 0,
+    "expected_queries": 204,
+    "indexed_kb_items": 829,
+    "missing_query_vectors": 31,
+    "ok_rows": 173,
+    "skipped_rows": 31,
+    "zero_norm_kb_vectors": 0,
+    "zero_norm_query_vectors": 0
+  },
+  "FeatureNN": {
+    "candidate_pool_size": 1063,
+    "dim_mismatch_query_vectors": 0,
+    "expected_queries": 204,
+    "indexed_kb_items": 1058,
+    "missing_query_vectors": 0,
+    "ok_rows": 204,
+    "skipped_rows": 0,
+    "zero_norm_kb_vectors": 0,
+    "zero_norm_query_vectors": 0
+  },
+  "PANNs": {
+    "candidate_pool_size": 1063,
+    "dim_mismatch_query_vectors": 0,
+    "expected_queries": 204,
+    "indexed_kb_items": 0,
+    "missing_query_vectors": 204,
+    "ok_rows": 0,
+    "skipped_rows": 204,
+    "zero_norm_kb_vectors": 0,
+    "zero_norm_query_vectors": 0
+  },
+  "PaSST": {
+    "candidate_pool_size": 1063,
+    "dim_mismatch_query_vectors": 0,
+    "expected_queries": 204,
+    "indexed_kb_items": 0,
+    "missing_query_vectors": 204,
+    "ok_rows": 0,
+    "skipped_rows": 204,
+    "zero_norm_kb_vectors": 0,
+    "zero_norm_query_vectors": 0
+  },
+  "TRR": {
+    "candidate_pool_size": 1063,
+    "dim_mismatch_query_vectors": 0,
+    "expected_queries": 204,
+    "indexed_kb_items": 1063,
+    "missing_query_vectors": 0,
+    "ok_rows": 204,
+    "skipped_rows": 0,
+    "zero_norm_kb_vectors": 0,
+    "zero_norm_query_vectors": 0
+  },
+  "Wav2Vec": {
+    "candidate_pool_size": 1063,
+    "dim_mismatch_query_vectors": 0,
+    "expected_queries": 204,
+    "indexed_kb_items": 1058,
+    "missing_query_vectors": 0,
+    "ok_rows": 204,
+    "skipped_rows": 0,
+    "zero_norm_kb_vectors": 0,
+    "zero_norm_query_vectors": 0
+  }
+}
