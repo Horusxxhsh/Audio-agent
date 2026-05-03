@@ -1,0 +1,13 @@
+{
+  "dataset": "Data/External_1267_211/dataset/dataset_full_vectors_1267.json",
+  "reason": "This repository currently exposes cached retrieval-path profiling, but this script does not provide a verified uncached Wav2Vec2 forward and TRR re-encoding path. Do not use cached latency numbers as evidence for live reference-audio deployment.",
+  "required_components": [
+    "audio_preprocess_ms",
+    "wav2vec_forward_ms",
+    "trr_encoding_ms",
+    "search_ms",
+    "validation_ms"
+  ],
+  "sample_count_requested": 20,
+  "status": "unavailable"
+}

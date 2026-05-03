@@ -15,6 +15,7 @@ Date: 2026-03-05
 import json
 import sys
 import time
+import statistics
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Callable
 from dataclasses import dataclass, asdict
@@ -23,16 +24,49 @@ import logging
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+
+try:
+    import matplotlib.pyplot as plt
+except ModuleNotFoundError:
+    plt = None
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "Source"))
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT / "Source"))
 
-from rag_system import AudioRAGSystem
+try:
+    from rag_system import AudioRAGSystem
+except ModuleNotFoundError:
+    AudioRAGSystem = None
+
+
+LATENCY_COMPONENTS = [
+    "audio_preprocess_ms",
+    "wav2vec_forward_ms",
+    "trr_encoding_ms",
+    "search_ms",
+    "validation_ms",
+]
+
+
+def _percentile(values: List[float], pct: float) -> float:
+    ordered = sorted(values)
+    index = int(round((len(ordered) - 1) * pct))
+    return ordered[index]
+
+
+def summarize_latency(rows: List[Dict[str, float]]) -> Dict[str, float]:
+    if not rows:
+        raise ValueError("latency rows must not be empty")
+    totals = [sum(float(row.get(component, 0.0)) for component in LATENCY_COMPONENTS) for row in rows]
+    return {
+        "median_total_uncached_ms": statistics.median(totals),
+        "p95_total_uncached_ms": _percentile(totals, 0.95),
+        "sample_count": float(len(rows)),
+    }
 
 
 @dataclass
@@ -318,6 +352,8 @@ class LatencyProfiler:
 
     def plot_results(self, df: pd.DataFrame, analysis: Dict[str, Any]):
         """Generate latency visualization plots."""
+        if plt is None:
+            raise RuntimeError("matplotlib is not installed; cannot generate latency plots")
         logger.info("Generating latency plots...")
 
         fig, axes = plt.subplots(2, 2, figsize=(14, 10))
@@ -377,61 +413,59 @@ class LatencyProfiler:
         logger.info(f"Saved plot to {output_path}")
 
 
+def write_uncached_latency_report(report: Dict[str, Any], output_json: Path, output_md: Path) -> None:
+    output_json.parent.mkdir(parents=True, exist_ok=True)
+    output_md.parent.mkdir(parents=True, exist_ok=True)
+    output_json.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    lines = [
+        "# Uncached Latency Audit",
+        "",
+        f"- status: `{report['status']}`",
+    ]
+    if report["status"] == "available":
+        summary = report["summary"]
+        lines.extend(
+            [
+                f"- sample_count: {int(summary['sample_count'])}",
+                f"- median_total_uncached_ms: {summary['median_total_uncached_ms']:.4f}",
+                f"- p95_total_uncached_ms: {summary['p95_total_uncached_ms']:.4f}",
+            ]
+        )
+    else:
+        lines.append(f"- reason: {report['reason']}")
+    output_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def build_unavailable_report(dataset: str, sample_count: int) -> Dict[str, Any]:
+    return {
+        "status": "unavailable",
+        "reason": (
+            "This repository currently exposes cached retrieval-path profiling, but this script does not "
+            "provide a verified uncached Wav2Vec2 forward and TRR re-encoding path. Do not use cached "
+            "latency numbers as evidence for live reference-audio deployment."
+        ),
+        "dataset": dataset,
+        "sample_count_requested": sample_count,
+        "required_components": LATENCY_COMPONENTS,
+    }
+
+
 def main():
     """Main entry point."""
-    import os
-    from dotenv import load_dotenv
+    import argparse
 
-    load_dotenv()
+    parser = argparse.ArgumentParser(description="Audit uncached latency evidence for TRR retrieval.")
+    parser.add_argument("--dataset", default="Data/External_1267_211/dataset/dataset_full_vectors_1267.json")
+    parser.add_argument("--sample-count", type=int, default=20)
+    parser.add_argument("--output-json", default="Experiments/E6_Latency/uncached_latency_report.json")
+    parser.add_argument("--output-md", default="Experiments/E6_Latency/uncached_latency_report.md")
+    args = parser.parse_args()
 
-    # Initialize RAG system
-    rag = AudioRAGSystem(
-        api_key=os.getenv("OPENAI_API_KEY", ""),
-        base_url=os.getenv("OPENAI_BASE_URL", "")
-    )
-
-    # Create profiler
-    profiler = LatencyProfiler(rag, output_dir="./results/E6_Latency")
-
-    # Create dummy queries for profiling
-    queries = [
-        {'id': f'query_{i}', 'text': f'test query {i}', 'audio_vector': [0.1] * 768}
-        for i in range(10)
-    ]
-
-    # Run profiling
-    df = profiler.run_profiling(queries, n_repeats=100)
-
-    # Analyze
-    analysis = profiler.analyze_results(df)
-
-    # Plot
-    profiler.plot_results(df, analysis)
-
-    # Print summary
-    print("\n" + "="*60)
-    print("LATENCY PROFILING SUMMARY")
-    print("="*60)
-
-    print("\nComponent Statistics (ms):")
-    for component, stats in analysis['component_stats'].items():
-        print(f"\n  {component}:")
-        print(f"    Median: {stats['p50']:.3f}ms")
-        print(f"    P95: {stats['p95']:.3f}ms")
-        print(f"    Mean: {stats['mean']:.3f}ms")
-
-    print("\nEnd-to-End Latency:")
-    e2e = analysis['end_to_end_stats']
-    print(f"  Median: {e2e['median']:.3f}ms")
-    print(f"  P95: {e2e['p95']:.3f}ms")
-    print(f"  Mean: {e2e['mean']:.3f}ms")
-
-    print("\nCache Breakdown:")
-    cache = analysis['cache_breakdown']
-    print(f"  Cacheable: {cache['cacheable_percentage']:.1f}%")
-    print(f"  Non-cacheable: {100-cache['cacheable_percentage']:.1f}%")
-
-    print("\n" + "="*60)
+    report = build_unavailable_report(args.dataset, args.sample_count)
+    write_uncached_latency_report(report, Path(args.output_json), Path(args.output_md))
+    print(f"wrote {args.output_json}")
+    print(f"wrote {args.output_md}")
 
 
 if __name__ == "__main__":
