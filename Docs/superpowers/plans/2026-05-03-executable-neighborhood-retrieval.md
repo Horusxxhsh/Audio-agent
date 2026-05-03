@@ -547,12 +547,16 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 ### 任务 4: Oracle-Free Module-Aware Reranking
 
+**Status:** COMPLETE  
+**Completed:** 2026-05-03  
+**Commits:** Task 4 commit in this branch
+
 **Harness（测试框架）:**
 
 - **范围：** 新增候选邻域内部的 active-module consensus reranking。只使用 top-K 候选参数与相似度，不读取 query ground-truth module labels；输出 reranked top-1 与原 top-1 对比。
 - **前置条件：** 任务 1-2 已提交。
 - **测试入口：** `python3 -m pytest Experiments/E8_ExecutableNeighborhood/test_module_aware_rerank.py -v`
-- **通过标准：** 3 个测试通过，0 失败；真实运行生成 `module_aware_rerank_results.csv/json`。
+- **通过标准：** 8 个测试通过，0 失败；真实运行生成 `module_aware_rerank_results.csv/json`。
 - **失败恢复：** `git reset --hard HEAD~1`
 - **依赖：** 任务 1、任务 2。
 
@@ -561,7 +565,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 - 创建：`Experiments/E8_ExecutableNeighborhood/module_aware_rerank.py`
 - 创建：`Experiments/E8_ExecutableNeighborhood/test_module_aware_rerank.py`
 
-- [ ] **步骤 1：编写失败的测试** (Red)
+- [x] **步骤 1：编写失败的测试** (Red)
 
 在 `Experiments/E8_ExecutableNeighborhood/test_module_aware_rerank.py` 写入：
 
@@ -595,13 +599,13 @@ def test_rerank_does_not_require_query_parameters():
     assert rerank_by_module_consensus(candidates, [1.0], module_weight=0.5)[0]["SongName"] == "A"
 ```
 
-- [ ] **步骤 2：运行测试确认失败** (Red)
+- [x] **步骤 2：运行测试确认失败** (Red)
 
 运行：`python3 -m pytest Experiments/E8_ExecutableNeighborhood/test_module_aware_rerank.py -v`
 
 预期：FAIL with `ModuleNotFoundError`
 
-- [ ] **步骤 3：编写最小实现** (Green)
+- [x] **步骤 3：编写最小实现** (Green)
 
 实现 rerank score：
 
@@ -611,7 +615,7 @@ score_i = similarity_i + module_weight * average_consensus_score(active_modules(
 
 当候选没有 active module 时，`average_consensus_score` 返回 `0.0`；输出中记录 `original_top1_name`、`reranked_top1_name`、`changed`、`reranked_norm_l2`、`reranked_module`。
 
-- [ ] **步骤 4：运行测试和真实导出** (Green)
+- [x] **步骤 4：运行测试和真实导出** (Green)
 
 运行：
 
@@ -633,7 +637,7 @@ wrote Experiments/E8_ExecutableNeighborhood/outputs/module_rerank/module_aware_r
 wrote Experiments/E8_ExecutableNeighborhood/outputs/module_rerank/module_aware_rerank_results.json
 ```
 
-- [ ] **步骤 5：提交代码**
+- [x] **步骤 5：提交代码**
 
 ```bash
 git add Experiments/E8_ExecutableNeighborhood/module_aware_rerank.py \
@@ -643,7 +647,7 @@ git add Experiments/E8_ExecutableNeighborhood/module_aware_rerank.py \
 git commit -m "feat: add oracle-free module-aware reranking"
 ```
 
-- [ ] **步骤 6：请求代码审查** (必需)
+- [x] **步骤 6：请求代码审查** (必需)
 
 ```bash
 BASE_SHA=$(git rev-parse HEAD~1)
