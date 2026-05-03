@@ -1,0 +1,236 @@
+{
+  "claims": {
+    "not_supported": [
+      "PC-TRR 训练收益未验证",
+      "Temporal Pyramid TRR 未验证",
+      "Log-Covariance/Riemannian TRR 未验证",
+      "Analysis-by-synthesis reranking 未验证",
+      "Protocol-C adaptive fusion 不能作为主贡献"
+    ],
+    "supported": [
+      "Top-K retrieval can be evaluated as parameter-neighborhood recall on the current Protocol-A E8 outputs.",
+      "EPR is an executable soft-blended projection with retained exemplar provenance over retrieved candidates.",
+      "MLP+RangeProjection remains the direct-regression boundary row, but current E8 outputs must compare it against EPR rather than assuming it is numerically stronger.",
+      "Module-aware reranking is diagnostic on these outputs and must not be described as a gain unless Norm.L2 delta is negative and alignment-score deltas are non-negative in future runs."
+    ]
+  },
+  "epr": {
+    "best_norm_l2_method": "EPR-K5",
+    "by_method": {
+      "EPR-K3": {
+        "acc_at_0_1": 0.7872220882,
+        "acc_at_0_1_n": 204,
+        "cosine": 0.917659381,
+        "cosine_n": 204,
+        "edit_cost": 4.1972020219,
+        "edit_cost_n": 204,
+        "module": 0.8186741363,
+        "module_n": 204,
+        "n": 204,
+        "norm_l2": 0.1356410171,
+        "norm_l2_n": 204,
+        "provenance_effective_exemplars": 2.6857063818,
+        "provenance_effective_exemplars_n": 204,
+        "provenance_entropy_norm": 0.9385882715,
+        "provenance_entropy_norm_n": 204,
+        "provenance_max_weight": 0.466370106,
+        "provenance_max_weight_n": 204,
+        "recall": 0.7060180352,
+        "recall_n": 204
+      },
+      "EPR-K5": {
+        "acc_at_0_1": 0.7908410257,
+        "acc_at_0_1_n": 204,
+        "cosine": 0.9207195749,
+        "cosine_n": 204,
+        "edit_cost": 4.1359213673,
+        "edit_cost_n": 204,
+        "module": 0.8315067694,
+        "module_n": 204,
+        "n": 204,
+        "norm_l2": 0.1333506616,
+        "norm_l2_n": 204,
+        "provenance_effective_exemplars": 4.2128602911,
+        "provenance_effective_exemplars_n": 204,
+        "provenance_entropy_norm": 0.9348588504,
+        "provenance_entropy_norm_n": 204,
+        "provenance_max_weight": 0.3438111093,
+        "provenance_max_weight_n": 204,
+        "recall": 0.7145563996,
+        "recall_n": 204
+      }
+    },
+    "interpretation": "executable_soft_blended_projection_with_provenance",
+    "n_rows": 408
+  },
+  "mlp": {
+    "interpretation": "direct_regression_numeric_boundary",
+    "method": "MLP-Regressor+RangeProjection",
+    "projected_metrics": {
+      "acc_at_0_1": 0.7894042232,
+      "cosine": 0.5941334131,
+      "module": 1.0,
+      "norm_l2": 0.1603045204,
+      "recall": 0.3468410827
+    },
+    "projection_delta": {
+      "acc_at_0_1": 0.0010055304,
+      "cosine": 0.0977660015,
+      "module": 0.0,
+      "norm_l2": -0.0003791995,
+      "recall": 0.0259172613
+    },
+    "raw_metrics": {
+      "acc_at_0_1": 0.7883986928,
+      "cosine": 0.4963674116,
+      "module": 1.0,
+      "norm_l2": 0.1606837199,
+      "recall": 0.3209238214
+    }
+  },
+  "module": {
+    "by_method": {
+      "TRR": {
+        "n": 204,
+        "original_acc_at_0_1": 0.7863009973,
+        "original_acc_at_0_1_n": 204,
+        "original_cosine": 0.9009740296,
+        "original_cosine_n": 204,
+        "original_module": 0.8050692499,
+        "original_module_n": 204,
+        "original_norm_l2": 0.1454497296,
+        "original_norm_l2_n": 204,
+        "original_recall": 0.7045008142,
+        "original_recall_n": 204,
+        "reranked_acc_at_0_1": 0.7869800757,
+        "reranked_acc_at_0_1_n": 204,
+        "reranked_cosine": 0.8957419812,
+        "reranked_cosine_n": 204,
+        "reranked_module": 0.7862336601,
+        "reranked_module_n": 204,
+        "reranked_norm_l2": 0.1478561878,
+        "reranked_norm_l2_n": 204,
+        "reranked_recall": 0.6955521913,
+        "reranked_recall_n": 204
+      }
+    },
+    "change_rate_by_method": {
+      "TRR": 0.1029411765
+    },
+    "delta_by_method": {
+      "TRR": {
+        "acc_at_0_1_delta": 0.0006790784,
+        "cosine_delta": -0.0052320484,
+        "module_delta": -0.0188355898,
+        "n": 204,
+        "norm_l2_delta": 0.0024064582,
+        "recall_delta": -0.0089486229
+      }
+    },
+    "interpretation": "diagnostic_negative",
+    "n_rows": 204
+  },
+  "recommendation": {
+    "numeric_winner": "EPR",
+    "text": "EPR should be reported as the primary hybrid result: it improves the retrieval-side Norm.L2 while preserving executable exemplar provenance (effective exemplars 4.2129)."
+  },
+  "topk": {
+    "best_pnr_at_5_method": "CLAP",
+    "by_method": {
+      "CLAP": {
+        "coverage": 1.0,
+        "coverage_n": 173,
+        "n": 173,
+        "pnr_at_1": 0.3526011561,
+        "pnr_at_1_n": 173,
+        "pnr_at_3": 0.676300578,
+        "pnr_at_3_n": 173,
+        "pnr_at_5": 0.7803468208,
+        "pnr_at_5_n": 173,
+        "pnr_at_k": 0.7803468208,
+        "pnr_at_k_n": 173,
+        "top1_acc_at_0_1": 0.7203589037,
+        "top1_acc_at_0_1_n": 173,
+        "top1_cosine": 0.8537674834,
+        "top1_cosine_n": 173,
+        "top1_module": 0.7188709973,
+        "top1_module_n": 173,
+        "top1_norm_l2": 0.1896189877,
+        "top1_norm_l2_n": 173,
+        "top1_recall": 0.6361356223,
+        "top1_recall_n": 173
+      },
+      "FeatureNN": {
+        "coverage": 1.0,
+        "coverage_n": 204,
+        "n": 204,
+        "pnr_at_1": 0.2450980392,
+        "pnr_at_1_n": 204,
+        "pnr_at_3": 0.4558823529,
+        "pnr_at_3_n": 204,
+        "pnr_at_5": 0.568627451,
+        "pnr_at_5_n": 204,
+        "pnr_at_k": 0.568627451,
+        "pnr_at_k_n": 204,
+        "top1_acc_at_0_1": 0.7055110324,
+        "top1_acc_at_0_1_n": 204,
+        "top1_cosine": 0.8434878761,
+        "top1_cosine_n": 204,
+        "top1_module": 0.6926840181,
+        "top1_module_n": 204,
+        "top1_norm_l2": 0.2001946118,
+        "top1_norm_l2_n": 204,
+        "top1_recall": 0.6208119466,
+        "top1_recall_n": 204
+      },
+      "TRR": {
+        "coverage": 1.0,
+        "coverage_n": 204,
+        "n": 204,
+        "pnr_at_1": 0.4607843137,
+        "pnr_at_1_n": 204,
+        "pnr_at_3": 0.6519607843,
+        "pnr_at_3_n": 204,
+        "pnr_at_5": 0.75,
+        "pnr_at_5_n": 204,
+        "pnr_at_k": 0.75,
+        "pnr_at_k_n": 204,
+        "top1_acc_at_0_1": 0.7863009973,
+        "top1_acc_at_0_1_n": 204,
+        "top1_cosine": 0.9009740296,
+        "top1_cosine_n": 204,
+        "top1_module": 0.8050692499,
+        "top1_module_n": 204,
+        "top1_norm_l2": 0.1454497296,
+        "top1_norm_l2_n": 204,
+        "top1_recall": 0.7045008142,
+        "top1_recall_n": 204
+      },
+      "Wav2Vec": {
+        "coverage": 1.0,
+        "coverage_n": 204,
+        "n": 204,
+        "pnr_at_1": 0.2941176471,
+        "pnr_at_1_n": 204,
+        "pnr_at_3": 0.5098039216,
+        "pnr_at_3_n": 204,
+        "pnr_at_5": 0.5931372549,
+        "pnr_at_5_n": 204,
+        "pnr_at_k": 0.5931372549,
+        "pnr_at_k_n": 204,
+        "top1_acc_at_0_1": 0.7085372997,
+        "top1_acc_at_0_1_n": 204,
+        "top1_cosine": 0.8348797671,
+        "top1_cosine_n": 204,
+        "top1_module": 0.6729302832,
+        "top1_module_n": 204,
+        "top1_norm_l2": 0.1996886672,
+        "top1_norm_l2_n": 204,
+        "top1_recall": 0.6227894459,
+        "top1_recall_n": 204
+      }
+    },
+    "interpretation": "parameter_neighborhood_recall",
+    "n_rows": 785
+  }
+}

@@ -667,12 +667,16 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 ### 任务 5: E8 结果汇总与 Claim Boundary 文档
 
+**Status:** COMPLETE  
+**Completed:** 2026-05-03  
+**Commits:** Task 5 commit in this branch
+
 **Harness（测试框架）:**
 
 - **范围：** 汇总任务 2-4 输出与现有 MLP boundary JSON，生成 paper-facing Markdown/JSON。该任务只做统计汇总，不改论文正文。
 - **前置条件：** 任务 2-4 已提交；存在 `Experiments/E2_SOTABaselines/outputs/p0_mlp_regressor/mlp_regressor_results.json`。
 - **测试入口：** `python3 -m pytest Experiments/E8_ExecutableNeighborhood/test_summarize_e8.py -v`
-- **通过标准：** 3 个测试通过，0 失败；真实运行生成 `e8_summary.md/json`。
+- **通过标准：** 8 个测试通过，0 失败；真实运行生成 `e8_summary.md/json`。
 - **失败恢复：** `git reset --hard HEAD~1`
 - **依赖：** 任务 2、任务 3、任务 4。
 
@@ -682,7 +686,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 - 创建：`Experiments/E8_ExecutableNeighborhood/test_summarize_e8.py`
 - 创建：`Experiments/E8_ExecutableNeighborhood/README.md`
 
-- [ ] **步骤 1：编写失败的测试** (Red)
+- [x] **步骤 1：编写失败的测试** (Red)
 
 在 `Experiments/E8_ExecutableNeighborhood/test_summarize_e8.py` 写入：
 
@@ -721,13 +725,13 @@ def test_recommendation_promotes_epr_when_it_beats_mlp():
     assert "primary hybrid result" in text
 ```
 
-- [ ] **步骤 2：运行测试确认失败** (Red)
+- [x] **步骤 2：运行测试确认失败** (Red)
 
 运行：`python3 -m pytest Experiments/E8_ExecutableNeighborhood/test_summarize_e8.py -v`
 
 预期：FAIL with `ModuleNotFoundError`
 
-- [ ] **步骤 3：编写最小实现** (Green)
+- [x] **步骤 3：编写最小实现** (Green)
 
 `e8_summary.md` 必须包含以下固定小节：
 
@@ -751,7 +755,7 @@ def test_recommendation_promotes_epr_when_it_beats_mlp():
 - Analysis-by-synthesis reranking 未验证。
 - Protocol-C adaptive fusion 不能作为主贡献。
 
-- [ ] **步骤 4：运行测试和真实汇总** (Green)
+- [x] **步骤 4：运行测试和真实汇总** (Green)
 
 运行：
 
@@ -773,7 +777,7 @@ wrote Experiments/E8_ExecutableNeighborhood/outputs/summary/e8_summary.json
 wrote Experiments/E8_ExecutableNeighborhood/outputs/summary/e8_summary.md
 ```
 
-- [ ] **步骤 5：提交代码**
+- [x] **步骤 5：提交代码**
 
 ```bash
 git add Experiments/E8_ExecutableNeighborhood/summarize_e8.py \
@@ -784,7 +788,7 @@ git add Experiments/E8_ExecutableNeighborhood/summarize_e8.py \
 git commit -m "docs: summarize executable neighborhood evidence"
 ```
 
-- [ ] **步骤 6：请求代码审查** (必需)
+- [x] **步骤 6：请求代码审查** (必需)
 
 ```bash
 BASE_SHA=$(git rev-parse HEAD~1)
