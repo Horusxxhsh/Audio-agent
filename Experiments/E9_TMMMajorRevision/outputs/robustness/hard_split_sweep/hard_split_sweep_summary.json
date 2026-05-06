@@ -1,0 +1,116 @@
+{
+  "0.010": {
+    "cluster_count": 130,
+    "kb_count": 278,
+    "query_count": 50,
+    "removed_query_count": 154,
+    "summary": {
+      "CLAP": {
+        "n": 37,
+        "norm_l2": 0.19109612659782937,
+        "norm_l2_ci_high": 0.2283455948,
+        "norm_l2_ci_low": 0.153217525
+      },
+      "FeatureNN": {
+        "n": 50,
+        "norm_l2": 0.21883306219800872,
+        "norm_l2_ci_high": 0.2532304113,
+        "norm_l2_ci_low": 0.1839498011
+      },
+      "PaSST": {
+        "n": 50,
+        "norm_l2": 0.241317669943945,
+        "norm_l2_ci_high": 0.2782370506,
+        "norm_l2_ci_low": 0.2046907429
+      },
+      "TRR": {
+        "n": 50,
+        "norm_l2": 0.20650518332286905,
+        "norm_l2_ci_high": 0.2438613745,
+        "norm_l2_ci_low": 0.1730180065
+      },
+      "Wav2Vec": {
+        "n": 50,
+        "norm_l2": 0.22034297423067634,
+        "norm_l2_ci_high": 0.2552833037,
+        "norm_l2_ci_low": 0.1823872622
+      }
+    }
+  },
+  "0.020": {
+    "cluster_count": 86,
+    "kb_count": 142,
+    "query_count": 46,
+    "removed_query_count": 158,
+    "summary": {
+      "CLAP": {
+        "n": 35,
+        "norm_l2": 0.20652772980201284,
+        "norm_l2_ci_high": 0.2462759379,
+        "norm_l2_ci_low": 0.1664883853
+      },
+      "FeatureNN": {
+        "n": 46,
+        "norm_l2": 0.2634297732999523,
+        "norm_l2_ci_high": 0.2980042449,
+        "norm_l2_ci_low": 0.2274414318
+      },
+      "PaSST": {
+        "n": 46,
+        "norm_l2": 0.2539888447102107,
+        "norm_l2_ci_high": 0.2888446648,
+        "norm_l2_ci_low": 0.2148978667
+      },
+      "TRR": {
+        "n": 46,
+        "norm_l2": 0.24242677192212425,
+        "norm_l2_ci_high": 0.273217828,
+        "norm_l2_ci_low": 0.2130934004
+      },
+      "Wav2Vec": {
+        "n": 46,
+        "norm_l2": 0.25954517885355116,
+        "norm_l2_ci_high": 0.2876214731,
+        "norm_l2_ci_low": 0.2290994427
+      }
+    }
+  },
+  "0.050": {
+    "cluster_count": 67,
+    "kb_count": 117,
+    "query_count": 38,
+    "removed_query_count": 166,
+    "summary": {
+      "CLAP": {
+        "n": 29,
+        "norm_l2": 0.27823949625540645,
+        "norm_l2_ci_high": 0.3092131603,
+        "norm_l2_ci_low": 0.2463067828
+      },
+      "FeatureNN": {
+        "n": 38,
+        "norm_l2": 0.27706689321178757,
+        "norm_l2_ci_high": 0.3116478437,
+        "norm_l2_ci_low": 0.2438777099
+      },
+      "PaSST": {
+        "n": 38,
+        "norm_l2": 0.31615505258865045,
+        "norm_l2_ci_high": 0.3475844034,
+        "norm_l2_ci_low": 0.2845361552
+      },
+      "TRR": {
+        "n": 38,
+        "norm_l2": 0.26681197362280323,
+        "norm_l2_ci_high": 0.3011651305,
+        "norm_l2_ci_low": 0.2350088553
+      },
+      "Wav2Vec": {
+        "n": 38,
+        "norm_l2": 0.2821775147833617,
+        "norm_l2_ci_high": 0.3137607266,
+        "norm_l2_ci_low": 0.2510023199
+      }
+    }
+  }
+}

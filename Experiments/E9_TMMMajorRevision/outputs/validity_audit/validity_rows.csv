@@ -1,0 +1,990 @@
+k,post_range_violations,post_switch_collisions,post_valid,pre_range_violations,pre_switch_collisions,pre_valid,query_idx,query_name,range_repaired,source_method,switch_repaired,temperature
+5,[],[],True,[],[],True,934,Memphis Soul Memphis,False,Wav2Vec,False,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,853,Acid Jazz Funk Crescendo,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,379,Hollow Body Jazz,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,996,Americana Alt Honky,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,962,Bluegrass Flatpick Sunrise,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,122,Futurebass Vocal Chop,False,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,991,Western Swing Outlaw,False,Wav2Vec,False,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,850,Acid Jazz Funk Smoky,True,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Compressor', 'Delay', 'Driver', 'Screamer']",False,620,Dubstep Wobble Digital,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,987,Western Swing Dusty,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Flanger']",False,650,UK Garage Neon,False,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,1074,Acoustic Sim Natural,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,27,Wah-Wah Rock,False,Wav2Vec,False,0.05
+5,[],[],True,"['CompressorOn.Release', 'FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,75,Breakbeat Hardcore,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,696,Granular Texture Prism,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,616,Drum and Bass Wave,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,547,Latin Rock Fusion Sahara,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,649,UK Garage Pulse,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Phaser', 'Screamer']",False,587,Future Bass Pluck Cyber,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,836,Smooth Jazz Lead Nocturne,False,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,46,Telephone EQ,False,Wav2Vec,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,224,Skweee Synth,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Compressor', 'Driver', 'Phaser', 'Screamer']",False,714,Overtone Drone Echo,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,875,Latin Jazz Velvet,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,149,J-Rock Power,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,801,Funeral Doom Fury,True,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,103,Drone Metal,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,63,Art Rock Theatrical,False,Wav2Vec,True,0.05
+5,[],[],True,['PhaserOn.Frequency'],"['Chorus', 'Delay', 'Flanger', 'Phaser']",False,835,Smooth Jazz Lead Velvet,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,436,Nostalgic VHS,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,1008,Indie Pop Jangle Hazy,False,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,174,Nu-Disco Groove,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,813,Technical Thrash Wrath,True,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,380,Honky Tonk Tears,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,225,Slacker Rock,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,960,Country Telecaster Frontier,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,119,Footwork Jungle,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,277,Yacht Rock Smooth,True,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'CompressorOn.Release', 'FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,749,Sludge Metal Wrath,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,16,Midwest Emo,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,1070,Midwest Emo Twinkled,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,1114,Midwest Emo - Warm Room Take,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,1144,Midwest Emo - Open Chord Mix,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,1174,Midwest Emo - Glass Tone Pass,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,1204,Midwest Emo - Natural Body Edit,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,1234,Midwest Emo - Bright Air Version,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,1264,Midwest Emo - Round Note Cut,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,248,Talk Box Funk,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1054,Lo-Fi Bedroom Pop Indie,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,865,Free Jazz Avantgarde Blue,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,343,Emo Piano,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,645,Deep House Synth,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,999,Americana Alt Outlaw,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,498,Spanish Guitar,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,118,Flamenco Fusion,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,983,Country Rock Twang Outlaw,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,332,Dirty South Trap,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,84,Cloud Rap Ethereal,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,365,Ghostly Pad,True,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Delay', 'Screamer']",False,812,Technical Thrash Chaos,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,938,Modern R&B Sweet,False,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,717,Overtone Drone Static,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,656,UK Garage Wave,True,Wav2Vec,True,0.05
+5,[],[],True,['PhaserOn.Frequency'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1048,Power Pop Hazy,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,504,Sub-Bass Drone,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,461,Power Ballad,False,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,281,2-Step Garage,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,593,Trap Metal Pulse,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,429,Neo-Classical Metal,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,845,Gypsy Jazz Manouche Crescendo,True,Wav2Vec,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,603,Hyperpop Glitch Cyber,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,977,Country Rock Twang Twang,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,916,Southern Soul Gospel Soulful,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Phaser', 'Screamer']",False,220,Sega Mauritian,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,869,Free Jazz Avantgarde Crescendo,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,241,Stripped Acoustic,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,831,Complex Jazz Fusion Groove,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,534,Reggae Skank Mystic,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,282,3-Chord Punk,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,537,K-Pop Shimmer Sunset,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,722,Modular Hybrid Echo,False,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver']",False,857,Cool Jazz Blue,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,400,Karaoke Pop,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,699,Spectral Freeze Drift,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1005,Indie Pop Jangle Radio,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,849,Acid Jazz Funk Blue,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,972,Nashville Session Honky,False,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,716,Overtone Drone Glitch,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],['Flanger'],False,919,Southern Soul Gospel Motown,True,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1022,Chamber Pop Indie,True,Wav2Vec,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Delay']",False,862,Cool Jazz Improv,True,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,39,Symphonic Metal,False,Wav2Vec,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,945,Soul Clap Groove,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,153,Lo-Fi House,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,897,Motown Soul Groove,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,133,Heartland Rock,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,775,Deathcore Breakdown Venom,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,695,Granular Texture Aether,False,Wav2Vec,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,91,D-beat Punk,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,70,Big Band Swing,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,487,Shoegaze Drone,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,266,Urban Cowboy,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,672,Glitch Noise Prism,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,627,Techno Industrial Cyber,False,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,33,Swedish Death Metal,False,Wav2Vec,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,1036,Britpop Glimmer,False,Wav2Vec,True,0.05
+5,[],[],True,[],['Chorus'],False,841,Gypsy Jazz Manouche Blue,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,193,Post-Punk Bassline,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,188,Polka Accordion,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,297,Berlin Techno,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,247,Tabla Fusion,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,589,Future Bass Pluck Synth,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,324,Cyber R&B,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,394,Italian Disco,False,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,817,Folk Metal Acoustic Fury,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Phaser', 'Screamer']",False,610,Drum and Bass Neon,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Phaser', 'Screamer']",False,93,Darkwave Synth,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,455,Philharmonic Rock,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,294,Barbershop Quartet,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,601,Hyperpop Glitch Pulse,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1009,Dream Pop Dream,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,617,Dubstep Wobble Pulse,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,818,Folk Metal Acoustic Rage,False,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,986,Western Swing Sunrise,False,Wav2Vec,False,0.05
+5,[],[],True,"['FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,208,Retro Electro,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,553,Celtic Folk Sunset,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,944,Modern R&B Philly,True,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,834,Smooth Jazz Lead Smoky,False,Wav2Vec,False,0.05
+5,[],[],True,['FlangerOn.Width'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,340,East Coast Boom Bap,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,560,Celtic Folk Heritage,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1038,Britpop Indie,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,723,Modular Hybrid Drift,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,298,Bhangra Fusion,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,564,Indian Classical Sitar Tropical,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,308,Chamber Pop,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,111,Epic Orchestral Rock,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,501,Spring Reverb Surf,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,955,Country Telecaster Dusty,True,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,520,Bossa Nova Acoustic Heritage,False,Wav2Vec,False,0.05
+5,[],[],True,['FlangerOn.Width'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,896,Neo-Soul Rhythm Philly,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,327,Deep Dub,True,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1017,Chamber Pop Dream,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Reverb']",False,1084,Rotary Speaker Fast,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,186,Pirate Metal,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,917,Southern Soul Gospel Gospel,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,291,Auto-Tune Pop,True,Wav2Vec,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Delay']",False,488,Sitar Fusion,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,454,Phased Synth,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Screamer']",False,391,Iranian Classical,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,128,Gothic Rock Reverb,False,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,666,Glitch Noise Echo,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,499,Spectral Glow,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Frequency']","['Chorus', 'Flanger', 'Phaser']",False,682,Prepared Guitar Echo,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1010,Dream Pop Shimmer,True,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,2,Neo-Soul Clean,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1072,Neo-Soul Clean Rhythm,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1116,Neo-Soul Clean - Pocket Groove Cut,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1146,Neo-Soul Clean - Sync Pulse Mix,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1176,Neo-Soul Clean - Muted Snap Take,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1206,Neo-Soul Clean - Chic Rhythm Pass,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1236,Neo-Soul Clean - Tight Jam Edit,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1266,Neo-Soul Clean - Velvet Groove Version,False,Wav2Vec,False,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,816,Technical Thrash Onslaught,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,191,Post-Hardcore Screamo,True,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,28,Hard Rock Crunch,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1080,Hard Rock Crunch,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1107,Hard Rock Crunch - Vintage Drive Mix,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1137,Hard Rock Crunch - Raw Amp Pass,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1167,Hard Rock Crunch - Grit Stack Take,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1197,Hard Rock Crunch - Classic Crunch Edit,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1227,Hard Rock Crunch - Hot Valve Version,False,Wav2Vec,False,0.05
+5,[],[],True,[],[],True,1257,Hard Rock Crunch - Saturated Bite Cut,False,Wav2Vec,False,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,127,Glitter Rock,False,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,533,Reggae Skank Andean,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,906,Philadelphia Soul Sweet,False,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,1077,Brown Sound Modern,False,Wav2Vec,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,418,Minimal Wave,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,647,Deep House Beat,True,Wav2Vec,True,0.05
+5,[],[],True,[],[],True,889,Neo-Soul Rhythm Groove,False,Wav2Vec,False,0.05
+5,[],[],True,['FlangerOn.Frequency'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,724,Modular Hybrid Glitch,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,206,Rave Hardcore,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,966,Bluegrass Flatpick Rambler,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,676,Microtonal Fusion Glitch,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,151,Krautrock Motorik,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,202,Qawwali Devotional,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,635,Synthwave Guitar Cyber,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,300,Blackened Crust,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,513,Bossa Nova Acoustic Sunset,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,194,Power Electronics,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,286,Analog Warm Bass,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,577,Japanese Enka Sunset,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,285,Ambient Guitar Loop,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1033,Britpop Dream,True,Wav2Vec,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'PhaserOn.Frequency']","['Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,447,Overdrive Crunch,True,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,733,Shoegaze Wall Static,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,976,Nashville Session Frontier,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,621,Dubstep Wobble Synth,False,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,829,Complex Jazz Fusion Crescendo,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay']",False,995,Americana Alt Dusty,False,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,1047,Power Pop Charm,False,Wav2Vec,True,0.05
+5,[],[],True,[],['Chorus'],False,530,Reggae Skank Moonrise,False,Wav2Vec,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,82,Chinese Guzheng Ambient,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,861,Cool Jazz Crescendo,True,Wav2Vec,True,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,788,Nu Metal 7-String Chaos,True,Wav2Vec,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,934,Memphis Soul Memphis,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,853,Acid Jazz Funk Crescendo,False,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,379,Hollow Body Jazz,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,996,Americana Alt Honky,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,962,Bluegrass Flatpick Sunrise,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,122,Futurebass Vocal Chop,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,991,Western Swing Outlaw,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,850,Acid Jazz Funk Smoky,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,620,Dubstep Wobble Digital,False,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser']",False,987,Western Swing Dusty,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,650,UK Garage Neon,False,FeatureNN,True,0.05
+5,[],[],True,[],[],True,1074,Acoustic Sim Natural,False,FeatureNN,False,0.05
+5,[],[],True,[],[],True,27,Wah-Wah Rock,False,FeatureNN,False,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,75,Breakbeat Hardcore,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,696,Granular Texture Prism,False,FeatureNN,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,616,Drum and Bass Wave,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,547,Latin Rock Fusion Sahara,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,649,UK Garage Pulse,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Phaser', 'Screamer']",False,587,Future Bass Pluck Cyber,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,836,Smooth Jazz Lead Nocturne,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,46,Telephone EQ,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,224,Skweee Synth,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,714,Overtone Drone Echo,True,FeatureNN,True,0.05
+5,[],[],True,[],['Chorus'],False,875,Latin Jazz Velvet,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,149,J-Rock Power,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,801,Funeral Doom Fury,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,103,Drone Metal,True,FeatureNN,True,0.05
+5,[],[],True,['PhaserOn.Frequency'],"['Chorus', 'Delay', 'Flanger', 'Phaser']",False,63,Art Rock Theatrical,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,835,Smooth Jazz Lead Velvet,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,436,Nostalgic VHS,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,1008,Indie Pop Jangle Hazy,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,174,Nu-Disco Groove,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'CompressorOn.Release', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,813,Technical Thrash Wrath,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,380,Honky Tonk Tears,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,225,Slacker Rock,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,960,Country Telecaster Frontier,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,119,Footwork Jungle,False,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,277,Yacht Rock Smooth,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,749,Sludge Metal Wrath,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,16,Midwest Emo,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1070,Midwest Emo Twinkled,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1114,Midwest Emo - Warm Room Take,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1144,Midwest Emo - Open Chord Mix,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1174,Midwest Emo - Glass Tone Pass,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1204,Midwest Emo - Natural Body Edit,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1234,Midwest Emo - Bright Air Version,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1264,Midwest Emo - Round Note Cut,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,248,Talk Box Funk,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1054,Lo-Fi Bedroom Pop Indie,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,865,Free Jazz Avantgarde Blue,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,343,Emo Piano,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,645,Deep House Synth,True,FeatureNN,True,0.05
+5,[],[],True,[],[],True,999,Americana Alt Outlaw,False,FeatureNN,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,498,Spanish Guitar,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,118,Flamenco Fusion,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,983,Country Rock Twang Outlaw,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,332,Dirty South Trap,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,84,Cloud Rap Ethereal,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,365,Ghostly Pad,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,812,Technical Thrash Chaos,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,938,Modern R&B Sweet,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Flanger', 'Phaser']",False,717,Overtone Drone Static,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,656,UK Garage Wave,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1048,Power Pop Hazy,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,504,Sub-Bass Drone,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,461,Power Ballad,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,281,2-Step Garage,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,593,Trap Metal Pulse,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,429,Neo-Classical Metal,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,845,Gypsy Jazz Manouche Crescendo,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,603,Hyperpop Glitch Cyber,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,977,Country Rock Twang Twang,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,916,Southern Soul Gospel Soulful,False,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,220,Sega Mauritian,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,869,Free Jazz Avantgarde Crescendo,True,FeatureNN,True,0.05
+5,[],[],True,[],[],True,241,Stripped Acoustic,False,FeatureNN,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,831,Complex Jazz Fusion Groove,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Reverb', 'Screamer']",False,534,Reggae Skank Mystic,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,282,3-Chord Punk,False,FeatureNN,True,0.05
+5,[],[],True,[],[],True,537,K-Pop Shimmer Sunset,False,FeatureNN,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,722,Modular Hybrid Echo,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Delay', 'Flanger']",False,857,Cool Jazz Blue,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,400,Karaoke Pop,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,699,Spectral Freeze Drift,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,1005,Indie Pop Jangle Radio,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,849,Acid Jazz Funk Blue,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,972,Nashville Session Honky,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,716,Overtone Drone Glitch,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay']",False,919,Southern Soul Gospel Motown,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1022,Chamber Pop Indie,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Delay', 'Flanger']",False,862,Cool Jazz Improv,True,FeatureNN,True,0.05
+5,[],[],True,[],[],True,39,Symphonic Metal,False,FeatureNN,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,945,Soul Clap Groove,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,153,Lo-Fi House,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay']",False,897,Motown Soul Groove,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,133,Heartland Rock,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,775,Deathcore Breakdown Venom,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,695,Granular Texture Aether,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,91,D-beat Punk,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,70,Big Band Swing,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Reverb', 'Screamer']",False,487,Shoegaze Drone,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,266,Urban Cowboy,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,672,Glitch Noise Prism,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,627,Techno Industrial Cyber,True,FeatureNN,True,0.05
+5,[],[],True,[],[],True,33,Swedish Death Metal,False,FeatureNN,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,1036,Britpop Glimmer,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,841,Gypsy Jazz Manouche Blue,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'CompressorOn.Release', 'FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,193,Post-Punk Bassline,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,188,Polka Accordion,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Phaser', 'Screamer']",False,297,Berlin Techno,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,247,Tabla Fusion,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,589,Future Bass Pluck Synth,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,324,Cyber R&B,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,394,Italian Disco,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,817,Folk Metal Acoustic Fury,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,610,Drum and Bass Neon,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Frequency']","['Chorus', 'Delay', 'Flanger', 'Phaser']",False,93,Darkwave Synth,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,455,Philharmonic Rock,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,294,Barbershop Quartet,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,601,Hyperpop Glitch Pulse,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1009,Dream Pop Dream,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Phaser', 'Screamer']",False,617,Dubstep Wobble Pulse,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,818,Folk Metal Acoustic Rage,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'PhaserOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,986,Western Swing Sunrise,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,208,Retro Electro,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,553,Celtic Folk Sunset,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,944,Modern R&B Philly,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay']",False,834,Smooth Jazz Lead Smoky,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,340,East Coast Boom Bap,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,560,Celtic Folk Heritage,False,FeatureNN,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,1038,Britpop Indie,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,723,Modular Hybrid Drift,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,298,Bhangra Fusion,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,564,Indian Classical Sitar Tropical,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,308,Chamber Pop,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,111,Epic Orchestral Rock,True,FeatureNN,True,0.05
+5,[],[],True,[],[],True,501,Spring Reverb Surf,False,FeatureNN,False,0.05
+5,[],[],True,[],[],True,955,Country Telecaster Dusty,False,FeatureNN,False,0.05
+5,[],[],True,[],[],True,520,Bossa Nova Acoustic Heritage,False,FeatureNN,False,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,896,Neo-Soul Rhythm Philly,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,327,Deep Dub,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'PhaserOn.Frequency']","['Chorus', 'Delay', 'Flanger', 'Phaser']",False,1017,Chamber Pop Dream,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Reverb', 'Screamer']",False,1084,Rotary Speaker Fast,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,186,Pirate Metal,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,917,Southern Soul Gospel Gospel,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Flanger', 'Phaser']",False,291,Auto-Tune Pop,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,488,Sitar Fusion,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Reverb', 'Screamer']",False,454,Phased Synth,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Screamer']",False,391,Iranian Classical,False,FeatureNN,True,0.05
+5,[],[],True,[],[],True,128,Gothic Rock Reverb,False,FeatureNN,False,0.05
+5,[],[],True,[],['Chorus'],False,666,Glitch Noise Echo,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,499,Spectral Glow,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,682,Prepared Guitar Echo,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1010,Dream Pop Shimmer,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,2,Neo-Soul Clean,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1072,Neo-Soul Clean Rhythm,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1116,Neo-Soul Clean - Pocket Groove Cut,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1146,Neo-Soul Clean - Sync Pulse Mix,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1176,Neo-Soul Clean - Muted Snap Take,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1206,Neo-Soul Clean - Chic Rhythm Pass,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1236,Neo-Soul Clean - Tight Jam Edit,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1266,Neo-Soul Clean - Velvet Groove Version,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Delay', 'Screamer']",False,816,Technical Thrash Onslaught,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,191,Post-Hardcore Screamo,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,28,Hard Rock Crunch,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1080,Hard Rock Crunch,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1107,Hard Rock Crunch - Vintage Drive Mix,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1137,Hard Rock Crunch - Raw Amp Pass,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1167,Hard Rock Crunch - Grit Stack Take,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1197,Hard Rock Crunch - Classic Crunch Edit,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1227,Hard Rock Crunch - Hot Valve Version,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1257,Hard Rock Crunch - Saturated Bite Cut,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,127,Glitter Rock,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,533,Reggae Skank Andean,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,906,Philadelphia Soul Sweet,False,FeatureNN,True,0.05
+5,[],[],True,[],[],True,1077,Brown Sound Modern,False,FeatureNN,False,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Chorus', 'Delay', 'Flanger']",False,418,Minimal Wave,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,647,Deep House Beat,False,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay']",False,889,Neo-Soul Rhythm Groove,False,FeatureNN,True,0.05
+5,[],[],True,[],[],True,724,Modular Hybrid Glitch,False,FeatureNN,False,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Delay', 'Screamer']",False,206,Rave Hardcore,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver']",False,966,Bluegrass Flatpick Rambler,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,676,Microtonal Fusion Glitch,False,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,151,Krautrock Motorik,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,202,Qawwali Devotional,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,635,Synthwave Guitar Cyber,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,300,Blackened Crust,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay']",False,513,Bossa Nova Acoustic Sunset,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Reverb', 'Screamer']",False,194,Power Electronics,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,286,Analog Warm Bass,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,577,Japanese Enka Sunset,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,285,Ambient Guitar Loop,True,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,1033,Britpop Dream,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,447,Overdrive Crunch,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,733,Shoegaze Wall Static,True,FeatureNN,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Delay']",False,976,Nashville Session Frontier,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,621,Dubstep Wobble Synth,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,829,Complex Jazz Fusion Crescendo,False,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Flanger', 'Phaser']",False,995,Americana Alt Dusty,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,1047,Power Pop Charm,True,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,530,Reggae Skank Moonrise,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,82,Chinese Guzheng Ambient,False,FeatureNN,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,861,Cool Jazz Crescendo,True,FeatureNN,True,0.05
+5,[],[],True,[],"['Compressor', 'Reverb', 'Screamer']",False,788,Nu Metal 7-String Chaos,False,FeatureNN,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,934,Memphis Soul Memphis,True,CLAP,True,0.05
+5,[],[],True,[],[],True,853,Acid Jazz Funk Crescendo,False,CLAP,False,0.05
+5,[],[],True,[],"['Chorus', 'Delay']",False,379,Hollow Body Jazz,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,996,Americana Alt Honky,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,962,Bluegrass Flatpick Sunrise,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,122,Futurebass Vocal Chop,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,991,Western Swing Outlaw,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,850,Acid Jazz Funk Smoky,False,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,620,Dubstep Wobble Digital,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,987,Western Swing Dusty,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,650,UK Garage Neon,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,75,Breakbeat Hardcore,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,696,Granular Texture Prism,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Frequency']","['Chorus', 'Flanger']",False,616,Drum and Bass Wave,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,547,Latin Rock Fusion Sahara,True,CLAP,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,649,UK Garage Pulse,False,CLAP,True,0.05
+5,[],[],True,[],"['Driver', 'Phaser', 'Screamer']",False,587,Future Bass Pluck Cyber,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,836,Smooth Jazz Lead Nocturne,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,224,Skweee Synth,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,714,Overtone Drone Echo,False,CLAP,True,0.05
+5,[],[],True,[],[],True,875,Latin Jazz Velvet,False,CLAP,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,149,J-Rock Power,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,801,Funeral Doom Fury,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,103,Drone Metal,False,CLAP,True,0.05
+5,[],[],True,[],"['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,63,Art Rock Theatrical,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,835,Smooth Jazz Lead Velvet,False,CLAP,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,436,Nostalgic VHS,True,CLAP,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1008,Indie Pop Jangle Hazy,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,174,Nu-Disco Groove,False,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Delay', 'Screamer']",False,813,Technical Thrash Wrath,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,380,Honky Tonk Tears,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,225,Slacker Rock,True,CLAP,True,0.05
+5,[],[],True,[],[],True,960,Country Telecaster Frontier,False,CLAP,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Delay', 'Flanger']",False,119,Footwork Jungle,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,277,Yacht Rock Smooth,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,749,Sludge Metal Wrath,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,248,Talk Box Funk,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1054,Lo-Fi Bedroom Pop Indie,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,865,Free Jazz Avantgarde Blue,True,CLAP,True,0.05
+5,[],[],True,[],[],True,343,Emo Piano,False,CLAP,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,645,Deep House Synth,False,CLAP,True,0.05
+5,[],[],True,[],['Chorus'],False,999,Americana Alt Outlaw,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,498,Spanish Guitar,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,118,Flamenco Fusion,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,983,Country Rock Twang Outlaw,True,CLAP,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,332,Dirty South Trap,True,CLAP,True,0.05
+5,[],[],True,[],['Compressor'],False,84,Cloud Rap Ethereal,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,365,Ghostly Pad,False,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Delay', 'Screamer']",False,812,Technical Thrash Chaos,True,CLAP,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,938,Modern R&B Sweet,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,717,Overtone Drone Static,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,656,UK Garage Wave,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Delay', 'Screamer']",False,1048,Power Pop Hazy,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,504,Sub-Bass Drone,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,461,Power Ballad,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,281,2-Step Garage,True,CLAP,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,593,Trap Metal Pulse,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,429,Neo-Classical Metal,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,845,Gypsy Jazz Manouche Crescendo,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,603,Hyperpop Glitch Cyber,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,977,Country Rock Twang Twang,True,CLAP,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Delay']",False,916,Southern Soul Gospel Soulful,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,220,Sega Mauritian,False,CLAP,True,0.05
+5,[],[],True,[],[],True,869,Free Jazz Avantgarde Crescendo,False,CLAP,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,241,Stripped Acoustic,True,CLAP,True,0.05
+5,[],[],True,[],[],True,831,Complex Jazz Fusion Groove,False,CLAP,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,534,Reggae Skank Mystic,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,282,3-Chord Punk,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,537,K-Pop Shimmer Sunset,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,722,Modular Hybrid Echo,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,857,Cool Jazz Blue,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,400,Karaoke Pop,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,699,Spectral Freeze Drift,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,1005,Indie Pop Jangle Radio,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay']",False,849,Acid Jazz Funk Blue,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,972,Nashville Session Honky,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,716,Overtone Drone Glitch,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,919,Southern Soul Gospel Motown,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1022,Chamber Pop Indie,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,862,Cool Jazz Improv,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'PhaserOn.Frequency']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,945,Soul Clap Groove,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,153,Lo-Fi House,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,897,Motown Soul Groove,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,133,Heartland Rock,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,775,Deathcore Breakdown Venom,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,695,Granular Texture Aether,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,91,D-beat Punk,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,70,Big Band Swing,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,487,Shoegaze Drone,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,266,Urban Cowboy,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,672,Glitch Noise Prism,False,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Delay', 'Screamer']",False,627,Techno Industrial Cyber,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1036,Britpop Glimmer,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,841,Gypsy Jazz Manouche Blue,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,193,Post-Punk Bassline,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,188,Polka Accordion,False,CLAP,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,297,Berlin Techno,False,CLAP,True,0.05
+5,[],[],True,[],[],True,247,Tabla Fusion,False,CLAP,False,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,589,Future Bass Pluck Synth,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,324,Cyber R&B,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,394,Italian Disco,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,817,Folk Metal Acoustic Fury,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,610,Drum and Bass Neon,True,CLAP,True,0.05
+5,[],[],True,['PhaserOn.Frequency'],"['Chorus', 'Flanger', 'Phaser']",False,93,Darkwave Synth,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,455,Philharmonic Rock,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,294,Barbershop Quartet,True,CLAP,True,0.05
+5,[],[],True,[],[],True,601,Hyperpop Glitch Pulse,False,CLAP,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1009,Dream Pop Dream,True,CLAP,True,0.05
+5,[],[],True,[],[],True,617,Dubstep Wobble Pulse,False,CLAP,False,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver']",False,818,Folk Metal Acoustic Rage,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Flanger', 'Phaser']",False,986,Western Swing Sunrise,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,208,Retro Electro,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,553,Celtic Folk Sunset,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,944,Modern R&B Philly,False,CLAP,True,0.05
+5,[],[],True,[],[],True,834,Smooth Jazz Lead Smoky,False,CLAP,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,340,East Coast Boom Bap,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,560,Celtic Folk Heritage,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1038,Britpop Indie,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,723,Modular Hybrid Drift,False,CLAP,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,298,Bhangra Fusion,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,564,Indian Classical Sitar Tropical,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,308,Chamber Pop,False,CLAP,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,111,Epic Orchestral Rock,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,501,Spring Reverb Surf,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,955,Country Telecaster Dusty,False,CLAP,True,0.05
+5,[],[],True,[],['Chorus'],False,520,Bossa Nova Acoustic Heritage,False,CLAP,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Delay']",False,896,Neo-Soul Rhythm Philly,True,CLAP,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,327,Deep Dub,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1017,Chamber Pop Dream,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver']",False,186,Pirate Metal,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,917,Southern Soul Gospel Gospel,True,CLAP,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,291,Auto-Tune Pop,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,488,Sitar Fusion,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,454,Phased Synth,False,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,391,Iranian Classical,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,128,Gothic Rock Reverb,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Screamer']",False,666,Glitch Noise Echo,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,499,Spectral Glow,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,682,Prepared Guitar Echo,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1010,Dream Pop Shimmer,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,816,Technical Thrash Onslaught,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,191,Post-Hardcore Screamo,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,127,Glitter Rock,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'PhaserOn.Frequency']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,533,Reggae Skank Andean,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Flanger', 'Phaser']",False,906,Philadelphia Soul Sweet,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,418,Minimal Wave,False,CLAP,True,0.05
+5,[],[],True,[],"['Driver', 'Phaser', 'Screamer']",False,647,Deep House Beat,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,889,Neo-Soul Rhythm Groove,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,724,Modular Hybrid Glitch,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,206,Rave Hardcore,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,966,Bluegrass Flatpick Rambler,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,676,Microtonal Fusion Glitch,False,CLAP,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,151,Krautrock Motorik,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,202,Qawwali Devotional,False,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,635,Synthwave Guitar Cyber,False,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,300,Blackened Crust,True,CLAP,True,0.05
+5,[],[],True,[],['Chorus'],False,513,Bossa Nova Acoustic Sunset,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,194,Power Electronics,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,286,Analog Warm Bass,True,CLAP,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,577,Japanese Enka Sunset,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,285,Ambient Guitar Loop,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1033,Britpop Dream,True,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,447,Overdrive Crunch,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,733,Shoegaze Wall Static,False,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,976,Nashville Session Frontier,True,CLAP,True,0.05
+5,[],[],True,[],[],True,621,Dubstep Wobble Synth,False,CLAP,False,0.05
+5,[],[],True,[],[],True,829,Complex Jazz Fusion Crescendo,False,CLAP,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,995,Americana Alt Dusty,True,CLAP,True,0.05
+5,[],[],True,"['CompressorOn.Release', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,1047,Power Pop Charm,True,CLAP,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Delay']",False,530,Reggae Skank Moonrise,True,CLAP,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,82,Chinese Guzheng Ambient,False,CLAP,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,861,Cool Jazz Crescendo,False,CLAP,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Delay', 'Screamer']",False,788,Nu Metal 7-String Chaos,True,CLAP,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,934,Memphis Soul Memphis,True,PaSST,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Delay']",False,853,Acid Jazz Funk Crescendo,True,PaSST,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Reverb']",False,379,Hollow Body Jazz,True,PaSST,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,996,Americana Alt Honky,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,962,Bluegrass Flatpick Sunrise,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,122,Futurebass Vocal Chop,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver']",False,991,Western Swing Outlaw,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,850,Acid Jazz Funk Smoky,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,620,Dubstep Wobble Digital,True,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,987,Western Swing Dusty,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay']",False,650,UK Garage Neon,False,PaSST,True,0.05
+5,[],[],True,[],[],True,1074,Acoustic Sim Natural,False,PaSST,False,0.05
+5,[],[],True,[],[],True,27,Wah-Wah Rock,False,PaSST,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,75,Breakbeat Hardcore,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,696,Granular Texture Prism,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,616,Drum and Bass Wave,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,547,Latin Rock Fusion Sahara,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,649,UK Garage Pulse,True,PaSST,True,0.05
+5,[],[],True,[],[],True,587,Future Bass Pluck Cyber,False,PaSST,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,836,Smooth Jazz Lead Nocturne,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,46,Telephone EQ,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Screamer']",False,224,Skweee Synth,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,714,Overtone Drone Echo,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay']",False,875,Latin Jazz Velvet,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,149,J-Rock Power,False,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,801,Funeral Doom Fury,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,103,Drone Metal,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,63,Art Rock Theatrical,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,835,Smooth Jazz Lead Velvet,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,436,Nostalgic VHS,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,1008,Indie Pop Jangle Hazy,True,PaSST,True,0.05
+5,[],[],True,[],"['Driver', 'Phaser', 'Screamer']",False,174,Nu-Disco Groove,False,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Delay', 'Screamer']",False,813,Technical Thrash Wrath,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,380,Honky Tonk Tears,False,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,225,Slacker Rock,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,960,Country Telecaster Frontier,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Delay', 'Flanger']",False,119,Footwork Jungle,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,277,Yacht Rock Smooth,False,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,749,Sludge Metal Wrath,True,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,16,Midwest Emo,False,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,1070,Midwest Emo Twinkled,False,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,1114,Midwest Emo - Warm Room Take,False,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,1144,Midwest Emo - Open Chord Mix,False,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,1174,Midwest Emo - Glass Tone Pass,False,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,1204,Midwest Emo - Natural Body Edit,False,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,1234,Midwest Emo - Bright Air Version,False,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,1264,Midwest Emo - Round Note Cut,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,248,Talk Box Funk,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'PhaserOn.Frequency']","['Chorus', 'Delay', 'Flanger', 'Phaser']",False,1054,Lo-Fi Bedroom Pop Indie,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,865,Free Jazz Avantgarde Blue,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,343,Emo Piano,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,645,Deep House Synth,True,PaSST,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Delay']",False,999,Americana Alt Outlaw,True,PaSST,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Reverb']",False,498,Spanish Guitar,True,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,118,Flamenco Fusion,True,PaSST,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Delay', 'Driver', 'Reverb', 'Screamer']",False,983,Country Rock Twang Outlaw,True,PaSST,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,332,Dirty South Trap,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,84,Cloud Rap Ethereal,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,365,Ghostly Pad,False,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Delay', 'Screamer']",False,812,Technical Thrash Chaos,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,938,Modern R&B Sweet,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,717,Overtone Drone Static,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Screamer']",False,656,UK Garage Wave,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,1048,Power Pop Hazy,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,504,Sub-Bass Drone,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,461,Power Ballad,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,281,2-Step Garage,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,593,Trap Metal Pulse,False,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,429,Neo-Classical Metal,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,845,Gypsy Jazz Manouche Crescendo,True,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,603,Hyperpop Glitch Cyber,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,977,Country Rock Twang Twang,True,PaSST,True,0.05
+5,[],[],True,['PhaserOn.Frequency'],"['Chorus', 'Flanger', 'Phaser']",False,916,Southern Soul Gospel Soulful,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,220,Sega Mauritian,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,869,Free Jazz Avantgarde Crescendo,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,241,Stripped Acoustic,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,831,Complex Jazz Fusion Groove,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,534,Reggae Skank Mystic,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Flanger', 'Phaser', 'Reverb']",False,282,3-Chord Punk,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,537,K-Pop Shimmer Sunset,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,722,Modular Hybrid Echo,False,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,857,Cool Jazz Blue,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,400,Karaoke Pop,True,PaSST,True,0.05
+5,[],[],True,[],[],True,699,Spectral Freeze Drift,False,PaSST,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1005,Indie Pop Jangle Radio,False,PaSST,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Delay']",False,849,Acid Jazz Funk Blue,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,972,Nashville Session Honky,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,716,Overtone Drone Glitch,False,PaSST,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,919,Southern Soul Gospel Motown,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1022,Chamber Pop Indie,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,862,Cool Jazz Improv,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Compressor', 'Delay', 'Reverb', 'Screamer']",False,39,Symphonic Metal,True,PaSST,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,945,Soul Clap Groove,False,PaSST,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,153,Lo-Fi House,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,897,Motown Soul Groove,True,PaSST,True,0.05
+5,[],[],True,[],"['Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,133,Heartland Rock,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,775,Deathcore Breakdown Venom,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,695,Granular Texture Aether,False,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,91,D-beat Punk,True,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,70,Big Band Swing,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Compressor', 'Driver', 'Equaliser', 'Flanger', 'Phaser', 'Screamer']",False,487,Shoegaze Drone,True,PaSST,True,0.05
+5,[],[],True,[],[],True,266,Urban Cowboy,False,PaSST,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,672,Glitch Noise Prism,False,PaSST,True,0.05
+5,[],[],True,"['CompressorOn.Release', 'DelayOn.Mix', 'FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,627,Techno Industrial Cyber,True,PaSST,True,0.05
+5,[],[],True,[],[],True,33,Swedish Death Metal,False,PaSST,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,1036,Britpop Glimmer,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,841,Gypsy Jazz Manouche Blue,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,193,Post-Punk Bassline,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,188,Polka Accordion,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,297,Berlin Techno,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,247,Tabla Fusion,True,PaSST,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,589,Future Bass Pluck Synth,False,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,324,Cyber R&B,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Feedback', 'FlangerOn.Frequency', 'PhaserOn.Frequency']","['Chorus', 'Flanger', 'Phaser']",False,394,Italian Disco,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,817,Folk Metal Acoustic Fury,False,PaSST,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,610,Drum and Bass Neon,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Phaser', 'Screamer']",False,93,Darkwave Synth,False,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Reverb', 'Screamer']",False,455,Philharmonic Rock,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,294,Barbershop Quartet,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,601,Hyperpop Glitch Pulse,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1009,Dream Pop Dream,True,PaSST,True,0.05
+5,[],[],True,[],[],True,617,Dubstep Wobble Pulse,False,PaSST,False,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,818,Folk Metal Acoustic Rage,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,986,Western Swing Sunrise,True,PaSST,True,0.05
+5,[],[],True,"['CompressorOn.Release', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Screamer']",False,208,Retro Electro,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,553,Celtic Folk Sunset,False,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,944,Modern R&B Philly,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,834,Smooth Jazz Lead Smoky,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,340,East Coast Boom Bap,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,560,Celtic Folk Heritage,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1038,Britpop Indie,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,723,Modular Hybrid Drift,False,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,298,Bhangra Fusion,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,564,Indian Classical Sitar Tropical,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Delay', 'Flanger']",False,308,Chamber Pop,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,111,Epic Orchestral Rock,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,501,Spring Reverb Surf,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,955,Country Telecaster Dusty,False,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,520,Bossa Nova Acoustic Heritage,False,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,896,Neo-Soul Rhythm Philly,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,327,Deep Dub,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'PhaserOn.Frequency']","['Chorus', 'Flanger', 'Phaser']",False,1017,Chamber Pop Dream,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Reverb']",False,1084,Rotary Speaker Fast,False,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Screamer']",False,186,Pirate Metal,True,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,917,Southern Soul Gospel Gospel,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,291,Auto-Tune Pop,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,488,Sitar Fusion,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,454,Phased Synth,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,391,Iranian Classical,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,128,Gothic Rock Reverb,False,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Reverb', 'Screamer']",False,666,Glitch Noise Echo,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,499,Spectral Glow,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,682,Prepared Guitar Echo,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1010,Dream Pop Shimmer,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,2,Neo-Soul Clean,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1072,Neo-Soul Clean Rhythm,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1116,Neo-Soul Clean - Pocket Groove Cut,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1146,Neo-Soul Clean - Sync Pulse Mix,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1176,Neo-Soul Clean - Muted Snap Take,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1206,Neo-Soul Clean - Chic Rhythm Pass,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1236,Neo-Soul Clean - Tight Jam Edit,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1266,Neo-Soul Clean - Velvet Groove Version,False,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,816,Technical Thrash Onslaught,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,191,Post-Hardcore Screamo,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,28,Hard Rock Crunch,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,1080,Hard Rock Crunch,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,1107,Hard Rock Crunch - Vintage Drive Mix,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,1137,Hard Rock Crunch - Raw Amp Pass,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,1167,Hard Rock Crunch - Grit Stack Take,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,1197,Hard Rock Crunch - Classic Crunch Edit,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,1227,Hard Rock Crunch - Hot Valve Version,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,1257,Hard Rock Crunch - Saturated Bite Cut,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,127,Glitter Rock,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,533,Reggae Skank Andean,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,906,Philadelphia Soul Sweet,False,PaSST,True,0.05
+5,[],[],True,[],[],True,1077,Brown Sound Modern,False,PaSST,False,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Screamer']",False,418,Minimal Wave,False,PaSST,True,0.05
+5,[],[],True,[],"['Driver', 'Phaser', 'Screamer']",False,647,Deep House Beat,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,889,Neo-Soul Rhythm Groove,True,PaSST,True,0.05
+5,[],[],True,[],[],True,724,Modular Hybrid Glitch,False,PaSST,False,0.05
+5,[],[],True,['DelayOn.Mix'],"['Delay', 'Screamer']",False,206,Rave Hardcore,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,966,Bluegrass Flatpick Rambler,True,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Screamer']",False,676,Microtonal Fusion Glitch,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,151,Krautrock Motorik,True,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,202,Qawwali Devotional,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,635,Synthwave Guitar Cyber,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,300,Blackened Crust,True,PaSST,True,0.05
+5,[],[],True,[],['Chorus'],False,513,Bossa Nova Acoustic Sunset,False,PaSST,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,194,Power Electronics,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,286,Analog Warm Bass,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,577,Japanese Enka Sunset,True,PaSST,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Reverb', 'Screamer']",False,285,Ambient Guitar Loop,True,PaSST,True,0.05
+5,[],[],True,[],"['Driver', 'Flanger', 'Phaser', 'Screamer']",False,1033,Britpop Dream,False,PaSST,True,0.05
+5,[],[],True,[],"['Driver', 'Reverb']",False,447,Overdrive Crunch,False,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Reverb']",False,733,Shoegaze Wall Static,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Driver', 'Flanger', 'Phaser', 'Screamer']",False,976,Nashville Session Frontier,True,PaSST,True,0.05
+5,[],[],True,[],[],True,621,Dubstep Wobble Synth,False,PaSST,False,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,829,Complex Jazz Fusion Crescendo,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,995,Americana Alt Dusty,True,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,1047,Power Pop Charm,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Flanger']",False,530,Reggae Skank Moonrise,True,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,82,Chinese Guzheng Ambient,True,PaSST,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,861,Cool Jazz Crescendo,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,788,Nu Metal 7-String Chaos,True,PaSST,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,934,Memphis Soul Memphis,True,TRR,True,0.05
+5,[],[],True,[],[],True,853,Acid Jazz Funk Crescendo,False,TRR,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,379,Hollow Body Jazz,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,996,Americana Alt Honky,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'PhaserOn.Frequency']","['Chorus', 'Flanger', 'Phaser']",False,962,Bluegrass Flatpick Sunrise,True,TRR,True,0.05
+5,[],[],True,[],[],True,122,Futurebass Vocal Chop,False,TRR,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'PhaserOn.Frequency']","['Chorus', 'Flanger', 'Phaser']",False,991,Western Swing Outlaw,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,850,Acid Jazz Funk Smoky,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,620,Dubstep Wobble Digital,False,TRR,True,0.05
+5,[],[],True,[],[],True,987,Western Swing Dusty,False,TRR,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback']",['Flanger'],False,650,UK Garage Neon,True,TRR,True,0.05
+5,[],[],True,[],[],True,1074,Acoustic Sim Natural,False,TRR,False,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Reverb']",False,27,Wah-Wah Rock,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,75,Breakbeat Hardcore,True,TRR,True,0.05
+5,[],[],True,[],[],True,696,Granular Texture Prism,False,TRR,False,0.05
+5,[],[],True,[],[],True,616,Drum and Bass Wave,False,TRR,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,547,Latin Rock Fusion Sahara,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,649,UK Garage Pulse,False,TRR,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,587,Future Bass Pluck Cyber,True,TRR,True,0.05
+5,[],[],True,[],[],True,836,Smooth Jazz Lead Nocturne,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Reverb']",False,46,Telephone EQ,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,224,Skweee Synth,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,714,Overtone Drone Echo,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,875,Latin Jazz Velvet,False,TRR,True,0.05
+5,[],[],True,[],['Compressor'],False,149,J-Rock Power,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,801,Funeral Doom Fury,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Flanger', 'Phaser']",False,103,Drone Metal,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,63,Art Rock Theatrical,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,835,Smooth Jazz Lead Velvet,True,TRR,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,436,Nostalgic VHS,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,1008,Indie Pop Jangle Hazy,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,174,Nu-Disco Groove,True,TRR,True,0.05
+5,[],[],True,"['CompressorOn.Release', 'DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,813,Technical Thrash Wrath,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,380,Honky Tonk Tears,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Flanger', 'Phaser']",False,225,Slacker Rock,True,TRR,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver']",False,960,Country Telecaster Frontier,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,119,Footwork Jungle,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,277,Yacht Rock Smooth,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,749,Sludge Metal Wrath,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Equaliser', 'Reverb']",False,16,Midwest Emo,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Equaliser', 'Reverb']",False,1070,Midwest Emo Twinkled,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Equaliser', 'Reverb']",False,1114,Midwest Emo - Warm Room Take,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Equaliser', 'Reverb']",False,1144,Midwest Emo - Open Chord Mix,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Equaliser', 'Reverb']",False,1174,Midwest Emo - Glass Tone Pass,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Equaliser', 'Reverb']",False,1204,Midwest Emo - Natural Body Edit,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Equaliser', 'Reverb']",False,1234,Midwest Emo - Bright Air Version,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Equaliser', 'Reverb']",False,1264,Midwest Emo - Round Note Cut,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,248,Talk Box Funk,False,TRR,True,0.05
+5,[],[],True,['FlangerOn.Frequency'],"['Chorus', 'Flanger', 'Phaser']",False,1054,Lo-Fi Bedroom Pop Indie,True,TRR,True,0.05
+5,[],[],True,[],[],True,865,Free Jazz Avantgarde Blue,False,TRR,False,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,343,Emo Piano,True,TRR,True,0.05
+5,[],[],True,[],[],True,645,Deep House Synth,False,TRR,False,0.05
+5,[],[],True,[],[],True,999,Americana Alt Outlaw,False,TRR,False,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,498,Spanish Guitar,True,TRR,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Compressor', 'Delay', 'Driver', 'Screamer']",False,118,Flamenco Fusion,True,TRR,True,0.05
+5,[],[],True,[],[],True,983,Country Rock Twang Outlaw,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,332,Dirty South Trap,False,TRR,True,0.05
+5,[],[],True,[],['Compressor'],False,84,Cloud Rap Ethereal,False,TRR,True,0.05
+5,[],[],True,[],['Compressor'],False,365,Ghostly Pad,False,TRR,True,0.05
+5,[],[],True,"['CompressorOn.Release', 'DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,812,Technical Thrash Chaos,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,938,Modern R&B Sweet,False,TRR,True,0.05
+5,[],[],True,['PhaserOn.Frequency'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,717,Overtone Drone Static,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Frequency', 'PhaserOn.Frequency']","['Chorus', 'Flanger', 'Phaser']",False,656,UK Garage Wave,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,1048,Power Pop Hazy,True,TRR,True,0.05
+5,[],[],True,['CompressorOn.Release'],['Compressor'],False,504,Sub-Bass Drone,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,461,Power Ballad,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,281,2-Step Garage,True,TRR,True,0.05
+5,[],[],True,[],[],True,593,Trap Metal Pulse,False,TRR,False,0.05
+5,[],[],True,[],['Compressor'],False,429,Neo-Classical Metal,False,TRR,True,0.05
+5,[],[],True,[],[],True,845,Gypsy Jazz Manouche Crescendo,False,TRR,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'PhaserOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,603,Hyperpop Glitch Cyber,True,TRR,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,977,Country Rock Twang Twang,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,916,Southern Soul Gospel Soulful,False,TRR,True,0.05
+5,[],[],True,[],[],True,220,Sega Mauritian,False,TRR,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'PhaserOn.Frequency']","['Chorus', 'Flanger', 'Phaser']",False,869,Free Jazz Avantgarde Crescendo,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,241,Stripped Acoustic,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,831,Complex Jazz Fusion Groove,True,TRR,True,0.05
+5,[],[],True,[],[],True,534,Reggae Skank Mystic,False,TRR,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Flanger', 'Phaser', 'Screamer']",False,282,3-Chord Punk,True,TRR,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver']",False,537,K-Pop Shimmer Sunset,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'PhaserOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,722,Modular Hybrid Echo,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,857,Cool Jazz Blue,True,TRR,True,0.05
+5,[],[],True,[],[],True,400,Karaoke Pop,False,TRR,False,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Flanger', 'Phaser']",False,699,Spectral Freeze Drift,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,1005,Indie Pop Jangle Radio,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,849,Acid Jazz Funk Blue,False,TRR,True,0.05
+5,[],[],True,[],[],True,972,Nashville Session Honky,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,716,Overtone Drone Glitch,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,919,Southern Soul Gospel Motown,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Frequency'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,1022,Chamber Pop Indie,True,TRR,True,0.05
+5,[],[],True,[],[],True,862,Cool Jazz Improv,False,TRR,False,0.05
+5,[],[],True,[],[],True,39,Symphonic Metal,False,TRR,False,0.05
+5,[],[],True,[],['Flanger'],False,945,Soul Clap Groove,False,TRR,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,153,Lo-Fi House,True,TRR,True,0.05
+5,[],[],True,[],[],True,897,Motown Soul Groove,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,133,Heartland Rock,False,TRR,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],['Flanger'],False,775,Deathcore Breakdown Venom,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,695,Granular Texture Aether,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Flanger', 'Phaser']",False,91,D-beat Punk,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,70,Big Band Swing,False,TRR,True,0.05
+5,[],[],True,[],['Compressor'],False,487,Shoegaze Drone,False,TRR,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,266,Urban Cowboy,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,672,Glitch Noise Prism,False,TRR,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver']",False,627,Techno Industrial Cyber,True,TRR,True,0.05
+5,[],[],True,[],[],True,33,Swedish Death Metal,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,1036,Britpop Glimmer,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Flanger', 'Phaser']",False,841,Gypsy Jazz Manouche Blue,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,193,Post-Punk Bassline,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Flanger', 'Phaser']",False,188,Polka Accordion,False,TRR,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,297,Berlin Techno,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,247,Tabla Fusion,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Feedback'],['Flanger'],False,589,Future Bass Pluck Synth,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,324,Cyber R&B,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,394,Italian Disco,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,817,Folk Metal Acoustic Fury,False,TRR,True,0.05
+5,[],[],True,['FlangerOn.Frequency'],['Flanger'],False,610,Drum and Bass Neon,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,93,Darkwave Synth,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,455,Philharmonic Rock,False,TRR,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,294,Barbershop Quartet,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,601,Hyperpop Glitch Pulse,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,1009,Dream Pop Dream,False,TRR,True,0.05
+5,[],[],True,[],['Flanger'],False,617,Dubstep Wobble Pulse,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,818,Folk Metal Acoustic Rage,True,TRR,True,0.05
+5,[],[],True,[],[],True,986,Western Swing Sunrise,False,TRR,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Flanger', 'Phaser']",False,208,Retro Electro,True,TRR,True,0.05
+5,[],[],True,[],[],True,553,Celtic Folk Sunset,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,944,Modern R&B Philly,False,TRR,True,0.05
+5,[],[],True,[],[],True,834,Smooth Jazz Lead Smoky,False,TRR,False,0.05
+5,[],[],True,[],[],True,340,East Coast Boom Bap,False,TRR,False,0.05
+5,[],[],True,[],[],True,560,Celtic Folk Heritage,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,1038,Britpop Indie,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,723,Modular Hybrid Drift,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,298,Bhangra Fusion,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Flanger', 'Phaser']",False,564,Indian Classical Sitar Tropical,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,308,Chamber Pop,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,111,Epic Orchestral Rock,False,TRR,True,0.05
+5,[],[],True,[],[],True,501,Spring Reverb Surf,False,TRR,False,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver']",False,955,Country Telecaster Dusty,True,TRR,True,0.05
+5,[],[],True,[],[],True,520,Bossa Nova Acoustic Heritage,False,TRR,False,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,896,Neo-Soul Rhythm Philly,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,327,Deep Dub,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,1017,Chamber Pop Dream,False,TRR,True,0.05
+5,[],[],True,[],"['Driver', 'Reverb']",False,1084,Rotary Speaker Fast,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,186,Pirate Metal,True,TRR,True,0.05
+5,[],[],True,[],[],True,917,Southern Soul Gospel Gospel,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,291,Auto-Tune Pop,False,TRR,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,488,Sitar Fusion,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,454,Phased Synth,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,391,Iranian Classical,False,TRR,True,0.05
+5,[],[],True,[],['Compressor'],False,128,Gothic Rock Reverb,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,666,Glitch Noise Echo,True,TRR,True,0.05
+5,[],[],True,[],['Compressor'],False,499,Spectral Glow,False,TRR,True,0.05
+5,[],[],True,[],[],True,682,Prepared Guitar Echo,False,TRR,False,0.05
+5,[],[],True,['PhaserOn.Frequency'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser']",False,1010,Dream Pop Shimmer,True,TRR,True,0.05
+5,[],[],True,[],['Driver'],False,2,Neo-Soul Clean,False,TRR,True,0.05
+5,[],[],True,[],['Driver'],False,1072,Neo-Soul Clean Rhythm,False,TRR,True,0.05
+5,[],[],True,[],['Driver'],False,1116,Neo-Soul Clean - Pocket Groove Cut,False,TRR,True,0.05
+5,[],[],True,[],['Driver'],False,1146,Neo-Soul Clean - Sync Pulse Mix,False,TRR,True,0.05
+5,[],[],True,[],['Driver'],False,1176,Neo-Soul Clean - Muted Snap Take,False,TRR,True,0.05
+5,[],[],True,[],['Driver'],False,1206,Neo-Soul Clean - Chic Rhythm Pass,False,TRR,True,0.05
+5,[],[],True,[],['Driver'],False,1236,Neo-Soul Clean - Tight Jam Edit,False,TRR,True,0.05
+5,[],[],True,[],['Driver'],False,1266,Neo-Soul Clean - Velvet Groove Version,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,816,Technical Thrash Onslaught,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,191,Post-Hardcore Screamo,True,TRR,True,0.05
+5,[],[],True,[],[],True,28,Hard Rock Crunch,False,TRR,False,0.05
+5,[],[],True,[],[],True,1080,Hard Rock Crunch,False,TRR,False,0.05
+5,[],[],True,[],[],True,1107,Hard Rock Crunch - Vintage Drive Mix,False,TRR,False,0.05
+5,[],[],True,[],[],True,1137,Hard Rock Crunch - Raw Amp Pass,False,TRR,False,0.05
+5,[],[],True,[],[],True,1167,Hard Rock Crunch - Grit Stack Take,False,TRR,False,0.05
+5,[],[],True,[],[],True,1197,Hard Rock Crunch - Classic Crunch Edit,False,TRR,False,0.05
+5,[],[],True,[],[],True,1227,Hard Rock Crunch - Hot Valve Version,False,TRR,False,0.05
+5,[],[],True,[],[],True,1257,Hard Rock Crunch - Saturated Bite Cut,False,TRR,False,0.05
+5,[],[],True,['FlangerOn.Width'],"['Chorus', 'Compressor', 'Flanger', 'Phaser']",False,127,Glitter Rock,True,TRR,True,0.05
+5,[],[],True,[],[],True,533,Reggae Skank Andean,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,906,Philadelphia Soul Sweet,False,TRR,True,0.05
+5,[],[],True,[],[],True,1077,Brown Sound Modern,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,418,Minimal Wave,False,TRR,True,0.05
+5,[],[],True,[],['Flanger'],False,647,Deep House Beat,False,TRR,True,0.05
+5,[],[],True,[],[],True,889,Neo-Soul Rhythm Groove,False,TRR,False,0.05
+5,[],[],True,['FlangerOn.Frequency'],"['Chorus', 'Flanger', 'Phaser']",False,724,Modular Hybrid Glitch,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'FlangerOn.Width', 'CompressorOn.Release']","['Chorus', 'Compressor', 'Flanger', 'Phaser']",False,206,Rave Hardcore,True,TRR,True,0.05
+5,[],[],True,"['DelayOn.Feedback', 'DelayOn.Mix']","['Chorus', 'Compressor', 'Delay', 'Driver']",False,966,Bluegrass Flatpick Rambler,True,TRR,True,0.05
+5,[],[],True,['PhaserOn.Frequency'],"['Chorus', 'Flanger', 'Phaser']",False,676,Microtonal Fusion Glitch,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,151,Krautrock Motorik,True,TRR,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,202,Qawwali Devotional,True,TRR,True,0.05
+5,[],[],True,['DelayOn.Mix'],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,635,Synthwave Guitar Cyber,True,TRR,True,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,300,Blackened Crust,True,TRR,True,0.05
+5,[],[],True,[],[],True,513,Bossa Nova Acoustic Sunset,False,TRR,False,0.05
+5,[],[],True,"['DelayOn.Mix', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,194,Power Electronics,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger', 'Phaser', 'Screamer']",False,286,Analog Warm Bass,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency', 'PhaserOn.Frequency']","['Chorus', 'Flanger', 'Phaser']",False,577,Japanese Enka Sunset,True,TRR,True,0.05
+5,[],[],True,[],['Compressor'],False,285,Ambient Guitar Loop,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,1033,Britpop Dream,False,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Width']","['Chorus', 'Compressor', 'Flanger', 'Phaser']",False,447,Overdrive Crunch,True,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Flanger', 'Phaser']",False,733,Shoegaze Wall Static,False,TRR,True,0.05
+5,[],[],True,[],[],True,976,Nashville Session Frontier,False,TRR,False,0.05
+5,[],[],True,[],['Flanger'],False,621,Dubstep Wobble Synth,False,TRR,True,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,829,Complex Jazz Fusion Crescendo,False,TRR,True,0.05
+5,[],[],True,['FlangerOn.Frequency'],"['Chorus', 'Flanger', 'Phaser']",False,995,Americana Alt Dusty,True,TRR,True,0.05
+5,[],[],True,['FlangerOn.Depth'],"['Chorus', 'Compressor', 'Delay', 'Driver', 'Flanger']",False,1047,Power Pop Charm,True,TRR,True,0.05
+5,[],[],True,"['FlangerOn.Delay', 'FlangerOn.Depth', 'FlangerOn.Feedback', 'FlangerOn.Frequency']",['Flanger'],False,530,Reggae Skank Moonrise,True,TRR,True,0.05
+5,[],[],True,[],['Compressor'],False,82,Chinese Guzheng Ambient,False,TRR,True,0.05
+5,[],[],True,[],[],True,861,Cool Jazz Crescendo,False,TRR,False,0.05
+5,[],[],True,[],"['Chorus', 'Compressor', 'Delay', 'Driver']",False,788,Nu Metal 7-String Chaos,False,TRR,True,0.05

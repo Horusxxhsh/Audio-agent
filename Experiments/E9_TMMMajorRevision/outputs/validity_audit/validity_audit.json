@@ -1,0 +1,11 @@
+{
+  "k": 5,
+  "methods": [
+    "Wav2Vec",
+    "FeatureNN",
+    "CLAP",
+    "PaSST",
+    "TRR"
+  ],
+  "temperature": 0.05
+}

@@ -1,0 +1,55 @@
+{
+  "kb_count": 1063,
+  "methods": {
+    "CLAP": {
+      "kb_ok": 829,
+      "kb_total": 1063,
+      "query_ok": 173,
+      "query_total": 204,
+      "ready": false,
+      "vector_key": "CLAP"
+    },
+    "FeatureNN": {
+      "kb_ok": 1058,
+      "kb_total": 1063,
+      "query_ok": 204,
+      "query_total": 204,
+      "ready": false,
+      "vector_key": "FeatureNN"
+    },
+    "PANNs": {
+      "kb_ok": 0,
+      "kb_total": 1063,
+      "query_ok": 0,
+      "query_total": 204,
+      "ready": false,
+      "vector_key": "PANNs"
+    },
+    "PaSST": {
+      "kb_ok": 1063,
+      "kb_total": 1063,
+      "query_ok": 204,
+      "query_total": 204,
+      "ready": true,
+      "vector_key": "PaSST"
+    },
+    "TRR": {
+      "kb_ok": 1063,
+      "kb_total": 1063,
+      "query_ok": 204,
+      "query_total": 204,
+      "ready": true,
+      "vector_key": "TRR"
+    },
+    "Wav2Vec": {
+      "kb_ok": 1058,
+      "kb_total": 1063,
+      "query_ok": 204,
+      "query_total": 204,
+      "ready": false,
+      "vector_key": "Wav2Vec"
+    }
+  },
+  "query_count": 204,
+  "ready": false
+}

@@ -1,0 +1,13 @@
+{
+  "k": 5,
+  "metric_impl": "epr_rcpp_softmax_topk_observed_kb_range",
+  "source_methods": [
+    "Wav2Vec",
+    "FeatureNN",
+    "CLAP",
+    "PaSST",
+    "PANNs",
+    "TRR"
+  ],
+  "temperature": 0.05
+}

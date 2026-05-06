@@ -3,7 +3,7 @@
 This report summarizes descriptive statistics and repeated-measures tests.
 Important: the study includes a hidden reference (`reference`) but no explicit low-quality anchor.
 
-- Input CSV: `/home/xyh/code/Audio-agent/Experiments/mushura/mushra.csv`
+- Input CSV: `/Users/xyh/Code/Audio-agent/Experiments/mushura/mushra.csv`
 - Participants (unique emails): 26
 - Total ratings: 910
 
@@ -68,15 +68,15 @@ Important: the study includes a hidden reference (`reference`) but no explicit l
 - n_complete=26
 - k_stimuli=3
 
-- Friedman Q=41.6154, p_perm=5e-05 (one-sided)
+- Friedman Q=41.6154, p_perm=0.000999 (one-sided)
 
 #### Pairwise Wilcoxon Signed-Rank (Permutation) + Holm Correction
 
 | A | B | n | mean(A-B) | median(A-B) | rbc | p | p(Holm) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| reference | HCAP | 26 | 13.78 | 8.38 | 0.860 | 0.0001 | 0.00015 |
-| reference | manual | 26 | 33.61 | 26.00 | 0.983 | 5e-05 | 0.00015 |
-| HCAP | manual | 26 | 19.83 | 17.25 | 1.000 | 5e-05 | 0.00015 |
+| reference | HCAP | 26 | 13.78 | 8.38 | 0.860 | 0.000999 | 0.002997 |
+| reference | manual | 26 | 33.61 | 26.00 | 0.983 | 0.000999 | 0.002997 |
+| HCAP | manual | 26 | 19.83 | 17.25 | 1.000 | 0.000999 | 0.002997 |
 
 ## Trial 6-10
 
@@ -108,13 +108,13 @@ Important: the study includes a hidden reference (`reference`) but no explicit l
 - n_complete=26
 - k_stimuli=3
 
-- Friedman Q=36.2308, p_perm=5e-05 (one-sided)
+- Friedman Q=36.2308, p_perm=0.000999 (one-sided)
 
 #### Pairwise Wilcoxon Signed-Rank (Permutation) + Holm Correction
 
 | A | B | n | mean(A-B) | median(A-B) | rbc | p | p(Holm) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| reference | MusicGen | 26 | 47.72 | 50.90 | 1.000 | 5e-05 | 0.00015 |
-| reference | HCAP | 26 | 46.71 | 51.30 | 0.994 | 5e-05 | 0.00015 |
-| MusicGen | HCAP | 24 | -1.10 | 0.80 | 0.067 | 0.7797 | 0.7797 |
+| reference | MusicGen | 26 | 47.72 | 50.90 | 1.000 | 0.000999 | 0.002997 |
+| reference | HCAP | 26 | 46.71 | 51.30 | 0.994 | 0.000999 | 0.002997 |
+| MusicGen | HCAP | 24 | -1.10 | 0.80 | 0.067 | 0.7762 | 0.7762 |
 

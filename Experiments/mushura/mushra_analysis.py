@@ -251,12 +251,14 @@ def _maybe_plot_boxplot(
     except Exception:
         return "Plot skipped (matplotlib not installed)."
 
+    display = {"HCAP": "TRR-based system"}
+    labels = [display.get(s, s) for s in stimuli]
     data = [per_subject_scores[s] for s in stimuli]
     try:
         import matplotlib.pyplot as plt
 
         plt.figure(figsize=(10, 4.5))
-        plt.boxplot(data, tick_labels=stimuli, showfliers=False)
+        plt.boxplot(data, tick_labels=labels, showfliers=False)
         for i, s in enumerate(stimuli, 1):
             y = per_subject_scores[s]
             x = np.random.normal(loc=i, scale=0.04, size=len(y))

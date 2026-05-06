@@ -1,0 +1,6 @@
+{
+  "augmented_dataset": "Experiments/E9_TMMMajorRevision/outputs/passt_vectors/dataset_full_vectors_1267_augmented.json",
+  "note": "This file is a derived copy. PaSST/PANNs vectors are added only by a successful optional encoder run.",
+  "sha256": "077577c654e360fa7cce4328c6e2c263773ac14d8c8331e5ccebe29e54129c28",
+  "source_dataset": "Data/External_1267_211/dataset/dataset_full_vectors_1267.json"
+}

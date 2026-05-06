@@ -1,113 +1,32 @@
 \begin{tikzpicture}[
-    x=1cm,
-    y=1cm,
+    node distance=0.7cm and 0.9cm,
     font=\small,
-    querytext/.style={
-        rounded rectangle,
-        rounded rectangle arc length=90,
-        draw=blue!55!black,
-        thick,
-        fill=blue!8,
-        align=center,
-        minimum width=2.2cm,
-        minimum height=0.85cm
-    },
-    queryaudio/.style={
-        rounded rectangle,
-        rounded rectangle arc length=90,
-        draw=orange!70!black,
-        thick,
-        fill=orange!10,
-        align=center,
-        minimum width=2.35cm,
-        minimum height=0.85cm
-    },
-    blockblue/.style={
-        rounded rectangle,
-        draw=blue!55!black,
-        thick,
-        fill=white,
-        align=center,
-        minimum width=3.0cm,
-        minimum height=0.95cm
-    },
-    blockorange/.style={
-        rounded rectangle,
-        draw=orange!70!black,
-        thick,
-        fill=white,
-        align=center,
-        minimum width=3.0cm,
-        minimum height=1.05cm
-    },
-    blockneutral/.style={
-        rounded rectangle,
-        draw=black!65,
-        thick,
-        fill=white,
-        align=center,
-        minimum width=3.2cm,
-        minimum height=1.1cm
-    },
-    blocksafe/.style={
-        rounded rectangle,
-        draw=green!45!black,
-        thick,
-        fill=green!8,
-        align=center,
-        minimum width=2.7cm,
-        minimum height=0.95cm
-    },
-    group/.style={
-        rounded rectangle,
-        draw=black!55,
-        dashed,
-        thick,
-        inner sep=0.35cm,
-        fill=black!2
-    },
-    note/.style={
-        font=\scriptsize,
-        align=center,
-        text=black!65
-    },
-    flow/.style={-{Latex[length=2.6mm]}, thick, draw=black!70},
-    blueflow/.style={-{Latex[length=2.6mm]}, thick, draw=blue!55!black},
-    orangeflow/.style={-{Latex[length=2.6mm]}, thick, draw=orange!70!black},
-    asyncflow/.style={-{Latex[length=2.6mm]}, thick, dashed, draw=black!70},
+    io/.style={ellipse, draw, thick, align=center, minimum width=2.3cm, minimum height=0.95cm, fill=blue!8},
+    stage/.style={rounded rectangle, draw, thick, align=center, minimum width=2.7cm, minimum height=1.05cm, fill=gray!8},
+    detail/.style={rounded rectangle, draw, thick, align=center, minimum width=2.8cm, minimum height=0.95cm, fill=orange!12},
+    group/.style={rounded rectangle, draw, thick, inner sep=0.35cm, fill=white},
+    flow/.style={-{Latex[length=2.5mm]}, thick},
+    asyncflow/.style={-{Latex[length=2.5mm]}, thick, dashed},
 ]
 
-\node[querytext] (textq) at (0,1.0) {Text query};
-\node[queryaudio] (audioq) at (0,-0.25) {Audio reference};
+\node[io] (textq) {Text query};
+\node[io, below=1.1cm of textq] (audioq) {Audio reference};
 
-\node[blockblue] (textretr) at (3.2,1.0) {Text retrieval};
-\node[blockorange] (trr) at (3.2,-0.25) {TRR encoding\\+ audio retrieval};
-\node[blockneutral] (select) at (6.7,0.38) {Top-$K$ preset selection\\+ validity checks};
-\node[note] at (6.7,-0.62) {plugin bounds and module constraints};
-\node[blockneutral] (project) at (10.2,0.38) {Deterministic projection\\to safe parameter state};
+\node[detail, right=1.7cm of textq] (textretr) {Text retrieval};
+\node[detail, below=1.1cm of textretr] (trr) {TRR encoding\\+ audio retrieval};
+\node[group, fit=(textretr)(trr), label={[font=\small]north:Retrieval module}] (retrgroup) {};
 
-\node[group, fit=(textretr)(trr)(select)(project),
-      label={[font=\small\bfseries, text=black!75]north west:Retrieval module (asynchronous inference)}] (retrgroup) {};
+\node[stage, right=1.4cm of retrgroup] (select) {Top-$K$ selection\\and validation};
+\node[stage, right=1.5cm of select] (project) {Deterministic\\projection};
+\node[stage, right=1.5cm of project] (dsp) {Real-time DSP\\engine};
+\node[io, right=1.6cm of dsp] (output) {Editable\\audio output};
 
-\node[querytext, draw=black!45, fill=black!4] (audioin) at (1.2,-2.75) {Input audio};
-\node[blocksafe] (state) at (6.0,-2.75) {Parameter state\\$\theta_{\text{safe}}$};
-\node[blockneutral, minimum width=4.45cm, minimum height=1.55cm] (dsp) at (10.4,-2.75) {Serial effect chain\\[0.1em]
-Compressor $\rightarrow$ Driver $\rightarrow$ Screamer\\
-Reverb $\rightarrow$ Delay $\rightarrow$ Chorus\\
-Flanger $\rightarrow$ Phaser $\rightarrow$ Equaliser};
-\node[querytext, draw=black!45, fill=black!4, minimum width=2.75cm] (output) at (14.5,-2.75) {Editable audio output};
-
-\node[group, fit=(state)(dsp),
-      label={[font=\small\bfseries, text=black!75]north west:Real-time DSP engine}] (dspgroup) {};
-
-\draw[blueflow] (textq.east) -- (textretr.west);
-\draw[orangeflow] (audioq.east) -- (trr.west);
+\draw[flow] (textq.east) -- (textretr.west);
+\draw[flow] (audioq.east) -- (trr.west);
 \draw[flow] (textretr.east) -- (select.west);
 \draw[flow] (trr.east) -- (select.west);
-\draw[flow] (select.east) -- node[above, font=\scriptsize] {retrieved preset candidates} (project.west);
-\draw[asyncflow] (project.south) |- node[pos=0.25, right, font=\scriptsize] {async parameter update} (state.north);
-\draw[flow] (audioin.east) -- (dsp.west);
-\draw[flow, draw=green!45!black] (state.east) -- node[above, font=\scriptsize] {$\theta_{\text{safe}}$} (dsp.west);
+\draw[flow] (select.east) -- (project.west);
+\draw[asyncflow] (project.east) -- node[above, font=\scriptsize] {async parameter update} (dsp.west);
 \draw[flow] (dsp.east) -- (output.west);
 
 \end{tikzpicture}

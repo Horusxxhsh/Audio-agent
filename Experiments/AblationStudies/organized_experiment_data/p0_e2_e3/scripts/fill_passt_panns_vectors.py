@@ -1,8 +1,11 @@
 import argparse
+import contextlib
 import json
 import math
+import ntpath
 import os
 import shutil
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
@@ -14,7 +17,7 @@ import torch
 import torchaudio
 
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+ROOT_DIR = str(Path(__file__).resolve().parents[5])
 DEFAULT_DATASET = os.path.join("Experiments", "dataset_full_vectors.json")
 MANUAL_AUDIO_PATHS = {
     "Prism Clean Math Rock Crystal": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Base_TRR_Advantage_for_Math_Rock_Crystal.wav"),
@@ -36,6 +39,20 @@ MANUAL_AUDIO_PATHS = {
     "Rotor Rush Rotary Speaker": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Rotary Speaker.wav"),
     "Amber Glow Texas Blues": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Texas Blues.wav"),
     "Silk Glide Touch Sensitive Lead": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Touch Sensitive Lead.wav"),
+    "Math Rock Crystal Cleans": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Math Rock Crystal.wav"),
+    "Dry Funk Rhythm": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Dry Funk.wav"),
+    "Reverse Psychedelic Delay": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Reverse Psychedelic.wav"),
+    "80s Hair Metal Arena": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "80s Hair Metal.wav"),
+    "Acoustic Sim Natural": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Acoustic Sim.wav"),
+    "Auto-Wah Funk Rhythm": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Auto-Wah Funk.wav"),
+    "Brown Sound Modern": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Brown Sound.wav"),
+    "Dreamy Shoegaze Ethereal": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Dreamy Shoegaze.wav"),
+    "Hard Rock Crunch": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Hard Rock Crunch.wav"),
+    "Lo-Fi Hip Hop Chill": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Lo-Fi Hip Hop.wav"),
+    "Punk Rock Raw Energy": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Punk Rock Raw.wav"),
+    "Rotary Speaker Fast": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Rotary Speaker.wav"),
+    "Texas Blues Warm": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Texas Blues.wav"),
+    "Touch Sensitive Lead Smooth": os.path.join(ROOT_DIR, "Data", "Audio_Synthetic", "Touch Sensitive Lead.wav"),
 }
 
 
@@ -132,7 +149,13 @@ def build_basename_index() -> Dict[str, str]:
         for root, _, files in os.walk(base_dir):
             for name in files:
                 index.setdefault(name.lower(), os.path.join(root, name))
+                index.setdefault(ascii_key(name), os.path.join(root, name))
     return index
+
+
+def ascii_key(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value)
+    return "".join(ch for ch in normalized if not unicodedata.combining(ch)).lower()
 
 
 def resolve_audio_path(original_path: str, basename_index: Dict[str, str]) -> Optional[str]:
@@ -140,8 +163,8 @@ def resolve_audio_path(original_path: str, basename_index: Dict[str, str]) -> Op
         return os.path.abspath(original_path)
     if not original_path:
         return None
-    basename = os.path.basename(original_path).lower()
-    return basename_index.get(basename)
+    basename = ntpath.basename(original_path) or os.path.basename(original_path)
+    return basename_index.get(basename.lower()) or basename_index.get(ascii_key(basename))
 
 
 def resolve_audio_path_for_item(item: Dict[str, Any], basename_index: Dict[str, str]) -> Optional[str]:
@@ -202,7 +225,8 @@ class PasstEncoder:
     def encode_many(self, audio_paths: List[str]) -> List[np.ndarray]:
         batch = load_audio_batch(audio_paths)
         tensor = torch.from_numpy(batch)
-        embeddings = self._get_scene_embeddings(tensor, self.model).detach().cpu().numpy()
+        with open(os.devnull, "w") as devnull, contextlib.redirect_stdout(devnull):
+            embeddings = self._get_scene_embeddings(tensor, self.model).detach().cpu().numpy()
         return [l2_normalize(np.asarray(emb, dtype=np.float32)) for emb in embeddings]
 
 class PannsEncoder:

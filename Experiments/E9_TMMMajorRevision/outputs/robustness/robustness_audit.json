@@ -1,0 +1,15 @@
+{
+  "dataset_path": "Experiments/E9_TMMMajorRevision/outputs/passt_vectors/dataset_full_vectors_1267_augmented.json",
+  "methods": {
+    "CLAP": "CLAP",
+    "FeatureNN": "FeatureNN",
+    "PaSST": "PaSST",
+    "TRR": "TRR",
+    "Wav2Vec": "Wav2Vec"
+  },
+  "normalization": "Evaluator(normalize=True)",
+  "query_count": 204,
+  "random_seed": 42,
+  "split_file": "Experiments/tmm/splits/tmm_external1267_audio_grouped/seed0/test.txt",
+  "threshold_definition": "threshold=0.000 is no-filter canonical; threshold>0 removes KB candidates with normalized parameter RMSE <= threshold to any Protocol-A query."
+}

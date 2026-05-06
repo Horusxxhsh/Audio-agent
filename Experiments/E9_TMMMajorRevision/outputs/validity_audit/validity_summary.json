@@ -1,0 +1,42 @@
+{
+  "CLAP": {
+    "n": 173,
+    "pre_validity_rate": 0.06936416184971098,
+    "range_repair_rate": 0.5375722543352601,
+    "repair_rate": 0.930635838150289,
+    "switch_repair_rate": 0.930635838150289,
+    "validity_rate": 1.0
+  },
+  "FeatureNN": {
+    "n": 204,
+    "pre_validity_rate": 0.06372549019607843,
+    "range_repair_rate": 0.5588235294117647,
+    "repair_rate": 0.9362745098039216,
+    "switch_repair_rate": 0.9362745098039216,
+    "validity_rate": 1.0
+  },
+  "PaSST": {
+    "n": 204,
+    "pre_validity_rate": 0.049019607843137254,
+    "range_repair_rate": 0.5931372549019608,
+    "repair_rate": 0.9509803921568627,
+    "switch_repair_rate": 0.9509803921568627,
+    "validity_rate": 1.0
+  },
+  "TRR": {
+    "n": 204,
+    "pre_validity_rate": 0.21568627450980393,
+    "range_repair_rate": 0.4362745098039216,
+    "repair_rate": 0.7843137254901961,
+    "switch_repair_rate": 0.7843137254901961,
+    "validity_rate": 1.0
+  },
+  "Wav2Vec": {
+    "n": 204,
+    "pre_validity_rate": 0.13725490196078433,
+    "range_repair_rate": 0.5343137254901961,
+    "repair_rate": 0.8627450980392157,
+    "switch_repair_rate": 0.8627450980392157,
+    "validity_rate": 1.0
+  }
+}
