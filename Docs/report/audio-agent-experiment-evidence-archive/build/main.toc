@@ -1,0 +1,11 @@
+\contentsline {chapter}{\numberline {第一章\hspace {.3em}}摘要与监督结论}{2}{chapter.1}%
+\contentsline {chapter}{\numberline {第二章\hspace {.3em}}TMM 期刊目标：可执行音频效果参数检索}{4}{chapter.2}%
+\contentsline {chapter}{\numberline {第三章\hspace {.3em}}背景与相关工作定位}{6}{chapter.3}%
+\contentsline {chapter}{\numberline {第四章\hspace {.3em}}Formulation：检索式可编辑参数控制}{8}{chapter.4}%
+\contentsline {chapter}{\numberline {第五章\hspace {.3em}}方法：Texture Resonance Retrieval}{11}{chapter.5}%
+\contentsline {chapter}{\numberline {第六章\hspace {.3em}}TMM 实验设计与评价方法}{13}{chapter.6}%
+\contentsline {chapter}{\numberline {第七章\hspace {.3em}}TMM 可复现台账与证据包规范}{16}{chapter.7}%
+\contentsline {chapter}{\numberline {第八章\hspace {.3em}}证据资产与归档结构}{19}{chapter.8}%
+\contentsline {chapter}{\numberline {第九章\hspace {.3em}}当前基线结果与统计证据}{21}{chapter.9}%
+\contentsline {chapter}{\numberline {第十章\hspace {.3em}}项目进度与 TMM 提交包收束计划}{24}{chapter.10}%
+\contentsline {chapter}{\numberline {第十一章\hspace {.3em}}KaiMing Gate：TMM 风险、验收与论文写作前置条件}{26}{chapter.11}%

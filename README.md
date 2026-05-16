@@ -68,3 +68,55 @@ git clone -b master --single-branch --recurse-submodules https://github.com/Horu
 ```
 
 Then you should be able to open up the `.jucer` file and work in your environment of choice.
+
+---
+
+## 重构说明 (v2.0)
+
+### 新增模块化架构 (`Source_new/`)
+
+原 `Source/llm.py`（1686 行）和 `Source/sql.py`（1023 行）已拆分为以下模块：
+
+| 模块 | 职责 | 行数 |
+|------|------|------|
+| `config/config_manager.py` | 路径、API 密钥、MusicGen 配置 | ~150 |
+| `core/audio_features.py` | Wav2Vec2 音频特征提取 | ~80 |
+| `core/musicgen_generator.py` | MusicGen 音频生成 | ~100 |
+| `core/llm_client.py` | OpenAI 兼容 LLM 客户端 | ~70 |
+| `core/parameters.py` | 效果器配置 + 参数 On/Off 切换 | ~200 |
+| `core/prompt_builder.py` | 三阶段 Prompt 组装 | ~150 |
+| `core/rag_bridge.py` | RAG 系统桥接（修复集成链路） | ~80 |
+| `database/music_db.py` | SQLite CRUD（参数化查询） | ~140 |
+| `llm.py` | 精简管道编排入口 | ~320 |
+| `sql.py` | 参数更新入口 | ~115 |
+
+### 已修复的问题
+
+1. **单一职责**: 将 2709 行代码拆分为 8 个职责清晰的模块
+2. **重复代码消除**: 9 个效果器的 On/Off 切换逻辑从 8 组复制粘贴缩减为数据驱动配置（`EFFECTOR_CONFIG`）
+3. **跨平台兼容**: 所有硬编码 Windows 路径替换为 `Config.Paths` 自动解析
+4. **RAG 集成修复**: `RAGBridge` 实际集成到主流程中（原为断开的死代码）
+5. **依赖管理**: `pyproject.toml` + 精简 `requirements.txt`（替代 Anaconda 全量快照）
+6. **测试覆盖**: 41 个 pytest 单元测试（原为 0）
+7. **代码质量**: Ruff linter 配置（`ruff.toml`）
+8. **安全改进**: 全部使用参数化 SQL 查询、API 密钥存在性校验
+
+### 使用方式
+
+```bash
+# 安装依赖
+pip install -r Source_new/requirements.txt
+
+# 运行测试
+cd Source_new && python3 -m pytest tests/ -v
+
+# 运行 LLM 管道
+python Source_new/llm.py "<chat_message>" <memory_enabled> [file_path] [weights...]
+
+# 运行参数更新
+python Source_new/sql.py "<chat_message>" "<user_message>" "<preset>" <memory_enabled>
+```
+
+### 数据元数据
+
+数据集元数据文件位于 `Data/dataset_metadata.json`，记录了 4 种特征提取模型及其参数。

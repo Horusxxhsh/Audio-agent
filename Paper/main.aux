@@ -1,0 +1,178 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{liu2023audioldm,agostinelli2023musiclm}
+\citation{engel2020ddsp}
+\citation{stables2014semantic}
+\citation{schedl2014survey}
+\citation{kuli2014active}
+\citation{bryan2024synthscribe}
+\citation{steinmetz2022automix}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{sec:introduction}{{I}{1}{Introduction}{section.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{1}{section.2}\protected@file@percent }
+\newlabel{sec:related_work}{{II}{1}{Related Work}{section.2}{}}
+\citation{peladeau2024blind}
+\citation{liu2024ddspSFX}
+\citation{deemanat2025latent}
+\citation{benetos2024stito}
+\citation{liu2023audioldm,liu2024audioldm2,agostinelli2023musiclm,vyas2023audiobox}
+\citation{huang2022makeanaudio}
+\citation{wang2023audiolcm}
+\citation{liang2024instruction}
+\citation{engel2020ddsp}
+\citation{baevski2020wav2vec}
+\citation{elizalde2023clap}
+\citation{koutini2022passt}
+\citation{kong2020panns}
+\citation{lewis2020rag}
+\citation{elizalde2023clap,chen2024reclap,niizumi2024m2dclap,wu2024fewshot}
+\citation{qwen_audio,salmonn}
+\citation{gatys2015style}
+\citation{stylianou2015audio}
+\citation{mcwec2023texture}
+\citation{verzotto2022representations}
+\citation{weck2023wikimute}
+\citation{srivatsan2024retrieval}
+\citation{gonzales2024rag}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {II-}0a}Perceptual similarity vs. parameter transferability.}{2}{paragraph.3}\protected@file@percent }
+\citation{stables2014semantic}
+\citation{engel2020ddsp}
+\citation{doh2025llm2fx}
+\citation{liu2023audioldm}
+\citation{liu2025hmrag}
+\@writefile{toc}{\contentsline {section}{\numberline {III}Problem Formulation}{3}{section.6}\protected@file@percent }
+\newlabel{sec:problem_formulation}{{III}{3}{Problem Formulation}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Signal Processing Dynamics}{3}{subsection.7}\protected@file@percent }
+\newlabel{eq:feasible_set}{{1}{3}{Signal Processing Dynamics}{equation.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Goal and Constraints}{3}{subsection.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-B}0a}Operational objective (without probabilistic semantics).}{3}{paragraph.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}The Retrieval-Based Approach}{3}{subsection.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {III-C}0a}Design Principle 1 (Well-defined synthesis under missing modalities).}{3}{paragraph.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Methodology}{3}{section.15}\protected@file@percent }
+\newlabel{sec:methodology}{{IV}{3}{Methodology}{section.15}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}System Architecture}{3}{subsection.16}\protected@file@percent }
+\newlabel{ssec:architecture}{{\mbox  {IV-A}}{3}{System Architecture}{subsection.16}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-A}0a}Design Principle 2 (Runtime isolation).}{3}{paragraph.19}\protected@file@percent }
+\citation{mcdermott2011sound}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Positioning Against Prior Work}}{4}{table.5}\protected@file@percent }
+\newlabel{tab:positioning}{{I}{4}{Positioning Against Prior Work}{table.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces System overview}}{4}{figure.18}\protected@file@percent }
+\newlabel{fig:architecture}{{1}{4}{System overview}{figure.18}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Texture Resonance Retrieval (TRR)}{4}{subsection.20}\protected@file@percent }
+\newlabel{ssec:rag}{{\mbox  {IV-B}}{4}{Texture Resonance Retrieval (TRR)}{subsection.20}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces TRR Encoding}}{4}{algorithm.21}\protected@file@percent }
+\newlabel{alg:trr_encoding}{{1}{4}{Texture Resonance Retrieval (TRR)}{algorithm.21}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-B}0a}Properties and limitations.}{4}{paragraph.32}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Representative TRR Gram-matrix examples illustrating the second-order co-activation structure used by the retrieval descriptor.}}{5}{figure.34}\protected@file@percent }
+\newlabel{fig:gram_matrix_examples}{{2}{5}{Representative TRR Gram-matrix examples illustrating the second-order co-activation structure used by the retrieval descriptor}{figure.34}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces t-SNE visualization comparing TRR and mean-pooled Wav2Vec2 embeddings on the benchmark presets. The plot is used only as a qualitative representation diagnostic.}}{5}{figure.36}\protected@file@percent }
+\newlabel{fig:tsne_comparison}{{3}{5}{t-SNE visualization comparing TRR and mean-pooled Wav2Vec2 embeddings on the benchmark presets. The plot is used only as a qualitative representation diagnostic}{figure.36}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Complexity and Latency Considerations}{5}{subsection.37}\protected@file@percent }
+\newlabel{ssec:complexity_latency}{{\mbox  {IV-C}}{5}{Complexity and Latency Considerations}{subsection.37}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {IV-C}0a}Latency measurement protocol.}{5}{paragraph.38}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Per-query cached retrieval-scoring latency breakdown. We report median and p95 over 633 runs from the original 211-query profiling pool ($211\times 3$ repeats). These numbers exclude feature extraction, live LLM calls, plugin rendering, and user-interface overhead, and should not be interpreted as end-to-end DAW real-time latency.}}{5}{table.40}\protected@file@percent }
+\newlabel{tab:latency_breakdown}{{II}{5}{Per-query cached retrieval-scoring latency breakdown. We report median and p95 over 633 runs from the original 211-query profiling pool ($211\times 3$ repeats). These numbers exclude feature extraction, live LLM calls, plugin rendering, and user-interface overhead, and should not be interpreted as end-to-end DAW real-time latency}{table.40}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Multimodal Fusion as a Supplementary Diagnostic Extension}{5}{subsection.41}\protected@file@percent }
+\newlabel{ssec:fusion}{{\mbox  {IV-D}}{5}{Multimodal Fusion as a Supplementary Diagnostic Extension}{subsection.41}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Experiments}{5}{section.43}\protected@file@percent }
+\newlabel{sec:experiments}{{V}{5}{Experiments}{section.43}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Experimental Setup}{5}{subsection.44}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-A}0a}Dataset and Knowledge Base.}{5}{paragraph.45}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-A}0b}Provenance notes.}{6}{paragraph.46}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-A}0c}Scope and protocol.}{6}{paragraph.47}\protected@file@percent }
+\newlabel{sec:repro}{{\mbox  {V-A}0d}{6}{Resources and reproducibility}{paragraph.48}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-A}0d}Resources and reproducibility.}{6}{paragraph.48}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-A}0e}Baselines.}{6}{paragraph.49}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Metrics}{6}{subsection.50}\protected@file@percent }
+\newlabel{ssec:metrics}{{\mbox  {V-B}}{6}{Metrics}{subsection.50}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces P0 Protocol-A: direct retrieval comparison on the shared 204-query benchmark. Lower is better for L2 and Norm.L2; higher is better for all other metrics. TRR achieves the best mean performance on the normalized distance and all reported alignment scores.}}{6}{table.62}\protected@file@percent }
+\newlabel{tab:main_results}{{III}{6}{P0 Protocol-A: direct retrieval comparison on the shared 204-query benchmark. Lower is better for L2 and Norm.L2; higher is better for all other metrics. TRR achieves the best mean performance on the normalized distance and all reported alignment scores}{table.62}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-B}0a}L2 Error (RMSE).}{6}{paragraph.51}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-B}0b}Accuracy@0.1.}{6}{paragraph.53}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-B}0c}Recall (active numeric parameters).}{6}{paragraph.55}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-B}0d}Cosine Similarity.}{6}{paragraph.56}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-B}0e}Module Consistency.}{6}{paragraph.58}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Protocol-A: Comparative Retrieval Evaluation}{6}{subsection.60}\protected@file@percent }
+\newlabel{ssec:protocolA}{{\mbox  {V-C}}{6}{Protocol-A: Comparative Retrieval Evaluation}{subsection.60}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Near-duplicate sensitivity for TRR on the audited Protocol-A split. The threshold controls cheap-fingerprint filtering between held-out queries and the retrieval database. Lower Norm.L2 is better.}}{7}{table.65}\protected@file@percent }
+\newlabel{tab:near_dup_sensitivity}{{IV}{7}{Near-duplicate sensitivity for TRR on the audited Protocol-A split. The threshold controls cheap-fingerprint filtering between held-out queries and the retrieval database. Lower Norm.L2 is better}{table.65}{}}
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-C}0a}Near-duplicate sensitivity.}{7}{paragraph.63}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-C}0b}Direct-regression boundary.}{7}{paragraph.66}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Supervised range-projected regression boundary on the P0 split. The MLP is stronger on normalized numeric error and Acc@0.1, while TRR preserves retrieved-exemplar semantics and is stronger on recall and cosine.}}{7}{table.68}\protected@file@percent }
+\newlabel{tab:supervised_boundary}{{V}{7}{Supervised range-projected regression boundary on the P0 split. The MLP is stronger on normalized numeric error and Acc@0.1, while TRR preserves retrieved-exemplar semantics and is stronger on recall and cosine}{table.68}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces P0 Protocol-C: real-degradation fusion robustness on the shared 204-query split. Lower is better for L2; higher is better for all other metrics.}}{7}{table.71}\protected@file@percent }
+\newlabel{tab:robustness}{{VI}{7}{P0 Protocol-C: real-degradation fusion robustness on the shared 204-query split. Lower is better for L2; higher is better for all other metrics}{table.71}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Diagnostic: Degraded-Input Fusion}{7}{subsection.69}\protected@file@percent }
+\newlabel{ssec:protocolC}{{\mbox  {V-D}}{7}{Diagnostic: Degraded-Input Fusion}{subsection.69}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Trial 1 (style matching): condition-level statistics (within-subject means).}}{8}{table.75}\protected@file@percent }
+\newlabel{tab:mushra_trial1_stats}{{VII}{8}{Trial 1 (style matching): condition-level statistics (within-subject means)}{table.75}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Perceptual Listening Test (Multiple-Stimulus with Hidden Reference)}{8}{subsection.72}\protected@file@percent }
+\newlabel{ssec:mushra}{{\mbox  {V-E}}{8}{Perceptual Listening Test (Multiple-Stimulus with Hidden Reference)}{subsection.72}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-E}1}Trial 1: Style Matching}{8}{subsubsection.73}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-E}2}Trials 2--5: Guitar Solo Comparison}{8}{subsubsection.78}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Trials 2--5 (solo comparison): condition-level statistics (within-subject means).}}{8}{table.80}\protected@file@percent }
+\newlabel{tab:mushra_trial2_5_stats}{{VIII}{8}{Trials 2--5 (solo comparison): condition-level statistics (within-subject means)}{table.80}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Trials 6--10 (similarity): condition-level statistics (within-subject means).}}{8}{table.85}\protected@file@percent }
+\newlabel{tab:mushra_trial6_10_stats}{{IX}{8}{Trials 6--10 (similarity): condition-level statistics (within-subject means)}{table.85}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {V-E}3}Trials 6--10: Similarity to Reference}{8}{subsubsection.83}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-E}3a}Interpretation.}{8}{paragraph.88}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\numberline {\mbox  {V-E}3b}Metric--perception alignment diagnostic.}{8}{paragraph.89}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Trial 1: condition-level score distributions (boxplot) for style matching.}}{9}{figure.77}\protected@file@percent }
+\newlabel{fig:mushra_trial1_boxplot}{{4}{9}{Trial 1: condition-level score distributions (boxplot) for style matching}{figure.77}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Trials 2--5: condition-level score distributions.}}{9}{figure.82}\protected@file@percent }
+\newlabel{fig:mushra_trial2_5_boxplot}{{5}{9}{Trials 2--5: condition-level score distributions}{figure.82}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Trials 6--10: condition-level score distributions.}}{9}{figure.87}\protected@file@percent }
+\newlabel{fig:mushra_trial6_10_boxplot}{{6}{9}{Trials 6--10: condition-level score distributions}{figure.87}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Discussion}{9}{section.90}\protected@file@percent }
+\newlabel{sec:discussion}{{VI}{9}{Discussion}{section.90}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Scope of the Current Evidence}{9}{subsection.91}\protected@file@percent }
+\newlabel{ssec:memory_exp}{{\mbox  {VI-A}}{9}{Scope of the Current Evidence}{subsection.91}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Implications for Audio Effect Control}{9}{subsection.92}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Revisiting the Texture Hypothesis}{9}{subsection.93}\protected@file@percent }
+\bibdata{reference}
+\bibcite{liu2023audioldm}{{1}{2023}{{Liu et~al.}}{{Liu, Chen, Yuan, Mei, Liu, Mandic, Wang, and Plumbley}}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Ethical Considerations}{10}{subsection.94}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Limitations}{10}{section.95}\protected@file@percent }
+\newlabel{sec:limitations}{{VII}{10}{Limitations}{section.95}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion}{10}{section.96}\protected@file@percent }
+\newlabel{sec:conclusion}{{VIII}{10}{Conclusion}{section.96}{}}
+\bibcite{agostinelli2023musiclm}{{2}{2023}{{Agostinelli et~al.}}{{Agostinelli, Denk, Borsos, Engel, Verzetti, Caillon, Huang, Jansen, Roberts, Tagliasacchi, Sharifi, Zeghidour, and Frank}}}
+\bibcite{engel2020ddsp}{{3}{2020}{{Engel et~al.}}{{Engel, Hantrakul, Gu, and Roberts}}}
+\bibcite{stables2014semantic}{{4}{2014}{{Stables et~al.}}{{Stables, Enderby, De~Man, Fazekas, and Reiss}}}
+\bibcite{schedl2014survey}{{5}{2014}{{Schedl et~al.}}{{Schedl, G{\'o}mez, and Urbano}}}
+\bibcite{kuli2014active}{{6}{2014}{{Huang et~al.}}{{Huang, Duvenaud, Arnold, Partridge, Oberholtzer, and Gajos}}}
+\bibcite{bryan2024synthscribe}{{7}{2024}{{Brade et~al.}}{{Brade, Wang, Sousa, Newsome, Oore, and Grossman}}}
+\bibcite{steinmetz2022automix}{{8}{2022}{{Steinmetz et~al.}}{{Steinmetz, Pons, Pascual, and Serrà}}}
+\bibcite{peladeau2024blind}{{9}{2024}{{Peladeau and Peeters}}{{}}}
+\bibcite{liu2024ddspSFX}{{10}{2024{}}{{Liu et~al.}}{{Liu, Jin, and Gunawan}}}
+\bibcite{deemanat2025latent}{{11}{2025}{{De~Man and Reiss}}{{}}}
+\bibcite{benetos2024stito}{{12}{2024}{{Steinmetz et~al.}}{{Steinmetz, Singh, Comunit{\`a}, Ibnyahya, Yuan, Benetos, and Reiss}}}
+\bibcite{liu2024audioldm2}{{13}{2024{}}{{Liu et~al.}}{{Liu, Yuan, Liu, Mei, Kong, Tian, Wang, Plumbley, and Wang}}}
+\bibcite{vyas2023audiobox}{{14}{2023}{{Vyas et~al.}}{{Vyas, Shi, Le, Tjandra, Wu, Shi, Guo, Hsu, Conneau, and Auli}}}
+\bibcite{huang2022makeanaudio}{{15}{2023}{{Huang et~al.}}{{Huang, Huang, Yang, Ren, Liu, Li, Ye, Liu, Yin, and Zhao}}}
+\bibcite{wang2023audiolcm}{{16}{2023}{{Wang et~al.}}{{Wang, Ye, Huang, Liu, Zhao, and Ren}}}
+\bibcite{liang2024instruction}{{17}{2023}{{Ghosal et~al.}}{{Ghosal, Majumder, Mehrish, and Poria}}}
+\bibcite{baevski2020wav2vec}{{18}{2020}{{Baevski et~al.}}{{Baevski, Zhou, Mohamed, and Auli}}}
+\bibcite{elizalde2023clap}{{19}{2023}{{Elizalde et~al.}}{{Elizalde, Deshmukh, Al~Ismail, and Wang}}}
+\bibcite{koutini2022passt}{{20}{2022}{{Koutini et~al.}}{{Koutini, Schl{\"u}ter, Eghbal-zadeh, and Widmer}}}
+\bibcite{kong2020panns}{{21}{2020}{{Kong et~al.}}{{Kong, Cao, Iqbal, Wang, Wang, and Plumbley}}}
+\bibcite{lewis2020rag}{{22}{2020}{{Lewis et~al.}}{{Lewis, Perez, Piktus, Petroni, Karpukhin, Goyal, K{\"u}ttler, Lewis, Yih, Rockt{\"a}schel, Riedel, and Kiela}}}
+\bibcite{chen2024reclap}{{23}{2024}{{Kumar et~al.}}{{Kumar, Ghosh, Manocha, Duraiswami, and Nieto}}}
+\bibcite{niizumi2024m2dclap}{{24}{2024}{{Niizumi et~al.}}{{Niizumi, Takeuchi, Ohishi, Harada, Yasuda, Tsubaki, and Imoto}}}
+\bibcite{wu2024fewshot}{{25}{2024}{{Hanif et~al.}}{{Hanif, Agro, Qazi, and Aldarmaki}}}
+\bibcite{qwen_audio}{{26}{2023}{{Chu et~al.}}{{Chu, Xu, Zhou, Yang, Zhang, Yan, Zhou, and Zhou}}}
+\bibcite{salmonn}{{27}{2023}{{Tang et~al.}}{{Tang, Yu, Sun, Chen, Tan, Li, Lu, Ma, and Zhang}}}
+\bibcite{gatys2015style}{{28}{2015}{{Gatys et~al.}}{{Gatys, Ecker, and Bethge}}}
+\bibcite{stylianou2015audio}{{29}{2014}{{Bruna and Mallat}}{{}}}
+\bibcite{mcwec2023texture}{{30}{2022}{{Sharma et~al.}}{{Sharma, Umapathy, and Krishnan}}}
+\bibcite{verzotto2022representations}{{31}{2022}{{Natsiou and O'Leary}}{{}}}
+\bibcite{weck2023wikimute}{{32}{2023}{{Weck et~al.}}{{Weck, Kirchhoff, Grosche, and Serra}}}
+\bibcite{srivatsan2024retrieval}{{33}{2024}{{Srivatsan et~al.}}{{Srivatsan, Chen, Dubnov, and Berg-Kirkpatrick}}}
+\bibcite{gonzales2024rag}{{34}{2024}{{Gonzales and Rudzicz}}{{}}}
+\bibcite{doh2025llm2fx}{{35}{2025}{{Doh et~al.}}{{Doh, Koo, Mart{\'i}nez-Ram{\'i}rez, Liao, Nam, and Mitsufuji}}}
+\bibcite{liu2025hmrag}{{36}{2025}{{Liu et~al.}}{{Liu, Liu, Yao, Liu, Meng, Wang, and Ma}}}
+\bibcite{mcdermott2011sound}{{37}{2011}{{McDermott and Simoncelli}}{{}}}
+\bibstyle{IEEEtranN}
+\gdef \@abspage@last{12}

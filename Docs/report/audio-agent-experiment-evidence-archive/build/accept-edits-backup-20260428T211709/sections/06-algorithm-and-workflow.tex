@@ -1,0 +1,92 @@
+\chapter{TMM 可复现台账与证据包规范}
+\label{chap:workflow}
+
+\reportdel{旧 NeurIPS run logger 说明。}
+
+\reportadd{本章把代码实现路径进一步约束为 TMM 可复现证据路径。TMM 期刊论文不能只依赖“某个脚本曾经跑出过表格”；它需要每个结果都能回答五个问题：使用了哪一次运行，运行时仓库处于什么状态，输入数据和 split 的 checksum 是什么，统计检验如何从原始 per-query 结果生成，以及该结果在主文、补充材料和 response letter 中被如何引用。Logger 的职责就是把这些问题变成强制字段。}
+
+\begin{table}[H]
+	\centering
+	\caption{TMM run logger 的最小字段规范。}
+	\label{tab:logger-schema}
+	\scriptsize
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{llll}
+		\toprule
+		字段 & 类型 & 角色 & 说明 \\
+		\midrule
+		\texttt{run\_id} & string & 主键 & 采用日期、实验编号、方法和短 hash 组成，所有 CSV/JSON/MD 共享。 \\
+		\texttt{submission\_gate} & enum & 监督阶段 & 取值如 T1-evidence-freeze、T2-baseline、T3-ablation、T6-package。 \\
+		\texttt{git\_commit} / \texttt{git\_dirty} & string/bool & 代码状态 & 记录 HEAD、branch、未提交变更摘要；dirty run 只能作探索，不能直接进主表。 \\
+		\texttt{command} / \texttt{env} & string/object & 复现入口 & 保存完整命令、Python 版本、关键依赖版本、设备信息。 \\
+		\texttt{dataset\_checksum} & string & 数据快照 & 指向 dataset manifest、split manifest 和原始 JSON/CSV checksum。 \\
+		\texttt{split\_id} & string & 协议边界 & 明确 204 audio-grouped、legacy 211 或更严格 family split。 \\
+		\texttt{query\_count} / \texttt{kb\_count} & integer & 规模审计 & 防止不同口径的样本规模被混入同一主表。 \\
+		\texttt{method\_config} & object & 方法定义 & 保存 retriever、embedding、normalization、top-k、seed、ablation flags。 \\
+		\texttt{metrics} / \texttt{stats} & object & 统计结果 & 保存均值、CI、paired permutation、Holm correction 和有效样本交集。 \\
+		\texttt{artifacts} & list & 证据索引 & 列出 per-query CSV、summary JSON、stats MD、stderr/stdout 和 checksum。 \\
+		\texttt{paper\_links} & list & 投稿映射 & 列出 main paper、supplement、response letter 与 checklist 中引用该结果的位置。 \\
+		\texttt{failure\_flags} & list & 负面证据 & 记录缺失缓存、跳过样本、异常输入、退化场景失败类型。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+表~\ref{tab:logger-schema} 是后续实验代码需要满足的最小审计接口。它的主要作用是让论文表格、附录统计和匿名代码包共享同一证据主键。
+
+\reportadd{TMM 修订还需要一张可复现性表（reproducibility table），把运行字段映射到论文审稿时可检查的最小项。}
+
+\begin{table}[H]
+	\centering
+	\caption{可复现性表：random seed、数据划分、配置、硬件与运行命令。}
+	\label{tab:reproducibility-table}
+	\scriptsize
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{llll}
+		\toprule
+		维度 & 当前状态 & 必填字段 & TMM gate \\
+		\midrule
+		随机种子 & 部分脚本需补登记 & seed、hash、统计重采样次数 & 进入主表前冻结。 \\
+		数据划分 & 204 audio-grouped 已定义 & split id、query count、kb count、checksum & 不同 split 不混写。 \\
+		方法配置 & TRR 与基线配置需集中化 & retriever、embedding、normalization、top-k & 同表方法共享 evaluator。 \\
+		硬件环境 & 当前报告未统一记录 & device、Python、依赖版本、缓存状态 & 匿名包 README 必填。 \\
+		运行命令 & 旧产物命令不完整 & command、cwd、env、stdout/stderr & 无命令不进主结果。 \\
+		论文映射 & TMM 包需新增 & main table、supplement、response、checklist & claim-to-evidence 一一对应。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+\reportadd{表~\ref{tab:reproducibility-table} 将 TMM 复现要求转化为主表进入条件：没有 seed、split、配置、硬件和命令的结果，不能进入主文核心 claim。}
+
+\reportdel{旧 NeurIPS run artifact 目录建议。}
+
+\reportadd{建议将每次运行归入 \texttt{Experiments/tmm/runs/} 下的独立 \texttt{run\_id} 子目录，最小文件包括运行描述、per-query 结果、统计摘要、校验和、日志与 paper links。 本报告不声称该目录已经完全实现；它是从当前 evidence boundary 和 TMM reproducible research 要求推导出的 design intent。后续实现时，旧的 Protocol-A/Protocol-C 产物可以被迁移或注册到同一 schema，而不需要重写历史结果。}
+
+KaiMing 对 logger 的验收标准很简单：任何进入主文的表格行，都必须能反查到唯一运行主键；任何显著性结论，都必须能反查到配对样本交集；任何缺失输出或 dirty run，都必须在表注或局限中被披露。\reportadd{任何 response letter 的答复，也必须能反查到主文或补充材料中的具体表、图或段落。}若做不到这一点，该结果只能进入探索记录或附录待复现清单。
+
+代码库中存在产品链路与实验链路两套路径。产品链路从用户文本和可选音频出发，通过 DeepSeek 解析风格与参数，经 \texttt{import\_params.json} 传入 JUCE 插件，再由插件加载参数和音频并离线渲染。该链路说明 Audio-Agent 具备可执行插件控制的工程背景，但本文不把它作为主实验结果来源，因为主实验没有评价完整插件输出音频质量。
+
+实验链路更适合作为论文证据。数据加载由 common dataset loader 负责，优先读取外部 1267 条数据集 JSON，再回退到 repo 内 JSON 或 SQLite 合并。TRR 检索由 common TRR adapter 实现，优先使用缓存向量。直接检索比较与 Protocol-C 分别由 AblationStudies 下的 comparison 与 robustness 脚本驱动，评价指标由公共 evaluator 计算。
+
+\begin{figure}[H]
+	\centering
+	\resizebox{\textwidth}{!}{%
+	\begin{tikzpicture}[node distance=1.25cm and 1.0cm]
+		\node[reportnode, minimum width=3.2cm] (dataset) {数据集 JSON\\1267 records};
+		\node[reportprocess, right=of dataset, minimum width=3.0cm] (split) {切分审计\\204/1063};
+		\node[reportprocess, right=of split, minimum width=3.2cm] (retrievers) {检索器\\TRR/Text/Wav2Vec/CLAP};
+		\node[reportprocess, right=of retrievers, minimum width=2.8cm] (metrics) {参数评价\\Evaluator};
+		\node[reportnode, right=of metrics, minimum width=3.2cm] (artifacts) {CSV/JSON/MD\\证据产物};
+		\draw[reportarrow] (dataset) -- (split);
+		\draw[reportarrow] (split) -- (retrievers);
+		\draw[reportarrow] (retrievers) -- (metrics);
+		\draw[reportarrow] (metrics) -- (artifacts);
+		\node[reportnode, below=1.0cm of retrievers, minimum width=4.2cm, fill=ReportSoftYellow] (boundary) {证据治理\\主证据 / 诊断 / 待补 / 历史};
+		\draw[reportarrow] (artifacts) |- (boundary);
+	\end{tikzpicture}}
+	\caption{实验证据生成路径。论文主结论应回到可复核的 CSV、JSON、Markdown 统计产物，避免依赖未验证的工程愿景。}
+	\label{fig:experiment-evidence-flow}
+\end{figure}
+
+图~\ref{fig:experiment-evidence-flow} 对应当前最可靠的复现路径。对于 Protocol-A，复核者应从 split audit、audio-grouped per-query CSV 和 objective stats 开始，确认样本规模、指标定义和配对统计。对于 Protocol-C，复核者应检查每个 scenario 下 Text-only、TRR-only 和 Fusion 的 L2、权重均值及 Holm-corrected comparisons。对于 P0，复核者只能先阅读 runbook 和脚本，因为报告引用的原始 outputs 尚未提交。
+
+当前代码中还存在一些不应被误写为主证据的部分。实验侧 Text-RAG 实际更接近 deterministic keyword overlap；Protocol-B 已经被标注为 deprecated；E0 合成音频管线仍有缺失音频记录。因此，本文在结论中使用 “under the current held-out protocol”、“cached TRR representation” 和 “currently evaluated baselines” 等限定语。

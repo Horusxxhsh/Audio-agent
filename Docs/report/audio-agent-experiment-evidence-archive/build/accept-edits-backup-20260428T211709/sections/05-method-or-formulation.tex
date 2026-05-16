@@ -1,0 +1,81 @@
+\chapter{TMM 实验设计与评价方法}
+\label{chap:experiment-design}
+
+\reportdel{旧 NeurIPS main-track 实验矩阵说明。}
+
+\reportadd{本章把当前实验协议改写为 TMM 期刊证据矩阵。核心原则是：每一个实验只服务一个可证伪命题，每一个主表数值都必须由 logger、原始输出、统计脚本、checksum 和论文包中的具体位置共同支撑。现有 Protocol-A/Protocol-C 仍是基线证据，但它们只能证明“当前已评估检索基线下 TRR 有优势”；若要达到 TMM 期刊论文强度，还必须把强基线公平性、TRR 消融、泄漏审计、感知评价边界、补充材料页数和 response letter 一致性同时纳入 gate。}
+
+\begin{table}[H]
+	\centering
+	\caption{TMM 期刊证据矩阵与 KaiMing 通过标准。}
+	\label{tab:tmm-experiment-matrix}
+	\scriptsize
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{lllll}
+		\toprule
+		Gate & 目标命题 & 最小证据集合 & 主要检查项 & 通过标准 \\
+		\midrule
+			T0 Scope & 论文属于 TMM 范围 & 引言、相关工作、方法 framing & 任务和贡献是否服务音频参数控制 & 不以通用 agent 或 demo 为核心贡献。 \\
+			T1 Evidence & 当前主证据可复核 & Protocol-A、Protocol-C、听测、split audit & checksum、manifest、统计复现、artifact path & 主表文件可由 manifest 定位。 \\
+			T2 Baseline & 排除弱基线解释 & Text、Wav2Vec、FeatureNN、CLAP；未完成强基线显式标注 & 五项参数指标、CI 与配对检验 & 同 split、同 query、同 logger；未完成项不暗示 SOTA。 \\
+			T3 Ablation & 二阶纹理统计是有效成分 & mean pooling、Gram、层选择、归一化、top-k & 主指标与运行成本 & 至少一个结构消融削弱主指标。 \\
+			T4 Leakage & 结果不来自近重复泄漏 & exact path、hash、近邻、family split & 重复率与严格 split 表现 & 严格 split 下结论方向保持，或降级 claim。 \\
+			T5 Boundary & 感知与鲁棒边界被披露 & 听测、Protocol-C、失败样例 & rater 元数据、真实退化、conflict failure & 证据不足时限定为 proxy 与诊断。 \\
+			T6 Package & 主文、附录、答复与匿名包一致 & paper、supplement、response、checklist、code/data & 页数、warning、citation、证据追踪 & claim、附录表、代码输出和答复一一对应。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+表~\ref{tab:tmm-experiment-matrix} 是后续 TMM 修订的实验与提交包契约。该契约把当前最可辩护的研究对象压实为四个限定词：检索式、可执行、参数可编辑、证据可审计。凡是不能进入这个矩阵的探索，例如产品侧 UI、个性化记忆或端到端生成体验，都应保留在 future work 或系统背景中。
+
+本报告采用三类协议口径。第一类是主证据协议，即 resolved-audio-grouped Protocol-A。该协议基于外部 1267 条 guitar-effects benchmark drop-in，按 resolved local audio path 分组后形成 204 条测试查询和 1063 条知识库记录，目的在于消除 legacy split 中已发现的 exact cross-split audio reuse。第二类是诊断协议，包括 211-query Protocol-C 和 legacy/strong-baseline 结果，用于分析融合边界和历史数值差异。第三类是待补协议，即 P0 E2/E3；它有报告和脚本，但缺少原始 outputs，因此不能作为主证据。
+
+\begin{table}[H]
+	\centering
+	\caption{实验协议、数据规模与证据状态。}
+	\label{tab:protocol-map}
+	\small
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{lrrll}
+		\toprule
+			协议或材料 & 测试数 & 知识库数 & 状态 & 本文用途 \\
+		\midrule
+		Protocol-A audio-grouped & 204 & 1063 & 本地主统计与 per-query 结果存在 & 主证据，论文主表口径。 \\
+		Protocol-A legacy/strong & 211 & 1056 & 本地结果存在，但含 legacy split 风险 & 历史对照或诊断，不与 204 口径混写。 \\
+		Protocol-C & 211 & 1056 & 本地统计与 per-query 结果存在 & Fusion fallback 与 conflict failure 诊断。 \\
+		Listening test & 26 participants & 910 ratings & 统计报告存在 & 主观补充，不作为严格胜负证据。 \\
+		P0 E2/E3 & 204 & 1063 & 报告和脚本存在，原始 outputs 缺失 & 复现入口，不能作为正式主证据。 \\
+		Protocol-B & 211 & 1056 & 文件自标 deprecated & 历史材料，不进入主结论。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+表~\ref{tab:protocol-map} 中最重要的设计选择是把 204 条 audio-grouped Protocol-A 固定为主文口径。旧 211-query 结果在数值上更好看，例如 TRR 的 L2 为 0.3064，但该切分的 audit 发现 16 条跨 split shared resolved audio paths 和 48 对近重复风险。严格切分的 TRR L2 变为 8.0467，数值尺度明显不同，却更适合作为提交面主证据。因此，本文宁可使用较难、更保守的主表，也不将 legacy 数值当作核心结论。
+
+\reportadd{TMM 主文还需要把 baseline matrix 前置为 fairness contract，而不是只在结果表中列出方法名。}
+
+\begin{table}[H]
+	\centering
+	\caption{Baseline matrix：对比方法、指标与公平性约束。}
+	\label{tab:baseline-matrix}
+	\scriptsize
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{lllll}
+		\toprule
+		方法 & 证据状态 & 共享协议 & 公平性约束 & TMM 使用方式 \\
+		\midrule
+		TRR & 主方法 & 204 audio-grouped & 缓存向量、同一 evaluator、同一 split & 主表核心结果。 \\
+		Text-RAG & 已评估 & 204 audio-grouped & 同 query set；说明 keyword-overlap 实现边界 & 检索文本基线。 \\
+		Wav2Vec-RAG & 已评估 & 204 audio-grouped & 同参数指标；不写成强语义基线 & 音频嵌入基线。 \\
+		FeatureNN-RAG & 已评估 & 204 audio-grouped & 同 top-1 检索输出与同统计检验 & 工程特征基线。 \\
+		CLAP & 部分覆盖 & 201 shared queries & 只做交集配对比较 & 语义音频基线。 \\
+		PaSST/PANNs/direct regression & 待复现 & P0 runbook & 原始 outputs 缺失前不进主表 & limitations 或补实验。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+\reportadd{表~\ref{tab:baseline-matrix} 的约束意味着：CLAP 可以作为语义音频基线，但只能在 201 条共享查询上比较；PaSST、PANNs 与 direct regression 在原始输出缺失前只能作为待复现项。}
+
+每个检索方法输出一个候选参数 JSON。参数距离按展开后的数值叶子计算 RMSE；阈值准确率、召回、余弦相似度和模块一致性由公共 evaluator 实现。Protocol-A 统计报告使用 bootstrap confidence intervals 和 paired permutation tests，并用 Holm correction 处理多重比较。CLAP 在 audio-grouped 协议中只覆盖 201 条查询，因此与 TRR 的配对比较使用交集样本。
+
+Protocol-C 的四个场景分别测试标准输入、vague text、noisy audio 和 modality conflict。需要强调的是，noisy audio 场景使用 embedding-space Gaussian noise，而非真实音频退化重新编码。因此，Protocol-C 只能说明当前 score-level fusion heuristic 的边界行为，不能证明系统已具备真实环境下的音频鲁棒性。

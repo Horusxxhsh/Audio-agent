@@ -1,0 +1,40 @@
+# Ruff configuration for Audio Agent
+# https://docs.astral.sh/ruff/
+
+target-version = "py310"
+line-length = 88
+
+[lint]
+select = [
+    "E",     # pycodestyle errors
+    "F",     # pyflakes
+    "W",     # pycodestyle warnings
+    "I",     # isort
+    "N",     # pep8-naming
+    "UP",    # pyupgrade
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "SIM",   # flake8-simplify
+    "PLC",   # pylint convention
+    "PLE",   # pylint error
+    "PLR",   # pylint refactor
+    "PLW",   # pylint warning
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "PLR0913",  # too many arguments
+    "PLR2004",  # magic value comparison
+    "PLR0912",  # too many branches
+    "PLW0603",  # global statement
+    "PLC0414",  # import aliasing (used for lazy loading)
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["PLR2004"]
+"Source/**/llm.py" = ["PLR0915"]  # legacy file is long
+"Source/**/sql.py" = ["PLR0915"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true

@@ -1,0 +1,47 @@
+{
+    "dataset_name": "Audio_Synthetic",
+    "version": "1.0.0",
+    "description": "Synthetic audio dataset with multi-model feature embeddings for Audio Agent RAG system.",
+    "created": "2026-01-24",
+    "last_modified": "2026-05-07",
+    "file_count": 1319,
+    "feature_models": {
+        "wav2vec": {
+            "model": "facebook/wav2vec2-base-960h",
+            "embedding_dim": 768,
+            "extension": ".wav2vec.npy",
+            "description": "Audio embedding from Wav2Vec2 base model"
+        },
+        "clap": {
+            "model": "CLAP (Contrastive Language-Audio Pretraining)",
+            "embedding_dim": 512,
+            "extension": ".clap.npy",
+            "description": "Audio-text joint embedding from CLAP"
+        },
+        "mfcc": {
+            "model": "librosa MFCC extraction",
+            "embedding_dim": 13,
+            "extension": ".mfcc.npy",
+            "description": "13-coefficient MFCC feature vector"
+        },
+        "trr": {
+            "model": "TRR (Tonalness-Roughness-Reliability)",
+            "embedding_dim": 384,
+            "extension": ".trr.npy",
+            "description": "Tonal roughness representation vector"
+        }
+    },
+    "audio_properties": {
+        "format": "WAV",
+        "sample_rate": 44100,
+        "channels": 1,
+        "bit_depth": 16
+    },
+    "file_naming_convention": "<genre>.wav[.<feature_extension>]",
+    "license": "Proprietary",
+    "extraction_parameters": {
+        "wav2vec_sr": 16000,
+        "mfcc_n_mfccs": 13,
+        "mfcc_sr": 22050
+    }
+}
