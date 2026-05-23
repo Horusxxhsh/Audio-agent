@@ -1,0 +1,162 @@
+{
+  "top1_norm_l2": [
+    {
+      "metric": "top1_norm_l2",
+      "baseline": "Wav2Vec",
+      "raw_p": 1.3004965754919698e-09,
+      "holm_corrected_p": 3.901489726475909e-09,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    },
+    {
+      "metric": "top1_norm_l2",
+      "baseline": "FeatureNN",
+      "raw_p": 3.137130552675596e-09,
+      "holm_corrected_p": 6.274261105351192e-09,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    },
+    {
+      "metric": "top1_norm_l2",
+      "baseline": "PaSST",
+      "raw_p": 3.3289580909661724e-08,
+      "holm_corrected_p": 3.3289580909661724e-08,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    }
+  ],
+  "top1_acc_at_0_1": [
+    {
+      "metric": "top1_acc_at_0_1",
+      "baseline": "Wav2Vec",
+      "raw_p": 2.686677046170198e-11,
+      "holm_corrected_p": 8.060031138510594e-11,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    },
+    {
+      "metric": "top1_acc_at_0_1",
+      "baseline": "FeatureNN",
+      "raw_p": 6.922254110106387e-10,
+      "holm_corrected_p": 1.3844508220212775e-09,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    },
+    {
+      "metric": "top1_acc_at_0_1",
+      "baseline": "PaSST",
+      "raw_p": 1.6632622916192296e-09,
+      "holm_corrected_p": 1.6632622916192296e-09,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    }
+  ],
+  "top1_recall": [
+    {
+      "metric": "top1_recall",
+      "baseline": "Wav2Vec",
+      "raw_p": 5.3825816880078054e-08,
+      "holm_corrected_p": 1.6147745064023417e-07,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    },
+    {
+      "metric": "top1_recall",
+      "baseline": "FeatureNN",
+      "raw_p": 1.0445589711891128e-07,
+      "holm_corrected_p": 2.0891179423782256e-07,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    },
+    {
+      "metric": "top1_recall",
+      "baseline": "PaSST",
+      "raw_p": 3.0295965814430946e-07,
+      "holm_corrected_p": 3.0295965814430946e-07,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    }
+  ],
+  "top1_cosine": [
+    {
+      "metric": "top1_cosine",
+      "baseline": "Wav2Vec",
+      "raw_p": 2.8337600861215604e-08,
+      "holm_corrected_p": 5.667520172243121e-08,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    },
+    {
+      "metric": "top1_cosine",
+      "baseline": "FeatureNN",
+      "raw_p": 4.646171627871784e-09,
+      "holm_corrected_p": 1.3938514883615351e-08,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    },
+    {
+      "metric": "top1_cosine",
+      "baseline": "PaSST",
+      "raw_p": 1.8859141111973036e-07,
+      "holm_corrected_p": 1.8859141111973036e-07,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    }
+  ],
+  "top1_switch_f1": [
+    {
+      "metric": "top1_switch_f1",
+      "baseline": "Wav2Vec",
+      "raw_p": 1.0304143119276314e-06,
+      "holm_corrected_p": 3.091242935782894e-06,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    },
+    {
+      "metric": "top1_switch_f1",
+      "baseline": "FeatureNN",
+      "raw_p": 3.971947370506467e-06,
+      "holm_corrected_p": 7.943894741012934e-06,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    },
+    {
+      "metric": "top1_switch_f1",
+      "baseline": "PaSST",
+      "raw_p": 1.6282048974858864e-05,
+      "holm_corrected_p": 1.6282048974858864e-05,
+      "n_comparisons": 3,
+      "significant_raw": true,
+      "significant_corrected": true,
+      "alpha": 0.05
+    }
+  ]
+}
