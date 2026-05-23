@@ -1,0 +1,159 @@
+{
+  "stats": [
+    {
+      "threshold": 0.02,
+      "original_queries": 204,
+      "retained_queries": 204,
+      "original_kb": 1063,
+      "retained_kb": 84,
+      "filtered_pairs": 979,
+      "filter_rate": 0.9209783631232361
+    },
+    {
+      "threshold": 0.05,
+      "original_queries": 204,
+      "retained_queries": 204,
+      "original_kb": 1063,
+      "retained_kb": 63,
+      "filtered_pairs": 1000,
+      "filter_rate": 0.940733772342427
+    },
+    {
+      "threshold": 0.1,
+      "original_queries": 204,
+      "retained_queries": 204,
+      "original_kb": 1063,
+      "retained_kb": 36,
+      "filtered_pairs": 1027,
+      "filter_rate": 0.9661335841956726
+    }
+  ],
+  "results": [
+    {
+      "method": "TRR",
+      "threshold": 0.02,
+      "norm_l2": 0.21305074258019227,
+      "coverage": 1.0,
+      "n_queries": 204
+    },
+    {
+      "method": "Wav2Vec",
+      "threshold": 0.02,
+      "norm_l2": 0.23709518707018737,
+      "coverage": 1.0,
+      "n_queries": 204
+    },
+    {
+      "method": "FeatureNN",
+      "threshold": 0.02,
+      "norm_l2": 0.2599001902778322,
+      "coverage": 1.0,
+      "n_queries": 204
+    },
+    {
+      "method": "CLAP",
+      "threshold": 0.02,
+      "norm_l2": 0.23315618794591006,
+      "coverage": 0.8480392156862745,
+      "n_queries": 173
+    },
+    {
+      "method": "PaSST",
+      "threshold": 0.02,
+      "norm_l2": NaN,
+      "coverage": 0.0,
+      "n_queries": 0
+    },
+    {
+      "method": "PANNs",
+      "threshold": 0.02,
+      "norm_l2": NaN,
+      "coverage": 0.0,
+      "n_queries": 0
+    },
+    {
+      "method": "TRR",
+      "threshold": 0.05,
+      "norm_l2": 0.20131183101340994,
+      "coverage": 1.0,
+      "n_queries": 204
+    },
+    {
+      "method": "Wav2Vec",
+      "threshold": 0.05,
+      "norm_l2": 0.23051261100296502,
+      "coverage": 1.0,
+      "n_queries": 204
+    },
+    {
+      "method": "FeatureNN",
+      "threshold": 0.05,
+      "norm_l2": 0.26528050065811715,
+      "coverage": 1.0,
+      "n_queries": 204
+    },
+    {
+      "method": "CLAP",
+      "threshold": 0.05,
+      "norm_l2": 0.22834296444207908,
+      "coverage": 0.8480392156862745,
+      "n_queries": 173
+    },
+    {
+      "method": "PaSST",
+      "threshold": 0.05,
+      "norm_l2": NaN,
+      "coverage": 0.0,
+      "n_queries": 0
+    },
+    {
+      "method": "PANNs",
+      "threshold": 0.05,
+      "norm_l2": NaN,
+      "coverage": 0.0,
+      "n_queries": 0
+    },
+    {
+      "method": "TRR",
+      "threshold": 0.1,
+      "norm_l2": 0.2233262493323143,
+      "coverage": 1.0,
+      "n_queries": 204
+    },
+    {
+      "method": "Wav2Vec",
+      "threshold": 0.1,
+      "norm_l2": 0.2288047975285916,
+      "coverage": 1.0,
+      "n_queries": 204
+    },
+    {
+      "method": "FeatureNN",
+      "threshold": 0.1,
+      "norm_l2": 0.2771617083689703,
+      "coverage": 1.0,
+      "n_queries": 204
+    },
+    {
+      "method": "CLAP",
+      "threshold": 0.1,
+      "norm_l2": 0.21164051850876645,
+      "coverage": 0.8480392156862745,
+      "n_queries": 173
+    },
+    {
+      "method": "PaSST",
+      "threshold": 0.1,
+      "norm_l2": NaN,
+      "coverage": 0.0,
+      "n_queries": 0
+    },
+    {
+      "method": "PANNs",
+      "threshold": 0.1,
+      "norm_l2": NaN,
+      "coverage": 0.0,
+      "n_queries": 0
+    }
+  ]
+}

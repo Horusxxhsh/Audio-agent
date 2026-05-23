@@ -47,6 +47,25 @@ def extract_panns_embeddings(
         return [data[str(i)] if str(i) in data else None for i in range(len(dataset))]
 
     # Import encoder
+    # Resolve Windows-style paths to Linux paths
+    base_audio_dir = Path("/home/xyh/code/Audio-agent/Data/Audio_Synthetic")
+
+    def resolve_path(audio_path: str) -> Optional[Path]:
+        """Convert Windows path to Linux path and check existence."""
+        if not audio_path:
+            return None
+        # Try direct path first
+        p = Path(audio_path)
+        if p.exists():
+            return p
+        # Extract basename and try under base audio dir
+        basename = audio_path.replace("\\", "/").split("/")[-1]
+        if basename:
+            candidate = base_audio_dir / basename
+            if candidate.exists():
+                return candidate
+        return None
+
     try:
         from panns_encoder import PANNsEncoder
     except ImportError:
@@ -58,12 +77,13 @@ def extract_panns_embeddings(
 
     for i, item in enumerate(dataset):
         audio_path = item.get("AudioPath", "")
-        if not audio_path or not Path(audio_path).exists():
+        resolved = resolve_path(audio_path)
+        if not resolved:
             embeddings.append(None)
             continue
 
         try:
-            emb = encoder.get_embedding(audio_path)
+            emb = encoder.encode_audio(str(resolved))
             embeddings.append(emb)
         except Exception as e:
             logger.warning(f"Failed to encode item {i}: {e}")

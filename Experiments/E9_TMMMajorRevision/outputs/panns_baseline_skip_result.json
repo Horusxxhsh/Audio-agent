@@ -1,0 +1,37 @@
+{
+  "method": "PANNs",
+  "protocol": "Protocol-A",
+  "n_queries": 204,
+  "coverage": 0.0,
+  "norm_l2": null,
+  "acc_at_0_1": null,
+  "recall": null,
+  "cosine": null,
+  "switch_f1": null,
+  "status": "skipped",
+  "skip_reason": "Model weights (312 MB, hosted on Zenodo record 3987831) cannot be downloaded in a practical timeframe at current network bandwidth (~80 KB/s average). panns-inference 0.1.1 is installed, all dependencies (librosa 0.11.0, numba 0.65.0, torch 2.11.0+cu130) are compatible under Python 3.10.12, and the encoder/evaluation code is correct. The blocking issue is purely infrastructural (infeasible model download), not software. At 80 KB/s, downloading the 312 MB CNN14 checkpoint requires ~6.5 hours. Torch hub fallback is blocked by trusted-repository policy in recent PyTorch versions.",
+  "environment": {
+    "os": "Ubuntu Linux (x86_64)",
+    "python": "3.10.12",
+    "panns_inference": "0.1.1",
+    "librosa": "0.11.0",
+    "numba": "0.65.0",
+    "torch": "2.11.0+cu130",
+    "torchaudio": "2.11.0+cu130",
+    "cuda_available": true
+  },
+  "attempted_fixes": [
+    "pip install panns-inference — installed successfully (0.1.1), imports OK",
+    "torch.hub.load fallback — blocked by PyTorch trusted-repository policy (requires interactive confirmation)",
+    "wget download of 312 MB CNN14 model — projected 6.5 hours at ~80 KB/s average bandwidth",
+    "HuggingFace model mirror search — network SSL errors prevent retrieval",
+    "Search for alternative model mirrors — none found"
+  ],
+  "audio_data_status": {
+    "dataset_items": 56,
+    "audio_files_present": 56,
+    "panns_embeddings_cached": 0
+  },
+  "encoder_code_status": "verified correct — PANNsEncoder.encode_audio() interface matches panns_baseline.py usage",
+  "timestamp": "2026-05-23T16:03:00Z"
+}

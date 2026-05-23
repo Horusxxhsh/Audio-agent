@@ -1,0 +1,142 @@
+[
+  {
+    "method": "CLAP",
+    "tolerance": 0.05,
+    "acc_at_tau": 0.127168,
+    "recall_at_tau": 0.554913,
+    "n_queries": 173
+  },
+  {
+    "method": "CLAP",
+    "tolerance": 0.1,
+    "acc_at_tau": 0.352601,
+    "recall_at_tau": 0.895954,
+    "n_queries": 173
+  },
+  {
+    "method": "CLAP",
+    "tolerance": 0.15,
+    "acc_at_tau": 0.393064,
+    "recall_at_tau": 0.942197,
+    "n_queries": 173
+  },
+  {
+    "method": "CLAP",
+    "tolerance": 0.2,
+    "acc_at_tau": 0.433526,
+    "recall_at_tau": 0.971098,
+    "n_queries": 173
+  },
+  {
+    "method": "FeatureNN",
+    "tolerance": 0.05,
+    "acc_at_tau": 0.078431,
+    "recall_at_tau": 0.362745,
+    "n_queries": 204
+  },
+  {
+    "method": "FeatureNN",
+    "tolerance": 0.1,
+    "acc_at_tau": 0.245098,
+    "recall_at_tau": 0.70098,
+    "n_queries": 204
+  },
+  {
+    "method": "FeatureNN",
+    "tolerance": 0.15,
+    "acc_at_tau": 0.338235,
+    "recall_at_tau": 0.784314,
+    "n_queries": 204
+  },
+  {
+    "method": "FeatureNN",
+    "tolerance": 0.2,
+    "acc_at_tau": 0.431373,
+    "recall_at_tau": 0.877451,
+    "n_queries": 204
+  },
+  {
+    "method": "PaSST",
+    "tolerance": 0.05,
+    "acc_at_tau": 0.107843,
+    "recall_at_tau": 0.416667,
+    "n_queries": 204
+  },
+  {
+    "method": "PaSST",
+    "tolerance": 0.1,
+    "acc_at_tau": 0.284314,
+    "recall_at_tau": 0.715686,
+    "n_queries": 204
+  },
+  {
+    "method": "PaSST",
+    "tolerance": 0.15,
+    "acc_at_tau": 0.333333,
+    "recall_at_tau": 0.803922,
+    "n_queries": 204
+  },
+  {
+    "method": "PaSST",
+    "tolerance": 0.2,
+    "acc_at_tau": 0.45098,
+    "recall_at_tau": 0.872549,
+    "n_queries": 204
+  },
+  {
+    "method": "TRR",
+    "tolerance": 0.05,
+    "acc_at_tau": 0.171569,
+    "recall_at_tau": 0.612745,
+    "n_queries": 204
+  },
+  {
+    "method": "TRR",
+    "tolerance": 0.1,
+    "acc_at_tau": 0.460784,
+    "recall_at_tau": 0.833333,
+    "n_queries": 204
+  },
+  {
+    "method": "TRR",
+    "tolerance": 0.15,
+    "acc_at_tau": 0.588235,
+    "recall_at_tau": 0.916667,
+    "n_queries": 204
+  },
+  {
+    "method": "TRR",
+    "tolerance": 0.2,
+    "acc_at_tau": 0.661765,
+    "recall_at_tau": 0.936275,
+    "n_queries": 204
+  },
+  {
+    "method": "Wav2Vec",
+    "tolerance": 0.05,
+    "acc_at_tau": 0.093137,
+    "recall_at_tau": 0.436275,
+    "n_queries": 204
+  },
+  {
+    "method": "Wav2Vec",
+    "tolerance": 0.1,
+    "acc_at_tau": 0.294118,
+    "recall_at_tau": 0.715686,
+    "n_queries": 204
+  },
+  {
+    "method": "Wav2Vec",
+    "tolerance": 0.15,
+    "acc_at_tau": 0.348039,
+    "recall_at_tau": 0.808824,
+    "n_queries": 204
+  },
+  {
+    "method": "Wav2Vec",
+    "tolerance": 0.2,
+    "acc_at_tau": 0.382353,
+    "recall_at_tau": 0.862745,
+    "n_queries": 204
+  }
+]

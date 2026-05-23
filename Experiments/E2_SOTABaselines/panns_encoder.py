@@ -60,8 +60,18 @@ class PANNsEncoder:
                 ], check=True)
                 from panns_inference import AudioTagging
 
+            # Determine checkpoint path — use env var or default location
+            import os
+            from pathlib import Path
+            checkpoint_path = os.environ.get("PANNs_CHECKPOINT")
+            if checkpoint_path and os.path.exists(checkpoint_path):
+                logger.info(f"Using PANNs checkpoint from env: {checkpoint_path}")
+            else:
+                checkpoint_path = None  # Auto-download to ~/panns_data/
+                logger.info("PANNs model will auto-download to ~/panns_data/")
+
             self.model = AudioTagging(
-                checkpoint_path=None,  # Auto-download
+                checkpoint_path=checkpoint_path,
                 device=self.device
             )
             logger.info("PANNs model loaded successfully")

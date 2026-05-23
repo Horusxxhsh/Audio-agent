@@ -1,0 +1,29 @@
+[
+  {
+    "threshold": 0.02,
+    "original_queries": 204,
+    "retained_queries": 204,
+    "original_kb": 1063,
+    "retained_kb": 84,
+    "filtered_pairs": 979,
+    "filter_rate": 0.9209783631232361
+  },
+  {
+    "threshold": 0.05,
+    "original_queries": 204,
+    "retained_queries": 204,
+    "original_kb": 1063,
+    "retained_kb": 63,
+    "filtered_pairs": 1000,
+    "filter_rate": 0.940733772342427
+  },
+  {
+    "threshold": 0.1,
+    "original_queries": 204,
+    "retained_queries": 204,
+    "original_kb": 1063,
+    "retained_kb": 36,
+    "filtered_pairs": 1027,
+    "filter_rate": 0.9661335841956726
+  }
+]
