@@ -1,0 +1,52 @@
+\chapter{项目进度与 TMM 提交包收束计划}
+\label{chap:progress}
+
+截至 2026-05-02，本报告对应的仓库状态是一个实验材料进一步增强、但 submission hygiene 尚未完全收束的 TMM 修订工作区。已经完成的部分包括：用户确认 P0 E2/E3 原始产物真实、完整、正确；P0 E2 已补齐 TRR、Wav2Vec、FeatureNN、CLAP、PaSST 和 PANNs baseline matrix；P0 E3 已补齐真实退化下 adaptive-vs-fixed fusion 结果；听测统计有本地可读产物；\texttt{Experiments/tmm} 下已有 split audit、leakage audit 和相关测试；TMM response、revision checklist、main paper 与 supplementary 已按双核心贡献方向更新。尚未完成的部分包括：统一 TMM run logger 尚未实现；主文与 supplement 仍需按 TMM/SPS 页数和 warning gate 检查；部分仓库路径和结果资产仍需完成版本控制卫生。
+
+\begin{table}[H]
+	\centering
+	\caption{当前项目进度与证据状态。}
+	\label{tab:project-progress}
+	\small
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{lll}
+		\toprule
+			事项 & 当前状态 & 下一步 \\
+		\midrule
+		报告工作区 & 正在从 NeurIPS 监督报告改为 TMM 证据监督报告 & 完成全局术语、gate 和 sources 同步。 \\
+		P0 E2 主证据 & 204-query baseline matrix 已确认 & 冻结为 TMM 主文 objective core table。 \\
+		主结果统计表 & 已补 mean [95\% CI] 与 Holm-corrected paired tests & 与 TMM run id、checksum 和 paper links 绑定。 \\
+		P0 E3 real degradation & 用户已 double check 真实完整正确 & 作为 adaptive fusion 鲁棒性主证据，但不写成跨域鲁棒性。 \\
+		听测统计 & 26 participants / 910 ratings 报告存在 & 继续作为主观补充，披露 anchor 与 metadata 限制。 \\
+		TMM 论文包 & main / supplement / response / checklist 均存在 & 检查页数、warning、引用、response-to-evidence trace。 \\
+		P0 E2/E3 结果状态 & 已确认真实完整正确 & 直接进入论文主结果，保持小效应量与单域边界。 \\
+		Protocol-B 与 legacy report & 已降级为历史材料 & 不进入 TMM 主论文证据链。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\caption{TMM 提交包收束节奏。}
+	\label{tab:four-six-week-plan}
+	\scriptsize
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{llll}
+		\toprule
+		阶段 & KaiMing gate & 预期产物 & 不通过时的处理 \\
+		\midrule
+		P0 & Scope migration & TMM title、goal、outline、gate、sources 与 report sections 全局一致 & 不进入论文包修订，先修报告真源。 \\
+		P1 & Evidence freeze & canonical artifacts、checksums、204 split lock、paper links schema & 不写新 claim，先修证据台账。 \\
+		P2 & Submission hygiene & main paper 页数、supplement 页数、LaTeX warning、citation、response package & 不提交；先修 formatting 与 response trace。 \\
+		P3 & Baseline / ablation closure & PaSST/PANNs 已进入 P0；direct regression、reranker 与 TRR 消融表仍待补 & 若证据缺失，主文保守写作，不写通用 SOTA 或 mechanism-strong claim。 \\
+			P4 & 感知与鲁棒边界 & 听测局限、P0 E3 真实退化、旧 Protocol-C conflict failure case & 真实退化只限定在当前条件集合下。 \\
+			P5 & 最终提交包冻结 & 匿名代码包、revision checklist、response ledger & 未通过则只形成内部技术报告。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+表~\ref{tab:project-progress} 中最需要优先处理的是主证据冻结和提交包卫生。若目标是正式投稿，建议把 P0 E2、P0 E3、listening test 和 split audit 纳入同一论文证据索引，并在 README 或 response checklist 中记录生成命令、数据集快照、统计方法和局限边界。P0 中的 PaSST/PANNs 与真实退化 E3 结果已经可以进入论文主结果。表~\ref{tab:four-six-week-plan} 给出的节奏属于监督计划；每个阶段结束必须用 PDF 编译报告和 response checklist 更新本章。
+
+当前报告本身也应视为 single-source working report。它已经根据现有代码和实验产物生成正文，并开始承担 supervisor ledger 的职责，但仍需要人工做三类审阅。
+
+第一类是科学审阅，确认是否接受“TRR 是当前已评估 retrieval prior 中最强 + adaptive fusion 是当前真实退化集合下更稳健机制”这一双核心主张。第二类是证据审阅，确认 P0 E2/E3 是否作为唯一主文核心口径，并将旧 211 口径与 audio-grouped 历史表全部移入附录或审计说明。第三类是投稿审阅，确认 TMM 主文、supplement、response letter、匿名代码包和 evidence ledger 是否满足期刊审稿标准。

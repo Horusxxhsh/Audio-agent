@@ -1,0 +1,29 @@
+{
+  "method": "PANNs (CNN14)",
+  "protocol": "Protocol-A",
+  "status": "skipped",
+  "n_evaluated": 0,
+  "n_total": 204,
+  "raw": null,
+  "normalized": null,
+  "skip_reason": "Model weights (312 MB, Zenodo record 3987831) cannot be downloaded in practical timeframe (~6.5 hours at ~80 KB/s average bandwidth). panns-inference 0.1.1 is installed and all dependencies are compatible under Python 3.10.12. The encoder/evaluation code is correct. The blocking issue is purely infrastructural.",
+  "environment": {
+    "os": "Ubuntu Linux (x86_64)",
+    "python": "3.10.12",
+    "panns_inference": "0.1.1",
+    "librosa": "0.11.0",
+    "numba": "0.65.0",
+    "torch": "2.11.0+cu130",
+    "torchaudio": "2.11.0+cu130",
+    "cuda_available": true
+  },
+  "attempted_fixes": [
+    "pip install panns-inference — installed, imports OK",
+    "torch.hub.load fallback — blocked by trusted-repository policy",
+    "wget download — projected 6.5 hours at ~80 KB/s",
+    "HuggingFace mirror — SSL errors prevent retrieval",
+    "Alternative mirrors — none found"
+  ],
+  "code_status": "verified correct — PANNsEncoder.encode_audio() matches baseline; path resolution added",
+  "timestamp": "2026-05-23T16:03:00Z"
+}

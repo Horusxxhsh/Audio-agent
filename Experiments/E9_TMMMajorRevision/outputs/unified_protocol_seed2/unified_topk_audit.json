@@ -1,0 +1,47 @@
+{
+  "coverage": {
+    "CLAP": {
+      "kb_ok": 844,
+      "kb_total": 1064,
+      "query_ok": 158,
+      "query_total": 203
+    },
+    "FeatureNN": {
+      "kb_ok": 1060,
+      "kb_total": 1064,
+      "query_ok": 202,
+      "query_total": 203
+    },
+    "PANNs": {
+      "kb_ok": 0,
+      "kb_total": 1064,
+      "query_ok": 0,
+      "query_total": 203
+    },
+    "PaSST": {
+      "kb_ok": 0,
+      "kb_total": 1064,
+      "query_ok": 0,
+      "query_total": 203
+    },
+    "TRR": {
+      "kb_ok": 1064,
+      "kb_total": 1064,
+      "query_ok": 203,
+      "query_total": 203
+    },
+    "Wav2Vec": {
+      "kb_ok": 1060,
+      "kb_total": 1064,
+      "query_ok": 202,
+      "query_total": 203
+    }
+  },
+  "k": 10,
+  "metric_impl": "protocol_ab_unified_evaluator_v1",
+  "pnr_thresholds": [
+    0.05,
+    0.1,
+    0.15
+  ]
+}

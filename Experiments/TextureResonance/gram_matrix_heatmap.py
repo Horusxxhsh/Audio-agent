@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 def reconstruct_gram_from_vec(
     vec: np.ndarray,
-    project_dim: int = 32,
+    project_dim: Optional[int] = None,
 ) -> np.ndarray:
     """Reconstruct Gram matrix from flattened L2-normalized TRR vector.
 
@@ -37,16 +37,14 @@ def reconstruct_gram_from_vec(
     Returns:
         Gram matrix (d x d).
     """
-    expected_dim = project_dim * project_dim
-    if len(vec) != expected_dim:
-        # Try to infer project_dim
+    if project_dim is None:
         d = int(np.sqrt(len(vec)))
-        if d * d == len(vec):
-            project_dim = d
-        else:
-            logger.warning(f"Vector dim {len(vec)} is not a perfect square, "
-                           f"using first {expected_dim} elements")
-            vec = vec[:expected_dim]
+        if d * d != len(vec):
+            raise ValueError(f"TRR vector dim {len(vec)} is not a perfect square")
+        project_dim = d
+    expected_dim = int(project_dim) * int(project_dim)
+    if len(vec) != expected_dim:
+        raise ValueError(f"TRR vector dim {len(vec)} does not match project_dim={project_dim}")
 
     gram = vec.reshape(project_dim, project_dim)
     return gram
@@ -67,8 +65,12 @@ def select_representative_queries(
     """
     style_groups: Dict[str, List[int]] = {}
     for i, item in enumerate(dataset[:204]):  # Protocol-A test set
-        style = item.get("Style", "Unknown")
-        if not isinstance(style, str):
+        style_raw = item.get("Style", "Unknown")
+        if isinstance(style_raw, list):
+            style = ", ".join(str(x) for x in style_raw[:2])
+        elif isinstance(style_raw, str):
+            style = style_raw
+        else:
             style = "Unknown"
         if style not in style_groups:
             style_groups[style] = []
@@ -83,7 +85,7 @@ def select_representative_queries(
         indices = style_groups[style]
         # Pick the first with valid vector
         for idx in indices:
-            vec = dataset[idx].get("Vectors", {}).get("Wav2Vec")
+            vec = dataset[idx].get("Vectors", {}).get("TRR")
             if vec is not None:
                 selected.append(idx)
                 break
@@ -149,8 +151,8 @@ def main() -> None:
     parser.add_argument("--output-dir", type=str, default=None,
                         help="Output directory (default: Paper/figures/)")
     parser.add_argument("--n-samples", type=int, default=6)
-    parser.add_argument("--project-dim", type=int, default=32,
-                        help="Projection dim used in TRR (must match encoding)")
+    parser.add_argument("--project-dim", type=int, default=None,
+                        help="Projection dim used in TRR; inferred from cached TRR vector by default")
     args = parser.parse_args()
 
     with open(args.dataset, "r") as f:
@@ -165,11 +167,12 @@ def main() -> None:
     titles = []
     for idx in indices:
         item = dataset[idx]
-        vec = np.array(item["Vectors"]["Wav2Vec"], dtype=np.float32)
+        vec = np.array(item["Vectors"]["TRR"], dtype=np.float32)
         gram = reconstruct_gram_from_vec(vec, project_dim=args.project_dim)
         grams.append(gram)
 
-        style = item.get("Style", "Unknown")
+        style_raw = item.get("Style", "Unknown")
+        style = ", ".join(str(x) for x in style_raw[:2]) if isinstance(style_raw, list) else str(style_raw)
         song = item.get("SongName", f"Query {idx}")
         titles.append(f"{song}\n({style})")
 

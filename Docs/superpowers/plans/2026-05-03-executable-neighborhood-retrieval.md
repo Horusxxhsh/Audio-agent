@@ -4,7 +4,7 @@
 
 **目标：** 在不更换数据集的前提下，把论文从“TRR 是更好的 Gram embedding”重定位为“parameter-transferability-aware executable neighborhood retrieval”，并用最小新增实验支撑 MLP 边界、Top-K 可执行邻域、exemplar-preserving projection、module-aware reranking 与论文正文改写。
 
-**架构：** 实现分为实验增强层与论文叙事层。实验增强层新增 `Experiments/E8_ExecutableNeighborhood/`，复用现有 `Experiments/common/evaluate.py`、Protocol-A split 与 cached vectors，不改动数据集；论文叙事层只在实验产物验证后修改 `Paper_submission/content.tex` 与 `Paper_submission/supplementary.tex`。PC-TRR、Temporal Pyramid TRR、Log-Covariance TRR、analysis-by-synthesis reranking 不进入本轮主线，只作为“下一阶段可验证扩展”，避免在没有稳定训练/渲染证据时扩大 claim。
+**架构：** 实现分为实验增强层与论文叙事层。实验增强层新增 `Experiments/E8_ExecutableNeighborhood/`，复用现有 `Experiments/common/evaluate.py`、Protocol-A split 与 cached vectors，不改动数据集；论文叙事层只在实验产物验证后修改 `Paper/content.tex` 与 `Paper/supplementary.tex`。PC-TRR、Temporal Pyramid TRR、Log-Covariance TRR、analysis-by-synthesis reranking 不进入本轮主线，只作为“下一阶段可验证扩展”，避免在没有稳定训练/渲染证据时扩大 claim。
 
 **技术栈：** Python 3.9、NumPy、pytest、现有 `Evaluator(normalize=True)`、LaTeX/IEEEtran、`latexmk`。
 
@@ -50,9 +50,9 @@
   - 责任：验证汇总表字段、排序、缺失输入错误。
 - 创建：`Experiments/E8_ExecutableNeighborhood/README.md`
   - 责任：记录命令、输入、输出、不能支持的 claim。
-- 修改：`Paper_submission/content.tex`
+- 修改：`Paper/content.tex`
   - 责任：改写 abstract、introduction、contributions、method framing、MLP boundary、discussion、limitations、conclusion。
-- 修改：`Paper_submission/supplementary.tex`
+- 修改：`Paper/supplementary.tex`
   - 责任：新增 E8 指标表与方法边界说明。
 
 ---
@@ -823,8 +823,8 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 **文件:**
 
-- 修改：`Paper_submission/content.tex`
-- 修改：`Paper_submission/supplementary.tex`
+- 修改：`Paper/content.tex`
+- 修改：`Paper/supplementary.tex`
 
 - [x] **步骤 1：编写失败的文本门禁** (Red)
 
@@ -833,7 +833,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 ```bash
 python3 - <<'PY'
 from pathlib import Path
-p = Path("Paper_submission/content.tex").read_text()
+p = Path("Paper/content.tex").read_text()
 required = [
     "parameter-transferability-aware executable neighborhood retrieval",
     "exemplar-preserving",
@@ -849,7 +849,7 @@ PY
 
 - [x] **步骤 2：改写 Abstract 和 Contributions** (Green)
 
-将 `Paper_submission/content.tex` abstract 替换为同等长度的证据约束版本：
+将 `Paper/content.tex` abstract 替换为同等长度的证据约束版本：
 
 ```latex
 \begin{abstract}
@@ -872,7 +872,7 @@ Concretely, this paper makes four evidence-bounded contributions. First, we form
 Table~\ref{tab:executable_neighborhood} reports Top-K parameter-neighborhood recall and exemplar-preserving projection on the same Protocol-A split. These metrics change the comparison target: instead of asking whether top-1 retrieval minimizes every numeric parameter leaf, they ask whether the retrieved set contains a parameter-transferable executable neighborhood and whether a constrained projection over that neighborhood can reduce error while preserving provenance. The result supports the narrower interpretation that retrieval provides auditable candidate structure, whereas the MLP remains a numeric boundary without exemplar provenance.
 ```
 
-在 `Paper_submission/supplementary.tex` 新增表 `tab:executable_neighborhood_supp`，列为：
+在 `Paper/supplementary.tex` 新增表 `tab:executable_neighborhood_supp`，列为：
 
 ```latex
 Method & K & PNR@K & Norm.L2 & Acc@0.1 & EditCost & Provenance
@@ -883,12 +883,12 @@ Method & K & PNR@K & Norm.L2 & Acc@0.1 & EditCost & Provenance
 运行：
 
 ```bash
-cd Paper_submission
+cd Paper
 latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 cd ..
 python3 - <<'PY'
 from pathlib import Path
-p = Path("Paper_submission/content.tex").read_text()
+p = Path("Paper/content.tex").read_text()
 for forbidden in ["universally superior", "proves perceptual preference"]:
     if forbidden in p:
         raise SystemExit(f"forbidden overclaim: {forbidden}")
@@ -908,7 +908,7 @@ claim grep passed
 - [x] **步骤 5：提交代码**
 
 ```bash
-git add Paper_submission/content.tex Paper_submission/supplementary.tex Paper_submission/main.pdf
+git add Paper/content.tex Paper/supplementary.tex Paper/main.pdf
 git commit -m "paper: reframe trr as executable neighborhood retrieval"
 ```
 
@@ -948,7 +948,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 **文件:**
 
 - 修改：`Experiments/E8_ExecutableNeighborhood/README.md`
-- 本地生成但不纳入提交：`Paper_submission/main.pdf`（当前仓库未跟踪该 PDF）
+- 本地生成但不纳入提交：`Paper/main.pdf`（当前仓库未跟踪该 PDF）
 
 - [x] **步骤 1：编写最终门禁脚本** (Red)
 
@@ -962,7 +962,7 @@ required = [
     "Experiments/E8_ExecutableNeighborhood/outputs/epr/epr_projection_results.json",
     "Experiments/E8_ExecutableNeighborhood/outputs/module_rerank/module_aware_rerank_results.json",
     "Experiments/E8_ExecutableNeighborhood/outputs/summary/e8_summary.md",
-    "Paper_submission/main.pdf",
+    "Paper/main.pdf",
 ]
 missing = [p for p in required if not Path(p).exists()]
 if missing:
@@ -979,8 +979,8 @@ PY
 
 ```bash
 python3 -m pytest Experiments/common/tests/test_parameter_space.py Experiments/E8_ExecutableNeighborhood -v
-(cd Paper_submission && latexmk -g -pdf -interaction=nonstopmode -halt-on-error main.tex)
-(cd Paper_submission && latexmk -g -pdf -interaction=nonstopmode -halt-on-error supplementary.tex)
+(cd Paper && latexmk -g -pdf -interaction=nonstopmode -halt-on-error main.tex)
+(cd Paper && latexmk -g -pdf -interaction=nonstopmode -halt-on-error supplementary.tex)
 ```
 
 预期：pytest 全部通过；LaTeX 输出 `Output written on main.pdf` 与 `Output written on supplementary.pdf`。
@@ -1028,7 +1028,7 @@ required = [
     "Experiments/E8_ExecutableNeighborhood/outputs/epr/epr_projection_results.json",
     "Experiments/E8_ExecutableNeighborhood/outputs/module_rerank/module_aware_rerank_results.json",
     "Experiments/E8_ExecutableNeighborhood/outputs/summary/e8_summary.md",
-    "Paper_submission/main.pdf",
+    "Paper/main.pdf",
 ]
 missing = [p for p in required if not Path(p).exists()]
 if missing:

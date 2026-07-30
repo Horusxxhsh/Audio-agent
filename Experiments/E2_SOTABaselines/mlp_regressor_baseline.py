@@ -264,6 +264,12 @@ def run_mlp_baseline(dataset_path: str, output_dir: str, test_size: int, seed: i
     projected_avg_metrics = {k: float(np.mean(v)) for k, v in projected_metrics.items()}
     projected_std_metrics = {f"{k}_std": float(np.std(v)) for k, v in projected_metrics.items()}
 
+    # Also save per-query metrics for bootstrap CI computation
+    per_query = {
+        "raw": {k: [float(v) for v in vals] for k, vals in metrics.items()},
+        "projected": {k: [float(v) for v in vals] for k, vals in projected_metrics.items()},
+    }
+
     results = {
         "method": "MLP-Regressor",
         "description": "Wav2Vec2 mean-pooled -> 2-layer MLP -> direct parameter regression",
@@ -276,6 +282,7 @@ def run_mlp_baseline(dataset_path: str, output_dir: str, test_size: int, seed: i
         "projected_method": "MLP-Regressor+RangeProjection",
         "projection": "Per-parameter clipping to the train-set observed numeric range.",
         "projected_metrics": {**projected_avg_metrics, **projected_std_metrics},
+        "per_query": per_query,
     }
 
     # Save

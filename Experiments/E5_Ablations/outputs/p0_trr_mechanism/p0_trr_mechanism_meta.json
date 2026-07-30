@@ -17,6 +17,18 @@
       "similarity": "cosine"
     },
     {
+      "name": "mean_pool_l456",
+      "family": "mean_pool",
+      "layers": [
+        4,
+        5,
+        6
+      ],
+      "project_dim": 0,
+      "l2_normalize": true,
+      "similarity": "cosine"
+    },
+    {
       "name": "gram_no_projection_l5",
       "family": "gram_full",
       "layers": [

@@ -17,13 +17,16 @@ from collections import defaultdict
 
 import numpy as np
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(Path(__file__).parent.parent / "common"))
 from evaluate import Evaluator, load_param_ranges
+from Experiments.E7_HardSplit.run_hard_split_retrieval import load_requested_query_indices
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
-PROTOCOL_A_TEST_SIZE = 204
+DEFAULT_SPLIT = REPO_ROOT / "Experiments" / "tmm" / "splits" / "tmm_external1267_audio_grouped" / "seed0" / "test.txt"
 
 MODULE_NAMES = [
     "CompressorOn", "CompressorOff",
@@ -58,7 +61,8 @@ def flatten_params_with_keys(params: Dict) -> Dict[str, float]:
 
 def compute_per_param_errors(
     dataset: List[Dict],
-    method_name: str = "TRR",
+    query_indices: List[int],
+    vector_key: str = "TRR",
 ) -> Dict[str, List[float]]:
     """Compute per-parameter absolute error for TRR retrieval.
 
@@ -69,14 +73,15 @@ def compute_per_param_errors(
     Returns:
         Dict mapping param key -> list of absolute errors.
     """
-    queries = dataset[:PROTOCOL_A_TEST_SIZE]
-    kb = dataset[PROTOCOL_A_TEST_SIZE:]
+    query_set = {int(i) for i in query_indices}
+    queries = [dataset[i] for i in query_indices]
+    kb = [item for i, item in enumerate(dataset) if i not in query_set]
 
     # Build KB embedding matrix
     kb_vecs = []
     kb_valid_idx = []
     for i, item in enumerate(kb):
-        vec = item.get("Vectors", {}).get("Wav2Vec")
+        vec = item.get("Vectors", {}).get(vector_key)
         if vec is not None:
             kb_vecs.append(np.array(vec, dtype=np.float32))
             kb_valid_idx.append(i)
@@ -87,7 +92,7 @@ def compute_per_param_errors(
     per_param_errors = defaultdict(list)
 
     for q in queries:
-        q_vec = q.get("Vectors", {}).get("Wav2Vec")
+        q_vec = q.get("Vectors", {}).get(vector_key)
         if q_vec is None:
             continue
         q_vec = np.array(q_vec, dtype=np.float32)
@@ -268,6 +273,10 @@ def main() -> None:
                         default=str(Path(__file__).parent.parent / "dataset_full_vectors.json"))
     parser.add_argument("--output-dir", type=str,
                         default=str(Path(__file__).parent))
+    parser.add_argument("--split-file", type=str, default=str(DEFAULT_SPLIT),
+                        help="Protocol-A query split file")
+    parser.add_argument("--vector-key", type=str, default="TRR",
+                        help="Cached vector key to evaluate, default: TRR")
     parser.add_argument("--figure-dir", type=str, default=None,
                         help="Directory for figure output (default: Paper/figures/)")
     args = parser.parse_args()
@@ -276,8 +285,11 @@ def main() -> None:
         dataset = json.load(f)
     logger.info(f"Loaded {len(dataset)} items from {args.dataset}")
 
+    query_indices = load_requested_query_indices(dataset, Path(args.split_file))
+    logger.info(f"Loaded {len(query_indices)} query indices from {args.split_file}")
+
     # Compute raw errors
-    per_param_raw = compute_per_param_errors(dataset)
+    per_param_raw = compute_per_param_errors(dataset, query_indices, vector_key=args.vector_key)
     logger.info(f"Computed errors for {len(per_param_raw)} parameters")
 
     # Normalize

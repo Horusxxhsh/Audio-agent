@@ -50,6 +50,7 @@ class Variant:
 
 VARIANTS: Tuple[Variant, ...] = (
     Variant("mean_pool_l5", "mean_pool", (5,), 0, True, "cosine"),
+    Variant("mean_pool_l456", "mean_pool", (4, 5, 6), 0, True, "cosine"),
     Variant("gram_no_projection_l5", "gram_full", (5,), 768, True, "cosine"),
     Variant("gram_l4_d64", "gram_projected", (4,), 64, True, "cosine"),
     Variant("gram_l5_d64", "gram_projected", (5,), 64, True, "cosine"),
@@ -173,7 +174,11 @@ def variant_embedding(
     projections: Dict[int, torch.Tensor],
 ) -> torch.Tensor:
     if variant.family == "mean_pool":
-        emb = hidden[variant.layers[0]].mean(dim=0)
+        if len(variant.layers) == 1:
+            emb = hidden[variant.layers[0]].mean(dim=0)
+        else:
+            pooled = [hidden[layer].mean(dim=0) for layer in variant.layers]
+            emb = torch.stack(pooled).mean(dim=0)
         return l2_norm(emb) if variant.l2_normalize else emb
 
     grams: List[torch.Tensor] = []
@@ -195,7 +200,7 @@ def compute_embeddings(
     device: torch.device,
     seed: int,
 ) -> Dict[str, List[np.ndarray | None]]:
-    model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base").to(device)
+    model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base", local_files_only=True).to(device)
     model.eval()
     projections = make_projection_matrices(device, seed)
     outputs: Dict[str, List[np.ndarray | None]] = {v.name: [] for v in variants}

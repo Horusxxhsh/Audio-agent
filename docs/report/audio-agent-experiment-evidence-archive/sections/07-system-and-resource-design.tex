@@ -1,0 +1,32 @@
+\chapter{证据资产与归档结构}
+
+本次报告生成前，实验材料已经被整理到 AblationStudies 的 organized experiment data 子目录。该目录承担当前工作区可见材料的证据快照角色，不承担新的实验运行职责。它包含 manifest、checksums、P0 报告与脚本、Protocol A/B/C 结果、fusion beta sweep 以及 legacy retrieval report。所有归档文件都有 checksum，便于后续判断内容是否被改动。
+
+证据资产评价的关键是文件能够支持什么强度的结论。P0 E2/E3 的报告数值已经由用户 double check 为真实、完整、正确，可支撑本轮论文主结果。Protocol-A audio-grouped 的 CSV、JSON 和 Markdown 统计报告能够支撑 split audit 与历史对照；旧 Protocol-C 的 CSV/JSON/MD 能支撑 fallback 与 conflict failure 诊断；listening test 的统计报告能支撑主观补充分析；Protocol-B 和 legacy report 明确不应进入主证据链。
+
+\begin{table}[H]
+	\centering
+	\caption{主要证据资产、来源状态与论文用途。}
+	\label{tab:artifact-inventory}
+	\small
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{lll}
+		\toprule
+			资产组 & 来源状态 & 论文用途 \\
+		\midrule
+		\texttt{protocolA\_audio\_grouped\_*} & workspace untracked & 主证据；严格切分下 TRR 对比。 \\
+		\texttt{protocolA\_*\_with\_clap*} & workspace untracked & 诊断或补充；211-query 口径不得混入主表。 \\
+		\texttt{protocolC\_*} & workspace ignored & 辅助诊断；说明 fusion fallback 与 conflict failure。 \\
+		\texttt{results\_report.md} & workspace file & 听测补充；说明主观评分与统计限制。 \\
+		\texttt{P0\_Experiments\_Report.md} & verified experimental data & P0 E2/E3 主结果来源。 \\
+		\texttt{protocolB\_*} & workspace ignored & deprecated 历史材料。 \\
+		\texttt{retrieval\_comparison\_report.md} & tracked legacy & 追溯早期叙事，不作为 TMM 主证据。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+表~\ref{tab:artifact-inventory} 现在解释的是证据使用边界，而不是 P0 结果是否可写入论文。用户已确认 P0 原始产物真实、完整、正确，因此 PaSST、PANNs 和真实退化 E3 数值可以进入本轮论文主张。
+
+为了让后续写作不再次漂移，建议将证据资产冻结为三个目录层级。第一层是 P0 主证据目录，包含 P0 E2/E3 的正式结果表与统计口径。第二层是审计与补充目录，包含 resolved-audio-grouped Protocol-A、旧 Protocol-C diagnostic 和 listening test。
+
+第三层是历史与待补目录，包含 Protocol-B、legacy retrieval report、direct regression 和 future reranker。这个结构有助于在写作中持续区分已确认正式实验数据、repo-observed fact 与 design intent。

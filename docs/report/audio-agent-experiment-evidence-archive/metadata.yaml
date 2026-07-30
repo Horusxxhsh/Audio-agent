@@ -1,0 +1,24 @@
+title: "Texture Resonance Retrieval 的 TMM 期刊证据监督报告"
+subtitle: "基于 Audio-Agent 代码库的 claim gate、submission package 与可复现实验台账"
+author: "Codex"
+date: "2026-04-28"
+lang: "zh-CN"
+documentclass: ctexrep
+classoption:
+  - UTF8
+fontsize: 11pt
+geometry:
+  - a4paper
+  - left=25mm
+  - right=25mm
+  - top=24mm
+  - bottom=26mm
+  - headheight=16pt
+  - headsep=8mm
+  - includeheadfoot
+toc: true
+toc-depth: 2
+numbersections: true
+colorlinks: true
+linkcolor: blue
+urlcolor: blue

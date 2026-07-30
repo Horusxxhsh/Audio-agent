@@ -1,0 +1,97 @@
+\chapter{当前基线结果与统计证据}
+\label{chap:results}
+
+主实验结果见表~\ref{tab:protocol-a-main-results}。本轮写作将 P0 E2 结果提升为 TMM 主文的 baseline matrix：同一 204-query / 1063-KB 协议下，TRR 与 Wav2Vec、FeatureNN、CLAP、PaSST 和 PANNs 对比。用户已 double check P0 原始数据真实、完整、正确，因此这些数值直接作为正式实验数据写入。
+
+面向 TMM 修订，表~\ref{tab:protocol-a-main-results} 的角色应升级为 objective core table。它可以支撑“TRR 在当前 P0 已评估检索基线中更强”，但不能支撑“TRR 是最先进通用音频表示”或“系统完成端到端自动音频制作”。若主文、supplement 或 response letter 使用该表，必须同时标注 204-query split、metric definition、Norm.L2 统计检验口径和小效应量边界。
+
+\begin{table}[H]
+	\centering
+			\caption{P0 Protocol-A 主结果。L2 与 Norm.L2 越低越好，其余指标越高越好。}
+		\label{tab:protocol-a-main-results}
+		\scriptsize
+		\resizebox{\textwidth}{!}{%
+			\begin{tabular}{lrrrrrrr}
+				\toprule
+				Method & n & L2 & Norm.L2 & Acc@0.1 & Recall & Cosine & Module \\
+				\midrule
+				TRR & 204 & \textbf{8.7287} & \textbf{0.1881} & \textbf{0.5766} & \textbf{0.5404} & \textbf{0.8415} & \textbf{0.8297} \\
+				Wav2Vec & 204 & 22.5174 & 0.2400 & 0.5015 & 0.4648 & 0.5642 & 0.7423 \\
+				FeatureNN & 204 & 17.9391 & 0.2236 & 0.5264 & 0.4779 & 0.6030 & 0.7544 \\
+				CLAP & 204 & 16.1257 & 0.2298 & 0.5389 & 0.4922 & 0.6531 & 0.7837 \\
+				PaSST & 204 & 18.2860 & 0.2132 & 0.5422 & 0.5001 & 0.6192 & 0.7960 \\
+				PANNs & 204 & 21.0269 & 0.2260 & 0.5090 & 0.4759 & 0.5826 & 0.7606 \\
+			\bottomrule
+		\end{tabular}}
+	\end{table}
+
+		表~\ref{tab:protocol-a-significance} 汇总 TRR 相对各 baseline 的 paired significance。P0 统计检验基于 per-query Norm.L2，而不是同时覆盖所有指标。所有 baseline 在 Holm 校正后均拒绝原假设；但 Cohen's d 较小，因此应解释为统计可靠、幅度适中的优势。
+
+	\begin{table}[H]
+		\centering
+			\caption{P0 Protocol-A 中 TRR 相对各 baseline 的 Norm.L2 统计检验。}
+		\label{tab:protocol-a-significance}
+		\small
+		\resizebox{\textwidth}{!}{%
+			\begin{tabular}{lrrrr}
+				\toprule
+				Baseline & n & $p$-value & Cohen's d & Holm reject \\
+				\midrule
+				Wav2Vec & 204 & 1.564e-07 & -0.2101 & Yes \\
+				FeatureNN & 204 & 9.523e-05 & -0.1380 & Yes \\
+				CLAP & 204 & 4.476e-04 & -0.2189 & Yes \\
+				PaSST & 204 & 1.254e-03 & -0.0980 & Yes \\
+				PANNs & 204 & 2.122e-05 & -0.1528 & Yes \\
+			\bottomrule
+		\end{tabular}}
+	\end{table}
+
+		表~\ref{tab:protocol-a-main-results} 与表~\ref{tab:protocol-a-significance} 共同支持一个窄而强的结论：在当前 P0 baseline matrix 中，TRR 是最强的参数对齐 retrieval prior。该结论不能外推为“TRR 是通用最优音频表示”。
+
+	外推边界来自三项事实。数据集是 guitar-effects 领域数据，不覆盖全部音频任务。评价指标是参数空间 operational metrics，不能直接替代听感距离。PaSST 与 PANNs 已经进入 P0 E2；直接参数回归、learned reranker 和跨域基线仍未完成。
+
+P0 E3 的结果见表~\ref{tab:protocol-c-results}。该协议对原始音频施加 AWGN、MP3、reverb 和 truncate 退化，再重新编码为 TRR embedding，并复用 P0 E2 的 204-query test split。结果显示，audio-heavy 的 fixed fusion a0.30 明显不稳定；adaptive fusion 在总体 L2、Acc@0.1、MRR 和 NDCG@5 上略优于 fixed a0.50 / a0.70，但差距不应被写成压倒性胜利。
+
+\begin{table}[H]
+	\centering
+		\caption{P0 Protocol-C 真实退化鲁棒性结果。}
+	\label{tab:protocol-c-results}
+	\small
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{lrrrrr}
+			\toprule
+			\textbf{Method} & $\alpha$ & L2 & Acc@0.1 & MRR & NDCG@5 \\
+			\midrule
+			fixed fusion a0.30 & 0.3000 & 29.2322 & 0.4846 & 0.4095 & 0.3723 \\
+			fixed fusion a0.50 & 0.5000 & 20.5551 & 0.6085 & 0.5607 & 0.5528 \\
+			fixed fusion a0.70 & 0.7000 & 20.1868 & 0.6104 & 0.5652 & 0.5551 \\
+			adaptive fusion & 0.5980 & \textbf{20.1491} & \textbf{0.6121} & \textbf{0.5654} & \textbf{0.5566} \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+听测结果见表~\ref{tab:listening-summary}。Trials 2--5 中，TRR-based system 的主观评分高于 manual baseline；Trials 6--10 中，MusicGen 与 TRR-based system 的差异没有达到统计显著。由于该实验没有显式低质量 anchor，也缺少设备、参与者专业程度和人工基线时间预算等元数据，本文将其解释为 workflow relevance 的主观背景，不将其写成系统优于人工或优于生成模型的强结论。
+
+\begin{table}[H]
+	\centering
+	\caption{Multiple-stimulus listening test 摘要。原始日志标签 HCAP 在论文叙述中对应 TRR-based system。}
+	\label{tab:listening-summary}
+	\small
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{llrrrr}
+		\toprule
+		\textbf{Block} & \textbf{Comparison} & \textbf{n} & \textbf{Mean(A-B)} & \textbf{rbc} & \textbf{$p$ (Holm)} \\
+		\midrule
+		Trials 2--5 & reference vs TRR-based system & 26 & 13.78 & 0.860 & 0.00015 \\
+		Trials 2--5 & TRR-based system vs manual & 26 & 19.83 & 1.000 & 0.00015 \\
+		Trials 6--10 & reference vs TRR-based system & 26 & 46.71 & 0.994 & 0.00015 \\
+		Trials 6--10 & MusicGen vs TRR-based system & 24 & -1.10 & 0.067 & 0.7797 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+综合来看，当前证据支持的论文叙事应当升级为双核心：P0 E2 证明 TRR 在更完整 baseline matrix 下仍是最强 retrieval prior；P0 E3 证明真实退化下 fusion design 是鲁棒性的关键，adaptive fusion 比 audio-heavy fixed fusion 更接近稳定工作区间；听测说明用户感知背景。
+
+TMM 论文包中，这三类结果应分工明确：P0 E2 进入主文结果表；P0 E3 进入 robustness-and-fusion 结果段落；听测进入补充感知证据和局限讨论。
+
+未完成的 direct regression、learned reranker、跨域真实退化和更严格听测仍只能出现在 limitations、future work 或 response 的未完成说明中，不能进入主结论。

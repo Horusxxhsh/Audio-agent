@@ -2,7 +2,7 @@
 
 > **给执行者：** 必需子技能：使用 superpowers:subagent-driven-development（推荐）或 superpowers:executing-plans 逐步实现此计划。步骤使用复选框（`- [ ]`）语法以便跟踪。
 
-**目标：** 将 `Paper_submission` 从“系统型技术报告”收敛为证据边界清晰、协议可审计、主张不过界的 IEEE TMM major revision 稿件。
+**目标：** 将 `Paper` 从“系统型技术报告”收敛为证据边界清晰、协议可审计、主张不过界的 IEEE TMM major revision 稿件。
 
 **架构：** 本计划先用自动化检查固定论文主张边界，再补齐最关键的 hard split 实验协议，随后重跑主检索表、补 uncached latency 边界，最后把结果以克制叙事整合进 LaTeX 并编译验证。方法层面不引入大规模 TRR++，避免在小数据集上新增过拟合风险；只把 hard split、normalized metrics、baseline fairness 和 claim consistency 做扎实。
 
@@ -26,9 +26,9 @@
 - `Experiments/E7_HardSplit/run_hard_split_retrieval.py`：新增 hard split 检索重跑入口，复用现有 evaluator 和 embedding retriever。
 - `Experiments/E7_HardSplit/README.md`：新增实验说明，记录 split 定义、输入、输出和不可外推边界。
 - `Experiments/E6_Latency/latency_profiler.py`：扩展现有 latency profiler，拆分 cached retrieval 与 uncached encoding 计时。
-- `Paper_submission/content.tex`：修改摘要、贡献、Table I、Protocol-A、near-duplicate/hard split、latency、fusion、limitations。
-- `Paper_submission/supplementary.tex`：同步补 hard split 细表、claim audit 说明、latency 细节。
-- `Paper_submission/main.tex`：仅在编译依赖或标题需要时修改。
+- `Paper/content.tex`：修改摘要、贡献、Table I、Protocol-A、near-duplicate/hard split、latency、fusion、limitations。
+- `Paper/supplementary.tex`：同步补 hard split 细表、claim audit 说明、latency 细节。
+- `Paper/main.tex`：仅在编译依赖或标题需要时修改。
 
 ---
 
@@ -36,7 +36,7 @@
 
 **Harness（测试框架）:**
 
-- **范围：** 新增一个文本审计工具，自动发现 `Paper_submission` 中不应作为主贡献出现的表述，包括 `Dual-Modal Retrieval`、`multimodal agent`、`real-time` 强 claim、`current codebase`、`server-side`、`journal readers`、`upon acceptance`。本任务只做检测工具，不改论文正文。
+- **范围：** 新增一个文本审计工具，自动发现 `Paper` 中不应作为主贡献出现的表述，包括 `Dual-Modal Retrieval`、`multimodal agent`、`real-time` 强 claim、`current codebase`、`server-side`、`journal readers`、`upon acceptance`。本任务只做检测工具，不改论文正文。
 - **前置条件：** 当前工作区允许新增 `Experiments/common/claim_audit.py` 和测试文件；不要求论文已编译通过。
 - **测试入口：** `python -m unittest Experiments.common.tests.test_claim_audit -v`
 - **通过标准：** 4 个测试通过，0 失败；工具能返回违规项的文件、行号、pattern 和 reason。
@@ -774,19 +774,19 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 **Harness（测试框架）:**
 
-- **范围：** 修改 `Paper_submission`，把主张收缩、hard split 结果、latency 边界、fusion 降级和 listening-study 限制整合进正文和 supplement；运行 claim audit 与 LaTeX 编译。本任务不新增实验算法。
+- **范围：** 修改 `Paper`，把主张收缩、hard split 结果、latency 边界、fusion 降级和 listening-study 限制整合进正文和 supplement；运行 claim audit 与 LaTeX 编译。本任务不新增实验算法。
 - **前置条件：** 任务 1、任务 3、任务 4 已提交；hard split 和 latency 产物存在，或 latency 产物明确标记 unavailable。
-- **测试入口：** `python - <<'PY'\nfrom pathlib import Path\nfrom Experiments.common.claim_audit import audit_files\nfindings = audit_files([Path('Paper_submission/content.tex'), Path('Paper_submission/supplementary.tex')])\nprint(findings)\nraise SystemExit(1 if findings else 0)\nPY`
-- **通过标准：** claim audit 0 findings；`latexmk -pdf -interaction=nonstopmode main.tex` 在 `Paper_submission` 下成功；`Paper_submission/main.pdf` 更新时间晚于本任务开始时间。
+- **测试入口：** `python - <<'PY'\nfrom pathlib import Path\nfrom Experiments.common.claim_audit import audit_files\nfindings = audit_files([Path('Paper/content.tex'), Path('Paper/supplementary.tex')])\nprint(findings)\nraise SystemExit(1 if findings else 0)\nPY`
+- **通过标准：** claim audit 0 findings；`latexmk -pdf -interaction=nonstopmode main.tex` 在 `Paper` 下成功；`Paper/main.pdf` 更新时间晚于本任务开始时间。
 - **失败恢复：** `git reset --hard HEAD~1`
 - **依赖：** 任务 1、任务 3、任务 4。
 
 **文件:**
 
-- 修改：`Paper_submission/content.tex`
-- 修改：`Paper_submission/supplementary.tex`
-- 修改：`Paper_submission/main.tex`（仅当标题或编译依赖需要）
-- 生成：`Paper_submission/main.pdf`
+- 修改：`Paper/content.tex`
+- 修改：`Paper/supplementary.tex`
+- 修改：`Paper/main.tex`（仅当标题或编译依赖需要）
+- 生成：`Paper/main.pdf`
 
 - [ ] **步骤 1：编写失败的文本门禁** (Red)
 
@@ -796,7 +796,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 python - <<'PY'
 from pathlib import Path
 from Experiments.common.claim_audit import audit_files
-findings = audit_files([Path("Paper_submission/content.tex"), Path("Paper_submission/supplementary.tex")])
+findings = audit_files([Path("Paper/content.tex"), Path("Paper/supplementary.tex")])
 for finding in findings:
     print(f'{finding["file"]}:{finding["line"]}: {finding["pattern"]}: {finding["reason"]}')
 raise SystemExit(1 if findings else 0)
@@ -810,7 +810,7 @@ PY
 运行：
 
 ```bash
-cd Paper_submission
+cd Paper
 latexmk -pdf -interaction=nonstopmode main.tex
 ```
 
@@ -818,7 +818,7 @@ latexmk -pdf -interaction=nonstopmode main.tex
 
 - [ ] **步骤 3：编写最小论文修改** (Green)
 
-按以下替换原则修改 `Paper_submission/content.tex`：
+按以下替换原则修改 `Paper/content.tex`：
 
 ```text
 1. 标题/摘要/贡献：
@@ -847,7 +847,7 @@ latexmk -pdf -interaction=nonstopmode main.tex
    - 明确 guitar-only、single chain topology、near-duplicate risk、metric-perception mismatch、regression boundary stronger on Norm.L2。
 ```
 
-按以下原则修改 `Paper_submission/supplementary.tex`：
+按以下原则修改 `Paper/supplementary.tex`：
 
 ```text
 1. 增加 hard split 细表，引用 `Experiments/E7_HardSplit/hard_split_results.csv` 的数值。
@@ -864,7 +864,7 @@ latexmk -pdf -interaction=nonstopmode main.tex
 python - <<'PY'
 from pathlib import Path
 from Experiments.common.claim_audit import audit_files
-findings = audit_files([Path("Paper_submission/content.tex"), Path("Paper_submission/supplementary.tex")])
+findings = audit_files([Path("Paper/content.tex"), Path("Paper/supplementary.tex")])
 for finding in findings:
     print(f'{finding["file"]}:{finding["line"]}: {finding["pattern"]}: {finding["reason"]}')
 raise SystemExit(1 if findings else 0)
@@ -876,16 +876,16 @@ PY
 运行编译：
 
 ```bash
-cd Paper_submission
+cd Paper
 latexmk -pdf -interaction=nonstopmode main.tex
 ```
 
-预期：生成 `Paper_submission/main.pdf`，无 fatal error。若有 citation warning 但 PDF 成功生成，记录 warning 并检查 `main.bbl` 是否更新。
+预期：生成 `Paper/main.pdf`，无 fatal error。若有 citation warning 但 PDF 成功生成，记录 warning 并检查 `main.bbl` 是否更新。
 
 - [ ] **步骤 5：提交稿件修改**
 
 ```bash
-git add Paper_submission/content.tex Paper_submission/supplementary.tex Paper_submission/main.tex Paper_submission/main.pdf
+git add Paper/content.tex Paper/supplementary.tex Paper/main.tex Paper/main.pdf
 git commit -m "docs: revise TMM submission claims and hard split evidence"
 ```
 
@@ -899,7 +899,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 ```
 
 提供给子代理：
-- **WHAT_WAS_IMPLEMENTED**: 整合 hard split、latency 边界和 claim 收缩，重新编译 `Paper_submission/main.pdf`。
+- **WHAT_WAS_IMPLEMENTED**: 整合 hard split、latency 边界和 claim 收缩，重新编译 `Paper/main.pdf`。
 - **PLAN_OR_REQUIREMENTS**: `docs/superpowers/plans/2026-05-03-tmm-paper-major-revision.md` 任务 5。
 - **BASE_SHA**: `$BASE_SHA`
 - **HEAD_SHA**: `$HEAD_SHA`

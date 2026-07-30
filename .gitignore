@@ -203,6 +203,11 @@ PublishScripts/
 # Audio-Agent local experiment assets (large / machine-specific)
 # -----------------------------------------------------------------------------
 
+# Local Python environments
+.venv/
+.venv.macos-broken-*/
+*.egg-info/
+
 # External full dataset drop-in (do not commit the raw JSON)
 Data/External_1267_211/dataset/*.json
 

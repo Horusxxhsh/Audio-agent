@@ -55,15 +55,15 @@ Last verified on 2026-05-03 with:
 
 ```bash
 python3 -m pytest Experiments/common/tests/test_parameter_space.py Experiments/E8_ExecutableNeighborhood -v
-(cd Paper_submission && latexmk -g -pdf -interaction=nonstopmode -halt-on-error main.tex)
-(cd Paper_submission && latexmk -g -pdf -interaction=nonstopmode -halt-on-error supplementary.tex)
+(cd Paper && latexmk -g -pdf -interaction=nonstopmode -halt-on-error main.tex)
+(cd Paper && latexmk -g -pdf -interaction=nonstopmode -halt-on-error supplementary.tex)
 ```
 
 Results:
 
 - `49 passed` for the E8 and shared parameter-space tests.
-- `Paper_submission/main.pdf` rebuilt successfully as a 13-page PDF.
-- `Paper_submission/supplementary.pdf` rebuilt successfully as a 9-page PDF.
+- `Paper/main.pdf` rebuilt successfully as a 13-page PDF.
+- `Paper/supplementary.pdf` rebuilt successfully as a 9-page PDF.
 - Required artifact gate passed for the Top-K, EPR, module-rerank, summary Markdown, and main PDF outputs.
 - LaTeX logs contain no undefined-reference, undefined-citation, or multiply-defined-label diagnostics.
 

@@ -46,9 +46,12 @@ def get_style_label(item: Dict) -> str:
         Style label string.
     """
     style = item.get("Style", "")
-    if not isinstance(style, str):
+    if isinstance(style, list):
+        style_lower = " ".join(str(x) for x in style).lower()
+    elif isinstance(style, str):
+        style_lower = style.lower()
+    else:
         return "Other"
-    style_lower = style.lower()
     for key in STYLE_COLORS:
         if key.lower() in style_lower:
             return key
@@ -60,9 +63,10 @@ def build_embedding_matrices(
 ) -> Tuple[np.ndarray, np.ndarray, List[str]]:
     """Build TRR and mean-pooled embedding matrices from cached vectors.
 
-    Since we use pre-computed vectors as proxies, TRR embeddings are
-    represented by the cached Wav2Vec Gram vectors and mean-pooled
-    embeddings are simulated by a different dimensionality reduction.
+    TRR embeddings are read from cached `Vectors["TRR"]` entries, while
+    mean-pooled Wav2Vec2 embeddings are read from cached `Vectors["Wav2Vec"]`
+    entries. Records missing either vector are excluded so the two panels
+    are drawn over the same item set.
 
     Args:
         dataset: Full dataset list.
@@ -73,27 +77,24 @@ def build_embedding_matrices(
         labels: Style labels per item.
     """
     trr_vecs = []
+    mp_vecs = []
     labels = []
     valid_indices = []
 
     for i, item in enumerate(dataset):
-        vec = item.get("Vectors", {}).get("Wav2Vec")
-        if vec is not None:
-            trr_vecs.append(np.array(vec, dtype=np.float32))
+        vectors = item.get("Vectors", {})
+        trr_vec = vectors.get("TRR") if isinstance(vectors, dict) else None
+        wav_vec = vectors.get("Wav2Vec") if isinstance(vectors, dict) else None
+        if trr_vec is not None and wav_vec is not None and len(trr_vec) == 4096 and len(wav_vec) == 768:
+            trr_vecs.append(np.array(trr_vec, dtype=np.float32))
+            mp_vecs.append(np.array(wav_vec, dtype=np.float32))
             labels.append(get_style_label(item))
             valid_indices.append(i)
 
     trr_matrix = np.stack(trr_vecs)
+    mp_matrix = np.stack(mp_vecs)
     logger.info(f"TRR matrix: {trr_matrix.shape}")
-
-    # For mean-pooled proxy: use the raw vectors with different normalization
-    # (In production, we'd extract mean-pooled separately; here we use a
-    # simple transformation to simulate the difference)
-    mp_matrix = trr_matrix.copy()
-    # Simulate mean-pooling by taking only first 768 dims (if available)
-    # or applying different normalization
-    if trr_matrix.shape[1] > 768:
-        mp_matrix = trr_matrix[:, :768]
+    logger.info(f"Wav2Vec matrix: {mp_matrix.shape}")
     # Apply L2 normalization
     norms = np.linalg.norm(mp_matrix, axis=1, keepdims=True)
     mp_matrix = mp_matrix / np.maximum(norms, 1e-8)
@@ -124,13 +125,19 @@ def compute_tsne(
         logger.error("scikit-learn required for t-SNE. Install: pip install scikit-learn")
         raise
 
-    tsne = TSNE(
-        n_components=2,
-        perplexity=min(perplexity, matrix.shape[0] - 1),
-        n_iter=n_iter,
-        random_state=random_state,
-        metric="cosine",
-    )
+    kwargs = {
+        "n_components": 2,
+        "perplexity": min(perplexity, matrix.shape[0] - 1),
+        "random_state": random_state,
+        "metric": "cosine",
+        "init": "random",
+    }
+    import inspect
+    if "max_iter" in inspect.signature(TSNE).parameters:
+        kwargs["max_iter"] = n_iter
+    else:
+        kwargs["n_iter"] = n_iter
+    tsne = TSNE(**kwargs)
     return tsne.fit_transform(matrix)
 
 

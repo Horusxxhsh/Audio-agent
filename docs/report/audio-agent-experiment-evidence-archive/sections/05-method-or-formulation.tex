@@ -1,0 +1,82 @@
+\chapter{TMM 实验设计与评价方法}
+\label{chap:experiment-design}
+
+
+
+本章把当前实验协议改写为 TMM 期刊证据矩阵。核心原则是：每一个实验只服务一个可证伪命题，每一个主表数值都必须由原始输出、统计脚本和论文包中的具体位置共同支撑。P0 E2/E3 已由用户 double check 为真实、完整、正确的正式实验数据，并将主张从单一 TRR retrieval prior 升级为“TRR 表示优势 + 真实退化下 adaptive fusion 稳健机制”；若要达到最终 TMM 期刊论文强度，还必须把强基线公平性、TRR 消融、泄漏审计、感知评价边界、补充材料页数和 response letter 一致性同时纳入 gate。
+
+\begin{table}[H]
+	\centering
+	\caption{TMM 期刊证据矩阵与 KaiMing 通过标准。}
+	\label{tab:tmm-experiment-matrix}
+	\scriptsize
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{lllll}
+		\toprule
+		Gate & 目标命题 & 最小证据集合 & 主要检查项 & 通过标准 \\
+		\midrule
+			T0 Scope & 论文属于 TMM 范围 & 引言、相关工作、方法 framing & 任务和贡献是否服务音频参数控制 & 不以通用 agent 或 demo 为核心贡献。 \\
+			T1 Evidence & 当前主证据可复核 & P0 E2、P0 E3、听测、split audit & checksum、manifest、统计复现、artifact path & 主表文件可由 manifest 定位。 \\
+			T2 Baseline & 排除弱基线解释 & Wav2Vec、FeatureNN、CLAP、PaSST、PANNs；未完成 direct regression 显式标注 & 参数指标、Norm.L2 检验与配对样本 & 同 split、同 query、同 logger；未完成项不暗示 SOTA。 \\
+			T3 Ablation & 二阶纹理统计是有效成分 & mean pooling、Gram、层选择、归一化、top-k & 主指标与运行成本 & 至少一个结构消融削弱主指标。 \\
+			T4 Leakage & 结果不来自近重复泄漏 & exact path、hash、近邻、family split & 重复率与严格 split 表现 & 严格 split 下结论方向保持，或降级 claim。 \\
+			T5 Boundary & 感知与鲁棒边界被披露 & 听测、P0 E3、旧 Protocol-C failure case & rater 元数据、真实退化、conflict failure & 证据不足时限定为 proxy 与诊断。 \\
+			T6 Package & 主文、附录、答复与匿名包一致 & paper、supplement、response、checklist、code/data & 页数、warning、citation、证据追踪 & claim、附录表、代码输出和答复一一对应。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+表~\ref{tab:tmm-experiment-matrix} 是后续 TMM 修订的实验与提交包契约。该契约把当前最可辩护的研究对象压实为四个限定词：检索式、可执行、参数可编辑、证据可审计。凡是不能进入这个矩阵的探索，例如产品侧 UI、个性化记忆或端到端生成体验，都应保留在 future work 或系统背景中。
+
+本报告采用三类协议口径。第一类是当前主证据协议，即 P0 E2/E3。P0 E2 基于外部 1267 条 guitar-effects benchmark drop-in，形成 204 条测试查询和 1063 条知识库记录，并在同一 split 上比较 TRR、Wav2Vec、FeatureNN、CLAP、PaSST 和 PANNs；P0 E3 复用该 split，对原始音频施加 AWGN、MP3、reverb 和 truncate 退化后重新编码。第二类是审计协议，即 resolved-audio-grouped Protocol-A，用于说明 legacy split 的 exact cross-split audio reuse 风险和更严格切分下的历史数值。第三类是诊断协议，即旧 211-query Protocol-C、Protocol-B 和 legacy retrieval report，用于分析历史边界而非主结论。
+
+\begin{table}[H]
+	\centering
+	\caption{实验协议、数据规模与证据状态。}
+	\label{tab:protocol-map}
+	\small
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{lrrll}
+		\toprule
+			协议或材料 & 测试数 & 知识库数 & 状态 & 本文用途 \\
+		\midrule
+		Protocol-A audio-grouped & 204 & 1063 & 本地主统计与 per-query 结果存在 & 主证据，论文主表口径。 \\
+		Protocol-A legacy/strong & 211 & 1056 & 本地结果存在，但含 legacy split 风险 & 历史对照或诊断，不与 204 口径混写。 \\
+		P0 E3 real degradation & 204 & 1063 & 用户已 double check 真实完整正确 & Adaptive fusion robustness 主证据。 \\
+		Protocol-C diagnostic & 211 & 1056 & 本地统计与 per-query 结果存在 & Fusion fallback 与 conflict failure 诊断。 \\
+		Listening test & 26 participants & 910 ratings & 统计报告存在 & 主观补充，不作为严格胜负证据。 \\
+		P0 E2 & 204 & 1063 & 用户已 double check 真实完整正确 & Baseline matrix 主证据。 \\
+		Protocol-B & 211 & 1056 & 文件自标 deprecated & 历史材料，不进入主结论。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+表~\ref{tab:protocol-map} 中最重要的设计选择是把 204 条 audio-grouped Protocol-A 固定为主文口径。旧 211-query 结果在数值上更好看，例如 TRR 的 L2 为 0.3064，但该切分的 audit 发现 16 条跨 split shared resolved audio paths 和 48 对近重复风险。严格切分的 TRR L2 变为 8.0467，数值尺度明显不同，却更适合作为提交面主证据。因此，本文宁可使用较难、更保守的主表，也不将 legacy 数值当作核心结论。
+
+TMM 主文还需要把 baseline matrix 前置为 fairness contract，而不是只在结果表中列出方法名。
+
+\begin{table}[H]
+	\centering
+	\caption{Baseline matrix：对比方法、指标与公平性约束。}
+	\label{tab:baseline-matrix}
+	\scriptsize
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{lllll}
+		\toprule
+		方法 & 证据状态 & 共享协议 & 公平性约束 & TMM 使用方式 \\
+		\midrule
+		TRR & 主方法 & P0 E2 & 缓存向量、同一 evaluator、同一 split & 主表核心结果。 \\
+		Wav2Vec & 已评估 & P0 E2 & 同 query set 与参数指标 & 音频嵌入基线。 \\
+		FeatureNN & 已评估 & P0 E2 & 同 top-1 检索输出与同统计检验 & 工程特征基线。 \\
+		CLAP & 已评估 & P0 E2 & 同 query set 与同统计检验 & 语义音频基线。 \\
+		PaSST/PANNs & 已评估 & P0 E2 & 用户已 double check 真实完整正确 & 主表 baseline。 \\
+		Direct regression / reranker & 待复现 & 后续 runbook & 未完成前不进主表 & limitations 或补实验。 \\
+		\bottomrule
+	\end{tabular}}
+\end{table}
+
+表~\ref{tab:baseline-matrix} 的约束意味着：CLAP、PaSST 与 PANNs 已经可以进入 P0 E2 主表；direct regression、learned reranker 与 Text2FX-style optimization 仍只能作为待复现项。
+
+每个检索方法输出一个候选参数 JSON。参数距离按展开后的数值叶子计算 RMSE；阈值准确率、召回、余弦相似度和模块一致性由公共 evaluator 实现。P0 E2 同时报告 raw L2 与 Norm.L2，并以 per-query Norm.L2 做 Wilcoxon signed-rank 检验和 Holm correction。Resolved-audio-grouped Protocol-A 的 bootstrap confidence intervals 与 paired permutation tests 保留为 split audit 和历史对照，不再替代 P0 主表。
+
+P0 E3 的退化场景分别覆盖 AWGN、MP3、reverb 和 truncate，并在退化后重新编码 TRR embedding。旧 Protocol-C 的 vague text、embedding-space noisy audio 和 modality conflict 仍只能说明 score-level fusion heuristic 的边界行为，不能替代 P0 E3 的真实退化证据，也不能证明系统已具备跨域鲁棒性。
