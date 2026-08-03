@@ -3,7 +3,7 @@
 ## 0. 元信息
 - 目标期刊：IEEE Transactions on Multimedia (TMM)
 - 论文定位：算法为主（表示学习/检索 + 融合 + 约束修复），系统作为应用场景
-- 当前问题：现有结果多为 pilot 规模（例如 `retrieval_comparison_report.md:1` 的 N=5），证据强度不足以支撑 TMM 级别结论
+- 当前问题：现有结果多为 pilot 规模（例如 `archive/legacy_reports/2025-01-09_retrieval_comparison_report.md:1` 的 N=5），证据强度不足以支撑 TMM 级别结论
 - 数据扩容策略：合成扩容（从现有 preset 参数分布采样生成新 preset，并离线渲染生成目标音频）
 
 ## 1. AE 主要关切点 -> 研究需求与验收标准
@@ -171,4 +171,3 @@
 - 至少 1 个音频空间客观指标 + 1 个主观实验（预注册、校正统计）
 - 有延迟 CDF 与 Pareto；有 sanity 与泄露扫描报告
 - 可复现闭环完整（manifest/splits/runs/evidence ledger）
-

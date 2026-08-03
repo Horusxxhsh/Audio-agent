@@ -4,6 +4,11 @@ import os
 import shutil
 import tempfile
 from dataclasses import dataclass
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_GUITAR_SOLO_METADATA = REPO_ROOT / "Data" / "metadata" / "guitar_solo_evaluation_metadata.csv"
 
 try:
     from frechet_audio_distance import CLAPScore, FrechetAudioDistance
@@ -500,7 +505,12 @@ def compute_clap_score(caption: str, wav_path: str, segment_seconds: float, hop_
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--csv", dest="csv_path", default="guitar_solo_evaluation_metadata.csv")
+    parser.add_argument(
+        "--csv",
+        dest="csv_path",
+        default=str(DEFAULT_GUITAR_SOLO_METADATA),
+        help="Path to the guitar-solo evaluation metadata CSV.",
+    )
     parser.add_argument("--id", dest="audio_id", default="XQB27QPic3k")
     parser.add_argument(
         "--generated",

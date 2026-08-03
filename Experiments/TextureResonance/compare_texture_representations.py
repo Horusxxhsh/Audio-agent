@@ -508,7 +508,8 @@ def main():
     print(df.to_string(index=False))
 
     # Save results
-    output_path = "texture_representation_comparison.csv"
+    output_path = REPO_ROOT / "Experiments" / "TextureResonance" / "outputs" / "texture_representation_comparison.csv"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(output_path, index=False)
     print(f"\nResults saved to {output_path}")
 

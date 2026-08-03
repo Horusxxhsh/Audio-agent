@@ -5,7 +5,7 @@
 ## 0. Meta
 - Target venue: IEEE Transactions on Multimedia (TMM)
 - Paper positioning: algorithm-first (representation + fusion + constraint repair), system as application
-- Current status: existing results are pilot-scale (e.g., `retrieval_comparison_report.md` uses N=5) and must be upgraded to TMM-level evidence
+- Current status: existing results are pilot-scale (e.g., `archive/legacy_reports/2025-01-09_retrieval_comparison_report.md` uses N=5) and must be upgraded to TMM-level evidence
 
 ## 1. AE Concerns -> Experiment Requirements (Acceptance Targets)
 - R1 Scale: main objective benchmark must be >= 200 test samples, with learning-curve evidence across multiple dataset sizes.
@@ -23,7 +23,7 @@
 - RQ4: What is the latency-cost trade-off of TRR/fusion/repair, and is it compatible with DAW-style workflows?
 
 ## 3. Assets We Already Have (Pilot Evidence, To Be Reframed)
-- Pilot retrieval report: `retrieval_comparison_report.md` (N=5 test samples, KB=51) is only a pilot and should not be used for TMM-level claims.
+- Pilot retrieval report: `archive/legacy_reports/2025-01-09_retrieval_comparison_report.md` (N=5 test samples, KB=51) is only a pilot and should not be used for TMM-level claims.
 - Existing scripts: `Experiments/TextureResonance/*`, `Experiments/Fusion/*`, `Experiments/mushura/*`.
 - Existing MUSHRA raw: `Experiments/mushura/mushra.csv` contains duplicate header rows; analysis must start from a cleaned dataset and report cleaning rules.
 - Existing dataset skeleton: `Data/Audio_Synthetic/` (50 WAV; some `.trr.npy` cache exists).

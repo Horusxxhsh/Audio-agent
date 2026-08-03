@@ -47,3 +47,5 @@ sim = np.dot(emb_a, emb_b)
 - `texture_encoder.py`: Core logic for Demucs wrapper and Wav2Vec2 Gram Matrix encoding.
 - `run_trr_demo.py`: Verification script with synthetic data generation.
 - `requirements_trr.txt`: Required Python packages.
+- `outputs/`: Versioned comparison tables. New comparison runs write
+  `outputs/texture_representation_comparison.csv` rather than the repository root.
