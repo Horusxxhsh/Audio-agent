@@ -52,6 +52,7 @@ def reconstruct_gram_from_vec(
 
 def select_representative_queries(
     dataset: List[Dict],
+    test_indices: List[int],
     n_samples: int = 6,
 ) -> List[int]:
     """Select diverse representative queries by style.
@@ -64,7 +65,8 @@ def select_representative_queries(
         List of dataset indices.
     """
     style_groups: Dict[str, List[int]] = {}
-    for i, item in enumerate(dataset[:204]):  # Protocol-A test set
+    for i in test_indices:  # Frozen Protocol-A test split (resolved-audio grouped, seed0)
+        item = dataset[i]
         style_raw = item.get("Style", "Unknown")
         if isinstance(style_raw, list):
             style = ", ".join(str(x) for x in style_raw[:2])
@@ -108,6 +110,8 @@ def plot_gram_heatmaps(
     try:
         import matplotlib
         matplotlib.use("Agg")
+        matplotlib.rcParams["pdf.fonttype"] = 42
+        matplotlib.rcParams["ps.fonttype"] = 42
         import matplotlib.pyplot as plt
     except ImportError:
         logger.error("matplotlib required for plotting")
@@ -117,7 +121,7 @@ def plot_gram_heatmaps(
     ncols = min(3, n)
     nrows = (n + ncols - 1) // ncols
 
-    fig, axes = plt.subplots(nrows, ncols, figsize=(4 * ncols, 3.5 * nrows))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(10.0, 6.5))
     if n == 1:
         axes = np.array([axes])
     axes = axes.flatten()
@@ -125,10 +129,10 @@ def plot_gram_heatmaps(
     for i, (gram, title) in enumerate(zip(grams, titles)):
         ax = axes[i]
         im = ax.imshow(gram, cmap="viridis", aspect="equal", interpolation="nearest")
-        ax.set_title(title, fontsize=10, fontweight="bold")
-        ax.set_xlabel("Channel $j$", fontsize=9)
-        ax.set_ylabel("Channel $i$", fontsize=9)
-        ax.tick_params(labelsize=7)
+        ax.set_title(title, fontsize=13, fontweight="bold")
+        ax.set_xlabel("Channel $j$", fontsize=12)
+        ax.set_ylabel("Channel $i$", fontsize=12)
+        ax.tick_params(labelsize=13)
         fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
 
     # Hide unused axes
@@ -136,7 +140,7 @@ def plot_gram_heatmaps(
         axes[j].set_visible(False)
 
     fig.suptitle("TRR Gram Matrix Heatmaps (Representative Queries)",
-                 fontsize=13, fontweight="bold")
+                 fontsize=16, fontweight="bold")
     fig.tight_layout()
     fig.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -151,6 +155,15 @@ def main() -> None:
     parser.add_argument("--output-dir", type=str, default=None,
                         help="Output directory (default: Paper/figures/)")
     parser.add_argument("--n-samples", type=int, default=6)
+    parser.add_argument(
+        "--split",
+        type=str,
+        default=str(
+            Path(__file__).parent.parent
+            / "tmm" / "splits" / "tmm_external1267_audio_grouped" / "seed0" / "test.txt"
+        ),
+        help="Frozen Protocol-A test-split file (one query name per line)",
+    )
     parser.add_argument("--project-dim", type=int, default=None,
                         help="Projection dim used in TRR; inferred from cached TRR vector by default")
     args = parser.parse_args()
@@ -159,8 +172,12 @@ def main() -> None:
         dataset = json.load(f)
     logger.info(f"Loaded {len(dataset)} items")
 
-    # Select representative queries
-    indices = select_representative_queries(dataset, n_samples=args.n_samples)
+    # Select representative queries from the frozen Protocol-A test split
+    with open(args.split, "r", encoding="utf-8") as f:
+        test_names = {line.strip() for line in f if line.strip()}
+    test_indices = [i for i, item in enumerate(dataset) if item.get("SongName") in test_names]
+    logger.info(f"Frozen test split: {len(test_indices)} matched records of {len(test_names)} names")
+    indices = select_representative_queries(dataset, test_indices, n_samples=args.n_samples)
     logger.info(f"Selected {len(indices)} representative queries: {indices}")
 
     grams = []
@@ -172,9 +189,12 @@ def main() -> None:
         grams.append(gram)
 
         style_raw = item.get("Style", "Unknown")
-        style = ", ".join(str(x) for x in style_raw[:2]) if isinstance(style_raw, list) else str(style_raw)
+        if isinstance(style_raw, list):
+            style = ", ".join(str(x) for x in style_raw[:2] if str(x).strip())
+        else:
+            style = str(style_raw)
         song = item.get("SongName", f"Query {idx}")
-        titles.append(f"{song}\n({style})")
+        titles.append(f"{song}\n({style})" if style else song)
 
     out_dir = args.output_dir or str(Path(__file__).parent.parent.parent / "Paper" / "figures")
     Path(out_dir).mkdir(parents=True, exist_ok=True)

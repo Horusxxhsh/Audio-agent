@@ -257,18 +257,29 @@ def _maybe_plot_boxplot(
     try:
         import matplotlib.pyplot as plt
 
+        import matplotlib
+
+        matplotlib.rcParams["pdf.fonttype"] = 42
+        matplotlib.rcParams["ps.fonttype"] = 42
+        matplotlib.rcParams["font.size"] = 14
+        matplotlib.rcParams["axes.titlesize"] = 15
+        matplotlib.rcParams["axes.labelsize"] = 14
+        matplotlib.rcParams["xtick.labelsize"] = 12
+        matplotlib.rcParams["ytick.labelsize"] = 12
+        rng = np.random.default_rng(42)
+
         plt.figure(figsize=(10, 4.5))
-        plt.boxplot(data, tick_labels=labels, showfliers=False)
+        plt.boxplot(data, tick_labels=labels, showfliers=True)
         for i, s in enumerate(stimuli, 1):
             y = per_subject_scores[s]
-            x = np.random.normal(loc=i, scale=0.04, size=len(y))
+            x = rng.normal(loc=i, scale=0.04, size=len(y))
             plt.scatter(x, y, s=8, alpha=0.4, color="black")
         plt.xticks(rotation=25, ha="right")
-        plt.ylim(min(min(xs) for xs in data), max(max(xs) for xs in data))
+        plt.ylim(0, 100)
         plt.ylabel("Listener score (0-100)")
         plt.title(title)
         plt.tight_layout()
-        plt.savefig(out_path, dpi=200)
+        plt.savefig(out_path, dpi=300)
         if out_path.suffix.lower() != ".pdf":
             plt.savefig(out_path.with_suffix(".pdf"))
         plt.close()

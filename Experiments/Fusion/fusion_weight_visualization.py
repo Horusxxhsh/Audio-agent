@@ -201,7 +201,18 @@ class FusionWeightAnalyzer:
         """
         绘制fusion weight分布（小样本友好版本）
         """
-        fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.4))
+        import matplotlib
+
+        matplotlib.rcParams["pdf.fonttype"] = 42
+        matplotlib.rcParams["ps.fonttype"] = 42
+        matplotlib.rcParams["font.size"] = 14
+        matplotlib.rcParams["axes.titlesize"] = 15
+        matplotlib.rcParams["axes.labelsize"] = 14
+        matplotlib.rcParams["xtick.labelsize"] = 12
+        matplotlib.rcParams["ytick.labelsize"] = 12
+        matplotlib.rcParams["legend.fontsize"] = 11
+
+        fig, axes = plt.subplots(1, 2, figsize=(8.5, 3.4))
 
         # Plot 1: Weight vs uncertainty
         ax1 = axes[0]
@@ -233,10 +244,10 @@ class FusionWeightAnalyzer:
             ax1.plot(x_fit, y_fit, linestyle='--', color='black', linewidth=1.4, label='Linear trend')
 
         ax1.axhline(y=0.5, color='gray', linestyle=':', linewidth=1.0)
-        ax1.set_xlabel('Text uncertainty (normalized entropy)', fontsize=11)
-        ax1.set_ylabel('Text weight $w_{text}$', fontsize=11)
-        ax1.set_title(f'Fusion Weight vs. Uncertainty (N={len(df)})', fontsize=12.5, fontweight='bold')
-        ax1.legend(fontsize=9)
+        ax1.set_xlabel('Text uncertainty (normalized entropy)', fontsize=14)
+        ax1.set_ylabel('Text weight $w_{text}$', fontsize=14)
+        ax1.set_title(f'Fusion Weight vs. Uncertainty (N={len(df)})', fontsize=15, fontweight='bold')
+        ax1.legend(fontsize=11)
         ax1.grid(True, alpha=0.3)
 
         # Plot 2: Per-query objective comparison (clearer than tiny-sample histograms)
@@ -245,12 +256,12 @@ class FusionWeightAnalyzer:
         ax2.plot(query_ids, df['text_distance'], marker='o', linewidth=1.6, label='Text-only', color='#1f77b4')
         ax2.plot(query_ids, df['audio_distance'], marker='s', linewidth=1.6, label='Audio-only', color='#ff7f0e')
         ax2.plot(query_ids, df['fused_distance'], marker='^', linewidth=1.8, label='Fusion', color='#2ca02c')
-        ax2.set_xlabel('Query index', fontsize=11)
-        ax2.set_ylabel('Param. Dist.', fontsize=11)
-        ax2.set_title('Per-query Param. Dist. Comparison', fontsize=12.5, fontweight='bold')
+        ax2.set_xlabel('Query index', fontsize=14)
+        ax2.set_ylabel('Param. Dist.', fontsize=14)
+        ax2.set_title('Per-query Param. Dist. Comparison', fontsize=15, fontweight='bold')
         ax2.set_xticks(query_ids)
         ax2.grid(True, alpha=0.3)
-        ax2.legend(fontsize=9)
+        ax2.legend(fontsize=11)
 
         plt.tight_layout()
         plt.savefig(output_path, dpi=300, bbox_inches='tight')
@@ -282,6 +293,17 @@ class FusionWeightAnalyzer:
 
         # Plot 1: Uncertainty characteristics of failures
         ax1 = axes[0, 0]
+
+        import matplotlib as _mpl
+
+        _mpl.rcParams["pdf.fonttype"] = 42
+        _mpl.rcParams["ps.fonttype"] = 42
+        _mpl.rcParams["font.size"] = 16
+        _mpl.rcParams["axes.titlesize"] = 17
+        _mpl.rcParams["axes.labelsize"] = 16
+        _mpl.rcParams["xtick.labelsize"] = 13
+        _mpl.rcParams["ytick.labelsize"] = 13
+        _mpl.rcParams["legend.fontsize"] = 13
 
         # Compare failures vs. successes
         successes = df[
@@ -647,7 +669,7 @@ def main():
 
     # Plot failure analysis
     print("\nAnalyzing failure cases...")
-    result = FusionWeightAnalyzer(beta=2.0, top_k=top_k).plot_failure_cases(df, "Experiments/Fusion/fusion_failure_analysis.png")
+    result = FusionWeightAnalyzer(beta=2.0, top_k=top_k).plot_failure_cases(df, "Experiments/Fusion/fusion_failure_analysis.pdf")
 
     if result:
         fig, failures = result

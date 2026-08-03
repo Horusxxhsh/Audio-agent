@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-08-03T00:00:00.000Z" agent="Codex" version="24.7.17" type="device" compressed="false">
+  <diagram id="trr-system-framework" name="Page-1">
+    <mxGraphModel dx="1030" dy="470" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1030" pageHeight="470" math="0" shadow="0" background="#ffffff">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="panel-title-a" value="(a) Evaluated offline protocol" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontSize=18;fontStyle=1;fontColor=#000000;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="12" width="390" height="28" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="node-audio-reference" value="Audio Reference" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#e8f5e9;strokeColor=#2e7d32;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontStyle=1;fontColor=#000000;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="20" y="55" width="150" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="node-trr-descriptor" value="&lt;div style=&quot;font-size:16px;font-weight:700;line-height:1.15;&quot;&gt;Cached TRR Descriptor&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.2;margin-top:5px;&quot;&gt;Gram of mid-level Wav2Vec2&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=7;" vertex="1" parent="1">
+          <mxGeometry x="195" y="55" width="205" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="node-topk-retrieval" value="&lt;div style=&quot;font-size:16px;font-weight:700;line-height:1.15;&quot;&gt;Cosine Top-K Retrieval&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.2;margin-top:5px;&quot;&gt;1,063-preset KB&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=7;" vertex="1" parent="1">
+          <mxGeometry x="425" y="55" width="195" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="node-epr-k5" value="&lt;div style=&quot;font-size:16px;font-weight:700;line-height:1.15;&quot;&gt;EPR-K5 Projection&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.2;margin-top:5px;&quot;&gt;softmax blend&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=7;" vertex="1" parent="1">
+          <mxGeometry x="645" y="55" width="170" height="64" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="node-optional-text" value="Optional Text Query" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#888888;strokeWidth=1.5;dashed=1;dashPattern=6 4;fontFamily=Helvetica;fontSize=16;fontStyle=1;fontColor=#000000;spacing=7;" vertex="1" parent="1">
+          <mxGeometry x="195" y="148" width="205" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="note-optional-text" value="(audio reference optional; text not used in the reported objective protocol)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontSize=13;fontColor=#000000;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="211" width="540" height="44" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="node-validity-check" value="&lt;div style=&quot;font-size:16px;font-weight:700;line-height:1.15;&quot;&gt;Validity Check&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.2;margin-top:5px;&quot;&gt;range / finite / On-Off&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#fff8e1;strokeColor=#b26a00;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=7;" vertex="1" parent="1">
+          <mxGeometry x="645" y="139" width="170" height="58" as="geometry"/>
+        </mxCell>
+        <mxCell id="node-editable-vector" value="&lt;div style=&quot;font-size:16px;font-weight:700;line-height:1.15;&quot;&gt;Editable Parameter Vector&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.2;margin-top:4px;&quot;&gt;offline output&lt;/div&gt;" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#e8f5e9;strokeColor=#2e7d32;strokeWidth=2.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=7;" vertex="1" parent="1">
+          <mxGeometry x="620" y="217" width="220" height="52" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge-audio-to-descriptor" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="node-audio-reference" target="node-trr-descriptor">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="170" y="87" as="sourcePoint"/>
+            <mxPoint x="195" y="87" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-descriptor-to-retrieval" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="node-trr-descriptor" target="node-topk-retrieval">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="87" as="sourcePoint"/>
+            <mxPoint x="425" y="87" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-retrieval-to-projection" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="node-topk-retrieval" target="node-epr-k5">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="620" y="87" as="sourcePoint"/>
+            <mxPoint x="645" y="87" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-text-to-descriptor" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#777777;strokeWidth=1.5;dashed=1;dashPattern=6 4;endArrow=block;endFill=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="node-optional-text" target="node-trr-descriptor">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="297.5" y="148" as="sourcePoint"/>
+            <mxPoint x="297.5" y="119" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-projection-to-validity" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="node-epr-k5" target="node-validity-check">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="730" y="119" as="sourcePoint"/>
+            <mxPoint x="730" y="139" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge-validity-to-vector" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="node-validity-check" target="node-editable-vector">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="730" y="197" as="sourcePoint"/>
+            <mxPoint x="730" y="217" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="separator-dashed" value="" style="shape=line;html=1;strokeColor=#888888;strokeWidth=1.5;dashed=1;dashPattern=8 6;" vertex="1" parent="1">
+          <mxGeometry x="20" y="284" width="990" height="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="separator-label" value="deployment bridge not validated" style="text;html=1;strokeColor=none;fillColor=#ffffff;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontSize=13;fontStyle=2;fontColor=#000000;spacing=2;" vertex="1" parent="1">
+          <mxGeometry x="390" y="273" width="250" height="24" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="panel-title-b" value="(b) Implemented real-time plugin" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontSize=18;fontStyle=1;fontColor=#000000;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="301" width="390" height="28" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="dsp-dry-input" value="Dry Guitar Input" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#e8f5e9;strokeColor=#2e7d32;strokeWidth=2.5;fontFamily=Helvetica;fontSize=16;fontStyle=1;fontColor=#000000;spacing=5;" vertex="1" parent="1">
+          <mxGeometry x="20" y="337" width="105" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="dsp-compressor" value="Compressor" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=3;" vertex="1" parent="1">
+          <mxGeometry x="137" y="337" width="96" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="dsp-equaliser" value="Equaliser" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=3;" vertex="1" parent="1">
+          <mxGeometry x="245" y="337" width="79" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="dsp-screamer" value="Screamer" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=3;" vertex="1" parent="1">
+          <mxGeometry x="336" y="337" width="80" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="dsp-driver" value="Driver" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=3;" vertex="1" parent="1">
+          <mxGeometry x="428" y="337" width="58" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="dsp-delay" value="Delay" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=3;" vertex="1" parent="1">
+          <mxGeometry x="498" y="337" width="53" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="dsp-chorus" value="Chorus" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=3;" vertex="1" parent="1">
+          <mxGeometry x="563" y="337" width="61" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="dsp-phaser" value="Phaser" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=3;" vertex="1" parent="1">
+          <mxGeometry x="636" y="337" width="60" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="dsp-flanger" value="Flanger" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=3;" vertex="1" parent="1">
+          <mxGeometry x="708" y="337" width="66" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="dsp-reverb" value="Reverb" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#eef3fb;strokeColor=#2f4f8f;strokeWidth=1.5;fontFamily=Helvetica;fontSize=16;fontColor=#000000;spacing=3;" vertex="1" parent="1">
+          <mxGeometry x="786" y="337" width="61" height="62" as="geometry"/>
+        </mxCell>
+        <mxCell id="dsp-processed-output" value="Processed Audio Output" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#e8f5e9;strokeColor=#2e7d32;strokeWidth=2.5;fontFamily=Helvetica;fontSize=16;fontStyle=1;fontColor=#000000;spacing=5;" vertex="1" parent="1">
+          <mxGeometry x="859" y="337" width="151" height="62" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="edge-dry-to-compressor" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dsp-dry-input" target="dsp-compressor">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="125" y="368" as="sourcePoint"/><mxPoint x="137" y="368" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-compressor-to-equaliser" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dsp-compressor" target="dsp-equaliser">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="233" y="368" as="sourcePoint"/><mxPoint x="245" y="368" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-equaliser-to-screamer" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dsp-equaliser" target="dsp-screamer">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="324" y="368" as="sourcePoint"/><mxPoint x="336" y="368" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-screamer-to-driver" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dsp-screamer" target="dsp-driver">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="416" y="368" as="sourcePoint"/><mxPoint x="428" y="368" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-driver-to-delay" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dsp-driver" target="dsp-delay">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="486" y="368" as="sourcePoint"/><mxPoint x="498" y="368" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-delay-to-chorus" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dsp-delay" target="dsp-chorus">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="551" y="368" as="sourcePoint"/><mxPoint x="563" y="368" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-chorus-to-phaser" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dsp-chorus" target="dsp-phaser">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="624" y="368" as="sourcePoint"/><mxPoint x="636" y="368" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-phaser-to-flanger" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dsp-phaser" target="dsp-flanger">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="696" y="368" as="sourcePoint"/><mxPoint x="708" y="368" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-flanger-to-reverb" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dsp-flanger" target="dsp-reverb">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="774" y="368" as="sourcePoint"/><mxPoint x="786" y="368" as="targetPoint"/></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-reverb-to-output" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="dsp-reverb" target="dsp-processed-output">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="847" y="368" as="sourcePoint"/><mxPoint x="859" y="368" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <mxCell id="note-dsp-subset" value="The nine modules form a simplified subset of the implemented chain, which also includes input gating, gain staging, wave-shaping, bit-crushing, cabinet, and limiter stages." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Helvetica;fontSize=13;fontColor=#000000;spacing=0;" vertex="1" parent="1">
+          <mxGeometry x="20" y="414" width="989" height="40" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

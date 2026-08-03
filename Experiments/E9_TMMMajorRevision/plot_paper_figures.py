@@ -25,6 +25,7 @@ def plot_robustness(out_dir: Path) -> None:
 
     fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2))
     ax = axes[0]
+    markers = {"TRR": "o", "Wav2Vec": "s", "FeatureNN": "^", "PaSST": "D", "CLAP": "v"}
     for method in methods:
         sub = sorted([r for r in rows if r["method"] == method], key=lambda r: float(r["group"]))
         if not sub:
@@ -32,7 +33,7 @@ def plot_robustness(out_dir: Path) -> None:
         ax.plot(
             [float(r["group"]) for r in sub],
             [float(r["norm_l2"]) for r in sub],
-            marker="o",
+            marker=markers.get(method, "o"),
             label=method,
             color=colors.get(method),
         )
@@ -54,11 +55,11 @@ def plot_robustness(out_dir: Path) -> None:
             yerr_low.append(max(0.0, float(entry["norm_l2"]) - float(entry.get("norm_l2_ci_low", entry["norm_l2"]))))
             yerr_high.append(max(0.0, float(entry.get("norm_l2_ci_high", entry["norm_l2"])) - float(entry["norm_l2"])))
         if xs:
-            ax.errorbar(xs, ys, yerr=[yerr_low, yerr_high], marker="o", capsize=3, label=method, color=colors.get(method))
+            ax.errorbar(xs, ys, yerr=[yerr_low, yerr_high], marker=markers.get(method, "o"), capsize=3, label=method, color=colors.get(method))
     ax.set_title("Parameter-Cluster Hard Split")
     ax.set_xlabel("Cluster threshold")
     ax.grid(alpha=0.25)
-    axes[0].legend(loc="upper left", fontsize=8)
+    axes[0].legend(loc="upper left", fontsize=11)
     fig.tight_layout()
     out = out_dir / "robustness_result_curves.pdf"
     fig.savefig(out, dpi=300, bbox_inches="tight")
@@ -70,20 +71,20 @@ def plot_epr(out_dir: Path) -> None:
     import matplotlib.pyplot as plt
 
     with EPR.open(newline="", encoding="utf-8") as handle:
-        rows = [r for r in csv.DictReader(handle) if r["source_method"] == "TRR"]
+        rows = list(csv.DictReader(handle))
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.2, 4.2))
-    for weighting, marker in [("softmax", "o"), ("uniform", "s")]:
-        sub = [r for r in rows if r["weighting"] == weighting and r["temperature"] == "0.05"]
-        sub = sorted(sub, key=lambda r: int(r["k"]))
-        axes[0].plot([int(r["k"]) for r in sub], [float(r["norm_l2"]) for r in sub], marker=marker, label=weighting)
-        axes[1].plot([int(r["k"]) for r in sub], [float(r["provenance_effective_exemplars"]) for r in sub], marker=marker, label=weighting)
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2))
+    temps = sorted({r["temperature"] for r in rows}, key=float)
+    for temp in temps:
+        sub = sorted([r for r in rows if r["temperature"] == temp], key=lambda r: int(r["k"]))
+        axes[0].plot([int(r["k"]) for r in sub], [float(r["norm_l2"]) for r in sub], marker="o", label=f"$\\tau$={temp}")
+        axes[1].plot([int(r["k"]) for r in sub], [float(r["n_eff"]) for r in sub], marker="s", label=f"$\\tau$={temp}")
     for ax in axes:
         ax.axvline(5, color="#444444", linestyle="--", linewidth=1.0, alpha=0.7)
         ax.set_xlabel("K")
         ax.grid(alpha=0.25)
-        ax.legend(fontsize=8)
-    axes[0].set_title("EPR Sensitivity")
+        ax.legend(fontsize=11)
+    axes[0].set_title("EPR Sensitivity (softmax weighting)")
     axes[0].set_ylabel("Normalized L2 (lower is better)")
     axes[1].set_title("Provenance Spread")
     axes[1].set_ylabel("Effective exemplars")
@@ -104,6 +105,14 @@ def main() -> int:
     import matplotlib
 
     matplotlib.use("Agg")
+    matplotlib.rcParams["pdf.fonttype"] = 42
+    matplotlib.rcParams["ps.fonttype"] = 42
+    matplotlib.rcParams["font.size"] = 14
+    matplotlib.rcParams["axes.titlesize"] = 15
+    matplotlib.rcParams["axes.labelsize"] = 14
+    matplotlib.rcParams["xtick.labelsize"] = 12
+    matplotlib.rcParams["ytick.labelsize"] = 12
+    matplotlib.rcParams["legend.fontsize"] = 12
     plot_robustness(out_dir)
     plot_epr(out_dir)
     return 0

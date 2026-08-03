@@ -347,6 +347,17 @@ def plot_layer_selection_results(results_df, output_path="layer_selection_analys
     """
     Plot layer selection results with both performance and characteristics.
     """
+    import matplotlib
+
+    matplotlib.rcParams["pdf.fonttype"] = 42
+    matplotlib.rcParams["ps.fonttype"] = 42
+    matplotlib.rcParams["font.size"] = 17
+    matplotlib.rcParams["axes.titlesize"] = 18
+    matplotlib.rcParams["axes.labelsize"] = 17
+    matplotlib.rcParams["xtick.labelsize"] = 14
+    matplotlib.rcParams["ytick.labelsize"] = 14
+    matplotlib.rcParams["legend.fontsize"] = 13
+
     fig, axes = plt.subplots(2, 1, figsize=(12, 10))
 
     # Plot 1: Performance metrics (separate y-scales to avoid mixed-metric distortion)
@@ -360,9 +371,9 @@ def plot_layer_selection_results(results_df, output_path="layer_selection_analys
     width = 0.55
 
     bars = ax1.bar(x, param_dist, width, label='Param. Dist. (L2)', color='#e74c3c', alpha=0.85)
-    ax1.set_xlabel('Wav2Vec2 Layer Index', fontsize=12)
-    ax1.set_ylabel('Param. Dist. (lower is better)', fontsize=12, color='#e74c3c')
-    ax1.set_title('TRR Performance Across Wav2Vec2 Layers', fontsize=14, fontweight='bold')
+    ax1.set_xlabel('Wav2Vec2 Layer Index', fontsize=16)
+    ax1.set_ylabel('Param. Dist. (lower is better)', fontsize=16, color='#e74c3c')
+    ax1.set_title('TRR Performance Across Wav2Vec2 Layers', fontsize=18, fontweight='bold')
     ax1.set_xticks(x)
     ax1.set_xticklabels(layers)
     ax1.tick_params(axis='y', labelcolor='#e74c3c')
@@ -374,10 +385,11 @@ def plot_layer_selection_results(results_df, output_path="layer_selection_analys
         cosine,
         color='#1f4e79',
         marker='o',
+        linestyle='--',
         linewidth=2.2,
         label='Cosine Similarity'
     )
-    ax1_twin.set_ylabel('Cosine Similarity (higher is better)', fontsize=12, color='#1f4e79')
+    ax1_twin.set_ylabel('Cosine Similarity (higher is better)', fontsize=16, color='#1f4e79')
     ax1_twin.tick_params(axis='y', labelcolor='#1f4e79')
 
     handles = [bars] + line
@@ -402,22 +414,32 @@ def plot_layer_selection_results(results_df, output_path="layer_selection_analys
             colors.append('#9b59b6')  # Purple
 
     # Plot parameter distance with layer-type color coding
-    ax2.bar(layers, param_dist, color=colors, alpha=0.7, edgecolor='black')
+    hatches = []
+    for idx in layers:
+        if layer_analysis[idx]['type'] == 'Low-level':
+            hatches.append('')
+        elif layer_analysis[idx]['type'] == 'Mid-level':
+            hatches.append('///')
+        elif layer_analysis[idx]['type'] == 'Mid-to-High':
+            hatches.append('xxx')
+        else:  # High-level
+            hatches.append('...')
+    ax2.bar(layers, param_dist, color=colors, alpha=0.7, edgecolor='black', hatch=hatches)
 
-    ax2.set_xlabel('Wav2Vec2 Layer Index', fontsize=12)
-    ax2.set_ylabel('Param. Dist. (L2)', fontsize=12)
-    ax2.set_title('Param. Dist. by Layer Type', fontsize=14, fontweight='bold')
+    ax2.set_xlabel('Wav2Vec2 Layer Index', fontsize=16)
+    ax2.set_ylabel('Param. Dist. (L2)', fontsize=16)
+    ax2.set_title('Param. Dist. by Layer Type', fontsize=18, fontweight='bold')
     ax2.grid(axis='y', alpha=0.3)
 
     # Add legend for layer types
     from matplotlib.patches import Patch
     legend_elements = [
-        Patch(facecolor='#e74c3c', edgecolor='black', label='Low-level (Layers 1-3)'),
-        Patch(facecolor='#f39c12', edgecolor='black', label='Mid-level (Layers 4-8)'),
-        Patch(facecolor='#3498db', edgecolor='black', label='Mid-to-High (Layer 9)'),
-        Patch(facecolor='#9b59b6', edgecolor='black', label='High-level (Layers 10-12)')
+        Patch(facecolor='#e74c3c', edgecolor='black', hatch='', label='Low-level (Layers 1-3)'),
+        Patch(facecolor='#f39c12', edgecolor='black', hatch='///', label='Mid-level (Layers 4-8)'),
+        Patch(facecolor='#3498db', edgecolor='black', hatch='xxx', label='Mid-to-High (Layer 9)'),
+        Patch(facecolor='#9b59b6', edgecolor='black', hatch='...', label='High-level (Layers 10-12)')
     ]
-    ax2.legend(handles=legend_elements, loc='upper right')
+    ax2.legend(handles=legend_elements, loc='upper right', fontsize=13)
 
     # Highlight best layer in this run
     best_layer_idx = int(results_df.loc[results_df["param_distance"].idxmin(), "layer_idx"])

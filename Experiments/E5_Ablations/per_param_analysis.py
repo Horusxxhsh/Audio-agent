@@ -240,6 +240,13 @@ def generate_matplotlib_figure(
     try:
         import matplotlib
         matplotlib.use("Agg")
+        matplotlib.rcParams["pdf.fonttype"] = 42
+        matplotlib.rcParams["ps.fonttype"] = 42
+        matplotlib.rcParams["font.size"] = 16
+        matplotlib.rcParams["axes.titlesize"] = 17
+        matplotlib.rcParams["axes.labelsize"] = 16
+        matplotlib.rcParams["xtick.labelsize"] = 12
+        matplotlib.rcParams["ytick.labelsize"] = 12
         import matplotlib.pyplot as plt
     except ImportError:
         logger.warning("matplotlib not available, skipping figure generation")
@@ -253,12 +260,13 @@ def generate_matplotlib_figure(
     x_pos = np.arange(len(modules))
     bars = ax.bar(x_pos, means, yerr=stds, capsize=3, color="#4C72B0", alpha=0.8)
 
-    ax.set_xlabel("Module", fontsize=12)
-    ax.set_ylabel("Normalized Mean Absolute Error", fontsize=12)
-    ax.set_title("Per-Module Parameter Error Distribution (Protocol-A, TRR)", fontsize=13)
+    ax.set_xlabel("Module", fontsize=16)
+    ax.set_ylabel("Normalized Mean Absolute Error", fontsize=16)
+    ax.set_title("Per-Module Parameter Error Distribution (Protocol-A, TRR)", fontsize=17)
     ax.set_xticks(x_pos)
-    ax.set_xticklabels(modules, rotation=45, ha="right", fontsize=9)
-    ax.set_ylim(0, 1.0)
+    ax.set_xticklabels(modules, rotation=45, ha="right", fontsize=16)
+    ymax = max([m + s for m, s in zip(means, stds)] + [0.05]) * 1.08
+    ax.set_ylim(0, max(1.0, ymax))
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
     fig.savefig(output_path, dpi=300, bbox_inches="tight")

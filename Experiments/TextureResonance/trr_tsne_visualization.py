@@ -158,6 +158,11 @@ def plot_tsne_comparison(
     try:
         import matplotlib
         matplotlib.use("Agg")
+        matplotlib.rcParams["pdf.fonttype"] = 42
+        matplotlib.rcParams["ps.fonttype"] = 42
+        matplotlib.rcParams["font.size"] = 17
+        matplotlib.rcParams["axes.titlesize"] = 18
+        matplotlib.rcParams["legend.fontsize"] = 13
         import matplotlib.pyplot as plt
         from matplotlib.lines import Line2D
     except ImportError:
@@ -167,18 +172,20 @@ def plot_tsne_comparison(
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
 
     unique_labels = sorted(set(labels))
-    for label in unique_labels:
+    markers = ["o", "s", "^", "D", "v", "P", "X", "h", "8", "*"]
+    for i, label in enumerate(unique_labels):
         mask = [l == label for l in labels]
         color = STYLE_COLORS.get(label, DEFAULT_COLOR)
+        marker = markers[i % len(markers)]
 
         idx = np.where(mask)[0]
         ax1.scatter(trr_coords[idx, 0], trr_coords[idx, 1],
-                    c=color, s=12, alpha=0.6, edgecolors="none")
+                    c=color, marker=marker, s=12, alpha=0.6, edgecolors="none")
         ax2.scatter(mp_coords[idx, 0], mp_coords[idx, 1],
-                    c=color, s=12, alpha=0.6, edgecolors="none")
+                    c=color, marker=marker, s=12, alpha=0.6, edgecolors="none")
 
-    ax1.set_title("TRR (Gram Matrix Embedding)", fontsize=13, fontweight="bold")
-    ax2.set_title("Wav2Vec2 Mean-Pooled", fontsize=13, fontweight="bold")
+    ax1.set_title("TRR (Gram Matrix Embedding)", fontsize=18, fontweight="bold")
+    ax2.set_title("Wav2Vec2 Mean-Pooled", fontsize=18, fontweight="bold")
 
     for ax in [ax1, ax2]:
         ax.set_xticks([])
@@ -188,17 +195,17 @@ def plot_tsne_comparison(
 
     # Legend
     legend_elements = [
-        Line2D([0], [0], marker="o", color="w",
+        Line2D([0], [0], marker=markers[i % len(markers)], color="w",
                markerfacecolor=STYLE_COLORS.get(l, DEFAULT_COLOR),
                markersize=8, label=l)
-        for l in unique_labels
+        for i, l in enumerate(unique_labels)
     ]
     fig.legend(handles=legend_elements, loc="lower center",
-               ncol=min(len(unique_labels), 5), fontsize=10,
+               ncol=min(len(unique_labels), 5), fontsize=13,
                frameon=False, bbox_to_anchor=(0.5, -0.02))
 
     fig.suptitle("t-SNE Comparison: TRR vs Wav2Vec2 Mean-Pooled Embeddings",
-                 fontsize=14, fontweight="bold", y=1.02)
+                 fontsize=16, fontweight="bold", y=1.02)
     fig.tight_layout()
     fig.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close(fig)

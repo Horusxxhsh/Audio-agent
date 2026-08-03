@@ -57,6 +57,14 @@ def main() -> int:
     import matplotlib
 
     matplotlib.use("Agg")
+    matplotlib.rcParams["pdf.fonttype"] = 42
+    matplotlib.rcParams["ps.fonttype"] = 42
+    matplotlib.rcParams["font.size"] = 17
+    matplotlib.rcParams["axes.titlesize"] = 18
+    matplotlib.rcParams["axes.labelsize"] = 17
+    matplotlib.rcParams["xtick.labelsize"] = 14
+    matplotlib.rcParams["ytick.labelsize"] = 14
+    matplotlib.rcParams["legend.fontsize"] = 13
     import matplotlib.pyplot as plt
 
     labels = [DISPLAY_LABELS.get(row["variant"], row["variant"]) for row in rows]
@@ -80,7 +88,7 @@ def main() -> int:
         xytext=(best_idx, values[best_idx] + 0.018),
         ha="center",
         arrowprops={"arrowstyle": "->", "linewidth": 0.8},
-        fontsize=9,
+        fontsize=13,
     )
     fig.tight_layout()
     out = Path(args.out)
