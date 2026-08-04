@@ -428,3 +428,7 @@ vector_db/
 Experiments/dataset_full_vectors.json
 Experiments/dataset_full_vectors.backup_*.json
 Experiments/common/dataset_full_vectors.json
+
+# derived per-param analysis outputs
+Experiments/E5_Ablations/per_param_analysis_report.md
+Experiments/E5_Ablations/per_param_analysis_results.json
