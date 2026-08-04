@@ -169,7 +169,7 @@ def plot_tsne_comparison(
         logger.error("matplotlib required for plotting")
         raise
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.0, 3.0))
 
     unique_labels = sorted(set(labels))
     markers = ["o", "s", "^", "D", "v", "P", "X", "h", "8", "*"]

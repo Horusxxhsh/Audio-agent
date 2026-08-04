@@ -268,7 +268,7 @@ def _maybe_plot_boxplot(
         matplotlib.rcParams["ytick.labelsize"] = 12
         rng = np.random.default_rng(42)
 
-        plt.figure(figsize=(10, 4.5))
+        plt.figure(figsize=(5.9, 2.65))
         plt.boxplot(data, tick_labels=labels, showfliers=True)
         for i, s in enumerate(stimuli, 1):
             y = per_subject_scores[s]

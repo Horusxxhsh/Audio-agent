@@ -358,7 +358,7 @@ def plot_layer_selection_results(results_df, output_path="layer_selection_analys
     matplotlib.rcParams["ytick.labelsize"] = 14
     matplotlib.rcParams["legend.fontsize"] = 13
 
-    fig, axes = plt.subplots(2, 1, figsize=(12, 10))
+    fig, axes = plt.subplots(2, 1, figsize=(6.9, 5.8))
 
     # Plot 1: Performance metrics (separate y-scales to avoid mixed-metric distortion)
     ax1 = axes[0]

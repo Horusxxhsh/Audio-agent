@@ -23,7 +23,7 @@ def plot_robustness(out_dir: Path) -> None:
     methods = ["TRR", "Wav2Vec", "FeatureNN", "PaSST", "CLAP"]
     colors = {"TRR": "#1b9e77", "Wav2Vec": "#7570b3", "FeatureNN": "#666666", "PaSST": "#d95f02", "CLAP": "#e7298a"}
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2))
+    fig, axes = plt.subplots(1, 2, figsize=(6.9, 2.5))
     ax = axes[0]
     markers = {"TRR": "o", "Wav2Vec": "s", "FeatureNN": "^", "PaSST": "D", "CLAP": "v"}
     for method in methods:
@@ -73,7 +73,7 @@ def plot_epr(out_dir: Path) -> None:
     with EPR.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2))
+    fig, axes = plt.subplots(1, 2, figsize=(6.9, 2.5))
     temps = sorted({r["temperature"] for r in rows}, key=float)
     for temp in temps:
         sub = sorted([r for r in rows if r["temperature"] == temp], key=lambda r: int(r["k"]))

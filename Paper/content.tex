@@ -294,9 +294,8 @@ We include compact robustness diagnostics in the main paper and report EPR sensi
 \centering
 \caption{Compact robustness diagnostics. Near-duplicate rows report TRR normalized L2 after removing candidates within the threshold of any query. Hard-split rows report the best full-coverage TRR normalized L2 under parameter-cluster exclusion.}
 \label{tab:robustness_summary}
-\small
+\footnotesize
 \setlength{\tabcolsep}{4pt}
-\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
 \textbf{Diagnostic} & \textbf{Setting} & \textbf{KB / $n_q$} & \textbf{TRR Norm.L2} \\
@@ -309,7 +308,6 @@ Hard split & $\tau_{\mathrm{cluster}}=0.02$ & 142 / 46 & 0.2424 \\
 Hard split & $\tau_{\mathrm{cluster}}=0.05$ & 117 / 38 & 0.2668 \\
 \bottomrule
 \end{tabular}
-}
 \end{table}
 
 Figure~\ref{fig:robustness_result_curves} plots the same robustness evidence as curves. The near-duplicate panel shows that TRR degrades as candidate density is reduced, but remains the strongest full-coverage row through the reported thresholds. The hard-split panel shows the expected increase in error when parameter clusters are excluded from the database; this is a stress-test result rather than a production setting.
