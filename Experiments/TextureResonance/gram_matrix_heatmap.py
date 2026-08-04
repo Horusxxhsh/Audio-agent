@@ -121,7 +121,7 @@ def plot_gram_heatmaps(
     ncols = min(3, n)
     nrows = (n + ncols - 1) // ncols
 
-    fig, axes = plt.subplots(nrows, ncols, figsize=(6.8, 4.4))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(10.0, 6.5))
     if n == 1:
         axes = np.array([axes])
     axes = axes.flatten()

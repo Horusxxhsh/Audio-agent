@@ -212,7 +212,7 @@ class FusionWeightAnalyzer:
         matplotlib.rcParams["ytick.labelsize"] = 12
         matplotlib.rcParams["legend.fontsize"] = 11
 
-        fig, axes = plt.subplots(1, 2, figsize=(5.7, 2.3))
+        fig, axes = plt.subplots(1, 2, figsize=(8.5, 3.4))
 
         # Plot 1: Weight vs uncertainty
         ax1 = axes[0]

@@ -256,7 +256,7 @@ def generate_matplotlib_figure(
     means = [module_stats_norm[m]["mean"] for m in modules]
     stds = [module_stats_norm[m]["std"] for m in modules]
 
-    fig, ax = plt.subplots(figsize=(6.3, 2.6))
+    fig, ax = plt.subplots(figsize=(12, 5))
     x_pos = np.arange(len(modules))
     bars = ax.bar(x_pos, means, yerr=stds, capsize=3, color="#4C72B0", alpha=0.8)
 

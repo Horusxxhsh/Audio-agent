@@ -17,6 +17,28 @@
 \usepackage{algorithmic}
 \usepackage{color}
 \usepackage[numbers,sort&compress]{natbib}
+\usepackage{makecell}
+
+% IEEEtran renders table captions in fake small-caps (\scshape), which at
+% \footnotesize drops the visual size to ~6.4pt. Override the table-caption
+% branch only: keep 8pt (\footnotesize) regular text, two-line IEEE style.
+\makeatletter
+\renewcommand{\@makecaption}[2]{%
+  \ifx\@captype\@IEEEtablestring%
+    \footnotesize\bgroup\par\centering\@IEEEtabletopskipstrut
+      {\normalfont\footnotesize #1}\\{\normalfont\footnotesize #2}%
+    \par\addvspace{0.5\baselineskip}\egroup%
+    \@IEEEtablecaptionsepspace
+  \else%
+    \@IEEEfigurecaptionsepspace
+    \setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}\nobreakspace\nobreakspace #2}%
+    \ifdim \wd\@tempboxa >\hsize%
+      \setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}\nobreakspace\nobreakspace}%
+      \parbox[t]{\hsize}{\normalfont\footnotesize\noindent\unhbox\@tempboxa#2}%
+    \else%
+      \hbox to\hsize{\normalfont\footnotesize\box\@tempboxa\hfil}%
+    \fi\fi}
+\makeatother
 
 % Path to figures (supports compiling from Paper/ or repo root)
 \graphicspath{{./figures/}{Paper/figures/}}
