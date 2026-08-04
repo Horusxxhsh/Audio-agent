@@ -121,7 +121,7 @@ def plot_gram_heatmaps(
     ncols = min(3, n)
     nrows = (n + ncols - 1) // ncols
 
-    fig, axes = plt.subplots(nrows, ncols, figsize=(10.0, 6.5))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(6.8, 4.2))
     if n == 1:
         axes = np.array([axes])
     axes = axes.flatten()
@@ -129,9 +129,9 @@ def plot_gram_heatmaps(
     for i, (gram, title) in enumerate(zip(grams, titles)):
         ax = axes[i]
         im = ax.imshow(gram, cmap="viridis", aspect="equal", interpolation="nearest")
-        ax.set_title(title, fontsize=13, fontweight="bold")
-        ax.set_xlabel("Channel $j$", fontsize=12)
-        ax.set_ylabel("Channel $i$", fontsize=12)
+        ax.set_title(title, fontsize=9, fontweight="bold")
+        ax.set_xlabel("Channel $j$", fontsize=8)
+        ax.set_ylabel("Channel $i$", fontsize=8)
         ax.tick_params(labelsize=13)
         fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
 
@@ -140,7 +140,7 @@ def plot_gram_heatmaps(
         axes[j].set_visible(False)
 
     fig.suptitle("TRR Gram Matrix Heatmaps (Representative Queries)",
-                 fontsize=16, fontweight="bold")
+                 fontsize=10, fontweight="bold")
     fig.tight_layout()
     fig.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close(fig)

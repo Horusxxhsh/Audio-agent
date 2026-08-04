@@ -23,7 +23,7 @@ def plot_robustness(out_dir: Path) -> None:
     methods = ["TRR", "Wav2Vec", "FeatureNN", "PaSST", "CLAP"]
     colors = {"TRR": "#1b9e77", "Wav2Vec": "#7570b3", "FeatureNN": "#666666", "PaSST": "#d95f02", "CLAP": "#e7298a"}
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2))
+    fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.6))
     ax = axes[0]
     markers = {"TRR": "o", "Wav2Vec": "s", "FeatureNN": "^", "PaSST": "D", "CLAP": "v"}
     for method in methods:
@@ -59,7 +59,7 @@ def plot_robustness(out_dir: Path) -> None:
     ax.set_title("Parameter-Cluster Hard Split")
     ax.set_xlabel("Cluster threshold")
     ax.grid(alpha=0.25)
-    axes[0].legend(loc="upper left", fontsize=11)
+    axes[0].legend(loc="upper left", fontsize=8)
     fig.tight_layout()
     out = out_dir / "robustness_result_curves.pdf"
     fig.savefig(out, dpi=300, bbox_inches="tight")
@@ -73,7 +73,7 @@ def plot_epr(out_dir: Path) -> None:
     with EPR.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.2))
+    fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.6))
     temps = sorted({r["temperature"] for r in rows}, key=float)
     for temp in temps:
         sub = sorted([r for r in rows if r["temperature"] == temp], key=lambda r: int(r["k"]))
@@ -83,7 +83,7 @@ def plot_epr(out_dir: Path) -> None:
         ax.axvline(5, color="#444444", linestyle="--", linewidth=1.0, alpha=0.7)
         ax.set_xlabel("K")
         ax.grid(alpha=0.25)
-        ax.legend(fontsize=11)
+        ax.legend(fontsize=8)
     axes[0].set_title("EPR Sensitivity (softmax weighting)")
     axes[0].set_ylabel("Normalized L2 (lower is better)")
     axes[1].set_title("Provenance Spread")
@@ -107,12 +107,12 @@ def main() -> int:
     matplotlib.use("Agg")
     matplotlib.rcParams["pdf.fonttype"] = 42
     matplotlib.rcParams["ps.fonttype"] = 42
-    matplotlib.rcParams["font.size"] = 14
-    matplotlib.rcParams["axes.titlesize"] = 15
-    matplotlib.rcParams["axes.labelsize"] = 14
-    matplotlib.rcParams["xtick.labelsize"] = 12
-    matplotlib.rcParams["ytick.labelsize"] = 12
-    matplotlib.rcParams["legend.fontsize"] = 12
+    matplotlib.rcParams["font.size"] = 9
+    matplotlib.rcParams["axes.titlesize"] = 10
+    matplotlib.rcParams["axes.labelsize"] = 9
+    matplotlib.rcParams["xtick.labelsize"] = 8
+    matplotlib.rcParams["ytick.labelsize"] = 8
+    matplotlib.rcParams["legend.fontsize"] = 8
     plot_robustness(out_dir)
     plot_epr(out_dir)
     return 0

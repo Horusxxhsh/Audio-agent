@@ -256,15 +256,15 @@ def generate_matplotlib_figure(
     means = [module_stats_norm[m]["mean"] for m in modules]
     stds = [module_stats_norm[m]["std"] for m in modules]
 
-    fig, ax = plt.subplots(figsize=(12, 5))
+    fig, ax = plt.subplots(figsize=(6.5, 2.8))
     x_pos = np.arange(len(modules))
     bars = ax.bar(x_pos, means, yerr=stds, capsize=3, color="#4C72B0", alpha=0.8)
 
-    ax.set_xlabel("Module", fontsize=16)
-    ax.set_ylabel("Normalized Mean Absolute Error", fontsize=16)
-    ax.set_title("Per-Module Parameter Error Distribution (Protocol-A, TRR)", fontsize=17)
+    ax.set_xlabel("Module", fontsize=9)
+    ax.set_ylabel("Normalized Mean Absolute Error", fontsize=9)
+    ax.set_title("Per-Module Parameter Error Distribution (Protocol-A, TRR)", fontsize=10)
     ax.set_xticks(x_pos)
-    ax.set_xticklabels(modules, rotation=45, ha="right", fontsize=16)
+    ax.set_xticklabels(modules, rotation=45, ha="right", fontsize=9)
     ymax = max([m + s for m, s in zip(means, stds)] + [0.05]) * 1.08
     ax.set_ylim(0, max(1.0, ymax))
     ax.grid(axis="y", alpha=0.3)

@@ -210,9 +210,9 @@ class FusionWeightAnalyzer:
         matplotlib.rcParams["axes.labelsize"] = 14
         matplotlib.rcParams["xtick.labelsize"] = 12
         matplotlib.rcParams["ytick.labelsize"] = 12
-        matplotlib.rcParams["legend.fontsize"] = 11
+        matplotlib.rcParams["legend.fontsize"] = 8
 
-        fig, axes = plt.subplots(1, 2, figsize=(8.5, 3.4))
+        fig, axes = plt.subplots(1, 2, figsize=(6.5, 2.6))
 
         # Plot 1: Weight vs uncertainty
         ax1 = axes[0]
@@ -244,10 +244,10 @@ class FusionWeightAnalyzer:
             ax1.plot(x_fit, y_fit, linestyle='--', color='black', linewidth=1.4, label='Linear trend')
 
         ax1.axhline(y=0.5, color='gray', linestyle=':', linewidth=1.0)
-        ax1.set_xlabel('Text uncertainty (normalized entropy)', fontsize=14)
-        ax1.set_ylabel('Text weight $w_{text}$', fontsize=14)
-        ax1.set_title(f'Fusion Weight vs. Uncertainty (N={len(df)})', fontsize=15, fontweight='bold')
-        ax1.legend(fontsize=11)
+        ax1.set_xlabel('Text uncertainty (normalized entropy)', fontsize=9)
+        ax1.set_ylabel('Text weight $w_{text}$', fontsize=9)
+        ax1.set_title(f'Fusion Weight vs. Uncertainty (N={len(df)})', fontsize=10, fontweight='bold')
+        ax1.legend(fontsize=8)
         ax1.grid(True, alpha=0.3)
 
         # Plot 2: Per-query objective comparison (clearer than tiny-sample histograms)
@@ -256,12 +256,12 @@ class FusionWeightAnalyzer:
         ax2.plot(query_ids, df['text_distance'], marker='o', linewidth=1.6, label='Text-only', color='#1f77b4')
         ax2.plot(query_ids, df['audio_distance'], marker='s', linewidth=1.6, label='Audio-only', color='#ff7f0e')
         ax2.plot(query_ids, df['fused_distance'], marker='^', linewidth=1.8, label='Fusion', color='#2ca02c')
-        ax2.set_xlabel('Query index', fontsize=14)
-        ax2.set_ylabel('Param. Dist.', fontsize=14)
-        ax2.set_title('Per-query Param. Dist. Comparison', fontsize=15, fontweight='bold')
+        ax2.set_xlabel('Query index', fontsize=9)
+        ax2.set_ylabel('Param. Dist.', fontsize=9)
+        ax2.set_title('Per-query Param. Dist. Comparison', fontsize=10, fontweight='bold')
         ax2.set_xticks(query_ids)
         ax2.grid(True, alpha=0.3)
-        ax2.legend(fontsize=11)
+        ax2.legend(fontsize=8)
 
         plt.tight_layout()
         plt.savefig(output_path, dpi=300, bbox_inches='tight')
@@ -330,8 +330,8 @@ class FusionWeightAnalyzer:
             linewidths=1.5
         )
 
-        ax1.set_xlabel('Text Uncertainty', fontsize=11)
-        ax1.set_ylabel('Audio Uncertainty', fontsize=11)
+        ax1.set_xlabel('Text Uncertainty', fontsize=8)
+        ax1.set_ylabel('Audio Uncertainty', fontsize=8)
         ax1.set_title('Failure Case Analysis: Uncertainty Space', fontsize=13, fontweight='bold')
         ax1.legend()
         ax1.grid(True, alpha=0.3)
@@ -360,8 +360,8 @@ class FusionWeightAnalyzer:
             density=True
         )
 
-        ax2.set_xlabel('Text Weight', fontsize=11)
-        ax2.set_ylabel('Density', fontsize=11)
+        ax2.set_xlabel('Text Weight', fontsize=8)
+        ax2.set_ylabel('Density', fontsize=8)
         ax2.set_title('Weight Distribution: Success vs. Failure', fontsize=13, fontweight='bold')
         ax2.legend()
         ax2.grid(axis='y', alpha=0.3)
@@ -383,8 +383,8 @@ class FusionWeightAnalyzer:
         ax3.bar(x - width/2, success_counts, width, label='Successes', color='green', alpha=0.7)
         ax3.bar(x + width/2, failure_counts, width, label='Failures', color='red', alpha=0.7)
 
-        ax3.set_xlabel('Category', fontsize=11)
-        ax3.set_ylabel('Count', fontsize=11)
+        ax3.set_xlabel('Category', fontsize=8)
+        ax3.set_ylabel('Count', fontsize=8)
         ax3.set_title('Success/Failure by Category', fontsize=13, fontweight='bold')
         ax3.set_xticks(x)
         ax3.set_xticklabels(all_cats, rotation=45, ha='right')
@@ -414,8 +414,8 @@ class FusionWeightAnalyzer:
         max_dist = max(failures['text_distance'].max(), failures['audio_distance'].max())
         ax4.plot([0, max_dist], [0, max_dist], 'k--', linewidth=2, label='Equal Performance')
 
-        ax4.set_xlabel('Text Distance', fontsize=11)
-        ax4.set_ylabel('Audio Distance', fontsize=11)
+        ax4.set_xlabel('Text Distance', fontsize=8)
+        ax4.set_ylabel('Audio Distance', fontsize=8)
         ax4.set_title('Failure Case: Modality Performance', fontsize=13, fontweight='bold')
         ax4.legend()
         ax4.grid(True, alpha=0.3)

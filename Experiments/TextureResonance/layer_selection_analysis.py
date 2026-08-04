@@ -351,14 +351,14 @@ def plot_layer_selection_results(results_df, output_path="layer_selection_analys
 
     matplotlib.rcParams["pdf.fonttype"] = 42
     matplotlib.rcParams["ps.fonttype"] = 42
-    matplotlib.rcParams["font.size"] = 17
-    matplotlib.rcParams["axes.titlesize"] = 18
-    matplotlib.rcParams["axes.labelsize"] = 17
-    matplotlib.rcParams["xtick.labelsize"] = 14
-    matplotlib.rcParams["ytick.labelsize"] = 14
-    matplotlib.rcParams["legend.fontsize"] = 13
+    matplotlib.rcParams["font.size"] = 9
+    matplotlib.rcParams["axes.titlesize"] = 10
+    matplotlib.rcParams["axes.labelsize"] = 9
+    matplotlib.rcParams["xtick.labelsize"] = 8
+    matplotlib.rcParams["ytick.labelsize"] = 8
+    matplotlib.rcParams["legend.fontsize"] = 8
 
-    fig, axes = plt.subplots(2, 1, figsize=(12, 10))
+    fig, axes = plt.subplots(2, 1, figsize=(6.5, 5.2))
 
     # Plot 1: Performance metrics (separate y-scales to avoid mixed-metric distortion)
     ax1 = axes[0]
@@ -371,9 +371,9 @@ def plot_layer_selection_results(results_df, output_path="layer_selection_analys
     width = 0.55
 
     bars = ax1.bar(x, param_dist, width, label='Param. Dist. (L2)', color='#e74c3c', alpha=0.85)
-    ax1.set_xlabel('Wav2Vec2 Layer Index', fontsize=16)
-    ax1.set_ylabel('Param. Dist. (lower is better)', fontsize=16, color='#e74c3c')
-    ax1.set_title('TRR Performance Across Wav2Vec2 Layers', fontsize=18, fontweight='bold')
+    ax1.set_xlabel('Wav2Vec2 Layer Index', fontsize=9)
+    ax1.set_ylabel('Param. Dist. (lower is better)', fontsize=9, color='#e74c3c')
+    ax1.set_title('TRR Performance Across Wav2Vec2 Layers', fontsize=10, fontweight='bold')
     ax1.set_xticks(x)
     ax1.set_xticklabels(layers)
     ax1.tick_params(axis='y', labelcolor='#e74c3c')
@@ -389,7 +389,7 @@ def plot_layer_selection_results(results_df, output_path="layer_selection_analys
         linewidth=2.2,
         label='Cosine Similarity'
     )
-    ax1_twin.set_ylabel('Cosine Similarity (higher is better)', fontsize=16, color='#1f4e79')
+    ax1_twin.set_ylabel('Cosine Similarity (higher is better)', fontsize=9, color='#1f4e79')
     ax1_twin.tick_params(axis='y', labelcolor='#1f4e79')
 
     handles = [bars] + line
@@ -426,9 +426,9 @@ def plot_layer_selection_results(results_df, output_path="layer_selection_analys
             hatches.append('...')
     ax2.bar(layers, param_dist, color=colors, alpha=0.7, edgecolor='black', hatch=hatches)
 
-    ax2.set_xlabel('Wav2Vec2 Layer Index', fontsize=16)
-    ax2.set_ylabel('Param. Dist. (L2)', fontsize=16)
-    ax2.set_title('Param. Dist. by Layer Type', fontsize=18, fontweight='bold')
+    ax2.set_xlabel('Wav2Vec2 Layer Index', fontsize=9)
+    ax2.set_ylabel('Param. Dist. (L2)', fontsize=9)
+    ax2.set_title('Param. Dist. by Layer Type', fontsize=10, fontweight='bold')
     ax2.grid(axis='y', alpha=0.3)
 
     # Add legend for layer types
@@ -439,7 +439,7 @@ def plot_layer_selection_results(results_df, output_path="layer_selection_analys
         Patch(facecolor='#3498db', edgecolor='black', hatch='xxx', label='Mid-to-High (Layer 9)'),
         Patch(facecolor='#9b59b6', edgecolor='black', hatch='...', label='High-level (Layers 10-12)')
     ]
-    ax2.legend(handles=legend_elements, loc='upper right', fontsize=13)
+    ax2.legend(handles=legend_elements, loc='upper right', fontsize=8)
 
     # Highlight best layer in this run
     best_layer_idx = int(results_df.loc[results_df["param_distance"].idxmin(), "layer_idx"])

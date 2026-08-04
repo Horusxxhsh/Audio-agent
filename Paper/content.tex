@@ -64,7 +64,7 @@ The architecture has two components. The real-time DSP engine executes parameter
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{retrieval_grounded_pipeline.pdf}
+\includegraphics[width=0.98\textwidth]{retrieval_grounded_pipeline.pdf}
 \caption{Overall framework of the retrieval-grounded guitar-effect control system. (a) The evaluated offline protocol: audio reference and optional text query are encoded into cached TRR descriptors, retrieved over an executable preset knowledge base, and projected by EPR-K5 under range/switch validity checks before a parameter vector is output. (b) The implemented real-time plugin executes the nine-module DSP chain on the dry guitar input. The two parts are implemented separately; their integration is a framework illustration rather than an experimental result figure.}
 \label{fig:framework}
 \end{figure*}
@@ -105,14 +105,14 @@ TRR is a second-order summary of deep features: it retains cross-channel correla
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.95\textwidth]{gram_matrix_examples.pdf}
+\includegraphics[width=0.88\textwidth]{gram_matrix_examples.pdf}
 \caption{Example TRR Gram matrices of six representative test-set queries. The figure is used for qualitative inspection rather than as standalone evidence of parameter transferability.}
 \label{fig:gram_examples}
 \end{figure*}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.95\textwidth]{trr_vs_wav2vec_tsne.pdf}
+\includegraphics[width=0.88\textwidth]{trr_vs_wav2vec_tsne.pdf}
 \caption{t-SNE comparison between TRR and mean-pooled Wav2Vec2 embeddings on the benchmark presets. The figure is used for qualitative inspection rather than as standalone evidence of parameter transferability.}
 \label{fig:tsne_comparison}
 \end{figure*}
@@ -271,14 +271,14 @@ Beyond the aggregate benchmark results, we include mechanism-level diagnostics t
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.82\textwidth]{trr_layer_selection.pdf}
+\includegraphics[width=0.78\textwidth]{trr_layer_selection.pdf}
 \caption{TRR mechanism and layer-selection diagnostic (204-query held-out split, normalized L2). The plot provides bounded evidence about which Wav2Vec2 layer region and aggregation choice give the most useful texture representation under the current benchmark.}
 \label{fig:trr_layer_selection}
 \end{figure*}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.86\textwidth]{per_param_error_dist.pdf}
+\includegraphics[width=0.80\textwidth]{per_param_error_dist.pdf}
 \caption{Per-module normalized parameter error (mean $\pm$ SD across leaves) on the 204-query held-out split. The figure complements the aggregate retrieval and projection metrics by showing where normalized parameter errors concentrate across effect-chain modules.}
 \label{fig:per_param_error_dist}
 \end{figure*}
@@ -314,7 +314,7 @@ Figure~\ref{fig:robustness_result_curves} plots the same robustness evidence as 
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.94\textwidth]{robustness_result_curves.pdf}
+\includegraphics[width=0.88\textwidth]{robustness_result_curves.pdf}
 \caption{Robustness result curves. Left: near-duplicate removal sensitivity. Right: parameter-cluster hard-split sweep with bootstrap confidence intervals where available. Lower normalized L2 is better.}
 \label{fig:robustness_result_curves}
 \end{figure*}
@@ -323,7 +323,7 @@ The direct-regression boundary and projection diagnostics further delimit the cl
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.94\textwidth]{epr_sensitivity_result_curve.pdf}
+\includegraphics[width=0.88\textwidth]{epr_sensitivity_result_curve.pdf}
 \caption{EPR sensitivity under softmax weighting. Left: normalized L2 as a function of K and softmax temperature. Right: effective exemplar count, showing the provenance-spread trade-off. The dashed line marks the K5 operating point used in the main table.}
 \label{fig:epr_sensitivity_result_curve}
 \end{figure*}
@@ -337,7 +337,7 @@ Second, a 26-participant multiple-stimulus listening study provides perceptual c
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.82\textwidth]{system_boxplot_Trial_2_5.pdf}
+\includegraphics[width=0.78\textwidth]{system_boxplot_Trial_2_5.pdf}
 \caption{Representative listening-study distribution for Trials~2--5, comparing the TRR-based system with a manual baseline. The figure is supporting perceptual context rather than primary validation.}
 \label{fig:listening_trials2_5}
 \end{figure*}

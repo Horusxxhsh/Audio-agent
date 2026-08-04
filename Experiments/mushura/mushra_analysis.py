@@ -261,14 +261,14 @@ def _maybe_plot_boxplot(
 
         matplotlib.rcParams["pdf.fonttype"] = 42
         matplotlib.rcParams["ps.fonttype"] = 42
-        matplotlib.rcParams["font.size"] = 14
-        matplotlib.rcParams["axes.titlesize"] = 15
-        matplotlib.rcParams["axes.labelsize"] = 14
-        matplotlib.rcParams["xtick.labelsize"] = 12
-        matplotlib.rcParams["ytick.labelsize"] = 12
+        matplotlib.rcParams["font.size"] = 9
+        matplotlib.rcParams["axes.titlesize"] = 10
+        matplotlib.rcParams["axes.labelsize"] = 9
+        matplotlib.rcParams["xtick.labelsize"] = 8
+        matplotlib.rcParams["ytick.labelsize"] = 8
         rng = np.random.default_rng(42)
 
-        plt.figure(figsize=(10, 4.5))
+        plt.figure(figsize=(6.3, 2.8))
         plt.boxplot(data, tick_labels=labels, showfliers=True)
         for i, s in enumerate(stimuli, 1):
             y = per_subject_scores[s]

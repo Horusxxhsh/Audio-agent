@@ -7,7 +7,11 @@
 \usepackage{makecell}
 \usepackage{caption}
 \captionsetup{font=footnotesize,labelfont=bf,labelsep=period,skip=4pt}
-
+\setlength{\textfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\floatsep}{6pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{8pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
 
 \title{Supplementary Material for Texture Resonance Retrieval for Guitar-Effect Preset Selection}
 \author{Anonymous Authors}
@@ -40,28 +44,30 @@ The mechanism audit includes one backbone-controlled comparison: TRR and Wav2Vec
 
 To further test the mechanism, we recomputed controlled Wav2Vec2 layer features on the same 204-query Protocol-A split with a fixed random seed and deterministic projection matrices. Table~\ref{tab:trr_mechanism_ablation} reports same-backbone aggregation variants and supports four bounded claims. First, Gram aggregation is not merely a backbone effect: same-layer Gram variants improve over same-backbone mean pooling. Second, the gain is strongest at a single mid-level layer (layer~5) rather than from multi-layer averaging: mean-pooling across layers~4--6 improves only marginally over layer~5 alone (0.2552 vs.\ 0.2582), and multi-layer Gram with $d=64$ improves only marginally over multi-layer mean pooling (0.2546 vs.\ 0.2552), so the reported TRR advantage is not experimentally isolated from the choice of layer~5. Third, L2 normalization is important: removing it produces the weakest row. Fourth, architectural choices remain meaningful: layer~5 and $d=32$/$d=64$ multi-layer variants trade off different metrics, so the reported configuration is not globally optimal.
 
+% Wide 7-column table: full-width is appropriate
 \begin{table*}[t]
-	\centering
-	\caption{Controlled TRR mechanism ablation on the Protocol-A split with recomputed features. Lower is better for Norm.L2; higher is better for all other metrics.}
-	\label{tab:trr_mechanism_ablation}
-	\footnotesize
-	\begin{tabular}{lcccccc}
-		\toprule
-		\textbf{Variant} & \textbf{Layers} & \textbf{Dim} & \textbf{Norm.L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{Recall} $\uparrow$ & \textbf{Cosine} $\uparrow$ \\
-		\midrule
-		Mean pooling & 5 & 768 & 0.2582 & 0.6089 & 0.4623 & 0.5895 \\
-		Mean pooling & 4+5+6 & 768 & 0.2552 & 0.6061 & 0.4589 & 0.6111 \\
-		Gram, no projection & 5 & 589824 & 0.2501 & 0.6103 & 0.4635 & 0.6092 \\
-		Gram, projected & 4 & 4096 & 0.2528 & 0.6017 & 0.4585 & 0.6191 \\
-		Gram, projected & 5 & 4096 & \textbf{0.2457} & \textbf{0.6104} & \textbf{0.4654} & 0.6224 \\
-		Gram, projected & 6 & 4096 & 0.2529 & 0.5985 & 0.4485 & 0.6317 \\
-		Gram, projected & 4+5+6, $d=16$ & 256 & 0.2501 & 0.6052 & 0.4449 & 0.6070 \\
-		Gram, projected & 4+5+6, $d=32$ & 1024 & 0.2480 & 0.6022 & 0.4640 & \textbf{0.6398} \\
-		Gram, projected & 4+5+6, $d=64$ & 4096 & 0.2546 & 0.5963 & 0.4487 & 0.6249 \\
-		Gram, projected & 4+5+6, $d=128$ & 16384 & 0.2576 & 0.6054 & 0.4538 & 0.6121 \\
-		Gram, no L2 norm & 4+5+6, $d=64$ & 4096 & 0.2849 & 0.5645 & 0.3944 & 0.5857 \\
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Controlled TRR mechanism ablation on the Protocol-A split with recomputed features. Lower is better for Norm.L2; higher is better for all other metrics.}
+\label{tab:trr_mechanism_ablation}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcccccc}
+\toprule
+\textbf{Variant} & \textbf{Layers} & \textbf{Dim} & \textbf{Norm.L2}$\downarrow$ & \textbf{Acc@0.1}$\uparrow$ & \textbf{Recall}$\uparrow$ & \textbf{Cosine}$\uparrow$ \\
+\midrule
+Mean pooling & 5 & 768 & 0.2582 & 0.6089 & 0.4623 & 0.5895 \\
+Mean pooling & 4+5+6 & 768 & 0.2552 & 0.6061 & 0.4589 & 0.6111 \\
+Gram, no projection & 5 & 589824 & 0.2501 & 0.6103 & 0.4635 & 0.6092 \\
+Gram, projected & 4 & 4096 & 0.2528 & 0.6017 & 0.4585 & 0.6191 \\
+Gram, projected & 5 & 4096 & \textbf{0.2457} & \textbf{0.6104} & \textbf{0.4654} & 0.6224 \\
+Gram, projected & 6 & 4096 & 0.2529 & 0.5985 & 0.4485 & 0.6317 \\
+Gram, projected & 4+5+6, $d=16$ & 256 & 0.2501 & 0.6052 & 0.4449 & 0.6070 \\
+Gram, projected & 4+5+6, $d=32$ & 1024 & 0.2480 & 0.6022 & 0.4640 & \textbf{0.6398} \\
+Gram, projected & 4+5+6, $d=64$ & 4096 & 0.2546 & 0.5963 & 0.4487 & 0.6249 \\
+Gram, projected & 4+5+6, $d=128$ & 16384 & 0.2576 & 0.6054 & 0.4538 & 0.6121 \\
+Gram, no L2 norm & 4+5+6, $d=64$ & 4096 & 0.2849 & 0.5645 & 0.3944 & 0.5857 \\
+\bottomrule
+\end{tabular*}
 \end{table*}
 
 \subsection{Dimensionality-Matched Control Baseline}
@@ -72,15 +78,16 @@ To rule out the ``higher dimensionality'' explanation for the TRR advantage (409
 
 To verify that the main result is not an artifact of a single random split, we construct five independent splits under the same resolved-audio-grouping protocol with different random seeds. Table~\ref{tab:split_stability} shows that TRR achieves the lowest Norm.L2 on all five splits, with a mean of $0.1500 \pm 0.0032$; the Wav2Vec baseline varies more ($0.1904 \pm 0.0087$) and never approaches the TRR level.
 
+% Narrow stability table: SINGLE COLUMN
 \begin{table}[htbp]
 \centering
 \caption{Cross-split stability on resolved-audio-grouped Protocol-A splits.}
 \label{tab:split_stability}
 \footnotesize
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{lccccc}
 \toprule
-\textbf{Split} & \textbf{$n$} & \makecell{\textbf{TRR}\\L2 $\downarrow$} & \makecell{\textbf{W2V}\\L2 $\downarrow$} & \makecell{\textbf{FNN}\\L2 $\downarrow$} & \textbf{Rank} \\
+\textbf{Split} & \textbf{$n$} & \makecell{\textbf{TRR}\\L2$\downarrow$} & \makecell{\textbf{W2V}\\L2$\downarrow$} & \makecell{\textbf{FNN}\\L2$\downarrow$} & \textbf{Rank} \\
 \midrule
 seed0 (original) & 204 & 0.1454 & 0.1997 & 0.2002 & 1st \\
 seed1 & 203 & 0.1543 & 0.1848 & 0.2088 & 1st \\
@@ -98,46 +105,50 @@ Std & -- & 0.0032 & 0.0087 & 0.0071 & -- \\
 
 Protocol-C corrupts raw audio (AWGN, MP3 compression, reverberation, truncation) and re-encodes the degraded signal into TRR embeddings, using \texttt{Style}+\texttt{Feature} as the text branch and parameter-space oracle neighbors as relevance targets. Table~\ref{tab:protocolC_summary} shows that adaptive fusion is the best overall setting (L2 $=20.1491$, Acc@0.1 $=0.6121$, MRR $=0.5654$, NDCG@5 $=0.5566$) but with a small margin over strong fixed text-weighted fusion. Per-condition, adaptive fusion is not a uniform winner: fixed 0.50 and fixed 0.70 remain competitive on several conditions. The stronger conclusion is that audio-heavy fusion is fragile, whereas adaptive fusion consistently moves the system toward the stable mid-to-high text-weight region. An independent boundary analysis with explicit audio-only ($\alpha=0.0$), pure-text ($\alpha=1.0$), and parameter-oracle upper-bound rows confirms that audio-only retrieval is weak under realistic degradation, mid/high text weights are stable, and the pure-text boundary remains a strong practical boundary (best L2 $=61.5079$); the oracle row quantifies only the remaining improvement attainable with perfect retrieval. Thus, adaptive fusion should be read as a multimodal operating strategy near the stable region, not as proof of superiority over text-only retrieval.
 
-\begin{table*}[t]
-	\centering
-	\caption{Protocol-C overall results on the shared 204-query split. Lower is better for L2; higher is better for all other metrics.}
-	\label{tab:protocolC_summary}
-	\footnotesize
-	\begin{tabular}{lccccc}
-		\toprule
-		\textbf{Method} & $\boldsymbol{\alpha}$ & \textbf{L2} $\downarrow$ & \textbf{Acc@0.1} $\uparrow$ & \textbf{MRR} $\uparrow$ & \textbf{NDCG@5} $\uparrow$ \\
-		\midrule
-		Fixed & 0.3000 & 29.2322 & 0.4846 & 0.4095 & 0.3723 \\
-		Fixed & 0.5000 & 20.5551 & 0.6085 & 0.5607 & 0.5528 \\
-		Fixed & 0.7000 & 20.1868 & 0.6104 & 0.5652 & 0.5551 \\
-		Adaptive fusion & 0.5980 & \textbf{20.1491} & \textbf{0.6121} & \textbf{0.5654} & \textbf{0.5566} \\
-		\bottomrule
-	\end{tabular}
-\end{table*}
+% Narrow 4-row table: SINGLE COLUMN
+\begin{table}[htbp]
+\centering
+\caption{Protocol-C overall results on the shared 204-query split.}
+\label{tab:protocolC_summary}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Method} & $\boldsymbol{\alpha}$ & \textbf{L2}$\downarrow$ & \textbf{Acc@0.1}$\uparrow$ & \textbf{MRR}$\uparrow$ & \textbf{NDCG@5}$\uparrow$ \\
+\midrule
+Fixed & 0.3000 & 29.2322 & 0.4846 & 0.4095 & 0.3723 \\
+Fixed & 0.5000 & 20.5551 & 0.6085 & 0.5607 & 0.5528 \\
+Fixed & 0.7000 & 20.1868 & 0.6104 & 0.5652 & 0.5551 \\
+Adaptive fusion & 0.5980 & \textbf{20.1491} & \textbf{0.6121} & \textbf{0.5654} & \textbf{0.5566} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Listening Study Statistics}
 
 The listening study uses a multiple-stimulus protocol with a hidden reference and no explicit low-quality anchor; across all trials it contains 26 unique participants and 910 ratings (Trial 1: 208 ratings across 8 stimuli; Trials 2--5: 312; Trials 6--10: 390). The raw logs preserve repeated-measures structure and participant IDs, but not device metadata, participant expertise labels, or the manual-baseline time budget; we therefore interpret the results as perceptual context rather than as a fairness-critical human-vs-system benchmark. Table~\ref{tab:listening_tests} reports repeated-measures nonparametric tests: in Trials~2--5 the TRR-based system and the manual baseline both trail the reference ($p_{\mathrm{Holm}}=0.00015$), with the TRR-based system rated above the manual baseline; in Trials~6--10 the TRR-based system and MusicGen are rated comparably ($p=0.7797$).
 
+% Wide listening table: full width
 \begin{table*}[t]
-	\centering
-	\caption{Repeated-measures nonparametric tests for the listening study.}
-	\label{tab:listening_tests}
-	\footnotesize
-	\begin{tabular}{llccccc}
-		\toprule
-		\textbf{Block} & \textbf{Comparison} & \textbf{$n$} & \textbf{Mean(A-B)} & \textbf{Median(A-B)} & \textbf{rbc} & \textbf{$p$ (Holm)} \\
-		\midrule
-		Trials 2--5 & Friedman omnibus ($Q=41.6154$, $p_{\mathrm{perm}}=5\times10^{-5}$) & N/A & N/A & N/A & N/A & N/A \\
-		Trials 2--5 & reference vs TRR-based system & 26 & 13.78 & 8.38 & 0.860 & 0.00015 \\
-		Trials 2--5 & reference vs manual & 26 & 33.61 & 26.00 & 0.983 & 0.00015 \\
-		Trials 2--5 & TRR-based system vs manual & 26 & 19.83 & 17.25 & 1.000 & 0.00015 \\
-		Trials 6--10 & Friedman omnibus ($Q=36.2308$, $p_{\mathrm{perm}}=5\times10^{-5}$) & N/A & N/A & N/A & N/A & N/A \\
-		Trials 6--10 & reference vs MusicGen & 26 & 47.72 & 50.90 & 1.000 & 0.00015 \\
-		Trials 6--10 & reference vs TRR-based system & 26 & 46.71 & 51.30 & 0.994 & 0.00015 \\
-		Trials 6--10 & MusicGen vs TRR-based system & 24 & -1.10 & 0.80 & 0.067 & 0.7797 \\
-		\bottomrule
-	\end{tabular}
+\centering
+\caption{Repeated-measures nonparametric tests for the listening study.}
+\label{tab:listening_tests}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llccccc}
+\toprule
+\textbf{Block} & \textbf{Comparison} & \textbf{$n$} & \textbf{Mean(A-B)} & \textbf{Med(A-B)} & \textbf{rbc} & \textbf{$p$ (Holm)} \\
+\midrule
+Trials 2--5 & Friedman omnibus ($Q=41.62$, $p_{\mathrm{perm}}=5\times10^{-5}$) & N/A & N/A & N/A & N/A & N/A \\
+Trials 2--5 & reference vs TRR-based system & 26 & 13.78 & 8.38 & 0.860 & 0.00015 \\
+Trials 2--5 & reference vs manual & 26 & 33.61 & 26.00 & 0.983 & 0.00015 \\
+Trials 2--5 & TRR-based system vs manual & 26 & 19.83 & 17.25 & 1.000 & 0.00015 \\
+Trials 6--10 & Friedman omnibus ($Q=36.23$, $p_{\mathrm{perm}}=5\times10^{-5}$) & N/A & N/A & N/A & N/A & N/A \\
+Trials 6--10 & reference vs MusicGen & 26 & 47.72 & 50.90 & 1.000 & 0.00015 \\
+Trials 6--10 & reference vs TRR-based system & 26 & 46.71 & 51.30 & 0.994 & 0.00015 \\
+Trials 6--10 & MusicGen vs TRR-based system & 24 & -1.10 & 0.80 & 0.067 & 0.7797 \\
+\bottomrule
+\end{tabular*}
 \end{table*}
 
 \section{CLAP-Covered Shared Subset}
@@ -150,74 +161,66 @@ The cached latency table in the main text measures retrieval scoring after embed
 
 \section{Protocol-B Executable-Neighborhood Diagnostics}
 
-Protocol-B evaluates whether retrieval produces a parameter-transferable executable neighborhood rather than only a single nearest preset. \textbf{PNR@K} is parameter-neighborhood recall at threshold $0.10$ over the retrieved set; EPR denotes a softmax-weighted blend over the retrieved executable presets followed by range and switch projection, with provenance reported as effective exemplars and maximum exemplar weight. Table~\ref{tab:executable_neighborhood_supp} reports the neighborhood diagnostics: the primary hybrid row is EPR-K5 (Norm.L2 $=0.1334$, SwitchF1 $=0.8824$, $N_{\mathrm{eff}}=4.2129$, $\max_i w_i=0.3438$), which improves over top-1 retrieval while retaining provenance. The range-projected MLP row (Norm.L2 $=0.1603$, Norm.Acc@0.1 $=0.7894$, Recall $0.3468$, Cosine $0.5941$) has no retrieved-neighborhood provenance; its low recall and cosine indicate that direct regression does not recover the same active parameter structure as retrieval, and it does not emit discrete switch states (SwitchF1 is undefined).
-
-\newpage
-
-The key-presence Module Jaccard is not used as a primary conclusion because it can become artificially high for methods that emit a complete parameter schema. Module-aware reranking is included only as a diagnostic negative result: it worsens Norm.L2 (0.1479) and degrades recall and cosine.
+Protocol-B evaluates whether retrieval produces a parameter-transferable executable neighborhood rather than only a single nearest preset. \textbf{PNR@K} is parameter-neighborhood recall at threshold $0.10$ over the retrieved set; EPR denotes a softmax-weighted blend over the retrieved executable presets followed by range and switch projection, with provenance reported as effective exemplars and maximum exemplar weight. Table~\ref{tab:executable_neighborhood_supp} reports the neighborhood diagnostics: the primary hybrid row is EPR-K5 (Norm.L2 $=0.1334$, SwitchF1 $=0.8824$, $N_{\mathrm{eff}}=4.2129$, $\max_i w_i=0.3438$), which improves over top-1 retrieval while retaining provenance. The range-projected MLP row (Norm.L2 $=0.1603$, Norm.Acc@0.1 $=0.7894$, Recall $0.3468$, Cosine $0.5941$) has no retrieved-neighborhood provenance; its low recall and cosine indicate that direct regression does not recover the same active parameter structure as retrieval, and it does not emit discrete switch states (SwitchF1 is undefined). The key-presence Module Jaccard is not used as a primary conclusion because it can become artificially high for methods that emit a complete parameter schema. Module-aware reranking is included only as a diagnostic negative result: it worsens Norm.L2 (0.1479) and degrades recall and cosine.
 
 Table~\ref{tab:supp_epr_sensitivity} reports EPR sensitivity under softmax weighting (the EPR sensitivity CSV does not contain uniform-weighting runs); $K=5$, $\tau=0.05$ is the primary manuscript row. Table~\ref{tab:supp_epr_validity} reports the validity and repair audit: all methods reach 100\% validity after range and switch projection, and TRR requires repair on 78.4\% of queries (range 43.6\%, switch 78.4\%).
 
-\clearpage
+% Three compact SINGLE-COLUMN tables (not full-width)
+\begin{table}[htbp]
+\centering
+\caption{Protocol-B executable-neighborhood diagnostics.}
+\label{tab:executable_neighborhood_supp}
+\footnotesize
+\setlength{\tabcolsep}{2.8pt}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Method} & \textbf{K} & \textbf{PNR@K} & \textbf{L2} & \textbf{Acc} & \textbf{SwF1} & \textbf{Prov.} \\
+\midrule
+TRR top-1 & 1 & 0.4608 & 0.1454 & 0.7863 & 0.8630 & yes \\
+TRR top-K & 5 & 0.7500 & -- & -- & -- & top-K \\
+EPR-K3 & 3 & -- & 0.1356 & 0.7872 & 0.8734 & 2.69/0.47 \\
+EPR-K5 & 5 & -- & 0.1334 & 0.7908 & 0.8824 & 4.21/0.34 \\
+MLP+Range & -- & -- & 0.1603 & 0.7894 & -- & none \\
+Mod.\ rerank & 5 & -- & 0.1479 & 0.7870 & -- & neg. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\noindent\begin{minipage}{\textwidth}
-	\centering
-	\captionof{table}{Protocol-B executable-neighborhood diagnostics on the Protocol-A query list. For pure TRR rows, Norm.L2 and Norm.Acc@0.1 are top-1 retrieval metrics; TRR top-K reports neighborhood recall. Provenance is reported as effective exemplars / max weight.}
-	\label{tab:executable_neighborhood_supp}
-	\footnotesize
-	\begin{tabular}{lcccccc}
-		\toprule
-		\textbf{Method} & \textbf{K} & \textbf{PNR@K} & \textbf{Norm.L2} & \textbf{Norm.Acc@0.1} & \textbf{SwitchF1} & \textbf{Provenance} \\
-		\midrule
-		TRR top-1 & 1 & 0.4608 & 0.1454 & 0.7863 & 0.8630 & yes \\
-		TRR top-K & 5 & 0.7500 & -- & -- & -- & top-K list \\
-		EPR-K3 & 3 & -- & 0.1356 & 0.7872 & 0.8734 & 2.6857 / 0.4664 \\
-		EPR-K5 & 5 & -- & 0.1334 & 0.7908 & 0.8824 & 4.2129 / 0.3438 \\
-		MLP + RangeProjection & -- & -- & 0.1603 & 0.7894 & -- & none \\
-		Module-aware rerank & 5 & -- & 0.1479 & 0.7870 & -- & diagnostic negative \\
-		\bottomrule
-	\end{tabular}
-\end{minipage}
+\begin{table}[htbp]
+\centering
+\caption{TRR EPR sensitivity (softmax). Primary row: $K=5$, $\tau=0.05$.}
+\label{tab:supp_epr_sensitivity}
+\footnotesize
+\setlength{\tabcolsep}{2.8pt}
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{W} & \textbf{$K$} & \textbf{$\tau$} & \textbf{L2} & \textbf{Rec.} & \textbf{Cos} & \textbf{SwF1} & \textbf{$N_{\mathrm{eff}}$} \\
+\midrule
+softm. & 1 & 0.05 & 0.1454 & 0.7045 & 0.9010 & 0.8630 & 1.00 \\
+softm. & 3 & 0.05 & 0.1356 & 0.7060 & 0.9177 & 0.8734 & 2.69 \\
+softm. & 5 & 0.05 & 0.1334 & 0.7146 & 0.9207 & 0.8824 & 4.21 \\
+softm. & 10 & 0.05 & 0.1307 & 0.7156 & 0.9258 & 0.8924 & 7.59 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\vspace{8pt}
-
-\noindent\begin{minipage}{\textwidth}
-	\centering
-	\captionof{table}{TRR EPR sensitivity. All rows use softmax weighting; $K=5$, $\tau=0.05$ is the primary manuscript row.}
-	\label{tab:supp_epr_sensitivity}
-	\footnotesize
-	\begin{tabular}{lcccccccc}
-		\toprule
-		\textbf{Weighting} & \textbf{$K$} & \textbf{$\tau$} & \textbf{Norm.L2} & \textbf{Recall} & \textbf{Cos} & \textbf{SwitchF1} & \textbf{$N_{\mathrm{eff}}$} & \textbf{max $w$} \\
-		\midrule
-		softmax & 1 & 0.05 & 0.1454 & 0.7045 & 0.9010 & 0.8630 & 1.0000 & 1.0000 \\
-		softmax & 3 & 0.05 & 0.1356 & 0.7060 & 0.9177 & 0.8734 & 2.6857 & 0.4664 \\
-		softmax & 5 & 0.05 & 0.1334 & 0.7146 & 0.9207 & 0.8824 & 4.2129 & 0.3438 \\
-		softmax & 10 & 0.05 & 0.1307 & 0.7156 & 0.9258 & 0.8924 & 7.5900 & 0.2400 \\
-		\bottomrule
-	\end{tabular}
-\end{minipage}
-
-\vspace{8pt}
-
-\noindent\begin{minipage}{\textwidth}
-	\centering
-	\captionof{table}{Protocol-B EPR-K5 validity and repair audit. Validity is measured after range and switch projection.}
-	\label{tab:supp_epr_validity}
-	\footnotesize
-	\setlength{\tabcolsep}{4pt}
-	\begin{tabular}{lccccc}
-		\toprule
-		\textbf{Method} & \textbf{$n$} & \textbf{Validity} & \textbf{Repair} & \makecell{\textbf{Range}\\\textbf{repair}} & \makecell{\textbf{Switch}\\\textbf{repair}} \\
-		\midrule
-		Wav2Vec EPR-K5 & 204 & 1.0000 & 0.8627 & 0.5343 & 0.8627 \\
-		FeatureNN EPR-K5 & 204 & 1.0000 & 0.9363 & 0.5588 & 0.9363 \\
-		CLAP EPR-K5 & 173 & 1.0000 & 0.9306 & 0.5376 & 0.9306 \\
-		PaSST EPR-K5 & 204 & 1.0000 & 0.9510 & 0.5931 & 0.9510 \\
-		TRR EPR-K5 & 204 & 1.0000 & 0.7843 & 0.4363 & 0.7843 \\
-		\bottomrule
-	\end{tabular}
-\end{minipage}
-
+\begin{table}[htbp]
+\centering
+\caption{EPR-K5 validity/repair after range and switch projection.}
+\label{tab:supp_epr_validity}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Method} & \textbf{$n$} & \textbf{Valid.} & \textbf{Repair} & \textbf{Range} & \textbf{Switch} \\
+\midrule
+Wav2Vec EPR-K5 & 204 & 1.0000 & 0.8627 & 0.5343 & 0.8627 \\
+FeatureNN EPR-K5 & 204 & 1.0000 & 0.9363 & 0.5588 & 0.9363 \\
+CLAP EPR-K5 & 173 & 1.0000 & 0.9306 & 0.5376 & 0.9306 \\
+PaSST EPR-K5 & 204 & 1.0000 & 0.9510 & 0.5931 & 0.9510 \\
+TRR EPR-K5 & 204 & 1.0000 & 0.7843 & 0.4363 & 0.7843 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \end{document}
