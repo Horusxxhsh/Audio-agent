@@ -5,27 +5,8 @@
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{makecell}
-
-% IEEEtran renders table captions in fake small-caps (\scshape), which at
-% \footnotesize drops the visual size to ~6.4pt. Override the table-caption
-% branch only: keep 8pt (\footnotesize) regular text, two-line IEEE style.
-\makeatletter
-\renewcommand{\@makecaption}[2]{%
-  \ifx\@captype\@IEEEtablestring%
-    \footnotesize\bgroup\par\centering\@IEEEtabletopskipstrut
-      {\normalfont\footnotesize #1}\\{\normalfont\footnotesize #2}%
-    \par\addvspace{0.5\baselineskip}\egroup%
-    \@IEEEtablecaptionsepspace
-  \else%
-    \@IEEEfigurecaptionsepspace
-    \setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}\nobreakspace\nobreakspace #2}%
-    \ifdim \wd\@tempboxa >\hsize%
-      \setbox\@tempboxa\hbox{\normalfont\footnotesize {#1.}\nobreakspace\nobreakspace}%
-      \parbox[t]{\hsize}{\normalfont\footnotesize\noindent\unhbox\@tempboxa#2}%
-    \else%
-      \hbox to\hsize{\normalfont\footnotesize\box\@tempboxa\hfil}%
-    \fi\fi}
-\makeatother
+\usepackage{caption}
+\captionsetup{font=footnotesize,labelfont=bf,labelsep=period}
 
 \title{Supplementary Material for Texture Resonance Retrieval for Guitar-Effect Preset Selection}
 \author{Anonymous Authors}
@@ -95,9 +76,10 @@ To verify that the main result is not an artifact of a single random split, we c
 \caption{Cross-split stability on resolved-audio-grouped Protocol-A splits.}
 \label{tab:split_stability}
 \footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{lcccccc}
 \toprule
-\textbf{Split} & \textbf{$n$} & \textbf{TRR L2} $\downarrow$ & \textbf{Wav2Vec L2} $\downarrow$ & \textbf{FeatureNN L2} $\downarrow$ & \textbf{TRR rank} \\
+\textbf{Split} & \textbf{$n$} & \makecell{\textbf{TRR}\\ \textbf{L2} $\downarrow$} & \makecell{\textbf{Wav2Vec}\\ \textbf{L2} $\downarrow$} & \makecell{\textbf{FeatureNN}\\ \textbf{L2} $\downarrow$} & \makecell{\textbf{TRR}\\ \textbf{rank}} \\
 \midrule
 seed0 (original) & 204 & 0.1454 & 0.1997 & 0.2002 & 1st \\
 seed1 & 203 & 0.1543 & 0.1848 & 0.2088 & 1st \\
@@ -167,13 +149,25 @@ The cached latency table in the main text measures retrieval scoring after embed
 
 \section{Protocol-B Executable-Neighborhood Diagnostics}
 
-Protocol-B evaluates whether retrieval produces a parameter-transferable executable neighborhood rather than only a single nearest preset. \textbf{PNR@K} is parameter-neighborhood recall at threshold $0.10$ over the retrieved set; EPR denotes a softmax-weighted blend over the retrieved executable presets followed by range and switch projection, with provenance reported as effective exemplars and maximum exemplar weight. Table~\ref{tab:executable_neighborhood_supp} reports the neighborhood diagnostics: the primary hybrid row is EPR-K5 (Norm.L2 $=0.1334$, SwitchF1 $=0.8824$, $N_{\mathrm{eff}}=4.2129$, $\max_i w_i=0.3438$), which improves over top-1 retrieval while retaining provenance. The range-projected MLP row (Norm.L2 $=0.1603$, Norm.Acc@0.1 $=0.7894$, Recall $0.3468$, Cosine $0.5941$) has no retrieved-neighborhood provenance; its low recall and cosine indicate that direct regression does not recover the same active parameter structure as retrieval, and it does not emit discrete switch states (SwitchF1 is undefined). The key-presence Module Jaccard is not used as a primary conclusion because it can become artificially high for methods that emit a complete parameter schema. Module-aware reranking is included only as a diagnostic negative result: it worsens Norm.L2 (0.1479) and degrades recall and cosine.
+Protocol-B evaluates whether retrieval produces a parameter-transferable executable neighborhood rather than only a single nearest preset. \textbf{PNR@K} is parameter-neighborhood recall at threshold $0.10$ over the retrieved set; EPR denotes a softmax-weighted blend over the retrieved executable presets followed by range and switch projection, with provenance reported as effective exemplars and maximum exemplar weight. Table~\ref{tab:executable_neighborhood_supp} reports the neighborhood diagnostics: the primary hybrid row is EPR-K5 (Norm.L2 $=0.1334$, SwitchF1 $=0.8824$, $N_{\mathrm{eff}}=4.2129$, $\max_i w_i=0.3438$), which improves over top-1 retrieval while retaining provenance. The range-projected MLP row (Norm.L2 $=0.1603$, Norm.Acc@0.1 $=0.7894$, Recall $0.3468$, Cosine $0.5941$) has no retrieved-neighborhood provenance; its low recall and cosine indicate that direct regression does not recover the same active parameter structure as retrieval, and it does not emit discrete switch states (SwitchF1 is undefined).
+
+\newpage
+
+The key-presence Module Jaccard is not used as a primary conclusion because it can become artificially high for methods that emit a complete parameter schema. Module-aware reranking is included only as a diagnostic negative result: it worsens Norm.L2 (0.1479) and degrades recall and cosine.
 
 Table~\ref{tab:supp_epr_sensitivity} reports EPR sensitivity under softmax weighting (the EPR sensitivity CSV does not contain uniform-weighting runs); $K=5$, $\tau=0.05$ is the primary manuscript row. Table~\ref{tab:supp_epr_validity} reports the validity and repair audit: all methods reach 100\% validity after range and switch projection, and TRR requires repair on 78.4\% of queries (range 43.6\%, switch 78.4\%).
 
-\begin{table*}[t]
+\clearpage
+
+
+
+
+
+\clearpage
+
+\begin{minipage}{\textwidth}
 	\centering
-	\caption{Protocol-B executable-neighborhood diagnostics on the Protocol-A query list. For pure TRR rows, Norm.L2 and Norm.Acc@0.1 are top-1 retrieval metrics; TRR top-K reports neighborhood recall. Provenance is reported as effective exemplars / max weight.}
+	\captionof{table}{Protocol-B executable-neighborhood diagnostics on the Protocol-A query list. For pure TRR rows, Norm.L2 and Norm.Acc@0.1 are top-1 retrieval metrics; TRR top-K reports neighborhood recall. Provenance is reported as effective exemplars / max weight.}
 	\label{tab:executable_neighborhood_supp}
 	\footnotesize
 	\begin{tabular}{lcccccc}
@@ -188,12 +182,13 @@ Table~\ref{tab:supp_epr_sensitivity} reports EPR sensitivity under softmax weigh
 		Module-aware rerank & 5 & -- & 0.1479 & 0.7870 & -- & diagnostic negative \\
 		\bottomrule
 	\end{tabular}
-\end{table*}
+\end{minipage}
 
-\begin{table*}[t]
+\begin{minipage}{\textwidth}
 	\centering
-	\caption{TRR EPR sensitivity. All rows use softmax weighting; $K=5$, $\tau=0.05$ is the primary manuscript row.}
+	\captionof{table}{TRR EPR sensitivity and the Protocol-B EPR-K5 validity/repair audit. All sensitivity rows use softmax weighting; $K=5$, $\tau=0.05$ is the primary manuscript row. Validity is measured after range and switch projection.}
 	\label{tab:supp_epr_sensitivity}
+	\label{tab:supp_epr_validity}
 	\footnotesize
 	\begin{tabular}{lcccccccc}
 		\toprule
@@ -205,17 +200,10 @@ Table~\ref{tab:supp_epr_sensitivity} reports EPR sensitivity under softmax weigh
 		softmax & 10 & 0.05 & 0.1307 & 0.7156 & 0.9258 & 0.8924 & 7.5900 & 0.2400 \\
 		\bottomrule
 	\end{tabular}
-\end{table*}
-
-\begin{table}[htbp]
-	\centering
-	\caption{Protocol-B EPR-K5 validity and repair audit. Validity is measured after range and switch projection.}
-	\label{tab:supp_epr_validity}
-	\footnotesize
-	\setlength{\tabcolsep}{4pt}
+	\vspace{8pt}
 	\begin{tabular}{lccccc}
 		\toprule
-		\textbf{Method} & \textbf{$n$} & \textbf{Validity} & \textbf{Repair} & \makecell{\textbf{Range}\\\textbf{repair}} & \makecell{\textbf{Switch}\\\textbf{repair}} \\
+		\textbf{Method} & \textbf{$n$} & \textbf{Validity} & \textbf{Repair} & \makecell{\textbf{Range}\\ \textbf{repair}} & \makecell{\textbf{Switch}\\ \textbf{repair}} \\
 		\midrule
 		Wav2Vec EPR-K5 & 204 & 1.0000 & 0.8627 & 0.5343 & 0.8627 \\
 		FeatureNN EPR-K5 & 204 & 1.0000 & 0.9363 & 0.5588 & 0.9363 \\
@@ -224,6 +212,6 @@ Table~\ref{tab:supp_epr_sensitivity} reports EPR sensitivity under softmax weigh
 		TRR EPR-K5 & 204 & 1.0000 & 0.7843 & 0.4363 & 0.7843 \\
 		\bottomrule
 	\end{tabular}
-\end{table}
+\end{minipage}
 
 \end{document}
