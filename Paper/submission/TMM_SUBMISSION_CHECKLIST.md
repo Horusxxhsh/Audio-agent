@@ -1,52 +1,52 @@
-# TMM Submission Checklist
+# TMM Submission Checklist (updated 2026-08-04)
 
-This checklist records the local submission state for the current IEEE
-Transactions on Multimedia manuscript package.
+Local submission state for the IEEE Transactions on Multimedia revision
+package in `Paper/submission/`.
 
-## Official Format Constraints Checked
+## Official Format Constraints (from IEEE SPS Information for Authors)
 
-- IEEE Transactions on Multimedia regular-paper initial submission page limit:
-  10 double-column pages, 10-point font, including title, authors, abstract,
-  text, figures, tables, and references. Supplemental material is not counted.
-- IEEE Signal Processing Society revised regular-paper limit for TMM: 14
-  double-column pages.
-- IEEE article structure includes title page, abstract, index terms, body,
-  conclusion, acknowledgments if any, references, and optional biographies.
-- IEEE abstract guidance: one paragraph, 150--250 words.
+- TMM regular paper, **initial submission**: max **10 double-column pages**,
+  10-point font (counts title, authors, abstract, text, figures, tables,
+  references). Supplemental material excluded.
+- TMM regular paper, **revision**: max **14 double-column pages**, 10-point
+  font; appendices/proofs may go to supplemental material.
+- Supplementary material: max **4 double-column pages**, 10-point font;
+  multimedia/code/data allowed with a README.
+- Abstract: one paragraph, **150–250 words**, no citations/abbreviations/
+  displayed equations.
+- Figures: PS/EPS/PDF/PNG/TIFF with embedded fonts (no Type 3 for TMM PDFs);
+  text in figures 8–10 pt; color figures must remain readable in grayscale.
+- All authors need ORCIDs; portal metadata must match the manuscript.
 
-Official sources:
-
-- https://signalprocessingsociety.org/publications-resources/information-authors
+Sources:
+- https://signalprocessingsociety.org/index.php/publications-resources/information-authors
 - https://signalprocessingsociety.org/index.php/publications-resources/ieee-transactions-multimedia
-- https://journals.ieeeauthorcenter.ieee.org/create-your-ieee-journal-article/authoring-tools-and-templates/tools-for-ieee-authors/ieee-article-templates/
-- https://journals.ieeeauthorcenter.ieee.org/wp-content/uploads/sites/7/IEEE-Editorial-Style-Manual-for-Authors.pdf
+- https://journals.ieeeauthorcenter.ieee.org/create-your-ieee-journal-article/prepare-supplementary-materials/
 
-## Local Package State
+## Verified Local State (2026-08-04)
 
-- Main manuscript: `Paper/main.tex`
-- Main body: `Paper/content.tex`
-- Supplement: `Paper/supplementary.tex`
-- Bibliography: `Paper/reference.bib`
-- Main PDF: `Paper/main.pdf`
-- Supplement PDF: `Paper/supplementary.pdf`
-
-Current local validation:
-
-- `Paper/main.pdf`: 12 pages, letter paper.
-- Abstract: 154 words, single paragraph.
-- `latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex`: passed.
-- `latexmk -pdf -interaction=nonstopmode -halt-on-error supplementary.tex`: passed.
-- Claim audit on `content.tex` and `supplementary.tex`: passed with no findings.
+| Check | Result |
+|---|---|
+| `main.pdf` page count | 13 (letter, double column) — within 14-page revision limit |
+| `supplementary.pdf` page count | 4 — within 4-page supplement limit |
+| Abstract word count | 161 |
+| Type 3 fonts (both PDFs) | none; Type 1 (Times) + embedded TrueType only |
+| Undefined citations | 0 (58 verified bibliography entries) |
+| Build (`latexmk -pdf`, both files) | passed |
+| Framework figure installed | `figures/retrieval_grounded_pipeline.pdf` (from user SVG, ≥8 pt text) |
+| Data freeze | all figures drawn from frozen CSV/JSON; experiment code untouched |
 
 ## Human Items Before ScholarOne Submission
 
-- Replace `Anonymous Authors` in `Paper/main.tex` with the final author list,
-  affiliations, and corresponding-author contact information unless the
-  submission portal explicitly requires anonymization.
-- Confirm whether this is an initial submission or a revision. The current
-  expanded manuscript is formatted for the revised regular-paper 14-page
-  boundary, not for the stricter initial 10-page limit.
-- Prepare the ScholarOne metadata: title, abstract, index terms, author ORCIDs,
-  funding statement, conflict-of-interest declarations, and any preprint links.
-- Upload `Paper/main.pdf` as the main manuscript and `Paper/supplementary.pdf`
-  as supplemental material if the portal requests separate supplemental files.
+- [ ] Decide anonymization: `main.tex` currently uses `Anonymous Authors`
+  (double-blind mode). If not blind, fill real authors/affiliations.
+- [ ] Fill ScholarOne metadata: title, abstract, index terms, all author
+  ORCIDs, funding statement, COI declaration, EDICS, preprint link
+  (arXiv:2603.09332).
+- [ ] Confirm submission track: revision (14-page limit, current package OK)
+  vs. initial (10-page limit — would require trimming ~3 pages).
+- [ ] Upload: `TMM_main_manuscript.pdf` (main), `TMM_supplementary_material.pdf`
+  (supplement), optionally `TMM_source_package.zip` (source) and `figures/`
+  (standalone figure PDFs).
+- [ ] If resubmission after prior reviews: attach prior review reports
+  verbatim plus a point-by-point response.
